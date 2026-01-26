@@ -13,5 +13,70 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.4</version>
+    </parent>
+
+    <!-- Các dependencies cần thiết cho dự án:
+     Cần cài nào thì lấy cái đó, không bỏ tràn lan vì cơ chế
+     auto-config của Spring Boot sẽ tự cấu hình khi detect được thư
+     viện được thêm vào dự án
+-->
+    <dependencies>
+
+        <!-- (Spring Boot + MVC + Thymeleaf + JDBC) -->
+        <dependency> <!-- JDBC Driver connect SQL Server -->
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>12.10.1.jre11</version>
+        </dependency>
+
+        <dependency> <!-- Spring Data -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>3.5.4</version>
+        </dependency>
+
+        <dependency> <!-- Spring MVC -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>3.5.4</version>
+        </dependency>
+
+        <dependency> <!-- Thymeleaf -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <version>3.5.4</version>
+        </dependency>
+
+        <!-- Devtool -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <version>3.5.4</version>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Authen/Authorization -->
+
+        <dependency> <!-- Spring Security -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>3.5.4</version>
+        </dependency>
+
+        <dependency> <!-- Thymeleaf Extras for Spring Security -->
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-springsecurity6</artifactId>
+            <version>3.1.2.RELEASE</version>
+        </dependency>
+
+    </dependencies>
+
+
+
 </project>
