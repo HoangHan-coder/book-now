@@ -14,12 +14,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.4</version>
-    </parent>
-
     <!-- Các dependencies cần thiết cho dự án:
      Cần cài nào thì lấy cái đó, không bỏ tràn lan vì cơ chế
      auto-config của Spring Boot sẽ tự cấu hình khi detect được thư
@@ -61,19 +55,19 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Authen/Authorization -->
+<!--        &lt;!&ndash; Authen/Authorization &ndash;&gt;-->
 
-        <dependency> <!-- Spring Security -->
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-            <version>3.5.4</version>
-        </dependency>
+<!--        <dependency> &lt;!&ndash; Spring Security &ndash;&gt;-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-security</artifactId>-->
+<!--            <version>3.5.4</version>-->
+<!--        </dependency>-->
 
-        <dependency> <!-- Thymeleaf Extras for Spring Security -->
-            <groupId>org.thymeleaf.extras</groupId>
-            <artifactId>thymeleaf-extras-springsecurity6</artifactId>
-            <version>3.1.2.RELEASE</version>
-        </dependency>
+<!--        <dependency> &lt;!&ndash; Thymeleaf Extras for Spring Security &ndash;&gt;-->
+<!--            <groupId>org.thymeleaf.extras</groupId>-->
+<!--            <artifactId>thymeleaf-extras-springsecurity6</artifactId>-->
+<!--            <version>3.1.2.RELEASE</version>-->
+<!--        </dependency>-->
 
     </dependencies>
 
