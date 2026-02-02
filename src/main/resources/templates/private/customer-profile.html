@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ cá nhân - BookNow</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+</head>
+
+<body class="bg-gray-50 font-sans text-gray-800 min-h-screen relative pt-24 pb-12">
+
+<!-- MAIN -->
+<div class="max-w-5xl mx-auto px-4 md:px-8">
+
+    <div class="flex flex-col lg:flex-row gap-8">
+
+        <!-- LEFT -->
+        <div class="w-full lg:w-1/3">
+            <div class="bg-white rounded-3xl shadow-lg p-8 text-center">
+
+                <!-- Avatar -->
+                <div class="w-32 h-32 mx-auto mb-4">
+                    <img th:src="${customerProfile.avatarUrl != null ? customerProfile.avatarUrl :
+        'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80'}"
+                            class="w-32 h-32 rounded-full object-cover border-4 border-white shadow"
+                            alt="Avatar"/>
+<!--                    <img src="/img/z7481825281286_fa899e399f343b7101288822f6c9a62d.jpg" class="w-32 h-32 rounded-full object-cover border-4 border-white shadow" alt="Avatar"/>-->
+
+                </div>
+
+                <!-- Name -->
+                <h2 class="text-2xl font-bold"
+                    th:text="${customerProfile.fullName}">
+
+                </h2>
+
+
+                <!-- Info -->
+                <div class="mt-6 text-sm text-left border-t pt-4">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Ngày tạo</span>
+                        <span th:text="${#temporals.format(customerProfile.createdAt, 'dd/MM/yyyy')}">
+
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="w-full lg:w-2/3">
+            <div class="bg-white rounded-3xl shadow-lg p-8">
+
+                <h3 class="text-xl font-bold mb-6">
+                    <i class="fa-regular fa-id-card text-blue-500"></i>
+                    Thông tin cá nhân
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Full name -->
+                    <div>
+                        <label class="text-xs text-gray-400 font-bold uppercase">Họ và tên</label>
+                        <div class="p-3 bg-gray-50 rounded-xl font-semibold"
+                             th:text="${customerProfile.fullName}">
+
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label class="text-xs text-gray-400 font-bold uppercase">Email</label>
+                        <div class="p-3 bg-gray-50 rounded-xl font-semibold"
+                             th:text="${customerProfile.email}">
+
+                        </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div>
+                        <label class="text-xs text-gray-400 font-bold uppercase">Số điện thoại</label>
+                        <div class="p-3 bg-gray-50 rounded-xl font-semibold"
+                             th:text="${customerProfile.phone}">
+
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <!-- Buttons -->
+                <div class="mt-10 flex gap-4">
+                    <a th:href="@{/user/profile/edit/{id}(id=${customerProfile.customerId})}"
+                       class="flex-1 text-center bg-blue-600 text-white py-3 rounded-xl font-bold">
+                        Cập nhật thông tin
+                    </a>
+
+                    <a th:href="@{/user/customer-change-password/{id}(id=${customerProfile.customerId})}"
+                       class="flex-1 text-center border py-3 rounded-xl font-bold">
+                        Đổi mật khẩu
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

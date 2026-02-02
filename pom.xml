@@ -64,17 +64,18 @@
 
 <!--        &lt;!&ndash; Authen/Authorization &ndash;&gt;-->
 
-<!--        <dependency> &lt;!&ndash; Spring Security &ndash;&gt;-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-security</artifactId>-->
-<!--            <version>3.5.4</version>-->
-<!--        </dependency>-->
+        <dependency> <!-- Spring Security -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>3.5.4</version>
+        </dependency>
 
 <!--        <dependency> &lt;!&ndash; Thymeleaf Extras for Spring Security &ndash;&gt;-->
 <!--            <groupId>org.thymeleaf.extras</groupId>-->
 <!--            <artifactId>thymeleaf-extras-springsecurity6</artifactId>-->
 <!--            <version>3.1.2.RELEASE</version>-->
 <!--        </dependency>-->
+
 
     </dependencies>
 
