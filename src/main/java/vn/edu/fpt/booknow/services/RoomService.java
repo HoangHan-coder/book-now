@@ -1,6 +1,10 @@
 package vn.edu.fpt.booknow.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import vn.edu.fpt.booknow.dto.RoomDTO;
 import vn.edu.fpt.booknow.entities.Room;
 import vn.edu.fpt.booknow.repositories.RoomRepo;
 
@@ -13,8 +17,9 @@ public class RoomService {
     public RoomService(RoomRepo roomRepo ){
         this.roomRepo = roomRepo;
     }
-    public List<Room> getAllRoomService( ){
-        List<Room> listRoom = roomRepo.findAll();
+    public Page<RoomDTO> getAllRoomService( ){
+        Pageable pageable =  PageRequest.of(0,3);
+        Page<RoomDTO> listRoom = roomRepo.findRoom(pageable);
         return listRoom;
     }
 }

@@ -20,7 +20,7 @@ public class RoomType {
     private String description;
 
     @Column(name = "base_price")
-    private Long basePrice;
+    private Double basePrice;
 
     @Column(name = "image_url")
     private String imageUrl;
