@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,13 +33,16 @@
             width: 8px;
             height: 8px;
         }
+
         ::-webkit-scrollbar-track {
             background: #f1f1f1;
         }
+
         ::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 4px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
@@ -54,7 +57,8 @@
 <body class="bg-gray-50 font-sans text-gray-800">
 
 <!-- === LOGO (Fixed Top-Left) === -->
-<div style="position: fixed; top: 25px; left: 25px; z-index: 100;" class="bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow-sm border border-white/50 transition-all hover:shadow-md">
+<div style="position: fixed; top: 25px; left: 25px; z-index: 100;"
+     class="bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow-sm border border-white/50 transition-all hover:shadow-md">
     <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
         <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100">
             <i class="fa-solid fa-house-chimney gradient-icon text-xl text-blue-600"></i>
@@ -67,7 +71,8 @@
 
 <!-- === AUTH BUTTONS (Fixed Top-Right) === -->
 <div style="position: fixed; top: 25px; right: 25px; z-index: 100;" class="flex items-center gap-3">
-    <button onclick="window.location.href='login_customer.html'" class="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white/90 backdrop-blur rounded-xl shadow-sm border border-white/50 hover:text-blue-600 hover:bg-white transition-all">
+    <button onclick="window.location.href='login_customer.html'"
+            class="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white/90 backdrop-blur rounded-xl shadow-sm border border-white/50 hover:text-blue-600 hover:bg-white transition-all">
         Đăng nhập
     </button>
     <button class="px-4 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-xl shadow-lg shadow-blue-500/30 hover:bg-blue-700 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
@@ -76,7 +81,7 @@
 </div>
 
 <!-- Main Container -->
-<div class="max-w-7xl mx-auto px-4 md:px-8 pt-32 pb-12">
+<div th:each="room : ${roomDetail}" class="max-w-7xl mx-auto px-4 md:px-8 pt-32 pb-12">
 
     <!-- Breadcrumb -->
     <nav class="flex mb-6 text-sm text-gray-500 pl-2">
@@ -106,7 +111,7 @@
                 <div class="p-6 md:p-8">
                     <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
                         <div>
-                            <h1 class="text-3xl font-bold text-gray-900 mb-2">Phòng Tiêu Chuẩn P.101</h1>
+                            <h1 class="text-3xl font-bold text-gray-900 mb-2" th:text="${room.getName()}"></h1>
                             <p class="text-gray-500 flex items-center gap-2">
                                 <i class="fa-solid fa-location-dot text-blue-500"></i>
                                 Tầng 1, Khu A, View vườn
@@ -115,7 +120,8 @@
                         <div class="text-right">
                             <div class="bg-blue-50 px-4 py-2 rounded-lg border border-blue-100 inline-block">
                                 <span class="block text-xs text-gray-500">Số người tối đa</span>
-                                <span class="text-lg font-bold text-blue-700"><i class="fa-solid fa-user-group mr-1"></i> 2 Người</span>
+                                <span class="text-lg font-bold text-blue-700"><i
+                                        class="fa-solid fa-user-group mr-1"></i> 2 Người</span>
                             </div>
                         </div>
                     </div>
@@ -135,25 +141,17 @@
                     <!-- Description -->
                     <div class="mb-6">
                         <h3 class="text-lg font-bold text-gray-800 mb-3">Mô tả phòng</h3>
-                        <p class="text-gray-600 leading-relaxed mb-4">
-                            Phòng được thiết kế theo phong cách hiện đại, tối giản nhưng đầy đủ tiện nghi.
-                            Không gian thoáng đãng với cửa sổ lớn nhìn ra khu vườn xanh mát, mang lại cảm giác thư thái tuyệt đối.
-                            Hệ thống cách âm tốt đảm bảo sự riêng tư cho quý khách.
-                        </p>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <div class="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 p-2 rounded-lg">
-                                <i class="fa-solid fa-wifi text-blue-500"></i> Wifi tốc độ cao
-                            </div>
-                            <div class="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 p-2 rounded-lg">
-                                <i class="fa-solid fa-snowflake text-blue-500"></i> Máy lạnh
-                            </div>
-                            <div class="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 p-2 rounded-lg">
-                                <i class="fa-solid fa-tv text-blue-500"></i> Smart TV
-                            </div>
-                            <div class="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 p-2 rounded-lg">
-                                <i class="fa-solid fa-bath text-blue-500"></i> Nóng lạnh
+                        <p class="text-gray-600 leading-relaxed mb-4" th:text="${room.getDescription()}"></p>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                            <div th:each="icon : ${room.amenityList}"
+                                 class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 shadow-sm hover:border-blue-400 hover:bg-blue-50 transition">
+                                <img th:src="${icon.iconUrl}"
+                                     alt=""
+                                     class="w-5 h-5 object-contain"/>
+                                <span th:text="${icon.name}" class="truncate"></span>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -169,13 +167,20 @@
                         <!-- Header Days -->
                         <div class="grid grid-cols-8 gap-1 mb-2 text-center">
                             <div class="p-2 text-xs font-bold text-gray-400 uppercase">Slot</div>
-                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700">T2<br><span class="text-xs font-normal">24/6</span></div>
-                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700">T3<br><span class="text-xs font-normal">25/6</span></div>
-                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700">T4<br><span class="text-xs font-normal">26/6</span></div>
-                            <div class="bg-blue-100 p-2 rounded text-sm font-semibold text-blue-800 ring-2 ring-blue-200">T5<br><span class="text-xs font-normal">Hôm nay</span></div>
-                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700">T6<br><span class="text-xs font-normal">28/6</span></div>
-                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700">T7<br><span class="text-xs font-normal">29/6</span></div>
-                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700 text-red-500">CN<br><span class="text-xs font-normal">30/6</span></div>
+                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700">T2<br><span
+                                    class="text-xs font-normal">24/6</span></div>
+                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700">T3<br><span
+                                    class="text-xs font-normal">25/6</span></div>
+                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700">T4<br><span
+                                    class="text-xs font-normal">26/6</span></div>
+                            <div class="bg-blue-100 p-2 rounded text-sm font-semibold text-blue-800 ring-2 ring-blue-200">
+                                T5<br><span class="text-xs font-normal">Hôm nay</span></div>
+                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700">T6<br><span
+                                    class="text-xs font-normal">28/6</span></div>
+                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700">T7<br><span
+                                    class="text-xs font-normal">29/6</span></div>
+                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700 text-red-500">CN<br><span
+                                    class="text-xs font-normal">30/6</span></div>
                         </div>
 
                         <!-- Slots Rows -->
@@ -183,56 +188,134 @@
                             <!-- Slot 1: 10:30 - 13:30 (150k) -->
                             <div class="grid grid-cols-8 gap-1 items-center">
                                 <div class="text-xs font-bold text-gray-500 text-center">Slot 1<br>10:30 - 13:30</div>
-                                <button onclick="toggleSlot(this, 'T2 24/6 - Slot 1', 150000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">Trống</button>
-                                <button onclick="toggleSlot(this, 'T3 25/6 - Slot 1', 150000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">Trống</button>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed" disabled>Đã đặt</button>
-                                <button onclick="toggleSlot(this, 'T5 27/6 - Slot 1', 150000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition ring-1 ring-green-400 cursor-pointer">Trống</button>
-                                <button onclick="toggleSlot(this, 'T6 28/6 - Slot 1', 150000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">Trống</button>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed" disabled>Đã đặt</button>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed" disabled>Đã đặt</button>
+                                <button onclick="toggleSlot(this, 'T2 24/6 - Slot 1', 150000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
+                                    Trống
+                                </button>
+                                <button onclick="toggleSlot(this, 'T3 25/6 - Slot 1', 150000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
+                                    Trống
+                                </button>
+                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
+                                        disabled>Đã đặt
+                                </button>
+                                <button onclick="toggleSlot(this, 'T5 27/6 - Slot 1', 150000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition ring-1 ring-green-400 cursor-pointer">
+                                    Trống
+                                </button>
+                                <button onclick="toggleSlot(this, 'T6 28/6 - Slot 1', 150000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
+                                    Trống
+                                </button>
+                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
+                                        disabled>Đã đặt
+                                </button>
+                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
+                                        disabled>Đã đặt
+                                </button>
                             </div>
 
                             <!-- Slot 2: 14:00 - 17:00 (150k) -->
                             <div class="grid grid-cols-8 gap-1 items-center">
                                 <div class="text-xs font-bold text-gray-500 text-center">Slot 2<br>14:00 - 17:00</div>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed" disabled>Đã đặt</button>
-                                <button onclick="toggleSlot(this, 'T3 25/6 - Slot 2', 150000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">Trống</button>
-                                <button onclick="toggleSlot(this, 'T4 26/6 - Slot 2', 150000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">Trống</button>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed" disabled>Đã đặt</button>
-                                <button onclick="toggleSlot(this, 'T6 28/6 - Slot 2', 150000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">Trống</button>
-                                <button onclick="toggleSlot(this, 'T7 29/6 - Slot 2', 150000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">Trống</button>
-                                <button onclick="toggleSlot(this, 'CN 30/6 - Slot 2', 150000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">Trống</button>
+                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
+                                        disabled>Đã đặt
+                                </button>
+                                <button onclick="toggleSlot(this, 'T3 25/6 - Slot 2', 150000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
+                                    Trống
+                                </button>
+                                <button onclick="toggleSlot(this, 'T4 26/6 - Slot 2', 150000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
+                                    Trống
+                                </button>
+                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
+                                        disabled>Đã đặt
+                                </button>
+                                <button onclick="toggleSlot(this, 'T6 28/6 - Slot 2', 150000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
+                                    Trống
+                                </button>
+                                <button onclick="toggleSlot(this, 'T7 29/6 - Slot 2', 150000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
+                                    Trống
+                                </button>
+                                <button onclick="toggleSlot(this, 'CN 30/6 - Slot 2', 150000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
+                                    Trống
+                                </button>
                             </div>
 
                             <!-- Slot 3: 17:30 - 20:30 (150k) -->
                             <div class="grid grid-cols-8 gap-1 items-center">
                                 <div class="text-xs font-bold text-gray-500 text-center">Slot 3<br>17:30 - 20:30</div>
-                                <button onclick="toggleSlot(this, 'T2 24/6 - Slot 3', 150000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">Trống</button>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed" disabled>Đã đặt</button>
-                                <button onclick="toggleSlot(this, 'T4 26/6 - Slot 3', 150000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">Trống</button>
-                                <button onclick="toggleSlot(this, 'T5 27/6 - Slot 3', 150000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition ring-1 ring-green-400 cursor-pointer">Trống</button>
-                                <button onclick="toggleSlot(this, 'T6 28/6 - Slot 3', 150000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">Trống</button>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed" disabled>Đã đặt</button>
-                                <button onclick="toggleSlot(this, 'CN 30/6 - Slot 3', 150000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">Trống</button>
+                                <button onclick="toggleSlot(this, 'T2 24/6 - Slot 3', 150000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
+                                    Trống
+                                </button>
+                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
+                                        disabled>Đã đặt
+                                </button>
+                                <button onclick="toggleSlot(this, 'T4 26/6 - Slot 3', 150000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
+                                    Trống
+                                </button>
+                                <button onclick="toggleSlot(this, 'T5 27/6 - Slot 3', 150000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition ring-1 ring-green-400 cursor-pointer">
+                                    Trống
+                                </button>
+                                <button onclick="toggleSlot(this, 'T6 28/6 - Slot 3', 150000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
+                                    Trống
+                                </button>
+                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
+                                        disabled>Đã đặt
+                                </button>
+                                <button onclick="toggleSlot(this, 'CN 30/6 - Slot 3', 150000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
+                                    Trống
+                                </button>
                             </div>
 
                             <!-- Qua đêm: 21:00 - 9:30 (500k) -->
                             <div class="grid grid-cols-8 gap-1 items-center">
                                 <div class="text-xs font-bold text-gray-500 text-center">Qua đêm<br>21:00 - 09:30</div>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed" disabled>Đã đặt</button>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed" disabled>Đã đặt</button>
-                                <button onclick="toggleSlot(this, 'T4 26/6 - Qua đêm', 500000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">Trống</button>
-                                <button onclick="toggleSlot(this, 'T5 27/6 - Qua đêm', 500000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition ring-1 ring-green-400 cursor-pointer">Trống</button>
-                                <button onclick="toggleSlot(this, 'T6 28/6 - Qua đêm', 500000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">Trống</button>
-                                <button onclick="toggleSlot(this, 'T7 29/6 - Qua đêm', 500000)" class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">Trống</button>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed" disabled>Đã đặt</button>
+                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
+                                        disabled>Đã đặt
+                                </button>
+                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
+                                        disabled>Đã đặt
+                                </button>
+                                <button onclick="toggleSlot(this, 'T4 26/6 - Qua đêm', 500000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
+                                    Trống
+                                </button>
+                                <button onclick="toggleSlot(this, 'T5 27/6 - Qua đêm', 500000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition ring-1 ring-green-400 cursor-pointer">
+                                    Trống
+                                </button>
+                                <button onclick="toggleSlot(this, 'T6 28/6 - Qua đêm', 500000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
+                                    Trống
+                                </button>
+                                <button onclick="toggleSlot(this, 'T7 29/6 - Qua đêm', 500000)"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
+                                    Trống
+                                </button>
+                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
+                                        disabled>Đã đặt
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="mt-4 flex gap-4 text-xs text-gray-500 justify-end">
-                    <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-green-100 border border-green-200"></span> Còn trống</div>
-                    <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-600 border border-blue-600"></span> Đang chọn</div>
+                    <div class="flex items-center gap-1"><span
+                            class="w-3 h-3 rounded bg-green-100 border border-green-200"></span> Còn trống
+                    </div>
+                    <div class="flex items-center gap-1"><span
+                            class="w-3 h-3 rounded bg-blue-600 border border-blue-600"></span> Đang chọn
+                    </div>
                     <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-gray-200"></span> Đã đặt</div>
                 </div>
             </div>
@@ -247,7 +330,8 @@
                 <form class="space-y-5">
 
                     <!-- Selected Slots Display -->
-                    <div id="selected-slots-container" class="hidden bg-blue-50 p-4 rounded-xl border border-blue-100 transition-all">
+                    <div id="selected-slots-container"
+                         class="hidden bg-blue-50 p-4 rounded-xl border border-blue-100 transition-all">
                         <h3 class="text-xs font-bold text-blue-700 mb-2 uppercase tracking-wide flex justify-between">
                             Slot đang chọn:
                         </h3>
@@ -264,24 +348,28 @@
 
                     <!-- Họ tên -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Họ và tên <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Họ và tên <span
+                                class="text-red-500">*</span></label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                                 <i class="fa-regular fa-user"></i>
                             </div>
-                            <input type="text" placeholder="Nguyễn Văn A" class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm">
+                            <input type="text" placeholder="Nguyễn Văn A"
+                                   class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm">
                         </div>
                     </div>
 
                     <!-- SĐT & Email -->
                     <div class="grid grid-cols-1 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Số điện thoại <span class="text-red-500">*</span></label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Số điện thoại <span
+                                    class="text-red-500">*</span></label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                                     <i class="fa-solid fa-phone"></i>
                                 </div>
-                                <input type="tel" placeholder="09xxxxxxx" class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm">
+                                <input type="tel" placeholder="09xxxxxxx"
+                                       class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm">
                             </div>
                         </div>
                         <div>
@@ -290,14 +378,16 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                                     <i class="fa-regular fa-envelope"></i>
                                 </div>
-                                <input type="email" placeholder="example@mail.com" class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm">
+                                <input type="email" placeholder="example@mail.com"
+                                       class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm">
                             </div>
                         </div>
                     </div>
 
                     <!-- Upload CCCD -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Ảnh CCCD/CMND (2 mặt) <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Ảnh CCCD/CMND (2 mặt) <span
+                                class="text-red-500">*</span></label>
                         <div class="grid grid-cols-2 gap-3">
                             <!-- Mặt trước -->
                             <div class="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors group">
@@ -317,19 +407,23 @@
                     <!-- Note -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1.5">Ghi chú</label>
-                        <textarea rows="2" placeholder="Yêu cầu đặc biệt..." class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm"></textarea>
+                        <textarea rows="2" placeholder="Yêu cầu đặc biệt..."
+                                  class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm"></textarea>
                     </div>
 
                     <!-- Terms -->
                     <div class="flex items-start gap-3 mt-2">
-                        <input type="checkbox" id="terms" class="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                        <input type="checkbox" id="terms"
+                               class="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
                         <label for="terms" class="text-xs text-gray-500 cursor-pointer">
-                            Tôi đồng ý với <a href="#" class="text-blue-600 hover:underline">điều khoản sử dụng</a> và <a href="#" class="text-blue-600 hover:underline">chính sách bảo mật</a> của BookNow.
+                            Tôi đồng ý với <a href="#" class="text-blue-600 hover:underline">điều khoản sử dụng</a> và
+                            <a href="#" class="text-blue-600 hover:underline">chính sách bảo mật</a> của BookNow.
                         </label>
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 mt-4">
+                    <button type="button"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 mt-4">
                         Xác nhận Đặt phòng
                     </button>
 
@@ -352,7 +446,7 @@
 
     // Helper to format currency
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(amount);
     };
 
     function toggleSlot(btn, slotName, price) {

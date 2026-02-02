@@ -15,15 +15,12 @@ import java.util.List;
 public class Amenity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "amenity_id")
     private Long amenityId;
 
     private String name;
 
-    @Column(name = "icon_url")
     private String iconUrl;
 
-    @Column(name = "is_deleted")
     private Boolean isDeleted;
 
     @OneToMany(mappedBy = "amenity")

@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import vn.edu.fpt.booknow.dto.RoomDTO;
 import vn.edu.fpt.booknow.dto.SearchDTO;
+import vn.edu.fpt.booknow.entities.Amenity;
 import vn.edu.fpt.booknow.entities.Room;
+import vn.edu.fpt.booknow.repositories.AmenityRepo;
 import vn.edu.fpt.booknow.services.RoomService;
 
 import java.util.List;
@@ -19,11 +21,13 @@ public class HomePageController {
         this.roomService = roomService;
     }
     @GetMapping("/homepage")
-    public String HomePage(Model model) {
+    public String getHomePage(Model model) {
         SearchDTO searchDTO = new SearchDTO();
         Page<RoomDTO> list = roomService.getAllRoomService();
+        List<Amenity> amenities = roomService.getAllAmenity();
         model.addAttribute("rooms",list);
         model.addAttribute("search",searchDTO);
+        model.addAttribute("amenities", amenities);
         return "public/HomePage";
     }
 }

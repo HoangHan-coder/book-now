@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=more_horiz"/>
     <script>
         tailwind.config = {
             theme: {
@@ -93,16 +94,18 @@
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 pb-24">
 
-<!-- LOGO (Fixed Position) -->
-<div class="logo-fixed flex items-center gap-3 select-none cursor-pointer" onclick="window.location.href='index.html'">
-    <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
-        <i class="fa-solid fa-house-chimney gradient-icon text-xl text-blue-600"></i>
+<a th:href="@{/homepage}">
+    <!-- LOGO (Fixed Position) -->
+    <div class="logo-fixed flex items-center gap-3 select-none cursor-pointer" >
+        <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
+            <i class="fa-solid fa-house-chimney gradient-icon text-xl text-blue-600"></i>
+        </div>
+        <div class="flex flex-col justify-center">
+            <span class="text-2xl font-extrabold tracking-tight text-white leading-none drop-shadow-md">BookNow</span>
+            <span class="text-[10px] text-gray-100 font-medium uppercase tracking-wider pl-0.5 drop-shadow-sm">Homestay System</span>
+        </div>
     </div>
-    <div class="flex flex-col justify-center">
-        <span class="text-2xl font-extrabold tracking-tight text-white leading-none drop-shadow-md">BookNow</span>
-        <span class="text-[10px] text-gray-100 font-medium uppercase tracking-wider pl-0.5 drop-shadow-sm">Homestay System</span>
-    </div>
-</div>
+</a>
 
 <!-- NAVBAR (Transparent Full Width) -->
 <nav class="fixed top-0 left-0 w-full flex justify-end items-center px-8 py-6 z-50 bg-gradient-to-b from-black/50 to-transparent transition-all duration-300"
@@ -175,21 +178,33 @@
 <!-- SEARCH & FILTER BAR -->
 <div class="max-w-6xl mx-auto px-4 -mt-24 relative z-20">
     <div class="bg-white rounded-2xl shadow-xl p-6 border border-gray-100" th:object="${search}">
-        <form class="grid grid-cols-1 md:grid-cols-12 gap-4" th:action="@{/search}" method="post">
+        <form class="bg-white rounded-2xl shadow-sm p-4 md:p-6 grid grid-cols-1 md:grid-cols-12 gap-4"
+              th:action="@{/search}" method="post">
+
             <!-- Search Input -->
             <div class="md:col-span-4">
-                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Tìm kiếm</label>
+                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
+                    Tìm kiếm
+                </label>
                 <div class="relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400"></i>
-                    <input th:field="*{keyword}" type="text" placeholder="Tên phòng, loại phòng..."
-                           class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow">
+                    <input th:field="*{keyword}" type="text"
+                           placeholder="Tên phòng, loại phòng..."
+                           class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl
+                          focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
                 </div>
             </div>
+
             <!-- Location -->
             <div class="md:col-span-2">
-                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Khu vực</label>
+                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
+                    Khu vực
+                </label>
                 <div class="relative">
-                    <select class="w-full pl-3 pr-8 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white cursor-pointer">
+                    <select th:field="*{area}"
+                            class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl
+                           focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none
+                           appearance-none bg-white cursor-pointer">
                         <option value="">Tất cả</option>
                         <option value="khu-a">Khu A (Vườn)</option>
                         <option value="khu-b">Khu B (Hồ bơi)</option>
@@ -198,24 +213,35 @@
                     <i class="fa-solid fa-chevron-down absolute right-3 top-3.5 text-xs text-gray-400 pointer-events-none"></i>
                 </div>
             </div>
+
             <!-- Guests -->
             <div class="md:col-span-2">
-                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Số khách</label>
+                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
+                    Số khách
+                </label>
                 <div class="relative">
-                    <select class="w-full pl-3 pr-8 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white cursor-pointer">
+                    <select th:field="*{maxGuest}"
+                            class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl
+                           focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none
+                           appearance-none bg-white cursor-pointer">
                         <option value="1">1 Người</option>
-                        <option value="2" selected>2 Người</option>
+                        <option value="2" selected >2 Người</option>
                         <option value="4">4 Người</option>
-                        <option value="family">Gia đình</option>
                     </select>
                     <i class="fa-solid fa-user-group absolute right-3 top-3.5 text-xs text-gray-400 pointer-events-none"></i>
                 </div>
             </div>
+
             <!-- Price Range -->
             <div class="md:col-span-2">
-                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Mức giá</label>
+                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
+                    Mức giá
+                </label>
                 <div class="relative">
-                    <select class="w-full pl-3 pr-8 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white cursor-pointer">
+                    <select th:field="*{price}"
+                            class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl
+                           focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none
+                           appearance-none bg-white cursor-pointer">
                         <option value="">Tất cả</option>
                         <option value="low">&lt; 300k</option>
                         <option value="mid">300k - 800k</option>
@@ -224,31 +250,45 @@
                     <i class="fa-solid fa-chevron-down absolute right-3 top-3.5 text-xs text-gray-400 pointer-events-none"></i>
                 </div>
             </div>
+
             <!-- Search Button -->
             <div class="md:col-span-2 flex items-end">
                 <button type="submit"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg transition-colors shadow-md flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-filter"></i> Tìm phòng
+                        class="w-full h-[42px] bg-blue-600 hover:bg-blue-700
+                       text-white text-sm font-semibold rounded-xl
+                       flex items-center justify-center gap-2
+                       transition shadow-sm">
+                    <i class="fa-solid fa-filter"></i>
+                    Tìm phòng
                 </button>
             </div>
-        </form>
 
-        <!-- Advanced Tags (Amenities) -->
-        <div class="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
-            <span class="text-xs font-semibold text-gray-500 mr-2 self-center">Tiện nghi:</span>
-            <label class="inline-flex items-center px-3 py-1 rounded-full border border-gray-200 bg-gray-50 text-xs cursor-pointer hover:border-blue-300 hover:bg-blue-50 transition-colors">
-                <input type="checkbox" class="mr-1.5 text-blue-600 rounded focus:ring-blue-500"> Wifi
-            </label>
-            <label class="inline-flex items-center px-3 py-1 rounded-full border border-gray-200 bg-gray-50 text-xs cursor-pointer hover:border-blue-300 hover:bg-blue-50 transition-colors">
-                <input type="checkbox" class="mr-1.5 text-blue-600 rounded focus:ring-blue-500"> Máy lạnh
-            </label>
-            <label class="inline-flex items-center px-3 py-1 rounded-full border border-gray-200 bg-gray-50 text-xs cursor-pointer hover:border-blue-300 hover:bg-blue-50 transition-colors">
-                <input type="checkbox" class="mr-1.5 text-blue-600 rounded focus:ring-blue-500"> Ban công
-            </label>
-            <label class="inline-flex items-center px-3 py-1 rounded-full border border-gray-200 bg-gray-50 text-xs cursor-pointer hover:border-blue-300 hover:bg-blue-50 transition-colors">
-                <input type="checkbox" class="mr-1.5 text-blue-600 rounded focus:ring-blue-500"> Bếp
-            </label>
-        </div>
+            <!-- Amenities -->
+            <div class="md:col-span-12 mt-2 pt-4 border-t border-gray-100 flex flex-wrap items-center gap-2">
+        <span class="text-xs font-semibold text-gray-500 mr-2">
+            Tiện nghi:
+        </span>
+                <label th:each="a,start : ${amenities}"
+                       th:classappend="${start.index >= 3} ? 'hidden' : ''"
+                       class="amenityIds-item flex items-center gap-1 px-3 py-1.5
+                      rounded-full border border-gray-200 bg-gray-50
+                      text-xs cursor-pointer
+                      hover:border-blue-400 hover:bg-blue-50 transition">
+
+                    <input type="checkbox"
+                           name="amenity"
+                           th:value="${a.getName()}"
+                           class="text-blue-600 rounded focus:ring-blue-500">
+
+                    <span th:text="${a.name}"></span>
+                </label>
+
+                <span id="amenity"
+                      class="material-symbols-outlined text-gray-400 cursor-pointer hover:text-blue-500 transition">
+            more_horiz
+        </span>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -338,10 +378,11 @@
             <div th:each="room : ${rooms}">
                 <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 group">
                     <div class="relative h-56 overflow-hidden">
-                        <img th:src="${room.getImage_url()}"
+                        <img th:src="${room.getImageUrl()}"
                              alt="Room"
                              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div th:text="${room.getName()}" class="absolute top-3 left-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-xs font-bold text-gray-800 shadow-sm">
+                        <div th:text="${room.getName()}"
+                             class="absolute top-3 left-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-xs font-bold text-gray-800 shadow-sm">
 
                         </div>
                         <div class="absolute bottom-3 right-3 bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">
@@ -352,16 +393,19 @@
                             Phòng Tiêu Chuẩn P.101</h3>
                         <p class="text-sm text-gray-500 mb-4 line-clamp-2" th:text="${room.getDescription()}">.</p>
                         <div class="flex items-center gap-3 text-xs text-gray-500 mb-4">
-                            <span class="flex items-center" ><i class="fa-solid fa-user-group mr-1.5" ></i> <span th:text="${room.getMax_guest()}"></span> Khách</span>
-                            <span class="flex items-center"><i class="fa-solid fa-wifi mr-1.5"></i> <span th:text="${room.getUtilities()}"></span></span>
+                            <span class="flex items-center"><i class="fa-solid fa-user-group mr-1.5"></i> <span
+                                    th:text="${room.getMaxGuest()}"></span> Khách</span>
+                            <span class="flex items-center"><i class="fa-solid fa-wifi mr-1.5"></i> <span
+                                    th:text="${room.getUtilities()}"></span></span>
                         </div>
                         <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                             <div>
                                 <p class="text-xs text-gray-400">Giá từ</p>
-                                <p class="text-lg font-bold text-blue-600" > <span th:text="${#numbers.formatDecimal(room.getBase_price(),0,'POINT',0,'COMMA') + ' đ'}"></span><span
+                                <p class="text-lg font-bold text-blue-600"><span
+                                        th:text="${#numbers.formatDecimal(room.getBasePrice(),0,'POINT',0,'COMMA') + ' đ'}"></span><span
                                         class="text-xs font-normal text-gray-500">/ slot</span></p>
                             </div>
-                            <a th:href="@{/detail/{id}(id=${room.getRoom_id()})}">
+                            <a th:href="@{/detail/{id}(id=${room.getRoomId()})}">
                                 <button class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">
                                     Chi tiết
                                 </button>
@@ -462,6 +506,19 @@
 
 <!-- SCRIPT -->
 <script>
+    // Amenity
+    const amenity = document.querySelectorAll(".amenityIds-item");
+    const iconAmenity = document.getElementById("amenity");
+    let expanded = false;
+    iconAmenity.addEventListener("click", () => {
+        expanded = !expanded;
+        amenity.forEach((item, index) => {
+            if (index >= 3) {
+                item.classList.toggle("hidden", expanded);
+            }
+        });
+
+    })
     // Profile Dropdown Logic
     const profileBtn = document.getElementById('profileBtn');
     const profileDropdown = document.getElementById('profileDropdown');

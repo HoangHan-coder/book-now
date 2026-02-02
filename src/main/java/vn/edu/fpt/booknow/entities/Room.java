@@ -14,19 +14,15 @@ import java.util.List;
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "room_id")
     private Long roomId;
 
     @ManyToOne
     @JoinColumn(name = "room_type_id")
     private RoomType roomType;
 
-    @Column(name = "room_number")
     private String roomNumber;
 
     private String status;
-
-    @Column(name = "is_deleted")
     private Boolean isDeleted;
 
     @OneToMany(mappedBy = "room")

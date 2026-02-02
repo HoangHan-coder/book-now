@@ -14,6 +14,6 @@ public class SearchDTO {
     private String keyword;
     private String area;
     private Integer maxGuest;
-    private BigDecimal price;
+    private String price;
     private List<String> amenity;
 }
