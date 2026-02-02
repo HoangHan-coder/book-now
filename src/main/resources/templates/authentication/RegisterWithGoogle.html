@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký - BookNow</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            light: '#60a5fa', // blue-400
+                            DEFAULT: '#3b82f6', // blue-500
+                            dark: '#2563eb', // blue-600
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Specific Logo Positioning Rule */
+        .logo-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin-top: 25px;
+            margin-left: 25px;
+            z-index: 50;
+        }
+
+        /* Subtle background pattern */
+        body {
+            background-color: #f3f4f6;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        .google-btn:hover {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center font-sans text-gray-800 relative p-4">
+
+<!-- LOGO (Fixed Position) -->
+<div class="logo-fixed flex items-center gap-3 select-none cursor-pointer" onclick="window.location.href='customer_login.html'">
+    <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
+        <i class="fa-solid fa-house-chimney gradient-icon text-xl text-blue-600"></i>
+    </div>
+    <div class="flex flex-col justify-center">
+        <span class="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-blue-600 leading-none">BookNow</span>
+        <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider pl-0.5">Homestay System</span>
+    </div>
+</div>
+
+<!-- REGISTER CARD -->
+<div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+
+    <!-- Header -->
+    <div class="px-8 pt-10 pb-6 text-center">
+        <h2 class="text-2xl font-bold text-gray-800">Tạo tài khoản mới</h2>
+        <p class="text-sm text-gray-500 mt-2">Nhập email của bạn để bắt đầu hành trình</p>
+    </div>
+
+    <!-- Form -->
+    <div class="px-8 pb-8">
+        <form id="registerStep1Form" class="space-y-6" novalidate>
+
+            <!-- Email Field -->
+            <div class="space-y-1">
+                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-regular fa-envelope text-gray-400"></i>
+                    </div>
+                    <input type="email" id="email" name="email"
+                           class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 sm:text-sm"
+                           placeholder="name@example.com">
+                </div>
+                <p id="emailError" class="hidden text-xs text-red-500 mt-1 flex items-center">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Email không hợp lệ hoặc đã tồn tại.
+                </p>
+            </div>
+
+            <!-- Main Button -->
+            <button type="submit" id="submitBtn"
+                    class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:-translate-y-0.5">
+                <span id="btnText">Tiếp tục đăng ký</span>
+                <i id="btnLoader" class="fa-solid fa-circle-notch fa-spin ml-2 hidden"></i>
+            </button>
+
+            <!-- Divider -->
+            <div class="relative py-2">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-200"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">Hoặc</span>
+                </div>
+            </div>
+
+            <!-- Google Button -->
+            <a th:href="@{/oauth2/authorization/google}">
+                <button type="button" class="w-full flex justify-center items-center gap-3 py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 google-btn transition-colors duration-200">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5">
+                    Đăng ký với Google
+                </button>
+            </a>
+
+
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-8 py-4 bg-gray-50 border-t border-gray-100 text-center">
+        <p class="text-sm text-gray-600">
+            Đã có tài khoản?
+            <a href="customer_login.html" class="font-semibold text-blue-600 hover:text-blue-500 hover:underline">Đăng nhập</a>
+        </p>
+    </div>
+</div>
+
+<!-- SCRIPT -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('registerStep1Form');
+        const emailInput = document.getElementById('email');
+        const emailError = document.getElementById('emailError');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoader = document.getElementById('btnLoader');
+
+        // Input Focus Logic (Remove errors)
+        emailInput.addEventListener('input', () => {
+            emailError.classList.add('hidden');
+            emailInput.classList.remove('border-red-300', 'focus:ring-red-200');
+            emailInput.classList.add('border-gray-300', 'focus:ring-blue-500');
+        });
+
+        // Form Submission
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let isValid = true;
+
+            // Validate Email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailInput.value.trim() || !emailRegex.test(emailInput.value)) {
+                emailError.textContent = "Vui lòng nhập địa chỉ email hợp lệ.";
+                emailError.classList.remove('hidden');
+                emailInput.classList.add('border-red-300', 'focus:ring-red-200');
+                isValid = false;
+            }
+
+            if (isValid) {
+                simulateCheckEmail();
+            }
+        });
+
+        function simulateCheckEmail() {
+            // UI Loading State
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
+            btnText.textContent = "Đang kiểm tra...";
+            btnLoader.classList.remove('hidden');
+
+            setTimeout(() => {
+                // Simulate "Email already exists" for a specific case
+                if (emailInput.value === 'exist@booknow.com') {
+                    emailError.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i> Email này đã được sử dụng. <a href="customer_login.html" class="underline">Đăng nhập?</a>';
+                    emailError.classList.remove('hidden');
+                    emailInput.classList.add('border-red-300', 'focus:ring-red-200');
+
+                    // Reset Button
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                    btnText.textContent = "Tiếp tục đăng ký";
+                    btnLoader.classList.add('hidden');
+                } else {
+                    // Success -> Proceed to next step (Simulated)
+                    alert(`Email hợp lệ! Chuyển sang bước nhập thông tin...`);
+
+                    // Reset for demo purposes
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                    btnText.textContent = "Tiếp tục đăng ký";
+                    btnLoader.classList.add('hidden');
+                }
+            }, 1000);
+        }
+    });
+</script>
+</body>
+</html>
