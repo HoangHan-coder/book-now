@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập Admin/Staff - BookNow</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            light: '#60a5fa', // blue-400
+                            DEFAULT: '#3b82f6', // blue-500
+                            dark: '#2563eb', // blue-600
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Custom Styles for specific positioning requirements */
+        .logo-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin-top: 25px;
+            margin-left: 25px;
+            z-index: 50; /* Ensure it stays on top */
+        }
+
+        /* Subtle background pattern */
+        body {
+            background-color: #f3f4f6;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-icon {
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center font-sans text-gray-800 relative">
+
+    <!-- LOGO SECTION (Fixed Position as required) -->
+    <div class="logo-fixed flex items-center gap-3 select-none">
+        <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
+            <i class="fa-solid fa-house-chimney gradient-icon text-xl"></i>
+        </div>
+        <div class="flex flex-col justify-center">
+            <span class="text-2xl font-extrabold tracking-tight gradient-text leading-none">BookNow</span>
+            <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider pl-0.5">Homestay System</span>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT CARD -->
+    <div class="w-full max-w-md p-4">
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            
+            <!-- Card Header -->
+            <div class="px-8 pt-10 pb-6 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+                    <i class="fa-solid fa-user-shield text-2xl text-blue-500"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Đăng nhập hệ thống</h2>
+                <p class="text-sm text-gray-500 mt-2">Dành cho Quản trị viên & Nhân viên</p>
+            </div>
+
+            <!-- Form -->
+            <div class="px-8 pb-10">
+                <form id="loginForm" class="space-y-5" novalidate th:action="@{/admin/login}" method="post">
+                    
+                    <!-- Email Field -->
+                    <div class="space-y-1">
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa-regular fa-envelope text-gray-400"></i>
+                            </div>
+                            <input type="email" id="email" name="email" 
+                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 sm:text-sm" 
+                                placeholder="Nhập email">
+                        </div>
+                        <p id="emailError" class="hidden text-xs text-red-500 mt-1 flex items-center">
+                            <i class="fa-solid fa-circle-exclamation mr-1"></i> Vui lòng nhập địa chỉ email hợp lệ.
+                        </p>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="space-y-1">
+                        <label for="password" class="block text-sm font-medium text-gray-700">Mật khẩu</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-lock text-gray-400"></i>
+                            </div>
+                            <input type="password" id="password" name="password" 
+                                class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 sm:text-sm" 
+                                placeholder="Nhập mật khẩu">
+                            <!-- Toggle Password Visibility -->
+                            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer focus:outline-none">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                        <p id="passwordError" class="hidden text-xs text-red-500 mt-1 flex items-center">
+                            <i class="fa-solid fa-circle-exclamation mr-1"></i> Vui lòng nhập mật khẩu.
+                        </p>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="submitBtn"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:-translate-y-0.5">
+                        <span id="btnText">Đăng nhập</span>
+                        <i id="btnLoader" class="fa-solid fa-circle-notch fa-spin ml-2 hidden"></i>
+                    </button>
+                    <div class="flex items-center justify-between bg-[#f9f9f9] border border-[#d3d3d3] rounded p-3 w-full sm:w-[304px]">
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="recaptcha-check" class="w-6 h-6 border-2 border-[#c1c1c1] rounded-sm cursor-pointer accent-blue-600">
+                        <label for="recaptcha-check" class="text-sm font-medium text-gray-700 cursor-pointer select-none">I'm not a robot</label>
+                    </div>
+                    <div class="flex flex-col items-center ml-4">
+                        <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" class="w-8 h-8 opacity-50" alt="reCAPTCHA">
+                        <div class="text-[10px] text-gray-500">reCAPTCHA</div>
+                        <div class="text-[8px] text-gray-400 whitespace-nowrap">
+                            <a href="#" class="hover:underline">Privacy</a> - <a href="#" class="hover:underline">Terms</a>
+                        </div>
+                    </div>
+                </div>
+                </form>
+            </div>
+            
+            <!-- Footer/Help -->
+            <div class="bg-gray-50 px-8 py-4 border-t border-gray-100 flex justify-center">
+                <p class="text-xs text-gray-500">
+                    Cần hỗ trợ? Liên hệ <a href="#" class="text-blue-600 hover:underline font-medium">IT Support</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Validation and Interaction -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const passwordInput = document.getElementById('password');
+            const togglePasswordBtn = document.getElementById('togglePassword');
+
+            // Toggle Password Visibility
+            togglePasswordBtn.addEventListener('click', () => {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Toggle Icon
+                const icon = togglePasswordBtn.querySelector('i');
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            });
+        });
+    </script>
+</body>
+</html>

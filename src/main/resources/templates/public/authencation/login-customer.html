@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập Khách hàng - BookNow</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            light: '#60a5fa', // blue-400
+                            DEFAULT: '#3b82f6', // blue-500
+                            dark: '#2563eb', // blue-600
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Specific Logo Positioning Rule */
+        .logo-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin-top: 25px;
+            margin-left: 25px;
+            z-index: 50;
+        }
+
+        /* Subtle background pattern */
+        body {
+            background-color: #f3f4f6;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        .google-btn:hover {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center font-sans text-gray-800 relative p-4">
+
+    <!-- LOGO (Fixed Position) -->
+    <div class="logo-fixed flex items-center gap-3 select-none cursor-pointer" onclick="window.location.href='#'">
+        <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
+            <i class="fa-solid fa-house-chimney gradient-icon text-xl text-blue-600"></i>
+        </div>
+        <div class="flex flex-col justify-center">
+            <span class="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-blue-600 leading-none">BookNow</span>
+            <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider pl-0.5">Homestay System</span>
+        </div>
+    </div>
+
+    <!-- LOGIN CARD -->
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        
+        <!-- Header -->
+        <div class="px-8 pt-10 pb-6 text-center">
+            <h2 class="text-2xl font-bold text-gray-800">Chào mừng trở lại!</h2>
+            <p class="text-sm text-gray-500 mt-2">Đăng nhập để đặt phòng và quản lý chuyến đi</p>
+        </div>
+
+        <!-- Form -->
+        <div class="px-8 pb-8">
+            <form id="loginForm" class="space-y-5" novalidate th:action="@{/auth/login}" method="post">
+                
+                <!-- Email -->
+                <div class="space-y-1">
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-regular fa-envelope text-gray-400"></i>
+                        </div>
+                        <input type="email" id="email" name="email" 
+                            class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 sm:text-sm" 
+                            placeholder="name@example.com">
+                    </div>
+                    <p id="emailError" class="hidden text-xs text-red-500 mt-1 flex items-center">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> Vui lòng nhập email hợp lệ.
+                    </p>
+                </div>
+
+                <!-- Password -->
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between">
+                        <label for="password" class="block text-sm font-medium text-gray-700">Mật khẩu</label>
+                        <a href="#" class="text-xs font-medium text-blue-600 hover:text-blue-500 hover:underline">Quên mật khẩu?</a>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" id="password" name="password" 
+                            class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 sm:text-sm" 
+                            placeholder="Nhập mật khẩu">
+                        <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer focus:outline-none">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                    <p id="passwordError" class="hidden text-xs text-red-500 mt-1 flex items-center">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> Vui lòng nhập mật khẩu.
+                    </p>
+                </div>
+
+                <!-- Main Button -->
+                <button type="submit" id="submitBtn"
+                    class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:-translate-y-0.5">
+                    <span id="btnText">Đăng nhập</span>
+                    <i id="btnLoader" class="fa-solid fa-circle-notch fa-spin ml-2 hidden"></i>
+                </button>
+
+                <!-- Divider -->
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-200"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Hoặc tiếp tục với</span>
+                    </div>
+                </div>
+
+                <!-- Google Button -->
+                <button type="button" class="w-full flex justify-center items-center gap-3 py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 google-btn transition-colors duration-200">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5">
+                    Đăng nhập với Google
+                </button>
+                 <div class="flex items-center justify-between bg-[#f9f9f9] border border-[#d3d3d3] rounded p-3 w-full sm:w-[304px]">
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="recaptcha-check" class="w-6 h-6 border-2 border-[#c1c1c1] rounded-sm cursor-pointer accent-blue-600">
+                        <label for="recaptcha-check" class="text-sm font-medium text-gray-700 cursor-pointer select-none">I'm not a robot</label>
+                    </div>
+                    <div class="flex flex-col items-center ml-4">
+                        <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" class="w-8 h-8 opacity-50" alt="reCAPTCHA">
+                        <div class="text-[10px] text-gray-500">reCAPTCHA</div>
+                        <div class="text-[8px] text-gray-400 whitespace-nowrap">
+                            <a href="#" class="hover:underline">Privacy</a> - <a href="#" class="hover:underline">Terms</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-8 py-4 bg-gray-50 border-t border-gray-100 text-center">
+            <p class="text-sm text-gray-600">
+                Chưa có tài khoản? 
+                <a href="#" class="font-semibold text-blue-600 hover:text-blue-500 hover:underline">Đăng ký ngay</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- SCRIPT -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('loginForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            const togglePasswordBtn = document.getElementById('togglePassword');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoader = document.getElementById('btnLoader');
+
+            // Toggle Password Visibility
+            togglePasswordBtn.addEventListener('click', () => {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Toggle Icon
+                const icon = togglePasswordBtn.querySelector('i');
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            });
+
+            // Input Focus Logic (Remove errors)
+            [emailInput, passwordInput].forEach(input => {
+                input.addEventListener('input', () => {
+                    if (input.id === 'email') emailError.classList.add('hidden');
+                    if (input.id === 'password') passwordError.classList.add('hidden');
+                    input.classList.remove('border-red-300', 'focus:ring-red-200');
+                    input.classList.add('border-gray-300', 'focus:ring-blue-500');
+                });
+            });
+
+            // Form Submission
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                let isValid = true;
+
+                // Validate Email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailInput.value.trim() || !emailRegex.test(emailInput.value)) {
+                    emailError.classList.remove('hidden');
+                    emailInput.classList.remove('border-gray-300', 'focus:ring-blue-500');
+                    emailInput.classList.add('border-red-300', 'focus:ring-red-200');
+                    isValid = false;
+                }
+
+                // Validate Password
+                if (!passwordInput.value.trim()) {
+                    passwordError.classList.remove('hidden');
+                    passwordInput.classList.remove('border-gray-300', 'focus:ring-blue-500');
+                    passwordInput.classList.add('border-red-300', 'focus:ring-red-200');
+                    isValid = false;
+                }
+
+                if (isValid) {
+                    form.submit();
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>
