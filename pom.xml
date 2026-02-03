@@ -63,11 +63,11 @@
 
         <!-- Authen/Authorization -->
 
-        <dependency> <!-- Spring Security -->
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-            <version>3.5.4</version>
-        </dependency>
+<!--        <dependency> &lt;!&ndash; Spring Security &ndash;&gt;-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-security</artifactId>-->
+<!--            <version>3.5.4</version>-->
+<!--        </dependency>-->
 
         <dependency> <!-- Thymeleaf Extras for Spring Security -->
             <groupId>org.thymeleaf.extras</groupId>

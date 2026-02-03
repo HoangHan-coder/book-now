@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - BookNow</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            light: '#60a5fa', // blue-400
+                            DEFAULT: '#3b82f6', // blue-500
+                            dark: '#2563eb', // blue-600
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Specific Logo Positioning Rule */
+        .logo-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin-top: 25px;
+            margin-left: 25px;
+            z-index: 60; /* Higher than sidebar (50) */
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-icon {
+            color: #3b82f6;
+        }
+
+        /* Sidebar transitions */
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Hide scrollbar for sidebar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+    <!-- LOGO (Fixed Position) -->
+    <div class="logo-fixed flex items-center gap-3 select-none bg-white/90 backdrop-blur px-3 py-2 rounded-xl shadow-sm lg:shadow-none lg:bg-transparent lg:p-0">
+        <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
+            <i class="fa-solid fa-house-chimney gradient-icon text-xl"></i>
+        </div>
+        <div class="flex flex-col justify-center">
+            <span class="text-2xl font-extrabold tracking-tight gradient-text leading-none">BookNow</span>
+            <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider pl-0.5">Homestay System</span>
+        </div>
+    </div>
+
+    <!-- MOBILE HEADER (Hamburger) -->
+    <div class="lg:hidden fixed top-0 w-full bg-white h-20 shadow-sm z-40 flex items-center justify-end px-6">
+        <button id="mobileMenuBtn" class="text-gray-500 hover:text-blue-600 focus:outline-none">
+            <i class="fa-solid fa-bars text-2xl"></i>
+        </button>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform -translate-x-full lg:translate-x-0 pt-28 overflow-y-auto no-scrollbar">
+        <!-- Navigation Links -->
+        <nav class="px-4 space-y-2">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium transition-colors">
+                <i class="fa-solid fa-chart-line w-5"></i>
+                Bảng điều khiển
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                <i class="fa-regular fa-calendar-check w-5"></i>
+                Đơn đặt phòng
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                <i class="fa-solid fa-door-open w-5"></i>
+                Phòng
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                <i class="fa-solid fa-users-gear w-5"></i>
+                Tài khoản nhân viên
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                <i class="fa-regular fa-comment-dots w-5"></i>
+                Phản hồi khách hàng
+            </a>
+        </nav>
+
+        <!-- Logout at Bottom -->
+        <div class="absolute bottom-0 w-full p-4 border-t border-gray-100 bg-white">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
+                <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
+                Đăng xuất
+            </a>
+        </div>
+    </aside>
+
+    <!-- OVERLAY (for mobile) -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden glass-effect"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
+        
+        <!-- TOP HEADER AREA -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+            <!-- User Info -->
+            <div class="flex items-center gap-4 bg-white p-3 rounded-xl shadow-sm border border-gray-100 md:ml-auto">
+                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border-2 border-white shadow-sm">
+                    AD
+                </div>
+                <div class="pr-2">
+                    <h4 class="text-sm font-bold text-gray-800 leading-none">Nguyễn Văn A</h4>
+                    <span class="text-xs text-blue-500 font-semibold bg-blue-50 px-2 py-0.5 rounded-full mt-1 inline-block">Admin</span>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600 ml-2">
+                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- FILTER BAR -->
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Tổng quan</h2>
+            <div class="flex bg-white rounded-lg p-1 shadow-sm border border-gray-200">
+                <button class="px-4 py-1.5 text-sm font-medium rounded-md bg-blue-50 text-blue-600">Tuần</button>
+                <button class="px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:bg-gray-50">Tháng</button>
+                <button class="px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:bg-gray-50">Quý</button>
+            </div>
+        </div>
+
+        <!-- STATS WIDGETS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+            <!-- Widget 1 -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Đơn đặt phòng</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1">128</h3>
+                    </div>
+                    <div class="p-2 bg-blue-50 rounded-lg text-blue-600">
+                        <i class="fa-regular fa-calendar-check"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-xs">
+                    <span class="text-green-500 font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-arrow-trend-up"></i> 12%
+                    </span>
+                    <span class="text-gray-400 ml-2">so với tuần trước</span>
+                </div>
+            </div>
+
+            <!-- Widget 2 -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Tổng doanh thu</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1">45M ₫</h3>
+                    </div>
+                    <div class="p-2 bg-green-50 rounded-lg text-green-600">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-xs">
+                    <span class="text-green-500 font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-arrow-trend-up"></i> 8.5%
+                    </span>
+                    <span class="text-gray-400 ml-2">so với tuần trước</span>
+                </div>
+            </div>
+
+            <!-- Widget 3 -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Phòng hoạt động</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1">18/20</h3>
+                    </div>
+                    <div class="p-2 bg-purple-50 rounded-lg text-purple-600">
+                        <i class="fa-solid fa-bed"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-xs">
+                    <span class="text-gray-500 font-medium">90% Công suất</span>
+                </div>
+            </div>
+
+            <!-- Widget 4 -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Khách hàng</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1">1,204</h3>
+                    </div>
+                    <div class="p-2 bg-orange-50 rounded-lg text-orange-600">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-xs">
+                    <span class="text-green-500 font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-plus"></i> 24
+                    </span>
+                    <span class="text-gray-400 ml-2">mới tháng này</span>
+                </div>
+            </div>
+
+            <!-- Widget 5 -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Nhân viên</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1">8</h3>
+                    </div>
+                    <div class="p-2 bg-red-50 rounded-lg text-red-600">
+                        <i class="fa-solid fa-id-card"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-xs">
+                    <span class="text-gray-400 font-medium">Tất cả đang online</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHARTS SECTION -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Main Chart (Revenue) -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-bold text-gray-800">Doanh thu theo tuần</h3>
+                    <button class="text-gray-400 hover:text-blue-600"><i class="fa-solid fa-ellipsis"></i></button>
+                </div>
+                <div class="relative h-72 w-full">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Side Charts Column -->
+            <div class="space-y-6">
+                
+                <!-- Bookings Chart -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-gray-800 mb-4">Đơn đặt phòng (Tháng)</h3>
+                    <div class="relative h-48 w-full">
+                        <canvas id="bookingsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Occupancy Rate Chart -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-gray-800 mb-4">Tỷ lệ lấp phòng (Quý)</h3>
+                    <div class="relative h-48 w-full flex items-center justify-center">
+                         <canvas id="occupancyChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- SCRIPT -->
+    <script>
+        // Mobile Sidebar Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.add('hidden');
+            }
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        // Chart.js Configurations
+        
+        // 1. Revenue Chart (Line)
+        const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctxRevenue, {
+            type: 'line',
+            data: {
+                labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                datasets: [{
+                    label: 'Doanh thu (Triệu VNĐ)',
+                    data: [12, 19, 15, 25, 22, 30, 45],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#3b82f6',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { borderDash: [2, 4], color: '#f3f4f6' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // 2. Bookings Chart (Bar)
+        const ctxBookings = document.getElementById('bookingsChart').getContext('2d');
+        new Chart(ctxBookings, {
+            type: 'bar',
+            data: {
+                labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'],
+                datasets: [{
+                    label: 'Số lượng',
+                    data: [45, 60, 55, 70],
+                    backgroundColor: '#60a5fa',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 3. Occupancy Chart (Doughnut)
+        const ctxOccupancy = document.getElementById('occupancyChart').getContext('2d');
+        new Chart(ctxOccupancy, {
+            type: 'doughnut',
+            data: {
+                labels: ['Đã đặt', 'Trống', 'Bảo trì'],
+                datasets: [{
+                    data: [75, 20, 5],
+                    backgroundColor: ['#3b82f6', '#e5e7eb', '#fca5a5'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { boxWidth: 10, font: { size: 10 } }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
