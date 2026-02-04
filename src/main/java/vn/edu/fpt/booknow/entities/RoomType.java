@@ -25,4 +25,5 @@ public class RoomType {
     private Integer maxGuests;
 
     private Boolean isDeleted;
+    private Double overPrice;
 }

@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import vn.edu.fpt.booknow.dto.RoomDTO;
 import vn.edu.fpt.booknow.dto.SearchDTO;
 import vn.edu.fpt.booknow.entities.Amenity;
+import vn.edu.fpt.booknow.entities.Booking;
 import vn.edu.fpt.booknow.repositories.AmenityRepo;
+import vn.edu.fpt.booknow.repositories.BookingRepo;
 import vn.edu.fpt.booknow.repositories.RoomRepo;
 
 import java.util.ArrayList;
@@ -19,9 +21,11 @@ import java.util.Map;
 public class RoomService {
     private RoomRepo roomRepo;
     private AmenityRepo amenityRepo;
-    public RoomService(RoomRepo roomRepo, AmenityRepo amenityRepo ) {
+    private BookingRepo bookingRepo;
+    public RoomService(RoomRepo roomRepo, AmenityRepo amenityRepo, BookingRepo bookingRepo) {
         this.amenityRepo = amenityRepo;
         this.roomRepo = roomRepo;
+        this.bookingRepo = bookingRepo;
     }
     public Page<RoomDTO> getAllRoomService(){
         Pageable pageable =  PageRequest.of(0,3);
@@ -36,8 +40,10 @@ public class RoomService {
         Page<RoomDTO> list = roomRepo.searchRooms(searchDTO.getKeyword(),searchDTO.getArea(),searchDTO.getMaxGuest(),searchDTO.getPrice(),searchDTO.getAmenity(),pageable);
         return list;
     }
+
+
     public List<RoomDTO> detailRoomService(Long id) {
-        List<RoomDTO> roomAmenityFlatDTO = roomRepo.findDetailRoom(id);
+        List<RoomDTO> roomAmenityFlatDTO = roomRepo.findRoomDetail(id);
         Map<String, RoomDTO> map = new LinkedHashMap<>();
         for (RoomDTO x : roomAmenityFlatDTO) {
             RoomDTO roomDTO = map.computeIfAbsent(
@@ -51,6 +57,7 @@ public class RoomService {
                             x.getImageUrl(),
                             null,
                             null,
+                            x.getOverPrice(),
                             new ArrayList<>()
                     )
             );
@@ -61,4 +68,7 @@ public class RoomService {
         List<RoomDTO> roomDTO = new ArrayList<>(map.values());
         return roomDTO;
     }
-}
+    public void saveBooking(Booking booking) {
+        bookingRepo.save(booking);
+    }
+ }

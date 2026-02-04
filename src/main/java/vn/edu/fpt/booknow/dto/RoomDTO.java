@@ -22,6 +22,7 @@ public class RoomDTO {
     private String imageUrl;
     private String utilities;
     private String iconUrl;
+    private Double overPrice;
     List<Amenity> amenityList = new ArrayList<>();
 
 }

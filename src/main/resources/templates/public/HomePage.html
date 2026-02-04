@@ -177,40 +177,26 @@
 
 <!-- SEARCH & FILTER BAR -->
 <div class="max-w-6xl mx-auto px-4 -mt-24 relative z-20">
-    <div class="bg-white rounded-2xl shadow-xl p-6 border border-gray-100" th:object="${search}">
-        <form class="bg-white rounded-2xl shadow-sm p-4 md:p-6 grid grid-cols-1 md:grid-cols-12 gap-4"
-              th:action="@{/search}" method="post">
+    <div class="bg-white rounded-3xl shadow-2xl border border-gray-100 p-6"
+         th:object="${search}">
 
-            <!-- Search Input -->
-            <div class="md:col-span-4">
+        <form th:action="@{/search}" method="post"
+              class="grid grid-cols-1 md:grid-cols-12 gap-5">
+
+            <!-- Search -->
+            <div class="md:col-span-6">
                 <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
                     Tìm kiếm
                 </label>
                 <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400"></i>
-                    <input th:field="*{keyword}" type="text"
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input th:field="*{keyword}"
+                           type="text"
                            placeholder="Tên phòng, loại phòng..."
-                           class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl
-                          focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                </div>
-            </div>
-
-            <!-- Location -->
-            <div class="md:col-span-2">
-                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
-                    Khu vực
-                </label>
-                <div class="relative">
-                    <select th:field="*{area}"
-                            class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl
-                           focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none
-                           appearance-none bg-white cursor-pointer">
-                        <option value="">Tất cả</option>
-                        <option value="khu-a">Khu A (Vườn)</option>
-                        <option value="khu-b">Khu B (Hồ bơi)</option>
-                        <option value="khu-c">Khu C (Trên lầu)</option>
-                    </select>
-                    <i class="fa-solid fa-chevron-down absolute right-3 top-3.5 text-xs text-gray-400 pointer-events-none"></i>
+                           class="w-full h-11 pl-11 pr-4 text-sm
+                                  border border-gray-200 rounded-xl
+                                  focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                  transition outline-none"/>
                 </div>
             </div>
 
@@ -221,76 +207,89 @@
                 </label>
                 <div class="relative">
                     <select th:field="*{maxGuest}"
-                            class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl
-                           focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none
-                           appearance-none bg-white cursor-pointer">
+                            class="w-full h-11 px-4 text-sm
+                                   border border-gray-200 rounded-xl
+                                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                   appearance-none bg-white cursor-pointer">
                         <option value="1">1 Người</option>
-                        <option value="2" selected >2 Người</option>
+                        <option value="2">2 Người</option>
                         <option value="4">4 Người</option>
                     </select>
-                    <i class="fa-solid fa-user-group absolute right-3 top-3.5 text-xs text-gray-400 pointer-events-none"></i>
+                    <i class="fa-solid fa-user-group absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400"></i>
                 </div>
             </div>
 
-            <!-- Price Range -->
+            <!-- Price -->
             <div class="md:col-span-2">
                 <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
                     Mức giá
                 </label>
                 <div class="relative">
                     <select th:field="*{price}"
-                            class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl
-                           focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none
-                           appearance-none bg-white cursor-pointer">
+                            class="w-full h-11 px-4 text-sm
+                                   border border-gray-200 rounded-xl
+                                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                   appearance-none bg-white cursor-pointer">
                         <option value="">Tất cả</option>
                         <option value="low">&lt; 300k</option>
-                        <option value="mid">300k - 800k</option>
+                        <option value="mid">300k – 800k</option>
                         <option value="high">&gt; 800k</option>
                     </select>
-                    <i class="fa-solid fa-chevron-down absolute right-3 top-3.5 text-xs text-gray-400 pointer-events-none"></i>
+                    <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400"></i>
                 </div>
             </div>
 
-            <!-- Search Button -->
+            <!-- Button -->
             <div class="md:col-span-2 flex items-end">
                 <button type="submit"
-                        class="w-full h-[42px] bg-blue-600 hover:bg-blue-700
-                       text-white text-sm font-semibold rounded-xl
-                       flex items-center justify-center gap-2
-                       transition shadow-sm">
+                        class="w-full h-11
+                               bg-blue-600 hover:bg-blue-700
+                               text-white text-sm font-semibold
+                               rounded-xl shadow-md
+                               flex items-center justify-center gap-2
+                               transition active:scale-[0.98]">
                     <i class="fa-solid fa-filter"></i>
                     Tìm phòng
                 </button>
             </div>
 
             <!-- Amenities -->
-            <div class="md:col-span-12 mt-2 pt-4 border-t border-gray-100 flex flex-wrap items-center gap-2">
-        <span class="text-xs font-semibold text-gray-500 mr-2">
-            Tiện nghi:
-        </span>
+            <div class="md:col-span-12 pt-4 border-t border-gray-100
+                        flex flex-wrap items-center gap-2">
+
+                <span class="text-xs font-semibold text-gray-500 mr-2">
+                    Tiện nghi:
+                </span>
+
                 <label th:each="a,start : ${amenities}"
                        th:classappend="${start.index >= 3} ? 'hidden' : ''"
-                       class="amenityIds-item flex items-center gap-1 px-3 py-1.5
-                      rounded-full border border-gray-200 bg-gray-50
-                      text-xs cursor-pointer
-                      hover:border-blue-400 hover:bg-blue-50 transition">
+                       class="amenityIds-item flex items-center gap-2
+                              px-3 py-1.5 rounded-full
+                              border border-gray-200 bg-gray-50
+                              text-xs cursor-pointer
+                              hover:border-blue-400 hover:bg-blue-50
+                              transition">
 
                     <input type="checkbox"
                            name="amenity"
-                           th:value="${a.getName()}"
-                           class="text-blue-600 rounded focus:ring-blue-500">
+                           th:value="${a.name}"
+                           class="text-blue-600 rounded focus:ring-blue-500"/>
 
                     <span th:text="${a.name}"></span>
                 </label>
 
                 <span id="amenity"
-                      class="material-symbols-outlined text-gray-400 cursor-pointer hover:text-blue-500 transition">
-            more_horiz
-        </span>
+                      class="material-symbols-outlined text-gray-400
+                             cursor-pointer hover:text-blue-500 transition">
+                    more_horiz
+                </span>
             </div>
+
         </form>
     </div>
 </div>
+
+
 
 <!-- MAIN CONTENT CONTAINER -->
 <div class="max-w-7xl mx-auto px-4 py-12 space-y-16">
@@ -514,6 +513,7 @@
         expanded = !expanded;
         amenity.forEach((item, index) => {
             if (index >= 3) {
+                console.log(expanded)
                 item.classList.toggle("hidden", expanded);
             }
         });

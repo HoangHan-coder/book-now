@@ -24,7 +24,7 @@ public class Room {
 
     private String status;
     private Boolean isDeleted;
-
+    private Double areaM2;
     @OneToMany(mappedBy = "room")
     private List<Image> images;
 
