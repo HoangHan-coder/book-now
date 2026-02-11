@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import vn.edu.fpt.booknow.dto.UserDTO;
 import vn.edu.fpt.booknow.entities.StaffAccount;
 import vn.edu.fpt.booknow.services.ViewUserListService;
 
@@ -32,7 +33,7 @@ public class ViewUserListController {
         String roleParam = (role != null && !role.trim().isEmpty()) ? role.toUpperCase() : null;
         String statusParam = (status != null && !status.trim().isEmpty()) ? status.toUpperCase() : null;
 
-        List<Object> users = service.getUserList(roleParam, statusParam);
+        List<UserDTO> users = service.getUserList(roleParam, statusParam);
 
         if (users.isEmpty()) {
             model.addAttribute("message", "Không tìm thấy người dùng nào khớp với bộ lọc.");

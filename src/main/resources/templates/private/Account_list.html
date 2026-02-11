@@ -17,9 +17,9 @@
                     },
                     colors: {
                         brand: {
-                            light: '#60a5fa',
-                            DEFAULT: '#3b82f6',
-                            dark: '#2563eb',
+                            light: '#60a5fa', // blue-400
+                            DEFAULT: '#3b82f6', // blue-500
+                            dark: '#2563eb', // blue-600
                         }
                     }
                 }
@@ -28,12 +28,36 @@
     </script>
 
     <style>
-        .logo-fixed { position: fixed; top: 0; left: 0; margin-top: 25px; margin-left: 25px; z-index: 60; }
-        .gradient-text { background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .gradient-icon { color: #3b82f6; }
-        .sidebar { transition: transform 0.3s ease-in-out; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .logo-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin-top: 25px;
+            margin-left: 25px;
+            z-index: 60;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-icon {
+            color: #3b82f6;
+        }
+
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
@@ -48,84 +72,103 @@
     </div>
 </div>
 
+<div class="lg:hidden fixed top-0 w-full bg-white h-20 shadow-sm z-40 flex items-center justify-end px-6">
+    <button id="mobileMenuBtn" class="text-gray-500 hover:text-blue-600 focus:outline-none">
+        <i class="fa-solid fa-bars text-2xl"></i>
+    </button>
+</div>
+
 <aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform -translate-x-full lg:translate-x-0 pt-28 overflow-y-auto no-scrollbar">
     <nav class="px-4 space-y-2">
-        <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition-colors">
+        <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
             <i class="fa-solid fa-chart-line w-5"></i> Bảng điều khiển
         </a>
-        <a href="#" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium shadow-sm ring-1 ring-black/5">
-            <i class="fa-solid fa-users-gear w-5"></i> Tài khoản nhân viên
+        <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+            <i class="fa-regular fa-calendar-check w-5"></i> Đơn đặt phòng
+        </a>
+        <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+            <i class="fa-solid fa-door-open w-5"></i> Phòng
+        </a>
+        <a th:href="@{/admin/account_list}" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium transition-colors shadow-sm ring-1 ring-black/5">
+            <i class="fa-solid fa-users-gear w-5"></i> Tài khoản hệ thống
+        </a>
+        <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+            <i class="fa-regular fa-comment-dots w-5"></i> Phản hồi
         </a>
     </nav>
+
     <div class="absolute bottom-0 w-full p-4 border-t border-gray-100 bg-white">
-        <a href="/logout" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
+        <a href="#" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
             <i class="fa-solid fa-arrow-right-from-bracket w-5"></i> Đăng xuất
         </a>
     </div>
 </aside>
+
+<div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden glass-effect"></div>
 
 <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
 
     <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
         <div>
             <h1 class="text-2xl font-bold text-gray-800">Danh sách tài khoản</h1>
-            <p class="text-sm text-gray-500 mt-1">Quản lý tài khoản nhân viên và khách hàng</p>
+            <p class="text-sm text-gray-500 mt-1">Quản lý tài khoản truy cập hệ thống (Admin, Staff, Customer)</p>
         </div>
         <button class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg shadow-sm font-medium transition-colors">
             <i class="fa-solid fa-user-plus"></i>
-            <span>Tạo tài khoản mới</span>
+            <span>Tạo tài khoản</span>
         </button>
     </div>
 
-    <form th:action="@{/admin/account_list}" method="get" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-
-            <div class="space-y-1">
-                <label class="text-xs font-medium text-gray-500 uppercase">Vai trò</label>
-                <div class="relative">
-                    <select name="role" onchange="this.form.submit()" class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none appearance-none bg-white cursor-pointer">
-                        <option value="" th:selected="${param.role == null or param.role[0] == ''}">Tất cả vai trò</option>
-                        <option value="ADMIN" th:selected="${param.role != null and param.role[0] == 'ADMIN'}">Quản trị viên (Admin)</option>
-                        <option value="STAFF" th:selected="${param.role != null and param.role[0] == 'STAFF'}">Nhân viên (Staff)</option>
-                        <option value="CUSTOMER" th:selected="${param.role != null and param.role[0] == 'CUSTOMER'}">Khách hàng (Customer)</option>
-                    </select>
-                    <i class="fa-solid fa-shield-halved absolute left-3 top-2.5 text-gray-400"></i>
-                    <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-gray-400 pointer-events-none"></i>
-                </div>
-            </div>
-
-            <div class="space-y-1">
-                <label class="text-xs font-medium text-gray-500 uppercase">Trạng thái</label>
-                <div class="relative">
-                    <select name="status" onchange="this.form.submit()" class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none appearance-none bg-white cursor-pointer">
-                        <option value="" th:selected="${param.status == null or param.status[0] == ''}">Tất cả trạng thái</option>
-                        <option value="ACTIVE" th:selected="${param.status != null and param.status[0] == 'ACTIVE'}">Đang hoạt động</option>
-                        <option value="INACTIVE" th:selected="${param.status != null and param.status[0] == 'INACTIVE'}">Ngưng hoạt động</option>
-                    </select>
-                    <i class="fa-solid fa-toggle-on absolute left-3 top-2.5 text-gray-400"></i>
-                    <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-gray-400 pointer-events-none"></i>
-                </div>
-            </div>
-
-            <div class="space-y-1">
-                <label class="text-xs font-medium text-gray-500 uppercase">Tìm kiếm</label>
-                <div class="flex gap-2">
-                    <div class="relative flex-1">
-                        <input type="text" name="search" th:value="${param.search}" placeholder="Tên, email..." class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400"></i>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
+        <form th:action="@{/admin/account_list}" method="get">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="space-y-1">
+                    <label class="text-xs font-medium text-gray-500 uppercase">Vai trò</label>
+                    <div class="relative">
+                        <select name="role" onchange="this.form.submit()" class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white cursor-pointer">
+                            <option value="">Tất cả vai trò</option>
+                            <option value="ADMIN" th:selected="${param.role != null and param.role[0] == 'ADMIN'}">Quản trị viên (Admin)</option>
+                            <option value="STAFF" th:selected="${param.role != null and param.role[0] == 'STAFF'}">Nhân viên (Staff)</option>
+                            <option value="CUSTOMER" th:selected="${param.role != null and param.role[0] == 'CUSTOMER'}">Khách hàng (Customer)</option>
+                        </select>
+                        <i class="fa-solid fa-shield-halved absolute left-3 top-2.5 text-gray-400"></i>
+                        <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-gray-400 pointer-events-none"></i>
                     </div>
-                    <button type="submit" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition-colors border border-gray-200">Tìm</button>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-medium text-gray-500 uppercase">Trạng thái</label>
+                    <div class="relative">
+                        <select name="status" onchange="this.form.submit()" class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white cursor-pointer">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="ACTIVE" th:selected="${param.status != null and param.status[0] == 'ACTIVE'}">Đang hoạt động</option>
+                            <option value="INACTIVE" th:selected="${param.status != null and param.status[0] == 'INACTIVE'}">Ngưng hoạt động</option>
+                        </select>
+                        <i class="fa-solid fa-toggle-on absolute left-3 top-2.5 text-gray-400"></i>
+                        <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-gray-400 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-medium text-gray-500 uppercase">Tìm kiếm</label>
+                    <div class="flex gap-2">
+                        <div class="relative flex-1">
+                            <input type="text" placeholder="Tên, mã, email..." class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400"></i>
+                        </div>
+                        <button type="submit" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition-colors border border-gray-200">Tìm</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead class="bg-gray-50 border-b border-gray-100">
                 <tr>
-                    <th class="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Mã số</th>
+                    <th class="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
                     <th class="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Họ tên</th>
                     <th class="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
                     <th class="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Vai trò</th>
@@ -134,42 +177,31 @@
                 </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
-                <tr th:if="${users == null or users.empty}">
-                    <td colspan="6" class="py-12 text-center">
-                        <i class="fa-regular fa-face-frown text-3xl text-gray-300 mb-2 block"></i>
-                        <span class="text-gray-500" th:text="${message}">Không tìm thấy dữ liệu</span>
-                    </td>
+                <tr th:if="${users.isEmpty()}">
+                    <td colspan="6" class="py-10 text-center text-gray-500" th:text="${message}">Không có dữ liệu</td>
                 </tr>
 
-                <tr th:each="u : ${users}" class="hover:bg-gray-50 transition-colors">
-                    <td class="py-4 px-6 font-mono text-xs text-gray-500">
-                        <span th:text="${u instanceof T(vn.edu.fpt.booknow.entities.StaffAccount) ? 'ST-' + u.staffAccountId : 'CU-' + u.customerId}">ID</span>
-                    </td>
+                <tr th:each="user : ${users}" class="hover:bg-gray-50 transition-colors">
+                    <td class="py-4 px-6 font-mono text-xs text-gray-500" th:text="${user.id}">001</td>
                     <td class="py-4 px-6">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-                                 th:classappend="${u instanceof T(vn.edu.fpt.booknow.entities.StaffAccount) ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'}"
-                                 th:text="${#strings.substring(u.fullName, 0, 1)}">U</div>
-                            <span class="font-medium text-gray-900" th:text="${u.fullName}">Name</span>
+                                 th:classappend="${user.role == 'ADMIN' ? 'bg-purple-100 text-purple-600' : (user.role == 'STAFF' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600')}"
+                                 th:text="${#strings.substring(user.fullName,0,1)}">U</div>
+                            <span class="font-medium text-gray-900" th:text="${user.fullName}">Name</span>
                         </div>
                     </td>
-                    <td class="py-4 px-6 text-sm text-gray-600" th:text="${u.email}">Email</td>
+                    <td class="py-4 px-6 text-sm text-gray-600" th:text="${user.email}">email@example.com</td>
                     <td class="py-4 px-6">
-                                <span th:if="${u instanceof T(vn.edu.fpt.booknow.entities.StaffAccount)}"
-                                      th:classappend="${u.role == 'ADMIN' ? 'bg-purple-50 text-purple-700 ring-purple-600/20' : 'bg-blue-50 text-blue-700 ring-blue-600/20'}"
-                                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset">
-                                    <span th:text="${u.role}">ROLE</span>
-                                </span>
-                        <span th:if="${u instanceof T(vn.edu.fpt.booknow.entities.Customer)}"
-                              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-50 text-orange-700 ring-1 ring-inset ring-orange-600/20">
-                                    CUSTOMER
-                                </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset"
+                                      th:classappend="${user.role == 'ADMIN' ? 'bg-purple-50 text-purple-700 ring-purple-600/20' : (user.role == 'STAFF' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' : 'bg-orange-50 text-orange-700 ring-orange-600/20')}"
+                                      th:text="${user.role}">Role</span>
                     </td>
                     <td class="py-4 px-6">
-                                <span th:classappend="${u.status == 'ACTIVE' ? 'bg-green-50 text-green-700 ring-green-600/20' : 'bg-gray-100 text-gray-600 ring-gray-500/20'}"
-                                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset">
-                                    <span th:classappend="${u.status == 'ACTIVE' ? 'bg-green-500' : 'bg-gray-400'}" class="w-1.5 h-1.5 rounded-full mr-1.5"></span>
-                                    <span th:text="${u.status == 'ACTIVE' ? 'Hoạt động' : 'Ngưng hoạt động'}">Status</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset"
+                                      th:classappend="${user.status == 'ACTIVE' ? 'bg-green-50 text-green-700 ring-green-600/20' : 'bg-gray-100 text-gray-600 ring-gray-500/20'}">
+                                    <span class="w-1.5 h-1.5 rounded-full mr-1.5" th:classappend="${user.status == 'ACTIVE' ? 'bg-green-500' : 'bg-gray-400'}"></span>
+                                    <span th:text="${user.status == 'ACTIVE' ? 'Hoạt động' : 'Ngưng hoạt động'}">Status</span>
                                 </span>
                     </td>
                     <td class="py-4 px-6 text-right">
@@ -179,20 +211,30 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="bg-gray-50 px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+            <span class="text-sm text-gray-500">Tổng cộng: <span class="font-medium text-gray-900" th:text="${users.size()}">0</span> tài khoản</span>
+        </div>
     </div>
 </main>
 
 <script>
-    // Sidebar Toggle Logic giữ nguyên của mày
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
+
     function toggleSidebar() {
-        sidebar.classList.toggle('-translate-x-full');
-        sidebarOverlay.classList.toggle('hidden');
+        const isClosed = sidebar.classList.contains('-translate-x-full');
+        if (isClosed) {
+            sidebar.classList.remove('-translate-x-full');
+            sidebarOverlay.classList.remove('hidden');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        }
     }
-    if(mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
-    if(sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+    mobileMenuBtn.addEventListener('click', toggleSidebar);
+    sidebarOverlay.addEventListener('click', toggleSidebar);
 </script>
 </body>
 </html>

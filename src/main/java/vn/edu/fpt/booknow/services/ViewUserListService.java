@@ -1,9 +1,10 @@
 package vn.edu.fpt.booknow.services;
 
+import vn.edu.fpt.booknow.dto.UserDTO;
 import vn.edu.fpt.booknow.entities.Customer;
 import vn.edu.fpt.booknow.entities.StaffAccount;
 import vn.edu.fpt.booknow.repositories.CustomerRepository;
-import vn.edu.fpt.booknow.repositories.UserRepository;
+import vn.edu.fpt.booknow.repositories.StaffAccountRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,27 +13,51 @@ import java.util.List;
 @Service
 public class ViewUserListService {
 
-    private final UserRepository userRepository;
+    private final StaffAccountRepository staffAccountRepository;
     private final CustomerRepository customerRepository;
 
-    public ViewUserListService(UserRepository userRepository,
+    public ViewUserListService(StaffAccountRepository staffAccountRepository,
                                CustomerRepository customerRepository) {
-        this.userRepository = userRepository;
+        this.staffAccountRepository = staffAccountRepository;
         this.customerRepository = customerRepository;
     }
 
+    public List<UserDTO> getUserList(String roleFilter, String statusFilter) {
 
-    public List<Object> getUserList(String roleFilter, String statusFilter) {
-        List<Object> result = new ArrayList<>();
+        List<UserDTO> result = new ArrayList<>();
 
-        //lấy STAFF/ADMIN
-        if (roleFilter == null || (!roleFilter.equals("CUSTOMER"))) {
-            result.addAll(userRepository.findByRoleAndStatus(roleFilter, statusFilter));
+        // STAFF + ADMIN
+        if (roleFilter == null || !roleFilter.equals("CUSTOMER")) {
+
+            List<StaffAccount> staffList =
+                    staffAccountRepository.findByRoleAndStatus(roleFilter, statusFilter);
+
+            for (StaffAccount staff : staffList) {
+                result.add(new UserDTO(
+                        staff.getStaffAccountId(),
+                        staff.getFullName(),
+                        staff.getEmail(),
+                        staff.getRole(),
+                        staff.getStatus()
+                ));
+            }
         }
 
-        //lấy CUSTOMER
+        // CUSTOMER
         if (roleFilter == null || roleFilter.equals("CUSTOMER")) {
-            result.addAll(customerRepository.findByStatus(statusFilter));
+
+            List<Customer> customerList =
+                    customerRepository.findByStatus(statusFilter);
+
+            for (Customer customer : customerList) {
+                result.add(new UserDTO(
+                        customer.getCustomerId(),
+                        customer.getFullName(),
+                        customer.getEmail(),
+                        "CUSTOMER", // vì bảng customer không có role
+                        customer.getStatus()
+                ));
+            }
         }
 
         return result;
