@@ -27,19 +27,22 @@ public class ViewUserListController {
     public String viewUserList(
             @RequestParam(required = false) String role,
             @RequestParam(required = false) String status,
+            @RequestParam(required = false) String search,
             Model model) {
 
-        // Chuyển chuỗi rỗng thành null và VIẾT HOA để khớp SQL
-        String roleParam = (role != null && !role.trim().isEmpty()) ? role.toUpperCase() : null;
-        String statusParam = (status != null && !status.trim().isEmpty()) ? status.toUpperCase() : null;
+        String roleParam = (role != null && !role.isBlank()) ? role.toUpperCase() : null;
+        String statusParam = (status != null && !status.isBlank()) ? status.toUpperCase() : null;
+        String keywordParam = (search != null && !search.isBlank()) ? search : null;
 
-        List<UserDTO> users = service.getUserList(roleParam, statusParam);
-
-        if (users.isEmpty()) {
-            model.addAttribute("message", "Không tìm thấy người dùng nào khớp với bộ lọc.");
-        }
+        List<UserDTO> users =
+                service.getUserList(roleParam, statusParam, keywordParam);
 
         model.addAttribute("users", users);
+
+        if (users.isEmpty()) {
+            model.addAttribute("message", "Không tìm thấy người dùng nào.");
+        }
+
         return "private/Account_list";
     }
 }

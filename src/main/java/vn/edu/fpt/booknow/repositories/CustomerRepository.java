@@ -9,9 +9,14 @@ import java.util.List;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
-    @Query("""
-        SELECT c FROM Customer c
-        WHERE (:status IS NULL OR c.status = :status)
-    """)
-    List<Customer> findByStatus(@Param("status") String status);
+    @Query("SELECT c FROM Customer c " +
+            "WHERE (:status IS NULL OR c.status = :status) " +
+            "AND (:keyword IS NULL OR LOWER(c.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    List<Customer> searchCustomer(
+            @Param("status") String status,
+            @Param("keyword") String keyword
+    );
+
+
+
 }

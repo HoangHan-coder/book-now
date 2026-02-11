@@ -22,42 +22,51 @@ public class ViewUserListService {
         this.customerRepository = customerRepository;
     }
 
-    public List<UserDTO> getUserList(String roleFilter, String statusFilter) {
+    public List<UserDTO> getUserList(String roleFilter,
+                                     String statusFilter,
+                                     String keyword) {
 
         List<UserDTO> result = new ArrayList<>();
 
-        // STAFF + ADMIN
+        // STAFF (trừ khi filter là CUSTOMER)
         if (roleFilter == null || !roleFilter.equals("CUSTOMER")) {
 
             List<StaffAccount> staffList =
-                    staffAccountRepository.findByRoleAndStatus(roleFilter, statusFilter);
+                    staffAccountRepository.searchStaff(
+                            roleFilter,
+                            statusFilter,
+                            keyword
+                    );
 
-            for (StaffAccount staff : staffList) {
-                result.add(new UserDTO(
-                        staff.getStaffAccountId(),
-                        staff.getFullName(),
-                        staff.getEmail(),
-                        staff.getRole(),
-                        staff.getStatus()
-                ));
-            }
+            staffList.forEach(s ->
+                    result.add(new UserDTO(
+                            s.getStaffAccountId(),
+                            s.getFullName(),
+                            s.getEmail(),
+                            s.getRole(),
+                            s.getStatus()
+                    ))
+            );
         }
 
         // CUSTOMER
         if (roleFilter == null || roleFilter.equals("CUSTOMER")) {
 
             List<Customer> customerList =
-                    customerRepository.findByStatus(statusFilter);
+                    customerRepository.searchCustomer(
+                            statusFilter,
+                            keyword
+                    );
 
-            for (Customer customer : customerList) {
-                result.add(new UserDTO(
-                        customer.getCustomerId(),
-                        customer.getFullName(),
-                        customer.getEmail(),
-                        "CUSTOMER", // vì bảng customer không có role
-                        customer.getStatus()
-                ));
-            }
+            customerList.forEach(c ->
+                    result.add(new UserDTO(
+                            c.getCustomerId(),
+                            c.getFullName(),
+                            c.getEmail(),
+                            "CUSTOMER",
+                            c.getStatus()
+                    ))
+            );
         }
 
         return result;

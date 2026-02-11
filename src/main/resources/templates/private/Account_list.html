@@ -153,10 +153,16 @@
                     <label class="text-xs font-medium text-gray-500 uppercase">Tìm kiếm</label>
                     <div class="flex gap-2">
                         <div class="relative flex-1">
-                            <input type="text" placeholder="Tên, mã, email..." class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                            <input type="text"
+                                   name="search"
+                                   th:value="${param.search}"
+                                   placeholder="Theo tên"
+                                   class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400"></i>
                         </div>
-                        <button type="submit" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition-colors border border-gray-200">Tìm</button>
+                        <button type="submit"
+                                class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition-colors border border-gray-200">
+                            Tìm</button>
                     </div>
                 </div>
             </div>
