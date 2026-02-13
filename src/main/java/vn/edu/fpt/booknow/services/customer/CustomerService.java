@@ -20,4 +20,9 @@ public class CustomerService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return new CustomerDetails(customer);
     }
+
+    public Customer findOrCreateGoogleUser(String email) {
+
+    }
+
 }
