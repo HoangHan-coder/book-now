@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi tiết tài khoản - BookNow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              light: '#60a5fa', // blue-400
+              DEFAULT: '#3b82f6', // blue-500
+              dark: '#2563eb', // blue-600
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .logo-fixed {
+      position: fixed;
+      top: 0;
+      left: 0;
+      margin-top: 25px;
+      margin-left: 25px;
+      z-index: 60;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gradient-icon {
+      color: #3b82f6;
+    }
+
+    .sidebar {
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+<div class="logo-fixed flex items-center gap-3 select-none bg-white/90 backdrop-blur px-3 py-2 rounded-xl shadow-sm lg:shadow-none lg:bg-transparent lg:p-0">
+  <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
+    <i class="fa-solid fa-house-chimney gradient-icon text-xl"></i>
+  </div>
+  <div class="flex flex-col justify-center">
+    <span class="text-2xl font-extrabold tracking-tight gradient-text leading-none">BookNow</span>
+    <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider pl-0.5">Homestay System</span>
+  </div>
+</div>
+
+<div class="lg:hidden fixed top-0 w-full bg-white h-20 shadow-sm z-40 flex items-center justify-end px-6">
+  <button id="mobileMenuBtn" class="text-gray-500 hover:text-blue-600 focus:outline-none">
+    <i class="fa-solid fa-bars text-2xl"></i>
+  </button>
+</div>
+
+<aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform -translate-x-full lg:translate-x-0 pt-28 overflow-y-auto no-scrollbar">
+  <nav class="px-4 space-y-2">
+    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+      <i class="fa-solid fa-chart-line w-5"></i> Bảng điều khiển
+    </a>
+    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+      <i class="fa-regular fa-calendar-check w-5"></i> Đơn đặt phòng
+    </a>
+    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+      <i class="fa-solid fa-door-open w-5"></i> Phòng
+    </a>
+    <a th:href="@{/admin/account_list}" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium transition-colors shadow-sm ring-1 ring-black/5">
+      <i class="fa-solid fa-users-gear w-5"></i> Tài khoản hệ thống
+    </a>
+    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+      <i class="fa-regular fa-comment-dots w-5"></i> Phản hồi khách hàng
+    </a>
+  </nav>
+
+  <div class="absolute bottom-0 w-full p-4 border-t border-gray-100 bg-white">
+    <a href="#" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
+      <i class="fa-solid fa-arrow-right-from-bracket w-5"></i> Đăng xuất
+    </a>
+  </div>
+</aside>
+
+<div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden glass-effect"></div>
+
+<main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
+
+  <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+    <div>
+      <nav class="flex text-sm text-gray-500 mb-1" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-2">
+          <li><a href="#" class="hover:text-blue-600">Dashboard</a></li>
+          <li><i class="fa-solid fa-chevron-right text-xs text-gray-400"></i></li>
+          <li><a th:href="@{/admin/account_list}" class="hover:text-blue-600">Danh sách tài khoản</a></li>
+          <li><i class="fa-solid fa-chevron-right text-xs text-gray-400"></i></li>
+          <li class="font-medium text-gray-800">Chi tiết</li>
+        </ol>
+      </nav>
+      <h1 class="text-2xl font-bold text-gray-800" th:text="'Hồ sơ: ' + ${user.fullName}">Hồ sơ nhân viên</h1>
+    </div>
+
+    <a th:href="@{/admin/account_list}" class="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2.5 rounded-lg font-medium transition-colors shadow-sm">
+      <i class="fa-solid fa-arrow-left"></i>
+      <span>Quay lại danh sách</span>
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+    <div class="xl:col-span-1 space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-8 text-center border-b border-gray-100 bg-gradient-to-b from-blue-50/50 to-white">
+          <div class="relative inline-block">
+            <div th:if="${user.avatarUrl != null}" class="w-24 h-24 rounded-full border-4 border-white shadow-md mx-auto mb-4 overflow-hidden">
+              <img th:src="${user.avatarUrl}" class="w-full h-full object-cover" alt="Avatar">
+            </div>
+            <div th:unless="${user.avatarUrl != null}"
+                 class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-3xl font-bold border-4 border-white shadow-md mx-auto mb-4"
+                 th:text="${#strings.substring(user.fullName,0,1)}">U</div>
+
+            <span class="absolute bottom-4 right-0 w-5 h-5 border-2 border-white rounded-full"
+                  th:classappend="${user.status == 'ACTIVE' ? 'bg-green-500' : 'bg-gray-400'}"
+                  th:title="${user.status}"></span>
+          </div>
+          <h2 class="text-xl font-bold text-gray-800" th:text="${user.fullName}">User Name</h2>
+          <p class="text-sm text-gray-500 mb-3" th:text="${user.role == 'ADMIN' ? 'Quản trị viên' : (user.role == 'STAFF' ? 'Nhân viên hệ thống' : 'Khách hàng')}">Vai trò</p>
+
+          <div class="flex justify-center gap-2">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  th:classappend="${user.role == 'ADMIN' ? 'bg-purple-100 text-purple-800' : (user.role == 'STAFF' ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800')}"
+                  th:text="${user.role}">Role</span>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  th:classappend="${user.status == 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}"
+                  th:text="${user.status == 'ACTIVE' ? 'Hoạt động' : 'Ngưng hoạt động'}">Status</span>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Thông tin liên hệ</h3>
+          <div class="space-y-4">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
+                <i class="fa-regular fa-envelope"></i>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500">Email</p>
+                <p class="text-sm font-medium text-gray-800 break-all" th:text="${user.email}">email@booknow.com</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
+                <i class="fa-solid fa-phone"></i>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500">Số điện thoại</p>
+                <p class="text-sm font-medium text-gray-800" th:text="${user.phone != null ? user.phone : 'Chưa cập nhật'}">0900...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="xl:col-span-2 space-y-6">
+
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+          <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+            <i class="fa-solid fa-circle-info text-blue-500"></i>
+            Thông tin hệ thống
+          </h3>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Mã định danh (ID)</label>
+              <p class="text-base font-semibold text-gray-900 bg-gray-50 p-2 rounded border border-gray-100" th:text="${user.userId}">ID-001</p>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Ngày đăng ký</label>
+              <p class="text-base font-medium text-gray-900 p-2"
+                 th:text="${user.createdAt != null ? #temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm') : '---'}">01/01/2026</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+          <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+            <i class="fa-solid fa-gear text-gray-500"></i>
+            Thao tác quản lý
+          </h3>
+        </div>
+        <div class="p-6">
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button class="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium transition-colors shadow-sm">
+              <i class="fa-regular fa-pen-to-square"></i>
+              <span>Chỉnh sửa hồ sơ</span>
+            </button>
+
+
+            <button class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors border"
+                    th:classappend="${user.status == 'ACTIVE'
+                         ? 'bg-red-50 text-red-700 hover:bg-red-100 border-red-600'
+                         : 'bg-green-50 text-green-700 hover:bg-green-100 border-green-600'}">
+
+              <i class="fa-solid" th:classappend="${user.status == 'ACTIVE' ? 'fa-user-slash' : 'fa-user-check'}"></i>
+
+              <span th:text="${user.status == 'ACTIVE' ? 'Ngưng hoạt động' : 'Kích hoạt lại'}">Thao tác</span>
+            </button>
+
+
+
+            <button class="flex-1 flex items-center justify-center gap-2 bg-white text-red-600 hover:bg-red-50 border border-red-200 px-4 py-3 rounded-lg font-medium transition-colors">
+              <i class="fa-regular fa-trash-can"></i>
+              <span>Xóa vĩnh viễn</span>
+            </button>
+          </div>
+          <p class="text-xs text-gray-400 mt-4 text-center">
+            * Lưu ý: Các thay đổi về trạng thái tài khoản sẽ có hiệu lực ngay lập tức.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<script>
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const sidebar = document.getElementById('sidebar');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    const isClosed = sidebar.classList.contains('-translate-x-full');
+    if (isClosed) {
+      sidebar.classList.remove('-translate-x-full');
+      sidebarOverlay.classList.remove('hidden');
+    } else {
+      sidebar.classList.add('-translate-x-full');
+      sidebarOverlay.classList.add('hidden');
+    }
+  }
+
+  mobileMenuBtn.addEventListener('click', toggleSidebar);
+  sidebarOverlay.addEventListener('click', toggleSidebar);
+</script>
+</body>
+</html>

@@ -2,6 +2,8 @@ package vn.edu.fpt.booknow.entities;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "Customer")
 public class Customer {
@@ -19,6 +21,16 @@ public class Customer {
 
     @Column(name = "status")
     private String status;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
 
 
     public Long getCustomerId() {
@@ -51,5 +63,29 @@ public class Customer {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }
