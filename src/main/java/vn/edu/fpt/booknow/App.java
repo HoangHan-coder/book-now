@@ -2,11 +2,6 @@ package vn.edu.fpt.booknow;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
-import vn.edu.fpt.booknow.entities.Room;
-import vn.edu.fpt.booknow.services.RoomServices;
-
-import java.util.List;
 
 @SpringBootApplication
 public class App {
@@ -19,9 +14,10 @@ public class App {
 //        ConfigurableApplicationContext ctx = SpringApplication.run(App.class, args);
 //        RoomServices roomServices = ctx.getBean(RoomServices.class);
 //
-//       List<Room> rooms = roomServices.getALl();
-//
-//       roomServices.testPrintRooms();
+//       List<Room> list = roomServices.getAll();
+//       for(Room r: list) {
+//           System.out.println(r.getRoomNumber() + r.getRoomType() + r.getRoomType().getName());
+//       }
 //    }
 //
 //}

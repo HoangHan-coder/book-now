@@ -158,9 +158,9 @@
                 <div class="relative">
                     <select class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white cursor-pointer">
                         <option value="">Tất cả trạng thái</option>
-                        <option value="available">Còn trống</option>
-                        <option value="occupied">Đang ở</option>
-                        <option value="maintenance">Bảo trì</option>
+                        <option value="Available">AVAILABLE</option>
+                        <option value="Booked">BOOKED</option>
+                        <option value="Maintenance">MAINTENANCE</option>
                     </select>
                     <i class="fa-solid fa-circle-check absolute left-3 top-2.5 text-gray-400"></i>
                     <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-gray-400 pointer-events-none"></i>
@@ -173,9 +173,9 @@
                 <div class="relative">
                     <select class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white cursor-pointer">
                         <option value="">Tất cả loại phòng</option>
-                        <option value="single">Single Room (Đơn)</option>
-                        <option value="double">Double Room (Đôi)</option>
-                        <option value="suite">Suite (Cao cấp)</option>
+                        <option value="Gaming">Gaming Hub Suite</option>
+                        <option value="Neon">Neon Night Studio</option>
+                        <option value="Ocean">Ocean City Retreat</option>
                     </select>
                     <i class="fa-solid fa-bed absolute left-3 top-2.5 text-gray-400"></i>
                     <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-gray-400 pointer-events-none"></i>
@@ -187,11 +187,13 @@
                 <label class="text-xs font-medium text-gray-500 uppercase">Tìm kiếm</label>
                 <div class="flex gap-2">
                     <div class="relative flex-1">
-                        <input type="text" placeholder="Nhập số phòng..."
+                        <input type="text"
+                               placeholder="Nhập số phòng..."
                                class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400"></i>
                     </div>
-                    <button class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-lg transition-colors text-sm font-medium border border-gray-200">
+                    <button
+                            class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-lg transition-colors text-sm font-medium border border-gray-200">
                         Tìm
                     </button>
                 </div>
@@ -224,7 +226,7 @@
                               th:text="${room.roomNumber}"></span>
                     </td>
                     <td class="py-4 px-6">
-                        <p class="text-sm font-medium text-gray-900">Single Room</p>
+                        <p class="text-sm font-medium text-gray-900" th:text="${room.roomType.name}"></p>
                     </td>
                     <td class="py-4 px-6">
                                 <span class="text-sm font-medium text-blue-600"
@@ -245,7 +247,7 @@
                     </td>
                     <td class="py-4 px-6 text-right">
                         <a th:href="@{/admin/detail}">
-                        <button class="text-blue-600 hover:text-blue-900 font-medium text-sm">Xem chi tiết</button>
+                            <button class="text-blue-600 hover:text-blue-900 font-medium text-sm">Xem chi tiết</button>
                         </a>
                     </td>
                 </tr>
@@ -256,21 +258,24 @@
         <!-- Pagination -->
         <div class="bg-gray-50 px-6 py-4 border-t border-gray-100 flex items-center justify-between">
             <span class="text-sm text-gray-500">Hiển thị <span class="font-medium text-gray-900">1-5</span> trên <span
-                    class="font-medium text-gray-900">20</span> phòng</span>
+                    class="font-medium text-gray-900" th:text="${totalRoom}"></span> phòng</span>
             <div class="flex items-center space-x-1">
-                <button class="px-3 py-1 rounded-md bg-white border border-gray-300 text-gray-500 hover:bg-gray-50 disabled:opacity-50 text-sm">
+                <button class="px-3 py-1 rounded-md bg-white border border-gray-300 text-gray-500 hover:bg-gray-50 disabled:opacity-50 text-sm"
+                        th:disabled="${rooms.first}"
+                        th:onclick="|window.location='@{/admin/list(page=${rooms.number})}'|">
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
-                <button class="px-3 py-1 rounded-md bg-blue-600 border border-blue-600 text-white text-sm font-medium">
-                    1
-                </button>
-                <button class="px-3 py-1 rounded-md bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm">
-                    2
-                </button>
-                <button class="px-3 py-1 rounded-md bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm">
-                    3
-                </button>
-                <button class="px-3 py-1 rounded-md bg-white border border-gray-300 text-gray-500 hover:bg-gray-50 text-sm">
+                <a th:each="i : ${#numbers.sequence(1, rooms.totalPages)}"
+                   th:href="@{/admin/list(page=${i})}"
+                   th:text="${i}"
+                   th:classappend="${(rooms.number + 1) == i}
+                     ? ' bg-blue-600 text-white border-blue-600'
+                     : ' bg-white text-gray-700 border-gray-300'"
+                   class="px-3 py-1 rounded-md border text-sm font-medium">
+                </a>
+                <button class="px-3 py-1 rounded-md bg-white border border-gray-300 text-gray-500 hover:bg-gray-50 disabled:opacity-50 text-sm"
+                        th:disabled="${rooms.last}"
+                        th:onclick="|window.location='@{/admin/list(page=${rooms.number + 2})}'|">
                     <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>

@@ -1,19 +1,25 @@
 package vn.edu.fpt.booknow.controller.Admin;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import vn.edu.fpt.booknow.services.RoomServices;
+import vn.edu.fpt.booknow.entities.Room;
+import vn.edu.fpt.booknow.services.ManageRoomServices;
+
+import java.util.List;
 
 @Controller
 @RequestMapping(value = "/admin")
 public class ManageRoomController {
-    private RoomServices roomServices;
+    final static int ITEM_PER_PAGE = 5;
+    private ManageRoomServices manageRoomServices;
 
-    public ManageRoomController(RoomServices roomServices) {
-        this.roomServices = roomServices;
+    public ManageRoomController(ManageRoomServices roomServices) {
+        this.manageRoomServices = roomServices;
     }
 
     @GetMapping("/dashboard")
@@ -22,13 +28,15 @@ public class ManageRoomController {
     }
 
     @GetMapping(value = "/list")
-    public String listRoom( @RequestParam(required = false) String status,
-                            @RequestParam(required = false) String type,
-                            @RequestParam(required = false) String roomNumber,
-                            Model model) {
-        model.addAttribute("rooms", roomServices.getAll());
-        model.addAttribute("rooms",
-                roomServices.searchRoom(status, type, roomNumber));
+    public String listRoom(Model model,
+                           @RequestParam(name = "page", required = false, defaultValue = "1") int page) {
+        Page<Room> roomlist = manageRoomServices.getAllWithPagination(
+                PageRequest.of(page - 1, ManageRoomController.ITEM_PER_PAGE)
+        );
+        model.addAttribute("rooms", roomlist);
+        model.addAttribute("totalRoom", roomlist.getTotalElements());
+        model.addAttribute("totalPages", roomlist.getTotalPages());
+
         return "private/Room_list";
     }
 
@@ -46,5 +54,4 @@ public class ManageRoomController {
     public String updateRoom() {
         return "private/Room_update_stt";
     }
-
 }

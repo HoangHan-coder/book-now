@@ -1,17 +1,19 @@
 package vn.edu.fpt.booknow.services;
 
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import vn.edu.fpt.booknow.entities.Room;
 import vn.edu.fpt.booknow.repositories.RoomRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class RoomServices {
+public class ManageRoomServices {
     private RoomRepository roomRepository;
-
-    public RoomServices(RoomRepository roomRepository) {
+    public ManageRoomServices(RoomRepository roomRepository) {
         this.roomRepository = roomRepository;
     }
 
@@ -21,11 +23,7 @@ public class RoomServices {
     }
 
     @Transactional
-    public List<Room> searchRoom(String status, String type, String roomNumber) {
-        return roomRepository.search(
-                status,
-                type,
-                roomNumber == null ? null : "%" + roomNumber + "%"
-        );
+    public Page<Room> getAllWithPagination(Pageable pageable){
+        return roomRepository.findAll(pageable);
     }
 }
