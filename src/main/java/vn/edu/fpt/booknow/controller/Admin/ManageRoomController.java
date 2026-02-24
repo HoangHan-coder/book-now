@@ -28,15 +28,26 @@ public class ManageRoomController {
     }
 
     @GetMapping(value = "/list")
-    public String listRoom(Model model,
-                           @RequestParam(name = "page", required = false, defaultValue = "1") int page) {
-        Page<Room> roomlist = manageRoomServices.getAllWithPagination(
-                PageRequest.of(page - 1, ManageRoomController.ITEM_PER_PAGE)
+    public String listRoom(
+            Model model,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String roomNumber) {
+        Page<Room> roomlist = manageRoomServices.filterRooms(
+                status,
+                type,
+                roomNumber,
+                PageRequest.of(page - 1, ITEM_PER_PAGE)
         );
         model.addAttribute("rooms", roomlist);
         model.addAttribute("totalRoom", roomlist.getTotalElements());
         model.addAttribute("totalPages", roomlist.getTotalPages());
 
+        // keep value filter
+        model.addAttribute("status", status);
+        model.addAttribute("type", type);
+        model.addAttribute("roomNumber", roomNumber);
         return "private/Room_list";
     }
 

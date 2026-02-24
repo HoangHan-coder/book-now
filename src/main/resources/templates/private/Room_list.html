@@ -148,6 +148,7 @@
         </a>
     </div>
 
+    <form th:action="@{/admin/list}" method="get">
     <!-- FILTERS CARD -->
     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -156,11 +157,11 @@
             <div class="space-y-1">
                 <label class="text-xs font-medium text-gray-500 uppercase">Trạng thái phòng</label>
                 <div class="relative">
-                    <select class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white cursor-pointer">
+                    <select name="status" class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white cursor-pointer">
                         <option value="">Tất cả trạng thái</option>
-                        <option value="Available">AVAILABLE</option>
-                        <option value="Booked">BOOKED</option>
-                        <option value="Maintenance">MAINTENANCE</option>
+                        <option value="AVAILABLE">AVAILABLE</option>
+                        <option value="BOOKED">BOOKED</option>
+                        <option value="MAINTENANCE">MAINTENANCE</option>
                     </select>
                     <i class="fa-solid fa-circle-check absolute left-3 top-2.5 text-gray-400"></i>
                     <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-gray-400 pointer-events-none"></i>
@@ -171,11 +172,11 @@
             <div class="space-y-1">
                 <label class="text-xs font-medium text-gray-500 uppercase">Loại phòng</label>
                 <div class="relative">
-                    <select class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white cursor-pointer">
+                    <select name="type" class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white cursor-pointer">
                         <option value="">Tất cả loại phòng</option>
-                        <option value="Gaming">Gaming Hub Suite</option>
-                        <option value="Neon">Neon Night Studio</option>
-                        <option value="Ocean">Ocean City Retreat</option>
+                        <option value="Gaming Hub Suite">Gaming Hub Suite</option>
+                        <option value="Neon Night Studio">Neon Night Studio</option>
+                        <option value="Ocean City Retreat">Ocean City Retreat</option>
                     </select>
                     <i class="fa-solid fa-bed absolute left-3 top-2.5 text-gray-400"></i>
                     <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-gray-400 pointer-events-none"></i>
@@ -188,11 +189,12 @@
                 <div class="flex gap-2">
                     <div class="relative flex-1">
                         <input type="text"
+                               name="roomNumber"
                                placeholder="Nhập số phòng..."
                                class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400"></i>
                     </div>
-                    <button
+                    <button type="submit"
                             class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-lg transition-colors text-sm font-medium border border-gray-200">
                         Tìm
                     </button>
@@ -200,6 +202,7 @@
             </div>
         </div>
     </div>
+    </form>
 
     <!-- TABLE SECTION -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -219,7 +222,7 @@
                 </thead>
                 <tbody class="divide-y divide-gray-50">
                 <!-- Available -->
-                <tr th:each="room : ${rooms}"
+                <tr th:each="room : ${rooms.content}"
                     class="hover:bg-gray-50 transition-colors group">
                     <td class="py-4 px-6">
                         <span class="font-bold text-gray-900 bg-gray-100 px-3 py-1 rounded-md text-sm"
@@ -251,12 +254,20 @@
                         </a>
                     </td>
                 </tr>
+                <!-- don't data -->
+                <tr th:if="${rooms.content.size() == 0}">
+                    <td colspan="6" class="text-center py-10 text-gray-500">
+                        <i class="fa-regular fa-face-frown text-2xl mb-2 block"></i>
+                        Không tìm thấy phòng phù hợp
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
 
         <!-- Pagination -->
-        <div class="bg-gray-50 px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+        <div th:if="${rooms.totalElements > 0}"
+                class="bg-gray-50 px-6 py-4 border-t border-gray-100 flex items-center justify-between">
             <span class="text-sm text-gray-500">Hiển thị <span class="font-medium text-gray-900">1-5</span> trên <span
                     class="font-medium text-gray-900" th:text="${totalRoom}"></span> phòng</span>
             <div class="flex items-center space-x-1">
@@ -266,7 +277,12 @@
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
                 <a th:each="i : ${#numbers.sequence(1, rooms.totalPages)}"
-                   th:href="@{/admin/list(page=${i})}"
+                   th:href="@{/admin/list(
+                   page=${i},
+                   status=${status},
+                   type=${type},
+                   roomNumber=${roomNumber}
+                   )}"
                    th:text="${i}"
                    th:classappend="${(rooms.number + 1) == i}
                      ? ' bg-blue-600 text-white border-blue-600'

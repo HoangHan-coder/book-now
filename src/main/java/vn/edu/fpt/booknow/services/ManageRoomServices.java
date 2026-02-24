@@ -18,12 +18,33 @@ public class ManageRoomServices {
     }
 
     @Transactional
-    public List<Room> getAll() {
-        return roomRepository.findAll();
-    }
+    public Page<Room> filterRooms(
+            String status,
+            String type,
+            String roomNumber,
+            Pageable pageable
+    ) {
+        if (roomNumber != null && !roomNumber.isBlank()) {
+            return roomRepository.findByRoomNumberContaining(
+                    roomNumber.trim(), pageable
+            );
+        }
 
-    @Transactional
-    public Page<Room> getAllWithPagination(Pageable pageable){
+        if (status != null && !status.isBlank()
+                && type != null && !type.isBlank()) {
+            return roomRepository.findByStatusAndRoomType_Name(
+                    status, type, pageable
+            );
+        }
+
+        if (status != null && !status.isBlank()) {
+            return roomRepository.findByStatus(status, pageable);
+        }
+
+        if (type != null && !type.isBlank()) {
+            return roomRepository.findByRoomType_Name(type, pageable);
+        }
+
         return roomRepository.findAll(pageable);
     }
 }
