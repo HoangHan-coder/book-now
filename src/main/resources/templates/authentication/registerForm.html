@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoàn tất đăng ký - BookNow</title>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            light: '#60a5fa', // blue-400
+                            DEFAULT: '#3b82f6', // blue-500
+                            dark: '#2563eb', // blue-600
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+
+
+    <style>
+        /* Specific Logo Positioning Rule */
+        .logo-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin-top: 25px;
+            margin-left: 25px;
+            z-index: 50;
+        }
+
+        /* Subtle background pattern */
+        body {
+            background-color: #f3f4f6;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center font-sans text-gray-800 relative p-4">
+
+<!-- LOGO (Fixed Position) -->
+<div class="logo-fixed flex items-center gap-3 select-none cursor-pointer">
+    <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
+        <i class="fa-solid fa-house-chimney gradient-icon text-xl text-blue-600"></i>
+    </div>
+    <div class="flex flex-col justify-center">
+        <span class="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-blue-600 leading-none">BookNow</span>
+        <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider pl-0.5">Homestay System</span>
+    </div>
+</div>
+
+<!-- MAIN CARD -->
+<div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+
+    <!-- Header -->
+    <div class="px-8 pt-10 pb-4 text-center">
+        <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fa-solid fa-user-pen text-2xl text-blue-600"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800">Hoàn tất hồ sơ</h2>
+        <p class="text-sm text-gray-500 mt-2 leading-relaxed">
+            Thiết lập thông tin cá nhân và mật khẩu<br>để bảo vệ tài khoản của bạn.
+        </p>
+    </div>
+
+    <!-- Form -->
+    <div class="px-8 pb-8">
+        <form th:action="@{/authen/registerForm}" method="post" id="profileForm" class="space-y-5">
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}"/>
+            <input type="hidden" name="email" th:value="${email}">
+            <!-- Full Name -->
+            <div class="space-y-1">
+                <label for="fullName" class="block text-sm font-medium text-gray-700">Họ và tên</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-regular fa-user text-gray-400"></i>
+                    </div>
+                    <input type="text" id="fullName" name="fullName"
+                           class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 sm:text-sm"
+                           placeholder="Nguyễn Văn A">
+                </div>
+            </div>
+
+            <!-- Phone -->
+            <div class="space-y-1">
+                <label for="phone" class="block text-sm font-medium text-gray-700">Số điện thoại</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-phone text-gray-400 text-xs"></i>
+                    </div>
+                    <input type="text" id="phone" name="phone"
+                           class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 sm:text-sm"
+                           placeholder="0912 345 678">
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="space-y-1">
+                <label for="password" class="block text-sm font-medium text-gray-700">Mật khẩu</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-lock text-gray-400"></i>
+                    </div>
+                    <input type="text" id="password" name="password"
+                           class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 sm:text-sm"
+                           placeholder="Tối thiểu 8 ký tự">
+                    <button type="button" class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer focus:outline-none" data-target="password">
+                        <i class="fa-regular fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="space-y-1">
+                <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Xác nhận mật khẩu</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-lock text-gray-400"></i>
+                    </div>
+                    <input type="text" id="confirmPassword" name="confirmPassword"
+                           class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 sm:text-sm"
+                           placeholder="Nhập lại mật khẩu">
+                    <button type="button" class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer focus:outline-none" data-target="confirmPassword">
+                        <i class="fa-regular fa-eye"></i>
+                    </button>
+                </div>
+                <p id="passwordError" class="hidden text-xs text-red-500 mt-1 flex items-center">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Mật khẩu xác nhận không khớp.
+                </p>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="submitBtn"
+                    class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:-translate-y-0.5 mt-2">
+                <span id="btnText">Hoàn tất đăng ký</span>
+                <i id="btnLoader" class="fa-solid fa-circle-notch fa-spin ml-2 hidden"></i>
+            </button>
+
+        </form>
+    </div>
+</div>
+
+<!-- Notification Overlay -->
+<div th:if="${messageFields} or ${messagePassword} or ${messageName} or ${messagePhone} or ${messageConfirm} or ${messageEmail}"
+     class="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 text-center animate-fade-in">
+        <div class="mb-3">
+            <i class="fa-solid fa-circle-exclamation text-red-500 text-3xl"></i>
+        </div>
+
+        <!-- Nội dung message -->
+
+            <p class="text-sm text-gray-700 font-medium" th:text="${#strings.defaultString(messageFields,
+         #strings.defaultString(messagePassword,
+         #strings.defaultString(messageName,
+         #strings.defaultString(messagePhone,
+         #strings.defaultString(messageConfirm,
+                                messageEmail))))) }"></p>
+
+        <button onclick="this.closest('.fixed').remove()"
+                class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+            OK
+        </button>
+    </div>
+</div>
+
+<!-- SCRIPT -->
+<!--<script>-->
+<!--    document.addEventListener('DOMContentLoaded', () => {-->
+<!--        const form = document.getElementById('profileForm');-->
+<!--        const fullnameInput = document.getElementById('fullname');-->
+<!--        const phoneInput = document.getElementById('phone');-->
+<!--        const passwordInput = document.getElementById('password');-->
+<!--        const confirmInput = document.getElementById('confirmPassword');-->
+<!--        const passwordError = document.getElementById('passwordError');-->
+<!--        const submitBtn = document.getElementById('submitBtn');-->
+<!--        const btnText = document.getElementById('btnText');-->
+<!--        const btnLoader = document.getElementById('btnLoader');-->
+<!--        const toggleBtns = document.querySelectorAll('.toggle-password');-->
+
+<!--        // Toggle Password Visibility-->
+<!--        toggleBtns.forEach(btn => {-->
+<!--            btn.addEventListener('click', () => {-->
+<!--                const targetId = btn.getAttribute('data-target');-->
+<!--                const input = document.getElementById(targetId);-->
+<!--                const icon = btn.querySelector('i');-->
+
+<!--                if (input.type === 'password') {-->
+<!--                    input.type = 'text';-->
+<!--                    icon.classList.remove('fa-eye');-->
+<!--                    icon.classList.add('fa-eye-slash');-->
+<!--                } else {-->
+<!--                    input.type = 'password';-->
+<!--                    icon.classList.remove('fa-eye-slash');-->
+<!--                    icon.classList.add('fa-eye');-->
+<!--                }-->
+<!--            });-->
+<!--        });-->
+
+<!--        // Input Focus Logic (Remove errors)-->
+<!--        [fullnameInput, phoneInput, passwordInput, confirmInput].forEach(input => {-->
+<!--            input.addEventListener('input', () => {-->
+<!--                passwordError.classList.add('hidden');-->
+<!--                input.classList.remove('border-red-300', 'focus:ring-red-200');-->
+<!--                input.classList.add('border-gray-300', 'focus:ring-blue-500');-->
+<!--            });-->
+<!--        });-->
+
+<!--        // Form Submission-->
+<!--        form.addEventListener('submit', (e) => {-->
+<!--            e.preventDefault();-->
+<!--            let isValid = true;-->
+
+<!--            // Validate Full Name-->
+<!--            if (!fullnameInput.value.trim()) {-->
+<!--                fullnameInput.classList.add('border-red-300', 'focus:ring-red-200');-->
+<!--                isValid = false;-->
+<!--            }-->
+
+<!--            // Validate Phone (Simple check)-->
+<!--            if (!phoneInput.value.trim() || phoneInput.value.length < 9) {-->
+<!--                phoneInput.classList.add('border-red-300', 'focus:ring-red-200');-->
+<!--                isValid = false;-->
+<!--            }-->
+
+<!--            // Validate Password-->
+<!--            if (passwordInput.value.length < 8) {-->
+<!--                passwordInput.classList.add('border-red-300', 'focus:ring-red-200');-->
+<!--                alert("Mật khẩu phải có ít nhất 8 ký tự.");-->
+<!--                isValid = false;-->
+<!--            }-->
+
+<!--            // Validate Match-->
+<!--            if (passwordInput.value !== confirmInput.value) {-->
+<!--                passwordError.classList.remove('hidden');-->
+<!--                confirmInput.classList.add('border-red-300', 'focus:ring-red-200');-->
+<!--                isValid = false;-->
+<!--            }-->
+
+<!--            if (isValid) {-->
+<!--                simulateCompletion();-->
+<!--            }-->
+<!--        });-->
+
+<!--        function simulateCompletion() {-->
+<!--            // UI Loading State-->
+<!--            submitBtn.disabled = true;-->
+<!--            submitBtn.classList.add('opacity-80', 'cursor-not-allowed');-->
+<!--            btnText.textContent = "Đang xử lý...";-->
+<!--            btnLoader.classList.remove('hidden');-->
+
+<!--            setTimeout(() => {-->
+<!--                // Success -> Redirect to Login-->
+<!--                alert(`Đăng ký thành công!\nChào mừng ${fullnameInput.value} đến với BookNow.`);-->
+<!--                window.location.href = 'customer_login.html';-->
+<!--            }, 1500);-->
+<!--        }-->
+<!--    });-->
+<!--</script>-->
+</body>
+</html>

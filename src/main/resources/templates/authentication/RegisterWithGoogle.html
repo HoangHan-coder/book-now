@@ -4,13 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng ký - BookNow</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <script>
         tailwind.config = {
             theme: {
@@ -29,6 +22,14 @@
             }
         }
     </script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+
 
     <style>
         /* Specific Logo Positioning Rule */
@@ -78,7 +79,7 @@
 
     <!-- Form -->
     <div class="px-8 pb-8">
-        <form id="registerStep1Form" class="space-y-6" novalidate>
+        <form th:action="@{/authen/otp}" method="get" id="registerStep1Form" class="space-y-6" novalidate>
 
             <!-- Email Field -->
             <div class="space-y-1">
@@ -135,73 +136,73 @@
 </div>
 
 <!-- SCRIPT -->
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const form = document.getElementById('registerStep1Form');
-        const emailInput = document.getElementById('email');
-        const emailError = document.getElementById('emailError');
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        const btnLoader = document.getElementById('btnLoader');
+<!--<script>-->
+<!--    document.addEventListener('DOMContentLoaded', () => {-->
+<!--        const form = document.getElementById('registerStep1Form');-->
+<!--        const emailInput = document.getElementById('email');-->
+<!--        const emailError = document.getElementById('emailError');-->
+<!--        const submitBtn = document.getElementById('submitBtn');-->
+<!--        const btnText = document.getElementById('btnText');-->
+<!--        const btnLoader = document.getElementById('btnLoader');-->
 
-        // Input Focus Logic (Remove errors)
-        emailInput.addEventListener('input', () => {
-            emailError.classList.add('hidden');
-            emailInput.classList.remove('border-red-300', 'focus:ring-red-200');
-            emailInput.classList.add('border-gray-300', 'focus:ring-blue-500');
-        });
+<!--        // Input Focus Logic (Remove errors)-->
+<!--        emailInput.addEventListener('input', () => {-->
+<!--            emailError.classList.add('hidden');-->
+<!--            emailInput.classList.remove('border-red-300', 'focus:ring-red-200');-->
+<!--            emailInput.classList.add('border-gray-300', 'focus:ring-blue-500');-->
+<!--        });-->
 
-        // Form Submission
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            let isValid = true;
+<!--        // Form Submission-->
+<!--        form.addEventListener('submit', (e) => {-->
+<!--            e.preventDefault();-->
+<!--            let isValid = true;-->
 
-            // Validate Email
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailInput.value.trim() || !emailRegex.test(emailInput.value)) {
-                emailError.textContent = "Vui lòng nhập địa chỉ email hợp lệ.";
-                emailError.classList.remove('hidden');
-                emailInput.classList.add('border-red-300', 'focus:ring-red-200');
-                isValid = false;
-            }
+<!--            // Validate Email-->
+<!--            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;-->
+<!--            if (!emailInput.value.trim() || !emailRegex.test(emailInput.value)) {-->
+<!--                emailError.textContent = "Vui lòng nhập địa chỉ email hợp lệ.";-->
+<!--                emailError.classList.remove('hidden');-->
+<!--                emailInput.classList.add('border-red-300', 'focus:ring-red-200');-->
+<!--                isValid = false;-->
+<!--            }-->
 
-            if (isValid) {
-                simulateCheckEmail();
-            }
-        });
+<!--            if (isValid) {-->
+<!--                simulateCheckEmail();-->
+<!--            }-->
+<!--        });-->
 
-        function simulateCheckEmail() {
-            // UI Loading State
-            submitBtn.disabled = true;
-            submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
-            btnText.textContent = "Đang kiểm tra...";
-            btnLoader.classList.remove('hidden');
+<!--        function simulateCheckEmail() {-->
+<!--            // UI Loading State-->
+<!--            submitBtn.disabled = true;-->
+<!--            submitBtn.classList.add('opacity-80', 'cursor-not-allowed');-->
+<!--            btnText.textContent = "Đang kiểm tra...";-->
+<!--            btnLoader.classList.remove('hidden');-->
 
-            setTimeout(() => {
-                // Simulate "Email already exists" for a specific case
-                if (emailInput.value === 'exist@booknow.com') {
-                    emailError.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i> Email này đã được sử dụng. <a href="customer_login.html" class="underline">Đăng nhập?</a>';
-                    emailError.classList.remove('hidden');
-                    emailInput.classList.add('border-red-300', 'focus:ring-red-200');
+<!--            setTimeout(() => {-->
+<!--                // Simulate "Email already exists" for a specific case-->
+<!--                if (emailInput.value === 'exist@booknow.com') {-->
+<!--                    emailError.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i> Email này đã được sử dụng. <a href="customer_login.html" class="underline">Đăng nhập?</a>';-->
+<!--                    emailError.classList.remove('hidden');-->
+<!--                    emailInput.classList.add('border-red-300', 'focus:ring-red-200');-->
 
-                    // Reset Button
-                    submitBtn.disabled = false;
-                    submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
-                    btnText.textContent = "Tiếp tục đăng ký";
-                    btnLoader.classList.add('hidden');
-                } else {
-                    // Success -> Proceed to next step (Simulated)
-                    alert(`Email hợp lệ! Chuyển sang bước nhập thông tin...`);
+<!--                    // Reset Button-->
+<!--                    submitBtn.disabled = false;-->
+<!--                    submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');-->
+<!--                    btnText.textContent = "Tiếp tục đăng ký";-->
+<!--                    btnLoader.classList.add('hidden');-->
+<!--                } else {-->
+<!--                    // Success -> Proceed to next step (Simulated)-->
+<!--                    alert(`Email hợp lệ! Chuyển sang bước nhập thông tin...`);-->
 
-                    // Reset for demo purposes
-                    submitBtn.disabled = false;
-                    submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
-                    btnText.textContent = "Tiếp tục đăng ký";
-                    btnLoader.classList.add('hidden');
-                }
-            }, 1000);
-        }
-    });
-</script>
+<!--                    // Reset for demo purposes-->
+<!--                    submitBtn.disabled = false;-->
+<!--                    submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');-->
+<!--                    btnText.textContent = "Tiếp tục đăng ký";-->
+<!--                    btnLoader.classList.add('hidden');-->
+<!--                }-->
+<!--            }, 1000);-->
+<!--        }-->
+<!--    });-->
+<!--</script>-->
 </body>
 </html>

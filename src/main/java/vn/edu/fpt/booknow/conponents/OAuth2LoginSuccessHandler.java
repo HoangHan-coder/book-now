@@ -26,10 +26,10 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         if (isNewUser) {
 
-            response.sendRedirect("/authen/login");
+            response.sendRedirect("/book-now/authen/login");
         } else {
 
-            response.sendRedirect("/authen/home");
+            response.sendRedirect("/book-now/authen/home");
         }
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import vn.edu.fpt.booknow.conponents.OAuth2LoginSuccessHandler;
 import vn.edu.fpt.booknow.services.customer.CustomOAuth2UserService;
@@ -22,7 +23,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/authen/login", "/authen/registerEmail")
+                        auth.requestMatchers("/authen/verifiedOtp","/authen/login", "/authen/registerEmail","/authen/otp","/authen/registerForm")
                                 .permitAll().anyRequest().authenticated())
                 .oauth2Login(oauth ->
                         oauth.loginPage("/authen/login")
