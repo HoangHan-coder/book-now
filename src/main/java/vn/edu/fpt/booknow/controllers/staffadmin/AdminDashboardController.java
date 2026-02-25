@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class AdminDashboardController {
     @GetMapping("admin/dashboard")
-    public String dasdboardPanel() {
+    public String dashboardPanel() {
         return "private/admin-dashboard";
     }
 

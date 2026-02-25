@@ -117,12 +117,10 @@
 
     <!-- Logout at Bottom -->
     <div class="absolute bottom-0 w-full p-4 border-t border-gray-100 bg-white">
-        <form th:action="@{/logout}" method="post">
-            <button class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
+        <a th:href="@{/auth/logout}" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
                 <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
                 Đăng xuất
-            </button>
-        </form>
+        </a>
     </div>
 </aside>
 
@@ -135,11 +133,11 @@
     <!-- TOP HEADER AREA -->
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <!-- User Info -->
-        <div class="flex items-center gap-4 bg-white p-3 rounded-xl shadow-sm border border-gray-100 md:ml-auto">
-            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border-2 border-white shadow-sm">
+        <div sec:authorize="isAuthenticated()" class="flex items-center gap-4 bg-white p-3 rounded-xl shadow-sm border border-gray-100 md:ml-auto">
+            <div  class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border-2 border-white shadow-sm">
                 AD
             </div>
-            <div class="pr-2">
+            <div class="pr-2" >
                 <h4 class="text-sm font-bold text-gray-800 leading-none" sec:authentication="principal.fullName"></h4>
                 <span class="text-xs text-blue-500 font-semibold bg-blue-50 px-2 py-0.5 rounded-full mt-1 inline-block">Admin</span>
             </div>

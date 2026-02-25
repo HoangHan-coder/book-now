@@ -155,7 +155,7 @@
             hệ</a>
 
         <div class="flex items-center gap-3" sec:authorize="!isAuthenticated()">
-            <a th:href="@{admin/auth/login}"
+            <a th:href="@{/auth/login}"
                class="text-sm font-semibold text-white px-5 py-2.5 rounded-full shadow-md transition-all transform hover:text-blue-500 hover:-translate-y-0.5 active:translate-y-0">
                 Đăng nhập
             </a>
@@ -183,7 +183,7 @@
                      class="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 dropdown-menu dropdown-hidden z-50">
                     <div class="px-4 py-3 border-b border-gray-100">
                         <p class="text-sm font-medium text-gray-900">Tài khoản của tôi</p>
-                        <p class="text-xs text-gray-500 truncate" sec:authentication="principal.username"></p>
+                        <p class="text-xs text-gray-500 truncate" sec:authentication="principal.fullName"></p>
                     </div>
                     <ul class="py-1">
                         <li>
@@ -200,11 +200,9 @@
                         </li>
                     </ul>
                     <div class="border-t border-gray-100 mt-1 pt-1">
-                        <form  th:action="@{/logout}" method="post">
-                            <button type="submit" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                                <i class="fa-solid fa-arrow-right-from-bracket mr-2 w-4"></i> Đăng xuất
-                            </button>
-                        </form>
+                        <a  th:href="@{/auth/logout}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                           <i class="fa-solid fa-arrow-right-from-bracket mr-2 w-4"></i> Đăng xuất
+                        </a>
                     </div>
                 </div>
             </div>

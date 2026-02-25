@@ -1,27 +1,25 @@
 package vn.edu.fpt.booknow.model.map;
 
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import vn.edu.fpt.booknow.model.entities.StaffAccount;
-
-
 import java.util.Collection;
 import java.util.List;
 
 public class StaffUserDetails implements UserDetails {
     private final StaffAccount staffAccount;
+    @Setter
+    @Getter
+    private String fullName;
 
     public StaffUserDetails(StaffAccount staffAccount) {
         this.staffAccount = staffAccount;
+        this.fullName = staffAccount.getFullName();
     }
-
-
-    public String getFullName() {
-        return staffAccount.getFullName();
-    }
-
 
     @Override
     public String getPassword() { return staffAccount.getPasswordHash(); }

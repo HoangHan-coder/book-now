@@ -1,27 +1,40 @@
 package vn.edu.fpt.booknow.services.staffadmin;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import vn.edu.fpt.booknow.model.entities.StaffAccount;
-import vn.edu.fpt.booknow.model.map.StaffUserDetails;
-import vn.edu.fpt.booknow.repositories.StaffAccountRepository;
+import vn.edu.fpt.booknow.model.map.CustomerDetails;
+import vn.edu.fpt.booknow.services.JWTService;
 
 @Service
-public class StaffAccountService implements UserDetailsService {
+public class StaffAccountService {
 
     @Autowired
-    private StaffAccountRepository staffAccountRepo;
+    private AuthenticationManager authManagerProvider;
 
+    @Autowired
+    private JWTService jwtService;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        StaffAccount sa = staffAccountRepo.findStaffAccountByEmail(username)
-                .orElseThrow( () -> new UsernameNotFoundException("User not found"));
-        return new StaffUserDetails(sa);
+    public boolean verify(StaffAccount users, HttpServletResponse response) {
+        System.out.println("Verify is running..");
+        Authentication authentication = authManagerProvider.authenticate(
+                new UsernamePasswordAuthenticationToken(users.getEmail(), users.getPasswordHash()));
+        if (authentication.isAuthenticated()) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            if (userDetails instanceof CustomerDetails) {
+                System.out.println("This is customer");
+                return false;
+            }
+            jwtService.createCookie(users, response);
+            return true;
+        }
+        return false;
     }
-
-
 }
