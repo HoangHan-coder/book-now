@@ -46,4 +46,10 @@ public class Booking {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "note", length = 255)
+    private String note;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }

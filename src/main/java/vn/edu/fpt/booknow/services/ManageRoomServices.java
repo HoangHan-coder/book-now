@@ -47,4 +47,9 @@ public class ManageRoomServices {
 
         return roomRepository.findAll(pageable);
     }
+
+    @Transactional
+    public Room findRoomById(Long id) {
+        return roomRepository.findById(id).orElse(null);
+    }
 }

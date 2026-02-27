@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import vn.edu.fpt.booknow.entities.Room;
@@ -56,13 +57,22 @@ public class ManageRoomController {
         return "private/Room_create";
     }
 
-    @GetMapping("/detail")
-    public String viewDetailRoom() {
+    @GetMapping("/detail/{id}")
+    public String viewDetailRoom(Model model, @PathVariable("id") Long id) {
+         Room room = manageRoomServices.findRoomById(id);
+         model.addAttribute("room", room);
         return "private/Room_Detail";
     }
 
     @GetMapping("/update")
     public String updateRoom() {
         return "private/Room_update_stt";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String editRoom(Model model, @PathVariable("id") Long id) {
+        Room room = manageRoomServices.findRoomById(id);
+        model.addAttribute("room", room);
+        return "private/Room_edit";
     }
 }

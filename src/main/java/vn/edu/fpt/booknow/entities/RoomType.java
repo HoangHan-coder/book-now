@@ -30,6 +30,9 @@ public class RoomType {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
 
+    @Column(name = "over_price", precision = 12, scale = 2, nullable = false)
+    private BigDecimal overPrice;
+
     // Quan hệ ngược (KHÔNG bắt buộc)
     @OneToMany(mappedBy = "roomType", fetch = FetchType.LAZY)
     private List<Room> rooms;
@@ -85,6 +88,14 @@ public class RoomType {
 
     public void setMaxGuests(Integer maxGuests) {
         this.maxGuests = maxGuests;
+    }
+
+    public BigDecimal getOverPrice() {
+        return overPrice;
+    }
+
+    public void setOverPrice(BigDecimal overPrice) {
+        this.overPrice = overPrice;
     }
 
     public Boolean getIsDeleted() {

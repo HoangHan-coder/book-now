@@ -2,6 +2,9 @@ package vn.edu.fpt.booknow.entities;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 @Entity
 public class Room {
     @Id
@@ -20,6 +23,15 @@ public class Room {
 
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
+
+    @Column(name = "area_m2", precision = 10, scale = 2)
+    private BigDecimal areaM2;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    private List<Image> images;
+
+    @OneToMany(mappedBy = "room")
+    private List<RoomAmenity> roomAmenities;
 
     // ===== Constructors =====
     public Room() {
@@ -66,4 +78,27 @@ public class Room {
         this.isDeleted = isDeleted;
     }
 
+    public BigDecimal getAreaM2() {
+        return areaM2;
+    }
+
+    public void setAreaM2(BigDecimal areaM2) {
+        this.areaM2 = areaM2;
+    }
+
+    public List<Image> getImages() {
+        return images;
+    }
+
+    public void setImages(List<Image> images) {
+        this.images = images;
+    }
+
+    public List<RoomAmenity> getRoomAmenities() {
+        return roomAmenities;
+    }
+
+    public void setRoomAmenities(List<RoomAmenity> roomAmenities) {
+        this.roomAmenities = roomAmenities;
+    }
 }

@@ -103,23 +103,15 @@
         <!-- HEADER -->
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
             <div class="flex items-center gap-3">
-                <a th:href="@{/admin/rooms}" class="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-colors">
+                <a th:href="@{/admin/list}" class="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-colors">
                     <i class="fa-solid fa-arrow-left"></i>
                 </a>
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800">Chi tiết phòng</h1>
-                    <p class="text-sm text-gray-500 mt-1">Xem thông tin phòng <span class="font-bold text-gray-700">G-Cyber-01</span></p>
+                    <p class="text-sm text-gray-500 mt-1">Xem thông tin phòng <span th:text="${room.roomNumber}" class="font-bold text-gray-700"></span></p>
                 </div>
             </div>
-            
-            <!-- Quick Action for Status Change (Optional) -->
-            <div class="hidden md:block">
-                 <span class="inline-flex items-center gap-2">
-                    <span class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700 border border-green-200">
-                        <i class="fa-solid fa-circle-check mr-1.5 text-xs"></i> Sẵn sàng
-                    </span>
-                </span>
-            </div>
+
         </div>
 
         <!-- INFO CARD -->
@@ -140,8 +132,7 @@
                                 <!-- Room Number -->
                                 <div class="space-y-1">
                                     <label class="block text-sm font-medium text-gray-500">Số phòng</label>
-                                    <div class="block w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 font-semibold sm:text-sm">
-                                        G-Cyber-01
+                                    <div th:text="${room.roomNumber}" class="block w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 font-semibold sm:text-sm">
                                     </div>
                                 </div>
 
@@ -150,7 +141,7 @@
                                     <label class="block text-sm font-medium text-gray-500">Trạng thái hiện tại</label>
                                     <div class="block w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg sm:text-sm flex items-center gap-2">
                                         <div>
-                                            <span class="text-green-600 font-medium"><i class="fa-solid fa-circle text-[10px] mr-1"></i> Còn trống (Sẵn sàng)</span>
+                                            <span th:text="${room.status}" class="text-green-600 font-medium"><i class="fa-solid fa-circle text-[10px] mr-1"></i></span>
                                         </div>
                                     </div>
                                 </div>
@@ -160,15 +151,16 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                                 <div class="space-y-1">
                                     <label class="block text-sm font-medium text-gray-500">Loại phòng</label>
-                                    <div class="block w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 font-medium sm:text-sm">
-                                        Gaming Hub Suite
+                                    <div th:text="${room.roomType.name}" class="block w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 font-medium sm:text-sm">
                                     </div>
-                                    <p class="text-xs text-gray-400 italic mt-1">Diện tích: 54m² | Tối đa: 2 người</p>
+                                    <p class="text-xs text-gray-400 italic mt-1"
+                                       th:text="|Diện tích: 54m² - Tối đa: ${room.roomType.maxGuests} người|">
+                                    </p>
                                 </div>
                                 <div class="hidden md:block">
                                     <div class="w-full aspect-video bg-gray-100 rounded-lg border border-gray-200 overflow-hidden flex items-center justify-center relative">
                                         <!-- Hardcoded Room Type Image -->
-                                        <img src="https://res.cloudinary.com/dlwdnmuir/image/upload/v1769965013/IMG_6116-scaled_xc8odf.jpg" 
+                                        <img th:src="${room.roomType.imageUrl}"
                                              alt="Room Type Preview" class="w-full h-full object-cover">
                                     </div>
                                 </div>
@@ -178,14 +170,16 @@
                             <div class="grid grid-cols-2 gap-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
                                 <div class="space-y-1">
                                     <label class="block text-sm font-medium text-blue-900/70">Giá / Slot (Giờ)</label>
-                                    <div class="text-blue-800 text-lg font-semibold">
-                                        150.000 ₫
+                                    <div th:text="${room.roomType != null
+                                      ? #numbers.formatDecimal(room.roomType.basePrice,0,'POINT',0,'COMMA') + '₫'
+                                      : 'N/A'}" class="text-blue-800 text-2xl font-bold">
                                     </div>
                                 </div>
                                 <div class="space-y-1">
                                     <label class="block text-sm font-medium text-blue-900/70">Giá / Đêm</label>
-                                    <div class="text-blue-800 text-2xl font-bold">
-                                        450.000 ₫
+                                    <div th:text="${room.roomType != null
+                                      ? #numbers.formatDecimal(room.roomType.overPrice,0,'POINT',0,'COMMA') + '₫'
+                                      : 'N/A'}" class="text-blue-800 text-2xl font-bold">
                                     </div>
                                 </div>
                             </div>
@@ -201,17 +195,17 @@
                             <div class="space-y-2">
                                 <label class="block text-sm font-medium text-gray-500">Thư viện ảnh</label>
                                 <div class="grid grid-cols-4 sm:grid-cols-5 gap-3">
+                                    <div th:if="${room.images == null or #lists.isEmpty(room.images)}"
+                                         class="col-span-full aspect-square flex items-center justify-center
+                border border-dashed border-gray-300 rounded-lg text-gray-400 italic">
+                                        Không có hình ảnh
+                                    </div>
                                     <!-- Image 1 -->
-                                    <div class="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group cursor-pointer hover:shadow-md transition-shadow">
-                                        <img src="https://res.cloudinary.com/dlwdnmuir/image/upload/v1769965013/IMG_6116-scaled_xc8odf.jpg" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300">
-                                    </div>
-                                    <!-- Image 2 -->
-                                    <div class="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group cursor-pointer hover:shadow-md transition-shadow">
-                                        <img src="https://res.cloudinary.com/dlwdnmuir/image/upload/v1769965211/IMG_6113-scaled_wjh8vv.jpg" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300">
-                                    </div>
-                                    <!-- Image 3 -->
-                                    <div class="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group cursor-pointer hover:shadow-md transition-shadow">
-                                        <img src="https://res.cloudinary.com/dlwdnmuir/image/upload/v1769965289/IMG_6111-scaled_ug1dvu.jpg" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300">
+                                    <div th:each="img : ${room.images}"
+                                         class="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group cursor-pointer hover:shadow-md transition-shadow">
+
+                                        <img th:src="${img.imageUrl}"
+                                             class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300">
                                     </div>
                                 </div>
                             </div>
@@ -219,7 +213,8 @@
                             <!-- Description -->
                             <div class="space-y-1">
                                 <label class="block text-sm font-medium text-gray-500">Mô tả chi tiết</label>
-                                <div class="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 sm:text-sm min-h-[100px] whitespace-pre-line">Thiên đường E-Sport với cấu hình máy khủng và không gian cách âm.</div>
+                                <div th:text="${room.roomType.description}"
+                                        class="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 sm:text-sm min-h-[100px] whitespace-pre-line"></div>
                             </div>
                         </div>
                     </div>
@@ -232,52 +227,26 @@
                             <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
                                 <i class="fa-solid fa-list-check text-green-500"></i> Tiện nghi có sẵn
                             </h3>
-                            
+
+                            <!-- Nếu không có tiện nghi -->
+                            <div th:if="${room.roomAmenities == null or room.roomAmenities.empty}"
+                                 class="text-sm text-gray-400 italic">
+                                Không có tiện nghi
+                            </div>
+
                             <!-- Amenities List (Read Only) -->
-                            <div class="space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
+                            <div th:if="${room.roomAmenities != null and !#lists.isEmpty(room.roomAmenities)}"
+                                    class="space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
                                 
                                 <!-- Hardcoded Amenities based on IDs provided -->
-                                <div class="flex items-center p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+                                <div th:each="ra : ${room.roomAmenities}"
+                                        class="flex items-center p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
                                     <div class="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center text-green-600 flex-shrink-0">
                                         <i class="fa-solid fa-check text-xs"></i>
                                     </div>
-                                    <span class="ml-3 text-sm font-medium text-gray-700">Wifi 6 (High Speed)</span>
-                                </div>
-                                <div class="flex items-center p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-                                    <div class="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center text-green-600 flex-shrink-0">
-                                        <i class="fa-solid fa-check text-xs"></i>
-                                    </div>
-                                    <span class="ml-3 text-sm font-medium text-gray-700">PC Gaming RTX 4090</span>
-                                </div>
-                                <div class="flex items-center p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-                                    <div class="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center text-green-600 flex-shrink-0">
-                                        <i class="fa-solid fa-check text-xs"></i>
-                                    </div>
-                                    <span class="ml-3 text-sm font-medium text-gray-700">Màn hình 240Hz</span>
-                                </div>
-                                <div class="flex items-center p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-                                    <div class="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center text-green-600 flex-shrink-0">
-                                        <i class="fa-solid fa-check text-xs"></i>
-                                    </div>
-                                    <span class="ml-3 text-sm font-medium text-gray-700">Ghế Gaming Secretlab</span>
-                                </div>
-                                <div class="flex items-center p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-                                    <div class="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center text-green-600 flex-shrink-0">
-                                        <i class="fa-solid fa-check text-xs"></i>
-                                    </div>
-                                    <span class="ml-3 text-sm font-medium text-gray-700">Cách âm chuyên dụng</span>
-                                </div>
-                                <div class="flex items-center p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-                                    <div class="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center text-green-600 flex-shrink-0">
-                                        <i class="fa-solid fa-check text-xs"></i>
-                                    </div>
-                                    <span class="ml-3 text-sm font-medium text-gray-700">Hệ thống đèn Smart Led</span>
-                                </div>
-                                <div class="flex items-center p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-                                    <div class="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center text-green-600 flex-shrink-0">
-                                        <i class="fa-solid fa-check text-xs"></i>
-                                    </div>
-                                    <span class="ml-3 text-sm font-medium text-gray-700">Máy lạnh độc lập</span>
+                                    <span class="ml-3 text-sm font-medium text-gray-700"
+                                          th:text="${ra.amenity.name}"
+                                    ></span>
                                 </div>
 
                             </div>
@@ -298,11 +267,11 @@
 
                 <!-- Footer Actions -->
                 <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-end gap-3 sticky bottom-0 bg-white py-4 z-10">
-                    <a th:href="@{/admin/rooms}" class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors flex items-center gap-2">
+                    <a th:href="@{/admin/list}" class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors flex items-center gap-2">
                         <i class="fa-solid fa-arrow-left"></i> Quay lại
                     </a>
                     
-                    <a th:href="@{/admin/rooms/edit/1}" class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition-colors flex items-center gap-2">
+                    <a th:href="@{/admin/edit/{id}(id=${room.roomId})}"  class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition-colors flex items-center gap-2">
                         <i class="fa-regular fa-pen-to-square"></i>
                         Chỉnh sửa thông tin
                     </a>
