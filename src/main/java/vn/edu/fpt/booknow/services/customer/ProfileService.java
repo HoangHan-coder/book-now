@@ -27,7 +27,7 @@ public class ProfileService {
                 throw new IllegalStateException("Customer has been deleted");
             }
 
-            if (!"ACTIVE".equals(customer.getStatus())) {
+            if (!"active".equalsIgnoreCase(customer.getStatus())) {
                 throw new IllegalStateException("Customer is inactive");
             }
 

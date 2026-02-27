@@ -42,27 +42,32 @@ public class CusChangePassController {
             @RequestParam("confirmPassword") String confirmPassword,
             RedirectAttributes redirectAttributes
     ) {
-        Map<String, String> errors = changePasswordService.changePassword(
-                customerId,
-                currentPassword,
-                newPassword,
-                confirmPassword
-        );
+        try {
+            Map<String, String> errors = changePasswordService.changePassword(
+                    customerId,
+                    currentPassword,
+                    newPassword,
+                    confirmPassword
+            );
 
-        if (!errors.isEmpty()) {
-            // 🔥 FLASH ATTRIBUTE
-            redirectAttributes.addFlashAttribute("errors", errors);
+            if (!errors.isEmpty()) {
+                redirectAttributes.addFlashAttribute("errors", errors);
+                redirectAttributes.addFlashAttribute("customerId", customerId);
+                return "redirect:/user/customer-change-password/" + customerId;
+            }
+
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Đổi mật khẩu thành công"
+            );
             redirectAttributes.addFlashAttribute("customerId", customerId);
 
             return "redirect:/user/customer-change-password/" + customerId;
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errors", 
+                    java.util.Collections.singletonMap("global", "Lỗi hệ thống: " + e.getMessage()));
+            redirectAttributes.addFlashAttribute("customerId", customerId);
+            return "redirect:/user/customer-change-password/" + customerId;
         }
-
-        redirectAttributes.addFlashAttribute(
-                "successMessage",
-                "Đổi mật khẩu thành công"
-        );
-        redirectAttributes.addFlashAttribute("customerId", customerId);
-
-        return "redirect:/user/customer-change-password/" + customerId;
     }
 }

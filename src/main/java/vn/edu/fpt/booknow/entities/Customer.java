@@ -29,6 +29,8 @@ public class Customer {
 
     @Column(name = "avatar_url", length = 255)
     private String avatarUrl;
+    @Column(name = "avatar_public_id", length = 255)
+    private String avatarPublicId;
 
     @Column(name = "phone", length = 20)
     private String phone;
@@ -44,4 +46,15 @@ public class Customer {
 
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+        isDeleted = false;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }
