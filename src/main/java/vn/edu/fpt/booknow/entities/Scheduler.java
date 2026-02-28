@@ -3,6 +3,8 @@ package vn.edu.fpt.booknow.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "scheduler")
 @Getter
@@ -22,4 +24,5 @@ public class Scheduler {
     @ManyToOne
     @JoinColumn(name = "timetable_id")
     private Timetable timetable;
+    private LocalDateTime date;
 }

@@ -26,9 +26,9 @@ public class Booking {
     @JoinColumn(name = "room_id")
     private Room room;
 
-    private LocalDate checkInTime;
+    private LocalDateTime checkInTime;
 
-    private LocalDate checkOutDate;
+    private LocalDateTime checkOutTime;
 
     private String idCardFrontUrl;
 
@@ -40,8 +40,8 @@ public class Booking {
 
     private String bookingCode;
 
-    private LocalDate createdAt;
-
+    private LocalDateTime createdAt;
+    private String note;
     @OneToMany(mappedBy = "booking")
     private List<Payment> payments;
 

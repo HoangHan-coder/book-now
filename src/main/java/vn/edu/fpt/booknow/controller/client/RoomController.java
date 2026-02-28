@@ -1,48 +1,161 @@
 package vn.edu.fpt.booknow.controller.client;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import vn.edu.fpt.booknow.dto.BookingDTO;
 import vn.edu.fpt.booknow.dto.RoomDTO;
 import vn.edu.fpt.booknow.dto.SearchDTO;
+import vn.edu.fpt.booknow.dto.TimeTableDTO;
+import vn.edu.fpt.booknow.entities.Amenity;
 import vn.edu.fpt.booknow.entities.Booking;
+import vn.edu.fpt.booknow.entities.Customer;
+import vn.edu.fpt.booknow.entities.Timetable;
+import vn.edu.fpt.booknow.repositories.CustomerRepository;
+import vn.edu.fpt.booknow.services.BookingService;
 import vn.edu.fpt.booknow.services.RoomService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 public class RoomController {
 
     private RoomService roomService;
-    public RoomController(RoomService roomService) {
+    private BookingService bookingService;
+    private CustomerRepository customerRepository;
+
+    public RoomController(RoomService roomService, BookingService bookingService, CustomerRepository customerRepository) {
         this.roomService = roomService;
+        this.bookingService = bookingService;
+        this.customerRepository = customerRepository;
     }
+
     @GetMapping("/detail/{roomId}")
-    public String detailRoom(@PathVariable Long roomId, Model model) {
+    public String detailRoom(@PathVariable Long roomId,
+                             Model model,
+                             @CookieValue(name = "access_token", required = false) String accessToken
+    ) {
+        // 1. Kiểm tra Access Token
+        String email = "";
+        Customer customer = new Customer();
         List<RoomDTO> roomDetail = roomService.detailRoomService(roomId);
-        Booking booking = new Booking();
-        model.addAttribute("roomDetail",roomDetail);
-        model.addAttribute("informBooking",booking);
+        List<Timetable> timetables = roomService.getAllTimeTable();
+        List<TimeTableDTO> getSlot = roomService.getSlot(roomId);
+        BookingDTO booking = new BookingDTO();
+        List<LocalDateTime> weekDates = new ArrayList<>();
+        LocalDateTime today = LocalDateTime.now();
+        if (accessToken != null && !accessToken.isEmpty()) {
+            customer = customerRepository.getCustomerByEmail(email);
+            booking.setCustomer(customer);
+        }
+
+        booking.setCustomer(customer);
+        for (int i = 0; i < 7; i++) {
+            weekDates.add(today.plusDays(i));
+        }
+        Set<String> bookedKeys = new HashSet<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMM");
+
+        for (TimeTableDTO s : getSlot) {
+            String key = s.getDate().format(formatter) + "-" + s.getTimetableId();
+            bookedKeys.add(key);
+        }
+        booking.setRoomId(roomId);
+        model.addAttribute("bookedKeys", bookedKeys);
+        model.addAttribute("timeTable", timetables);
+        model.addAttribute("weekDates", weekDates);
+        model.addAttribute("today", today);
+        model.addAttribute("roomDetail", roomDetail);
+        model.addAttribute("informBooking", booking);
         return "public/DetailRoom";
     }
-    @GetMapping("/search")
-    public String search() {
-        return "public/SearchRoom";
-    }
+
     @PostMapping("/search")
-    public String search(@ModelAttribute SearchDTO searchDTO, Model model) {
-        Page<RoomDTO> list = roomService.getSearchService(searchDTO);
-        System.out.println(list.getNumberOfElements());
-        model.addAttribute("rooms",list);
-        return "public/SearchRoom";
+    public String searchPost(@ModelAttribute("search") SearchDTO searchDTO,
+                             Model model) {
+        try {
+            // Luôn mặc định về trang 0 khi bấm tìm mới
+            Page<RoomDTO> rooms = roomService.getSearchService(searchDTO, searchDTO.getPage());
+
+            // Tính toán phân trang trực tiếp trong hàm
+            int totalPages = rooms.getTotalPages();
+            int current = rooms.getNumber();
+            int displayRange = 5;
+            int start = Math.max(0, current - displayRange / 2);
+            int end = Math.min(totalPages - 1, start + displayRange - 1);
+            if (end - start + 1 < displayRange) start = Math.max(0, end - displayRange + 1);
+            System.out.println(searchDTO.getPage());
+            List<Integer> pageNumbers = new ArrayList<>();
+            for (int i = start; i <= end; i++) pageNumbers.add(i);
+
+            model.addAttribute("rooms", rooms);
+            model.addAttribute("search", searchDTO);
+            model.addAttribute("pageNumbers", pageNumbers);
+            model.addAttribute("amenities", roomService.getAllAmenity());
+
+            return "public/SearchRoom";
+        } catch (Exception e) {
+            return "redirect:/homepage";
+        }
     }
-    @PostMapping("/infor")
-    public String booking(@ModelAttribute Booking booking) {
-        roomService.saveBooking(booking);
-        return "redirect:/detail/1";
+
+    // 2. XỬ LÝ KHI NGƯỜI DÙNG CHUYỂN TRANG (GET)
+    @GetMapping("/search")
+    public String searchGet(@ModelAttribute("search") SearchDTO searchDTO,
+                            @RequestParam(value = "page", defaultValue = "0") int page,
+                            Model model) {
+        try {
+            // Sử dụng tham số 'page' từ URL
+            Page<RoomDTO> rooms = roomService.getSearchService(searchDTO, page);
+
+            // Tính toán phân trang trực tiếp trong hàm (lặp lại logic)
+            int totalPages = rooms.getTotalPages();
+            int current = rooms.getNumber();
+            int displayRange = 5;
+            int start = Math.max(0, current - displayRange / 2);
+            int end = Math.min(totalPages - 1, start + displayRange - 1);
+            if (end - start + 1 < displayRange) start = Math.max(0, end - displayRange + 1);
+
+            List<Integer> pageNumbers = new ArrayList<>();
+            for (int i = start; i <= end; i++) pageNumbers.add(i);
+
+            model.addAttribute("rooms", rooms);
+            model.addAttribute("search", searchDTO);
+            model.addAttribute("pageNumbers", pageNumbers);
+            model.addAttribute("amenities", roomService.getAllAmenity());
+
+            return "public/SearchRoom";
+        } catch (Exception e) {
+            return "redirect:/homepage";
+        }
+    }
+
+    @PostMapping("/booking/save")
+    public String bookingSave(@ModelAttribute BookingDTO bookingDTO, @RequestParam(value = "cccd_front", required = false) MultipartFile frontImg,
+                              @RequestParam(value = "cccd_back", required = false) MultipartFile backImg,
+                              @CookieValue(name = "access_token", required = false) String accessToken,
+                              RedirectAttributes redirectAttributes) {
+//        if (accessToken == null || accessToken.isEmpty()) {
+//            return "login";
+//        }
+        try {
+            bookingService.saveBooking(bookingDTO, frontImg, backImg, redirectAttributes);
+            return "redirect:/detail/1";
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return "redirect:/homepage";
+        }
     }
 }

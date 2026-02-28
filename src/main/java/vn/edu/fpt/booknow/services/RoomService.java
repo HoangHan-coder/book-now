@@ -3,14 +3,13 @@ package vn.edu.fpt.booknow.services;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import vn.edu.fpt.booknow.dto.RoomDTO;
 import vn.edu.fpt.booknow.dto.SearchDTO;
-import vn.edu.fpt.booknow.entities.Amenity;
-import vn.edu.fpt.booknow.entities.Booking;
-import vn.edu.fpt.booknow.repositories.AmenityRepo;
-import vn.edu.fpt.booknow.repositories.BookingRepo;
-import vn.edu.fpt.booknow.repositories.RoomRepo;
+import vn.edu.fpt.booknow.dto.TimeTableDTO;
+import vn.edu.fpt.booknow.entities.*;
+import vn.edu.fpt.booknow.repositories.*;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -19,40 +18,75 @@ import java.util.Map;
 
 @Service
 public class RoomService {
-    private RoomRepo roomRepo;
+    private RoomRepository roomRepository;
     private AmenityRepo amenityRepo;
-    private BookingRepo bookingRepo;
-    public RoomService(RoomRepo roomRepo, AmenityRepo amenityRepo, BookingRepo bookingRepo) {
+    private RoomTypeRepository roomTypeRepository;
+    private TimeTableRepository timeTableRepository;
+    private BookingRepository bookingRepository;
+    private ScheduleRepository scheduleRepository;
+
+    public RoomService(RoomRepository roomRepository,
+                       AmenityRepo amenityRepo,
+                       BookingRepository bookingRepository,
+                       RoomTypeRepository roomTypeRepository,
+                       TimeTableRepository timeTableRepository,
+                       ScheduleRepository scheduleRepository) {
         this.amenityRepo = amenityRepo;
-        this.roomRepo = roomRepo;
-        this.bookingRepo = bookingRepo;
+        this.roomRepository = roomRepository;
+        this.roomTypeRepository = roomTypeRepository;
+        this.timeTableRepository = timeTableRepository;
+        this.bookingRepository = bookingRepository;
+        this.scheduleRepository = scheduleRepository;
     }
-    public Page<RoomDTO> getAllRoomService(){
-        Pageable pageable =  PageRequest.of(0,3);
-        Page<RoomDTO> listRoom = roomRepo.findRoom(pageable);
+
+    public Page<RoomDTO> getAllRoomService() {
+        Pageable pageable = PageRequest.of(0, 3);
+        Page<RoomDTO> listRoom = roomRepository.findRoom(pageable);
         return listRoom;
     }
-    public List<Amenity> getAllAmenity() {
-        return amenityRepo.findAll();
-    }
-    public Page<RoomDTO> getSearchService(SearchDTO searchDTO){
-        Pageable pageable = PageRequest.of(0,3);
-        Page<RoomDTO> list = roomRepo.searchRooms(searchDTO.getKeyword(),searchDTO.getArea(),searchDTO.getMaxGuest(),searchDTO.getPrice(),searchDTO.getAmenity(),pageable);
-        return list;
+
+    public Page<RoomDTO> getSearchService(SearchDTO searchDTO, int page) {
+        Sort sort;
+        String sortType = searchDTO.getSortType();
+
+        // 1. Logic xác định Sort
+        if ("price_asc".equals(sortType)) {
+            sort = Sort.by("t.basePrice").ascending();
+        } else if ("price_desc".equals(sortType)) {
+            sort = Sort.by("t.basePrice").descending();
+        } else if ("popular".equals(sortType)) {
+            sort = Sort.by("r.roomId").ascending();
+        } else {
+            sort = Sort.by("r.roomId").descending();
+        }
+
+        // 2. Khởi tạo Pageable với số trang động 'page'
+        // Quan trọng: Thay vì để số 0 cố định, ta dùng biến 'page' truyền vào
+        Pageable pageable = PageRequest.of(page, 2, sort);
+
+        // 3. Gọi Repository
+        return roomRepository.searchRooms(
+                searchDTO.getKeyword(),
+                searchDTO.getArea(),
+                searchDTO.getMaxGuest(),
+                searchDTO.getPrice(),
+                searchDTO.getAmenity(),
+                pageable
+        );
     }
 
 
     public List<RoomDTO> detailRoomService(Long id) {
-        List<RoomDTO> roomAmenityFlatDTO = roomRepo.findRoomDetail(id);
+        List<RoomDTO> roomAmenityFlatDTO = roomRepository.findRoomDetail(id);
         Map<String, RoomDTO> map = new LinkedHashMap<>();
         for (RoomDTO x : roomAmenityFlatDTO) {
             RoomDTO roomDTO = map.computeIfAbsent(
-                    x.getRoomId() +"",
+                    x.getRoomId() + "",
                     idd -> new RoomDTO(
                             x.getRoomId(),
                             x.getBasePrice(),
                             x.getMaxGuest(),
-                            x.getName(),
+                            x.getRoomNumber(),
                             x.getDescription(),
                             x.getImageUrl(),
                             null,
@@ -62,13 +96,52 @@ public class RoomService {
                     )
             );
             roomDTO.getAmenityList().add(
-                new Amenity(null,x.getName(),x.getIconUrl(),null,null)
+                    new Amenity(null, x.getRoomNumber(), x.getIconUrl(), null, null)
             );
         }
         List<RoomDTO> roomDTO = new ArrayList<>(map.values());
         return roomDTO;
     }
-    public void saveBooking(Booking booking) {
-        bookingRepo.save(booking);
+
+    public List<Timetable> getAllTimeTable() {
+        List<Timetable> list = timeTableRepository.findAll();
+        return list;
     }
- }
+
+    public List<TimeTableDTO> getSlot(Long id) {
+        List<TimeTableDTO> list = timeTableRepository.getBookingDetailsByRoomId(id);
+        return list;
+    }
+    public List<TimeTableDTO> getSlotBooking() {
+        List<TimeTableDTO> list = timeTableRepository.getBookingDetails();
+        return list;
+    }
+    public List<RoomDTO> getAllRoomService(Sort sort) {
+        List<RoomDTO> list = roomRepository.findAllRoomsSorted(sort);
+        return list;
+    }
+
+    public List<RoomType> getAllRoomType() {
+        List<RoomType> roomTypes = roomTypeRepository.findAll();
+        return roomTypes;
+    }
+
+    public List<Booking> getAllBooking() {
+        List<Booking> booking = bookingRepository.findAll();
+        return booking;
+    }
+
+    public List<Amenity> getAllAmenity() {
+        List<Amenity> list = amenityRepo.findAll();
+        return list;
+    }
+
+    public List<Scheduler> schedulers() {
+        List<Scheduler> list = scheduleRepository.findAll();
+        return list;
+    }
+    public List<RoomDTO> roomAll() {
+        List<RoomDTO> list = roomRepository.findAllRoom();
+        return list;
+    }
+}
