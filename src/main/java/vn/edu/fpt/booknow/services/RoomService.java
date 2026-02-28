@@ -62,11 +62,7 @@ public class RoomService {
 
         // 2. Khởi tạo Pageable với số trang động 'page'
         // Quan trọng: Thay vì để số 0 cố định, ta dùng biến 'page' truyền vào
-<<<<<<< HEAD
         Pageable pageable = PageRequest.of(page, 2, sort);
-=======
-        Pageable pageable = PageRequest.of(page, 1, sort);
->>>>>>> 1adc012b685cdc678fd40d60d4117d96a8d17941
 
         // 3. Gọi Repository
         return roomRepository.searchRooms(
@@ -100,11 +96,7 @@ public class RoomService {
                     )
             );
             roomDTO.getAmenityList().add(
-<<<<<<< HEAD
                     new Amenity(null, x.getRoomNumber(), x.getIconUrl(), null, null)
-=======
-                    new Amenity(null, x.getName(), x.getIconUrl(), null, null)
->>>>>>> 1adc012b685cdc678fd40d60d4117d96a8d17941
             );
         }
         List<RoomDTO> roomDTO = new ArrayList<>(map.values());
