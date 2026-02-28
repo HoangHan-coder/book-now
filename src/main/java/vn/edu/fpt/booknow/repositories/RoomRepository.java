@@ -12,7 +12,11 @@ import vn.edu.fpt.booknow.entities.Room;
 import java.util.List;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
+<<<<<<< HEAD
     @Query("SELECT DISTINCT new vn.edu.fpt.booknow.dto.RoomDTO(r.roomId,t.basePrice,t.maxGuests,r.roomNumber,t.description,i.imageUrl,m.name,m.iconUrl,t.overPrice,null)  FROM Room r \n" +
+=======
+    @Query("SELECT DISTINCT new vn.edu.fpt.booknow.dto.RoomDTO(r.roomId,t.basePrice,t.maxGuests,t.name,t.description,i.imageUrl,m.name,m.iconUrl,t.overPrice,null)  FROM Room r \n" +
+>>>>>>> 1adc012b685cdc678fd40d60d4117d96a8d17941
             "JOIN RoomAmenity a ON r.roomId = a.roomAmenityId \n" +
             "JOIN RoomType t ON t.roomTypeId = r.roomType.roomTypeId\n" +
             "JOIN Amenity m ON m.amenityId= a.roomAmenityId\n" +
@@ -22,7 +26,11 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     @Query(
             value = """
         SELECT DISTINCT new vn.edu.fpt.booknow.dto.RoomDTO(
+<<<<<<< HEAD
             r.roomId, t.basePrice, t.maxGuests, r.roomNumber, t.description, 
+=======
+            r.roomId, t.basePrice, t.maxGuests, t.name, t.description, 
+>>>>>>> 1adc012b685cdc678fd40d60d4117d96a8d17941
             i.imageUrl, null, null, t.overPrice, null
         )
         FROM Room r
@@ -105,7 +113,11 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 // Spring sẽ tự động nối ORDER BY dựa vào tham số Sort truyền vào
     List<RoomDTO> findAllRoomsSorted(Sort sort);
 
+<<<<<<< HEAD
     @Query("SELECT DISTINCT new vn.edu.fpt.booknow.dto.RoomDTO(r.roomId,t.basePrice,t.maxGuests,r.roomNumber,t.description,i.imageUrl,m.name,m.iconUrl,t.overPrice,null)  FROM Room r \n" +
+=======
+    @Query("SELECT DISTINCT new vn.edu.fpt.booknow.dto.RoomDTO(r.roomId,t.basePrice,t.maxGuests,t.name,t.description,i.imageUrl,m.name,m.iconUrl,t.overPrice,null)  FROM Room r \n" +
+>>>>>>> 1adc012b685cdc678fd40d60d4117d96a8d17941
             "JOIN RoomAmenity a ON r.roomId = a.roomAmenityId \n" +
             "JOIN RoomType t ON t.roomTypeId = r.roomType.roomTypeId\n" +
             "JOIN Amenity m ON m.amenityId= a.roomAmenityId\n" +

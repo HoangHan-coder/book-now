@@ -51,7 +51,10 @@ public class HomePageController {
         for (int i = 0; i < 7; i++) {
             weekDates.add(today.plusDays(i));
         }
+<<<<<<< HEAD
         System.out.println(roomAll.size());
+=======
+>>>>>>> 1adc012b685cdc678fd40d60d4117d96a8d17941
         model.addAttribute("bookedKeys", bookedKeys);
         model.addAttribute("rooms",list);
         model.addAttribute("search",searchDTO);
