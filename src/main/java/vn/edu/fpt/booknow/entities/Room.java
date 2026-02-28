@@ -21,9 +21,9 @@ public class Room {
     private RoomType roomType;
 
     private String roomNumber;
-
     private String status;
     private Boolean isDeleted;
+    @Column(name = "area_m2")
     private Double areaM2;
     @OneToMany(mappedBy = "room")
     private List<Image> images;

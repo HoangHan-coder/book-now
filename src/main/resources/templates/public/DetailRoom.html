@@ -4,31 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chi tiết phòng - BookNow</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            DEFAULT: '#2563eb', // blue-600
-                        }
-                    }
+                    fontFamily: {sans: ['Inter', 'sans-serif']},
+                    colors: {brand: {DEFAULT: '#2563eb'}}
                 }
             }
         }
     </script>
     <style>
-        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -56,12 +46,11 @@
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<!-- === LOGO (Fixed Top-Left) === -->
 <div style="position: fixed; top: 25px; left: 25px; z-index: 100;"
      class="bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow-sm border border-white/50 transition-all hover:shadow-md">
-    <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
+    <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='/homepage'">
         <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100">
-            <i class="fa-solid fa-house-chimney gradient-icon text-xl text-blue-600"></i>
+            <i class="fa-solid fa-house-chimney text-xl text-blue-600"></i>
         </div>
         <div class="flex flex-col justify-center">
             <span class="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-blue-700 leading-none">BookNow</span>
@@ -69,10 +58,8 @@
     </div>
 </div>
 
-<!-- === AUTH BUTTONS (Fixed Top-Right) === -->
 <div style="position: fixed; top: 25px; right: 25px; z-index: 100;" class="flex items-center gap-3">
-    <button onclick="window.location.href='login_customer.html'"
-            class="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white/90 backdrop-blur rounded-xl shadow-sm border border-white/50 hover:text-blue-600 hover:bg-white transition-all">
+    <button class="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white/90 backdrop-blur rounded-xl shadow-sm border border-white/50 hover:text-blue-600 hover:bg-white transition-all">
         Đăng nhập
     </button>
     <button class="px-4 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-xl shadow-lg shadow-blue-500/30 hover:bg-blue-700 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
@@ -80,24 +67,15 @@
     </button>
 </div>
 
-<!-- Main Container -->
 <div th:each="room : ${roomDetail}" class="max-w-7xl mx-auto px-4 md:px-8 pt-32 pb-12">
 
-    <!-- Breadcrumb -->
     <nav class="flex mb-6 text-sm text-gray-500 pl-2">
-        <a href="index.html" class="hover:text-blue-600">Trang chủ</a>
-        <span class="mx-2">/</span>
-        <a href="list_room_search.html" class="hover:text-blue-600">Tìm kiếm</a>
+        <a href="/" class="hover:text-blue-600">Trang chủ</a>
         <span class="mx-2">/</span>
         <span class="text-gray-800 font-medium">Chi tiết phòng</span>
     </nav>
-
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-        <!-- LEFT COLUMN: Room Info & Timetable (Chiếm 2/3) -->
         <div class="lg:col-span-2 space-y-8">
-
-            <!-- 1. Room Image & Basic Info -->
             <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
                 <div class="relative h-[400px]">
                     <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80"
@@ -107,7 +85,6 @@
                         <i class="fa-solid fa-star text-yellow-400"></i> 4.8 (120 đánh giá)
                     </div>
                 </div>
-
                 <div class="p-6 md:p-8">
                     <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
                         <div>
@@ -120,411 +97,341 @@
                         <div class="text-right">
                             <div class="bg-blue-50 px-4 py-2 rounded-lg border border-blue-100 inline-block">
                                 <span class="block text-xs text-gray-500">Số người tối đa</span>
-                                <span class="text-lg font-bold text-blue-700"><i
-                                        class="fa-solid fa-user-group mr-1"></i> <span th:text="${room.getMaxGuest() + ' Người'}"></span></span>
+                                <span class="text-lg font-bold text-blue-700">
+                                    <i class="fa-solid fa-user-group mr-1"></i>
+                                    <span th:text="${room.getMaxGuest() + ' Người'}"></span>
+                                </span>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Price Badges -->
                     <div class="flex gap-4 mb-6 border-b border-gray-100 pb-6">
                         <div class="flex-1 bg-gray-50 p-3 rounded-xl border border-gray-200">
                             <span class="block text-xs text-gray-500 mb-1">Giá theo Slot (3h)</span>
-                            <span class="text-xl font-bold text-gray-800" th:text="${#numbers.formatDecimal(room.getBasePrice(),0,'POINT',0,'COMMA') + ' đ'}"></span>
+                            <span class="text-xl font-bold text-gray-800"
+                                  th:text="${#numbers.formatDecimal(room.getBasePrice(),0,'POINT',0,'COMMA') + ' đ'}"></span>
                         </div>
                         <div class="flex-1 bg-blue-50 p-3 rounded-xl border border-blue-100">
                             <span class="block text-xs text-blue-600 mb-1">Giá qua đêm</span>
-                            <span class="text-xl font-bold text-blue-700" th:text="${#numbers.formatDecimal(room.getOverPrice(),0, 'POINT',0,'COMMA') + ' đ'} "></span>
+                            <span class="text-xl font-bold text-blue-700"
+                                  th:text="${#numbers.formatDecimal(room.getOverPrice(),0, 'POINT',0,'COMMA') + ' đ'} "></span>
                         </div>
                     </div>
-
-                    <!-- Description -->
                     <div class="mb-6">
                         <h3 class="text-lg font-bold text-gray-800 mb-3">Mô tả phòng</h3>
                         <p class="text-gray-600 leading-relaxed mb-4" th:text="${room.getDescription()}"></p>
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                             <div th:each="icon : ${room.amenityList}"
-                                 class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 shadow-sm hover:border-blue-400 hover:bg-blue-50 transition">
-                                <img th:src="${icon.iconUrl}"
-                                     alt=""
-                                     class="w-5 h-5 object-contain"/>
+                                 class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 shadow-sm hover:border-blue-400 transition">
+                                <img th:src="${icon.iconUrl}" alt="" class="w-5 h-5 object-contain"/>
                                 <span th:text="${icon.name}" class="truncate"></span>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
-
-            <!-- 2. Timetable (Lịch phòng) - INTERACTIVE -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
                 <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
                     <i class="fa-regular fa-calendar-check text-blue-600"></i> Lịch trống phòng tuần này
                 </h3>
-
-                <div class="overflow-x-auto custom-scrollbar pb-2">
+                <div class="overflow-x-auto pb-2">
                     <div class="min-w-[600px]">
-                        <!-- Header Days -->
-                        <div class="grid grid-cols-8 gap-1 mb-2 text-center">
+                        <div class="grid grid-cols-8 gap-1 text-center">
                             <div class="p-2 text-xs font-bold text-gray-400 uppercase">Slot</div>
-                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700">T2<br><span
-                                    class="text-xs font-normal">24/6</span></div>
-                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700">T3<br><span
-                                    class="text-xs font-normal">25/6</span></div>
-                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700">T4<br><span
-                                    class="text-xs font-normal">26/6</span></div>
-                            <div class="bg-blue-100 p-2 rounded text-sm font-semibold text-blue-800 ring-2 ring-blue-200">
-                                T5<br><span class="text-xs font-normal">Hôm nay</span></div>
-                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700">T6<br><span
-                                    class="text-xs font-normal">28/6</span></div>
-                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700">T7<br><span
-                                    class="text-xs font-normal">29/6</span></div>
-                            <div class="bg-gray-100 p-2 rounded text-sm font-semibold text-gray-700 text-red-500">CN<br><span
-                                    class="text-xs font-normal">30/6</span></div>
-                        </div>
-
-                        <!-- Slots Rows -->
-                        <div class="space-y-1">
-                            <!-- Slot 1: 10:30 - 13:30 (150k) -->
-                            <div class="grid grid-cols-8 gap-1 items-center">
-                                <div class="text-xs font-bold text-gray-500 text-center">Slot 1<br>10:30 - 13:30</div>
-                                <button onclick="toggleSlot(this, 'T2 24/6 - Slot 1', 150000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
-                                    Trống
-                                </button>
-                                <button onclick="toggleSlot(this, 'T3 25/6 - Slot 1', 150000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
-                                    Trống
-                                </button>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
-                                        disabled>Đã đặt
-                                </button>
-                                <button onclick="toggleSlot(this, 'T5 27/6 - Slot 1', 150000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition ring-1 ring-green-400 cursor-pointer">
-                                    Trống
-                                </button>
-                                <button onclick="toggleSlot(this, 'T6 28/6 - Slot 1', 150000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
-                                    Trống
-                                </button>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
-                                        disabled>Đã đặt
-                                </button>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
-                                        disabled>Đã đặt
-                                </button>
-                            </div>
-
-                            <!-- Slot 2: 14:00 - 17:00 (150k) -->
-                            <div class="grid grid-cols-8 gap-1 items-center">
-                                <div class="text-xs font-bold text-gray-500 text-center">Slot 2<br>14:00 - 17:00</div>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
-                                        disabled>Đã đặt
-                                </button>
-                                <button onclick="toggleSlot(this, 'T3 25/6 - Slot 2', 150000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
-                                    Trống
-                                </button>
-                                <button onclick="toggleSlot(this, 'T4 26/6 - Slot 2', 150000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
-                                    Trống
-                                </button>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
-                                        disabled>Đã đặt
-                                </button>
-                                <button onclick="toggleSlot(this, 'T6 28/6 - Slot 2', 150000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
-                                    Trống
-                                </button>
-                                <button onclick="toggleSlot(this, 'T7 29/6 - Slot 2', 150000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
-                                    Trống
-                                </button>
-                                <button onclick="toggleSlot(this, 'CN 30/6 - Slot 2', 150000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
-                                    Trống
-                                </button>
-                            </div>
-
-                            <!-- Slot 3: 17:30 - 20:30 (150k) -->
-                            <div class="grid grid-cols-8 gap-1 items-center">
-                                <div class="text-xs font-bold text-gray-500 text-center">Slot 3<br>17:30 - 20:30</div>
-                                <button onclick="toggleSlot(this, 'T2 24/6 - Slot 3', 150000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
-                                    Trống
-                                </button>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
-                                        disabled>Đã đặt
-                                </button>
-                                <button onclick="toggleSlot(this, 'T4 26/6 - Slot 3', 150000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
-                                    Trống
-                                </button>
-                                <button onclick="toggleSlot(this, 'T5 27/6 - Slot 3', 150000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition ring-1 ring-green-400 cursor-pointer">
-                                    Trống
-                                </button>
-                                <button onclick="toggleSlot(this, 'T6 28/6 - Slot 3', 150000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
-                                    Trống
-                                </button>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
-                                        disabled>Đã đặt
-                                </button>
-                                <button onclick="toggleSlot(this, 'CN 30/6 - Slot 3', 150000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
-                                    Trống
-                                </button>
-                            </div>
-
-                            <!-- Qua đêm: 21:00 - 9:30 (500k) -->
-                            <div class="grid grid-cols-8 gap-1 items-center">
-                                <div class="text-xs font-bold text-gray-500 text-center">Qua đêm<br>21:00 - 09:30</div>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
-                                        disabled>Đã đặt
-                                </button>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
-                                        disabled>Đã đặt
-                                </button>
-                                <button onclick="toggleSlot(this, 'T4 26/6 - Qua đêm', 500000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
-                                    Trống
-                                </button>
-                                <button onclick="toggleSlot(this, 'T5 27/6 - Qua đêm', 500000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition ring-1 ring-green-400 cursor-pointer">
-                                    Trống
-                                </button>
-                                <button onclick="toggleSlot(this, 'T6 28/6 - Qua đêm', 500000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
-                                    Trống
-                                </button>
-                                <button onclick="toggleSlot(this, 'T7 29/6 - Qua đêm', 500000)"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 text-xs py-3 rounded font-medium transition cursor-pointer">
-                                    Trống
-                                </button>
-                                <button class="bg-gray-200 text-gray-400 text-xs py-3 rounded font-medium cursor-not-allowed"
-                                        disabled>Đã đặt
-                                </button>
+                            <div th:each="date : ${weekDates}"
+                                 th:classappend="${date.isEqual(today)} ? 'bg-blue-100 text-blue-800 ring-2 ring-blue-400' : 'bg-gray-100 text-gray-700'"
+                                 class="p-2 rounded text-sm font-semibold">
+                                <span th:if="${date.isEqual(today)}">Hôm nay</span>
+                                <span th:if="${!date.isEqual(today)}"
+                                      th:text="${date.getDayOfWeek().getValue() == 7 ? 'Chủ Nhật' : 'Thứ ' + (date.getDayOfWeek().getValue() + 1)}"></span>
+                                <br>
+                                <span class="text-xs font-normal"
+                                      th:classappend="${date.getDayOfWeek().getValue() == 7} ? 'text-red-500'"
+                                      th:text="${#temporals.format(date, 'dd/MM')}"></span>
                             </div>
                         </div>
+                        <div th:each="tItem : ${timeTable}" class="grid grid-cols-8 gap-1 items-center mt-1">
+                            <div class="text-[0.7rem] font-bold text-gray-500 text-center">
+                                <span th:utext="${tItem.slotName != null ? tItem.slotName.replaceFirst(' ', '<br/>') : ''}"></span>
+                            </div>
+                            <th:block th:each="date : ${weekDates}">
+                                <div class="w-full">
+                                    <th:block th:with="currentKey=${#temporals.format(date, 'ddMM')} + '-' + ${tItem.timetableId}">
+                                        <div class="w-full py-1"
+                                             th:with="isNightSlot=${tItem.slotName.contains('Đêm') or tItem.timetableId > 4},
+                              currentPrice=${isNightSlot ? 450000 : 150000}">
+
+                                            <button th:if="${!bookedKeys.contains(currentKey)}"
+                                                    type="button"
+                                                    th:data-slot-info="|${#temporals.format(date, 'dd/MM')} ${tItem.slotName}|"
+                                                    th:data-price="${currentPrice}"
+                                                    onclick="toggleSlot(this, this.getAttribute('data-slot-info'), this.getAttribute('data-price'))"
+                                                    th:classappend="${date.isEqual(today)} ? 'ring-1 ring-green-400 bg-green-100' : 'bg-[#e8fdf1]'"
+                                                    class="w-full hover:bg-[#d1fae5] text-green-700 border border-[#c2f5d8] text-sm py-3 rounded-lg font-medium transition-all duration-200 shadow-sm active:scale-95">
+                                                <span class="block">Trống</span>
+                                            </button>
+
+                                            <button th:if="${bookedKeys.contains(currentKey)}"
+                                                    type="button"
+                                                    disabled
+                                                    class="w-full bg-[#e5e7eb] text-[#9ca3af] border border-[#d1d5db] text-sm py-3 rounded-lg font-medium cursor-not-allowed opacity-80">
+                                                Đã đặt
+                                            </button>
+                                        </div>
+                                    </th:block>
+                                </div>
+                            </th:block>
+                        </div>
                     </div>
-                </div>
-                <div class="mt-4 flex gap-4 text-xs text-gray-500 justify-end">
-                    <div class="flex items-center gap-1"><span
-                            class="w-3 h-3 rounded bg-green-100 border border-green-200"></span> Còn trống
-                    </div>
-                    <div class="flex items-center gap-1"><span
-                            class="w-3 h-3 rounded bg-blue-600 border border-blue-600"></span> Đang chọn
-                    </div>
-                    <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-gray-200"></span> Đã đặt</div>
                 </div>
             </div>
-
         </div>
-
-        <!-- RIGHT COLUMN: Booking Form (Chiếm 1/3) -->
         <div class="lg:col-span-1">
-            <div class="bg-white p-6 rounded-2xl shadow-lg border border-blue-100 sticky top-32" >
+            <div class="bg-white p-6 rounded-2xl shadow-lg border border-blue-100 sticky top-32">
                 <h2 class="text-xl font-bold text-gray-800 mb-6 border-b border-gray-100 pb-3">Thông tin đặt phòng</h2>
 
-                <form class="space-y-5" th:action="@{/infor}" method="post" th:object="${informBooking}">
+                <form class="space-y-5" onsubmit="return validateBooking(event)"  th:action="@{/booking/save}" method="post" th:object="${informBooking}" enctype="multipart/form-data">
+                    <input type="hidden" th:field="*{roomId}">
+                    <input type="hidden" name="roomId">
+                    <input name="customer.fullName">
+<!--                    <input type="hidden" th:field="*{customer.fullName}">-->
+
+                    <input type="hidden" th:field="*{customer.phone}">
+                    <input type="hidden" th:field="*{customer.email}">
+
                     <div id="slot-hidden-container"></div>
 
-                    <!-- Selected Slots Display -->
-                    <div id="selected-slots-container"
-                         class="hidden bg-blue-50 p-4 rounded-xl border border-blue-100 transition-all">
-                        <h3 class="text-xs font-bold text-blue-700 mb-2 uppercase tracking-wide flex justify-between">
-                            Slot đang chọn:
-                        </h3>
-                        <ul  id="selected-list" class="space-y-2 text-sm text-gray-700 font-medium mb-3">
-                            <!-- JS will add items here -->
-                        </ul>
-
-                        <!-- TOTAL PRICE DISPLAY -->
+                    <div id="selected-slots-container" class="hidden bg-blue-50 p-4 rounded-xl border border-blue-100 transition-all">
+                        <h3 class="text-xs font-bold text-blue-700 mb-2 uppercase tracking-wide">Slot đang chọn:</h3>
+                        <ul id="selected-list" class="space-y-2 text-sm text-gray-700 font-medium mb-3"></ul>
                         <div class="border-t border-blue-200 pt-3 flex justify-between items-center">
                             <span class="text-sm font-semibold text-gray-600">Tổng cộng:</span>
                             <span id="total-price" class="text-xl font-bold text-red-600">0đ</span>
                         </div>
                         <input type="hidden" name="totalAmount" id="totalAmountHidden">
-
-
                     </div>
 
-                    <!-- Họ tên -->
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Họ và tên <span
-                                class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                <i class="fa-regular fa-user"></i>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                            <i class="fa-regular fa-user text-blue-500 w-5"></i>
+                            <div>
+                                <p class="text-[10px] uppercase text-gray-400 font-bold">Họ và tên</p>
+                                <p class="text-sm font-semibold text-gray-700" th:text="*{customer.fullName} ?: 'Chưa cập nhật'"></p>
                             </div>
-                            <input th:field="*{customer.fullName}" type="text" placeholder="Nguyễn Văn A"
-                                   class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm">
                         </div>
-                    </div>
 
-                    <!-- SĐT & Email -->
-                    <div class="grid grid-cols-1 gap-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Số điện thoại <span
-                                    class="text-red-500">*</span></label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                    <i class="fa-solid fa-phone"></i>
-                                </div>
-                                <input th:field="*{customer.phone}" type="tel" placeholder="09xxxxxxx"
-                                       class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm">
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                            <i class="fa-solid fa-phone text-blue-500 w-5"></i>
+                            <div>
+                                <p class="text-[10px] uppercase text-gray-400 font-bold">Số điện thoại</p>
+                                <p class="text-sm font-semibold text-gray-700" th:text="*{customer.phone} ?: 'Chưa cập nhật'"></p>
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                    <i class="fa-regular fa-envelope"></i>
-                                </div>
-                                <input th:field="*{customer.email}" type="email" placeholder="example@mail.com"
-                                       class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm">
+
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                            <i class="fa-regular fa-envelope text-blue-500 w-5"></i>
+                            <div>
+                                <p class="text-[10px] uppercase text-gray-400 font-bold">Email</p>
+                                <p class="text-sm font-semibold text-gray-700" th:text="*{customer.email} ?: 'Chưa cập nhật'"></p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Upload CCCD -->
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Ảnh CCCD/CMND (2 mặt) <span
-                                class="text-red-500">*</span></label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <!-- Mặt trước -->
-                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors group">
-                                <i class="fa-solid fa-id-card text-2xl text-gray-400 group-hover:text-blue-500 mb-1"></i>
-                                <p class="text-xs text-gray-500 font-medium">Mặt trước</p>
-                                <input type="file" class="hidden">
+                    <div class="grid grid-cols-2 gap-3 mt-4">
+                        <div onclick="document.getElementById('cccd_front').click()"
+                             class="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center cursor-pointer hover:border-blue-500 group relative min-h-[120px] flex items-center justify-center overflow-hidden">
+                            <input type="file" id="cccd_front" name="cccd_front" class="hidden" accept="image/*" onchange="previewImage(this, 'preview_front_content')">
+                            <div id="preview_front_content" class="flex flex-col items-center">
+                                <i class="fa-solid fa-id-card text-2xl text-gray-400 group-hover:text-blue-500"></i>
+                                <p class="text-[10px] text-gray-500 mt-1">Mặt trước CCCD</p>
                             </div>
-                            <!-- Mặt sau -->
-                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors group">
-                                <i class="fa-solid fa-id-card text-2xl text-gray-400 group-hover:text-blue-500 mb-1"></i>
-                                <p class="text-xs text-gray-500 font-medium">Mặt sau</p>
-                                <input type="file" class="hidden">
+                        </div>
+
+                        <div onclick="document.getElementById('cccd_back').click()"
+                             class="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center cursor-pointer hover:border-blue-500 group relative min-h-[120px] flex items-center justify-center overflow-hidden">
+                            <input type="file" id="cccd_back" name="cccd_back" class="hidden" accept="image/*" onchange="previewImage(this, 'preview_back_content')">
+                            <div id="preview_back_content" class="flex flex-col items-center">
+                                <i class="fa-solid fa-id-card text-2xl text-gray-400 group-hover:text-blue-500"></i>
+                                <p class="text-[10px] text-gray-500 mt-1">Mặt sau CCCD</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Note -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1.5">Ghi chú</label>
-                        <textarea rows="2" placeholder="Yêu cầu đặc biệt..."
+                        <textarea th:field="*{note}" rows="2" placeholder="Yêu cầu đặc biệt..."
                                   class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm"></textarea>
                     </div>
 
-                    <!-- Terms -->
                     <div class="flex items-start gap-3 mt-2">
-                        <input type="checkbox" id="terms"
+                        <input type="checkbox" id="terms" required
                                class="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
                         <label for="terms" class="text-xs text-gray-500 cursor-pointer">
-                            Tôi đồng ý với <a href="#" class="text-blue-600 hover:underline">điều khoản sử dụng</a> và
-                            <a href="#" class="text-blue-600 hover:underline">chính sách bảo mật</a> của BookNow.
+                            Tôi đồng ý với <a href="#" class="text-blue-600 hover:underline">điều khoản sử dụng</a>.
                         </label>
                     </div>
 
-                    <!-- Submit Button -->
-                    <button type="submit"
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 mt-4">
+                    <button id="submit-booking" type="submit"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 mt-4">
                         Xác nhận Đặt phòng
                     </button>
-
                 </form>
             </div>
         </div>
-
     </div>
-
 </div>
 
-<!-- Script for Interaction -->
-<script>
-    // Store selected slots as Map: Key=Name, Value=Price
+<script th:inline="javascript">
     const selectedSlotsMap = new Map();
-
     const selectedListEl = document.getElementById('selected-list');
     const containerEl = document.getElementById('selected-slots-container');
     const totalPriceEl = document.getElementById('total-price');
 
-    // Helper to format currency
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(amount);
-    };
-    function syncHiddenSlots() {
-        const container = document.getElementById("slot-hidden-container");
-        container.innerHTML = ""; // reset
-
-        selectedSlotsMap.forEach((price, slotName) => {
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = "slot"; // QUAN TRỌNG: trùng tên field backend
-            input.value = slotName;
-            container.appendChild(input);
-        });
-    }
+    const formatCurrency = (num) => new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(num);
 
     function toggleSlot(btn, slotName, price) {
-        // CSS classes
-        const availableClasses = ['bg-green-100', 'text-green-700', 'hover:bg-green-200'];
-        const selectedClasses = ['bg-blue-600', 'text-white', 'hover:bg-blue-700', 'shadow-md', 'ring-2', 'ring-blue-300', 'scale-105'];
+        // Dùng OUTLINE cho trạng thái chọn để không xóa mất RING (viền xanh ngày hôm nay)
+        const selectedStyles = ['bg-blue-600', 'text-white', 'hover:bg-blue-700', 'outline', 'outline-2', 'outline-blue-300', 'scale-105', 'shadow-md'];
+        const availableStyles = ['bg-green-100', 'text-green-700', 'hover:bg-green-200'];
 
-        if (btn.classList.contains('bg-blue-600')) {
-            // Deselect logic
-            btn.classList.remove(...selectedClasses);
-            btn.classList.add(...availableClasses);
-            btn.innerHTML = 'Trống'; // Reset text
-
-            // Remove from Map
+        if (selectedSlotsMap.has(slotName)) {
+            btn.classList.remove(...selectedStyles);
+            btn.classList.add(...availableStyles);
+            btn.innerHTML = 'Trống';
             selectedSlotsMap.delete(slotName);
         } else {
-            // Select logic
-            btn.classList.remove(...availableClasses);
-            btn.classList.add(...selectedClasses);
-            btn.innerHTML = '<i class="fa-solid fa-check"></i>'; // Checked icon
-
-            // Add to Map
+            btn.classList.remove(...availableStyles);
+            btn.classList.add(...selectedStyles);
+            btn.innerHTML = '<i class="fa-solid fa-check"></i>';
             selectedSlotsMap.set(slotName, price);
         }
-
-        updateSelectedDisplay();
-        syncHiddenSlots();
+        updateUI();
     }
 
-    function updateSelectedDisplay() {
+    function updateUI() {
         selectedListEl.innerHTML = "";
-
         let total = 0;
 
-        selectedSlotsMap.forEach((price, slotName) => {
+        // Lấy container chứa các input ẩn
+        const hiddenContainer = document.getElementById("slot-hidden-container");
+        hiddenContainer.innerHTML = ""; // Xóa các input cũ để tạo mới hoàn toàn
+
+        selectedSlotsMap.forEach((price, name) => {
+            const numericPrice = Number(price);
+
+            // 1. Hiển thị danh sách lên giao diện (li)
             const li = document.createElement("li");
-            li.className = "flex justify-between";
-
+            li.className = "flex justify-between items-center py-1";
             li.innerHTML = `
-            <span>${slotName}</span>
-            <span class="text-red-500 font-semibold">${formatCurrency(price)}</span>
+            <span class="text-gray-700">${name}</span>
+            <span class="text-red-500 font-semibold">${formatCurrency(numericPrice)}</span>
         `;
-
             selectedListEl.appendChild(li);
-            total += price;
+
+            // 2. TẠO INPUT ẨN ĐỂ GỬI BACKEND
+            // Quan trọng: name="selectedSlots" phải khớp với tên field trong Java DTO
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "selectedSlots";
+            input.value = name; // Ví dụ: "24/05 Slot 1"
+            hiddenContainer.appendChild(input);
+
+            total += numericPrice;
         });
 
+        // Cập nhật tổng tiền
         totalPriceEl.textContent = formatCurrency(total);
-
-        // 🔥 DÒNG QUAN TRỌNG
         document.getElementById("totalAmountHidden").value = total;
 
-        // show / hide container
-        if (selectedSlotsMap.size > 0) {
-            containerEl.classList.remove("hidden");
+        if (containerEl) {
+            containerEl.classList.toggle('hidden', selectedSlotsMap.size === 0);
+        }
+        const submitBtn = document.getElementById('submit-booking');
+        const isHasSlots = selectedSlotsMap.size > 0;
+
+        if (isHasSlots) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'transform', 'hover:-translate-y-0.5');
         } else {
-            containerEl.classList.add("hidden");
+            submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+            submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'transform', 'hover:-translate-y-0.5');
         }
     }
+    function previewImage(input, previewId) {
+        const previewContainer = document.getElementById(previewId);
 
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
 
+            reader.onload = function(e) {
+                // Thay thế toàn bộ nội dung bên trong div bằng thẻ img
+                previewContainer.innerHTML = `
+                <img src="${e.target.result}"
+                     class="absolute inset-0 w-full h-full object-cover p-1 rounded-lg"
+                     alt="CCCD Preview">
+                <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span class="text-white text-xs font-bold bg-blue-600/80 px-2 py-1 rounded">Thay đổi</span>
+                </div>
+            `;
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    window.onload = function() {
+        /* Lấy dữ liệu từ FlashAttributes của Spring Boot */
+        const message = /*[[${toastMessage}]]*/ null;
+        const type = /*[[${toastType}]]*/ "error";
+
+        // Nếu có tin nhắn từ Server gửi về sau khi load lại trang
+        if (message) {
+            showToast(message, type);
+        }
+    };
+
+    function showToast(message, type = 'error') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        const bgColor = type === 'error' ? 'bg-red-600' : 'bg-green-600';
+
+        toast.className = `${bgColor} text-white px-6 py-3 rounded-xl shadow-2xl transform transition-all duration-500 translate-x-full opacity-0 flex items-center gap-3 min-w-[300px]`;
+        toast.innerHTML = `
+            <i class="fa-solid ${type === 'error' ? 'fa-circle-exclamation' : 'fa-check-circle'}"></i>
+            <span class="font-medium">${message}</span>
+        `;
+
+        container.prepend(toast);
+
+        setTimeout(() => toast.classList.remove('translate-x-full', 'opacity-0'), 100);
+
+        setTimeout(() => {
+            toast.classList.add('translate-x-full', 'opacity-0');
+            setTimeout(() => toast.remove(), 500);
+        }, 4000);
+    }
+    function validateBooking(event) {
+        // 1. Kiểm tra Slot
+        console.log(event)
+        if (selectedSlotsMap.size === 0) {
+            event.preventDefault(); // Ngăn gửi form
+            showToast("Vui lòng chọn ít nhất một slot thời gian!", "error");
+            return false;
+        }
+
+        // 2. Kiểm tra ảnh CCCD (nếu muốn bắt buộc)
+        // const front = document.getElementById('cccd_front').files.length;
+        // const back = document.getElementById('cccd_back').files.length;
+        // if (front === 0 || back === 0) {
+        //     event.preventDefault();
+        //     showToast("Vui lòng tải lên cả hai mặt CCCD!", "error");
+        //     return false;
+        // }
+
+        return true;
+    }
 </script>
-
+<div id="toast-container" class="fixed top-5 right-5 z-[200] flex flex-col gap-2"></div>
 </body>
 </html>

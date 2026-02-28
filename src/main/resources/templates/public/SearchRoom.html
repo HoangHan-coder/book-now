@@ -4,303 +4,222 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tìm kiếm phòng - BookNow</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=more_horiz"/>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=more_horiz"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            light: '#60a5fa', // blue-400
-                            DEFAULT: '#3b82f6', // blue-500
-                            dark: '#2563eb', // blue-600
-                        }
-                    }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { brand: { light: '#60a5fa', DEFAULT: '#3b82f6', dark: '#2563eb' } }
                 }
             }
         }
     </script>
-
-    <style>
-        .gradient-text {
-            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Dropdown Animation */
-        .dropdown-content {
-            transition: all 0.2s ease-in-out;
-            transform-origin: top;
-            opacity: 0;
-            transform: scaleY(0.9);
-            pointer-events: none;
-            position: absolute;
-            width: 100%;
-            z-index: 20;
-        }
-
-        .dropdown-open .dropdown-content {
-            opacity: 1;
-            transform: scaleY(1);
-            pointer-events: auto;
-        }
-
-        .dropdown-open .fa-chevron-down {
-            transform: rotate(180deg);
-        }
-    </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 pb-12">
 
-<!-- HEADER / NAVBAR (Transparent & Unified) -->
-<header class="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm transition-all duration-300 px-6 py-3 md:px-8 border-b border-gray-100">
+<header class="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm px-6 py-3 md:px-8 border-b border-gray-100">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
-
-       <a th:href="@{/homepage}">
-           <!-- Logo -->
-           <div class="flex items-center gap-3 cursor-pointer" >
-               <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100">
-                   <i class="fa-solid fa-house-chimney gradient-icon text-xl text-blue-600"></i>
-               </div>
-               <div class="flex flex-col justify-center">
-                   <span class="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-blue-700 leading-none">BookNow</span>
-               </div>
-           </div>
-       </a>
-
-        <!-- Nav Links & Auth Buttons -->
-        <div class="flex items-center gap-6">
-            <!-- Auth Buttons (REPLACED ACCOUNT BUTTON) -->
-            <div class="flex items-center gap-3">
-                <button class="text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors px-3 py-2">
-                    Đăng nhập
-                </button>
-                <button class="text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-full shadow-md transition-all transform hover:-translate-y-0.5 active:translate-y-0">
-                    Đăng ký
-                </button>
+        <a th:href="@{/homepage}">
+            <div class="flex items-center gap-3 cursor-pointer">
+                <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100">
+                    <i class="fa-solid fa-house-chimney text-xl text-blue-600"></i>
+                </div>
+                <span class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-blue-700">BookNow</span>
             </div>
+        </a>
+        <div class="flex items-center gap-3">
+            <button class="text-sm font-semibold text-gray-600 px-3 py-2">Đăng nhập</button>
+            <button class="text-sm font-semibold text-white bg-blue-600 px-5 py-2.5 rounded-full shadow-md">Đăng ký</button>
         </div>
     </div>
 </header>
 
-<!-- MAIN CONTAINER -->
 <div class="max-w-7xl mx-auto px-4 pt-32 flex flex-col lg:flex-row gap-8">
-
-    <!-- SIDEBAR FILTERS (Left) -->
     <aside class="lg:w-1/4 space-y-6">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-24">
+        <div class="flex items-center space-x-4 p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+            <a th:href="@{/homepage}" class="group flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 text-gray-500 hover:text-blue-600 transition-all bg-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </a>
+            <span class="text-gray-600 font-medium text-sm">Quay lại trang chủ</span>
+        </div>
+
+        <form id="searchForm" th:action="@{/search}" th:object="${search}" method="post" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-24">
+            <input type="hidden" id="pageNumber" th:field="*{page}" />
+            <input type="hidden" id="sortTypeInput" th:field="*{sortType}" />
+
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-lg font-bold text-gray-800">Bộ lọc</h2>
-                <button class="text-xs text-blue-600 hover:underline font-medium">Đặt lại</button>
+                <a th:href="@{/search}" class="text-xs text-blue-600 hover:underline font-medium">Đặt lại</a>
             </div>
 
-            <!-- Price Filter (DROPDOWN) -->
-            <div class="mb-6 relative group" id="price-dropdown-container">
-                <label class="block text-sm font-semibold text-gray-700 mb-3">Khoảng giá</label>
-
-                <!-- Dropdown Trigger Button -->
-                <button onclick="togglePriceDropdown()" class="w-full flex justify-between items-center bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg px-4 py-2.5 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all">
-                    <span id="price-selected-text">Tất cả mức giá</span>
-                    <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform duration-200"></i>
-                </button>
-
-                <!-- Dropdown Menu -->
-                <div class="dropdown-content mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden ring-1 ring-black ring-opacity-5">
-                    <ul class="py-1 text-sm text-gray-700">
-                        <li>
-                            <button onclick="selectPrice('all', 'Tất cả mức giá')" class="w-full text-left px-4 py-2.5 hover:bg-blue-50 hover:text-blue-600 flex justify-between items-center group/item">
-                                <span>Tất cả</span>
-                                <i class="fa-solid fa-check text-blue-600 opacity-0 group-hover/item:opacity-100"></i>
-                            </button>
-                        </li>
-                        <li>
-                            <button onclick="selectPrice('0-200', 'Dưới 200.000đ')" class="w-full text-left px-4 py-2.5 hover:bg-blue-50 hover:text-blue-600 flex justify-between items-center group/item">
-                                <span>Dưới 200.000đ</span>
-                                <i class="fa-solid fa-check text-blue-600 opacity-0 group-hover/item:opacity-100"></i>
-                            </button>
-                        </li>
-                        <li>
-                            <button onclick="selectPrice('200-400', '200.000đ - 400.000đ')" class="w-full text-left px-4 py-2.5 hover:bg-blue-50 hover:text-blue-600 flex justify-between items-center group/item">
-                                <span>200.000đ - 400.000đ</span>
-                                <i class="fa-solid fa-check text-blue-600 opacity-0 group-hover/item:opacity-100"></i>
-                            </button>
-                        </li>
-                        <li>
-                            <button onclick="selectPrice('400-600', '400.000đ - 600.000đ')" class="w-full text-left px-4 py-2.5 hover:bg-blue-50 hover:text-blue-600 flex justify-between items-center group/item">
-                                <span>400.000đ - 600.000đ</span>
-                                <i class="fa-solid fa-check text-blue-600 opacity-0 group-hover/item:opacity-100"></i>
-                            </button>
-                        </li>
-                    </ul>
+            <div class="mb-6">
+                <label class="block text-xs font-semibold text-gray-500 uppercase mb-2">Tìm kiếm</label>
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                    <input th:field="*{keyword}" type="text" placeholder="Tên phòng..." class="w-full h-10 pl-9 pr-4 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"/>
                 </div>
             </div>
 
-            <!-- Room Type -->
             <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-3">Loại phòng</label>
-                <div class="space-y-2">
-                    <label class="flex items-center space-x-3 cursor-pointer group">
-                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                        <span class="text-sm text-gray-600 group-hover:text-blue-600 transition-colors">Single Room</span>
-                    </label>
-                    <label class="flex items-center space-x-3 cursor-pointer group">
-                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" checked>
-                        <span class="text-sm text-gray-600 group-hover:text-blue-600 transition-colors">Double Room</span>
-                    </label>
-                    <label class="flex items-center space-x-3 cursor-pointer group">
-                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                        <span class="text-sm text-gray-600 group-hover:text-blue-600 transition-colors">Suite</span>
-                    </label>
-                    <label class="flex items-center space-x-3 cursor-pointer group">
-                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                        <span class="text-sm text-gray-600 group-hover:text-blue-600 transition-colors">Dorm</span>
-                    </label>
-                </div>
+                <label class="block text-xs font-semibold text-gray-500 uppercase mb-3">Mức giá</label>
+                <select th:field="*{price}" class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white outline-none">
+                    <option value="">Tất cả mức giá</option>
+                    <option value="low">&lt; 300.000đ</option>
+                    <option value="mid">300.000đ – 800.000đ</option>
+                    <option value="high">&gt; 800.000đ</option>
+                </select>
             </div>
 
-            <!-- Guests -->
             <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-3">Số lượng khách</label>
+                <label class="block text-xs font-semibold text-gray-500 uppercase mb-3">Số khách</label>
                 <div class="flex gap-2">
-                    <button class="w-8 h-8 rounded border border-gray-200 text-gray-500 hover:border-blue-500 hover:text-blue-500 flex items-center justify-center transition-colors text-sm">1</button>
-                    <button class="w-8 h-8 rounded bg-blue-600 text-white border border-blue-600 flex items-center justify-center text-sm shadow-sm">2</button>
-                    <button class="w-8 h-8 rounded border border-gray-200 text-gray-500 hover:border-blue-500 hover:text-blue-500 flex items-center justify-center transition-colors text-sm">3</button>
-                    <button class="w-8 h-8 rounded border border-gray-200 text-gray-500 hover:border-blue-500 hover:text-blue-500 flex items-center justify-center transition-colors text-sm">4+</button>
+                    <label th:each="v : ${ {1, 2, 4} }" class="flex-1 cursor-pointer">
+                        <input type="radio" th:field="*{maxGuest}" th:value="${v}" class="hidden peer">
+                        <div class="h-9 rounded-lg border border-gray-200 text-gray-500 flex items-center justify-center peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 text-xs font-medium">
+                            <span th:text="${v} + ' Người'"></span>
+                        </div>
+                    </label>
                 </div>
             </div>
 
-            <!-- Amenities -->
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-3">Tiện nghi</label>
+            <div class="mb-8">
+                <label class="block text-xs font-semibold text-gray-500 uppercase mb-3">Tiện nghi</label>
                 <div class="flex flex-wrap gap-2">
-                    <span class="px-3 py-1 rounded-full border border-gray-200 bg-gray-50 text-xs text-gray-600 cursor-pointer hover:border-blue-300 hover:bg-blue-50">Wifi</span>
-                    <span class="px-3 py-1 rounded-full border border-blue-200 bg-blue-50 text-xs text-blue-700 font-medium cursor-pointer">Máy lạnh</span>
-                    <span class="px-3 py-1 rounded-full border border-gray-200 bg-gray-50 text-xs text-gray-600 cursor-pointer hover:border-blue-300 hover:bg-blue-50">Tủ lạnh</span>
-                    <span class="px-3 py-1 rounded-full border border-gray-200 bg-gray-50 text-xs text-gray-600 cursor-pointer hover:border-blue-300 hover:bg-blue-50">Bếp</span>
+                    <label th:each="a, start : ${amenities}" th:classappend="${start.index >= 3} ? 'hidden amenity-extra' : ''" class="cursor-pointer">
+                        <input type="checkbox" name="amenity" th:value="${a.name}" th:checked="${search.amenity != null && search.amenity.contains(a.name)}" class="hidden peer">
+                        <div class="px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 text-[11px] text-gray-600 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:border-blue-200">
+                            <span th:text="${a.name}"></span>
+                        </div>
+                    </label>
+                    <span id="toggleAmenity"
+                          class="material-symbols-outlined text-gray-400
+                             cursor-pointer hover:text-blue-500 transition">
+                    more_horiz
+                </span>
                 </div>
             </div>
-        </div>
+
+            <button type="submit" onclick="document.getElementById('pageNumber').value=0" class="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-md flex items-center justify-center gap-2 transition">
+                <i class="fa-solid fa-filter"></i> Tìm phòng
+            </button>
+        </form>
     </aside>
 
-    <!-- ROOM LIST (Right) -->
     <main class="lg:w-3/4">
-
-        <!-- Top Controls -->
         <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-            <h1 class="text-xl font-bold text-gray-800"><span class="text-blue-600" th:text="${rooms.getNumberOfElements()}"></span> phòng phù hợp với bạn</h1>
-
+            <h1 class="text-xl font-bold text-gray-800">
+                <span class="text-blue-600" th:text="${rooms.totalElements}"></span> phòng phù hợp
+            </h1>
             <div class="flex items-center gap-3">
                 <span class="text-sm text-gray-500">Sắp xếp:</span>
-                <div class="relative">
-                    <select class="pl-3 pr-8 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white cursor-pointer hover:border-blue-300">
-                        <option>Phổ biến nhất</option>
-                        <option>Giá thấp đến cao</option>
-                        <option>Giá cao đến thấp</option>
-                        <option>Mặc định</option>
-                    </select>
-                    <i class="fa-solid fa-chevron-down absolute right-3 top-2.5 text-xs text-gray-400 pointer-events-none"></i>
-                </div>
+                <select onchange="syncSortAndSubmit(this.value)" class="pl-3 pr-8 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white cursor-pointer">
+                    <option value="default" th:selected="${search.sortType == 'default' || search.sortType == null}">Mặc định</option>
+                    <option value="popular" th:selected="${search.sortType == 'popular'}">Phổ biến nhất</option>
+                    <option value="price_asc" th:selected="${search.sortType == 'price_asc'}">Giá thấp đến cao</option>
+                    <option value="price_desc" th:selected="${search.sortType == 'price_desc'}">Giá cao đến thấp</option>
+                </select>
             </div>
         </div>
 
-        <!-- List Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-            <!-- Room Card 1 -->
-            <div th:each="room : ${rooms}" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 group flex flex-col">
+            <div th:each="room : ${rooms}" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all group flex flex-col">
                 <div class="relative h-56 overflow-hidden">
-                    <img th:src="${room.getImageUrl()}" alt="Room" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                    <div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-xs font-bold text-gray-800 shadow-sm">
-                        Single Room
-                    </div>
-                    <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/20 backdrop-blur hover:bg-white text-white hover:text-red-500 flex items-center justify-center transition-colors">
-                        <i class="fa-regular fa-heart"></i>
-                    </button>
+                    <img th:src="${room.imageUrl}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-xs font-bold text-gray-800 shadow-sm">Phòng đơn</div>
                 </div>
                 <div class="p-5 flex-1 flex flex-col">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors" th:text="${room.getName()}"></h3>
-                        <div class="flex items-center gap-1 text-xs font-bold text-gray-800 bg-yellow-50 px-2 py-1 rounded border border-yellow-100">
-                            <i class="fa-solid fa-star text-yellow-400"></i> 4.8
-                        </div>
-                    </div>
-                    <p class="text-sm text-gray-500 mb-4 line-clamp-2" th:text="${room.getDescription()}"></p>
-
+                    <h3 class="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors" th:text="${room.name}"></h3>
+                    <p class="text-sm text-gray-500 mb-4 line-clamp-2" th:text="${room.description}"></p>
                     <div class="flex items-center gap-4 text-xs text-gray-500 mb-4">
-                        <span  class="flex items-center"><i class="fa-solid fa-user-group mr-1.5 text-blue-500"></i><span th:text="${room.getMaxGuest()} + ' ' + Khách"> </span></span>
-                        <span class="flex items-center"><i class="fa-solid fa-bed mr-1.5 text-blue-500"></i> 1 Giường đôi</span>
+                        <span class="flex items-center"><i class="fa-solid fa-user-group mr-1.5 text-blue-500"></i> <span th:text="${room.maxGuest} + ' Khách'"></span></span>
                     </div>
-
                     <div class="mt-auto pt-4 border-t border-gray-100 flex flex-col gap-2">
                         <div class="flex justify-between items-center">
                             <span class="text-xs text-gray-400">Giá theo giờ</span>
-                            <span class="text-base font-bold text-gray-800">150.000đ <span class="text-xs font-normal text-gray-500">/ slot</span></span>
+                            <span class="text-base font-bold text-gray-800">
+                                [[${#numbers.formatDecimal(room.basePrice, 0, 'COMMA', 0, 'POINT')}]]đ <span class="text-xs font-normal text-gray-500">/ slot</span>
+                            </span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-xs text-gray-400">Giá qua đêm</span>
-                            <span class="text-base font-bold text-blue-600">500.000đ <span class="text-xs font-normal text-gray-500">/ đêm</span></span>
+                            <span class="text-base font-bold text-blue-600">
+                                [[${#numbers.formatDecimal(room.overPrice, 0, 'COMMA', 0, 'POINT')}]]đ <span class="text-xs font-normal text-gray-500">/ đêm</span>
+                            </span>
                         </div>
-                        <button onclick="window.location.href='room_detail.html'" class="w-full mt-3 bg-gray-900 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors shadow-md">
-                            Xem chi tiết
-                        </button>
+                        <button class="w-full mt-3 bg-gray-900 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors shadow-md">Xem chi tiết</button>
                     </div>
                 </div>
             </div>
         </div>
+        <div th:if="${rooms.totalPages > 0}" class="mt-12 flex justify-center items-center gap-2">
 
-        <!-- Pagination -->
-        <div class="mt-12 flex justify-center gap-2">
-            <button class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:border-blue-500 hover:text-blue-600 transition-colors disabled:opacity-50" disabled>
-                <i class="fa-solid fa-chevron-left"></i>
+            <button type="button"
+                    th:disabled="${rooms.number == 0}"
+                    th:onclick="'changePage(' + (${rooms.number - 1}) + ')'"
+                    class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-chevron-left text-xs text-gray-500"></i>
             </button>
-            <button class="w-10 h-10 rounded-lg bg-blue-600 text-white font-bold flex items-center justify-center shadow-md">1</button>
-            <button class="w-10 h-10 rounded-lg border border-gray-200 text-gray-600 hover:border-blue-500 hover:text-blue-600 font-medium flex items-center justify-center transition-colors">2</button>
-            <button class="w-10 h-10 rounded-lg border border-gray-200 text-gray-600 hover:border-blue-500 hover:text-blue-600 font-medium flex items-center justify-center transition-colors">3</button>
-            <button class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:border-blue-500 hover:text-blue-600 transition-colors">
-                <i class="fa-solid fa-chevron-right"></i>
+
+            <th:block th:each="pageNo : ${pageNumbers}">
+                <button type="button"
+                        th:text="${pageNo + 1}"
+                        th:onclick="|changePage(${pageNo})|"
+                        th:classappend="${pageNo == rooms.number} ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 hover:bg-gray-100 text-gray-700'"
+                        class="w-10 h-10 rounded-lg border font-medium transition-all">
+                </button>
+            </th:block>
+
+            <button type="button"
+                    th:disabled="${rooms.number == rooms.totalPages - 1}"
+                    th:onclick="'changePage(' + (${rooms.number + 1}) + ')'"
+                    class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-chevron-right text-xs text-gray-500"></i>
             </button>
         </div>
-
     </main>
-
 </div>
 
-<!-- Script for Dropdown -->
 <script>
-    function togglePriceDropdown() {
-        const container = document.getElementById('price-dropdown-container');
-        container.classList.toggle('dropdown-open');
-    }
+    function changePage(index) {
+        console.log("Đang chuyển sang trang index:", index); // Để debug
 
-    function selectPrice(value, text) {
-        // Update button text
-        document.getElementById('price-selected-text').innerText = text;
+        const form = document.getElementById('searchForm');
+        const pageInput = document.getElementById('pageNumber');
 
-        // Close dropdown
-        document.getElementById('price-dropdown-container').classList.remove('dropdown-open');
-
-        // Optional: You can add logic here to filter the list
-        console.log('Selected Price Range:', value);
-    }
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
-        const container = document.getElementById('price-dropdown-container');
-        if (!container.contains(event.target)) {
-            container.classList.remove('dropdown-open');
+        if (form && pageInput) {
+            pageInput.value = index;
+            form.submit();
+        } else {
+            console.error("Không tìm thấy searchForm hoặc pageInput trong HTML!");
         }
+    }
+
+    // 2. Sắp xếp (Đồng bộ vào form chính)
+    function syncSortAndSubmit(val) {
+        document.getElementById('sortTypeInput').value = val;
+        document.getElementById('pageNumber').value = 0; // Reset về trang 1
+        document.getElementById('searchForm').submit();
+    }
+
+    // 3. Toggle Tiện nghi
+    const toggleBtn = document.getElementById("toggleAmenity");
+    const extraAmenities = document.querySelectorAll(".amenity-extra");
+    let isExpanded = false;
+
+    toggleBtn.addEventListener("click", () => {
+        isExpanded = !isExpanded;
+        extraAmenities.forEach(el => el.classList.toggle("hidden", !isExpanded));
+        toggleBtn.innerText = isExpanded ? "expand_less" : "more_horiz";
     });
 </script>
-
 </body>
 </html>

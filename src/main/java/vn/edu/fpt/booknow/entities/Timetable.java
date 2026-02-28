@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -19,9 +20,8 @@ public class Timetable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "timetable_id")
     private Long timetableId;
+    private String slotName;
+    private LocalDateTime startTime;
 
-    private LocalDate date;
-
-    @OneToMany(mappedBy = "timetable")
-    private List<Scheduler> schedulers;
+    private LocalDateTime endTime;
 }
