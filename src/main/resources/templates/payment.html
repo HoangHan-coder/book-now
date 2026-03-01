@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán MoMo</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #a50064 0%, #6a003f 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 44px 40px;
+            width: 440px;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.25);
+        }
+        .header { text-align: center; margin-bottom: 32px; }
+        .logo { font-size: 48px; }
+        .header h1 { color: #a50064; font-size: 26px; margin-top: 8px; }
+        .header p  { color: #888; font-size: 14px; margin-top: 4px; }
+
+        .form-group { margin-bottom: 22px; }
+        label { display: block; color: #444; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 13px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            color: #333;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        input:focus { border-color: #a50064; }
+        .hint { color: #aaa; font-size: 12px; margin-top: 5px; }
+
+        .btn-pay {
+            width: 100%;
+            padding: 15px;
+            background: #a50064;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 4px;
+            transition: background 0.2s, transform 0.1s;
+            letter-spacing: 0.3px;
+        }
+        .btn-pay:hover   { background: #8a0055; }
+        .btn-pay:active  { transform: scale(0.98); }
+
+        .error-box {
+            background: #fff0f3;
+            border: 1px solid #ffb3c1;
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #c62828;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .divider { border: none; border-top: 1px solid #f0f0f0; margin: 24px 0; }
+        .security-note {
+            text-align: center;
+            color: #aaa;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <div class="logo">🟣</div>
+        <h1>Thanh toán MoMo</h1>
+        <p>Sandbox – Môi trường kiểm thử</p>
+    </div>
+
+    <!--
+        th:if="${error}": Chỉ render div này khi model có attribute "error".
+        Controller set: model.addAttribute("error", "message").
+        Nếu không có "error" trong model → div ẩn hoàn toàn (không render ra HTML).
+    -->
+    <div class="error-box" th:if="${error}">
+        <span>⚠️</span>
+        <span th:text="${error}">Lỗi không xác định</span>
+    </div>
+
+    <!--
+        th:action="@{/create-payment}": Thymeleaf tự thêm context path.
+        Tốt hơn action="/create-payment" khi app deploy tại subdirectory.
+        method="post": gửi POST request, không để lộ data trên URL.
+    -->
+    <form th:action="@{/pay/create-payment}" method="post">
+
+        <div class="form-group">
+            <label for="amount">💰 Số tiền (VNĐ)</label>
+            <input
+                type="number"
+                id="amount"
+                name="amount"
+                placeholder="Nhập số tiền thanh toán..."
+                min="1000"
+                max="50000000"
+                required
+            />
+            <p class="hint">Tối thiểu 1,000 VNĐ · Tối đa 50,000,000 VNĐ</p>
+        </div>
+
+        <div class="form-group">
+            <label for="orderInfo">📋 Nội dung thanh toán</label>
+            <input
+                type="text"
+                id="orderInfo"
+                name="orderInfo"
+                placeholder="VD: Thanh toán đơn hàng #12345"
+                value="Thanh toán đơn hàng"
+                maxlength="255"
+                required
+            />
+        </div>
+
+        <button type="submit" class="btn-pay">
+            Thanh toán ngay →
+        </button>
+
+    </form>
+
+    <hr class="divider"/>
+    <p class="security-note">🔒 Giao dịch được mã hoá và bảo mật bởi MoMo</p>
+</div>
+</body>
+</html>

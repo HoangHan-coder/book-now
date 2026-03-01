@@ -1,6 +1,5 @@
-package vn.edu.fpt.booknow.services.staffadmin;
+package vn.edu.fpt.booknow.services.admin;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;

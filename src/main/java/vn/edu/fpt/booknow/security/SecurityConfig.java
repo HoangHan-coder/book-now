@@ -47,8 +47,8 @@ public class SecurityConfig {
                 .securityMatcher("/admin/**")
                 .authenticationProvider(staffAuthProvider())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/login","/auth/logout", "/public/**", "/home").permitAll()
-                        .anyRequest().hasRole("ADMIN")
+                        .requestMatchers("/admin/login","/auth/logout", "/public/**", "/home","/pay/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -67,8 +67,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authenticationProvider(customerAuthProvider())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login","/auth/logout", "/register", "/public/**", "/home").permitAll()
-                        .anyRequest().hasRole("CUSTOMER")
+                        .requestMatchers("/auth/login",
+                                "/auth/logout", "/register",
+                                "/public/**", "/home","/pay/**",
+                                "/momo-*").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

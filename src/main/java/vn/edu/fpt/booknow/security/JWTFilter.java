@@ -35,7 +35,8 @@ public class JWTFilter extends OncePerRequestFilter {
         // Skip JWT validation for public endpoints
         if (requestPath.contains("/auth/login") || requestPath.contains("/admin/login") || 
             requestPath.contains("/register") || requestPath.contains("/public") ||
-            requestPath.contains("/auth/logout")) {
+            requestPath.contains("/auth/logout") || requestPath.contains("/pay") ||
+                requestPath.contains("/momo-*")) {
             filterChain.doFilter(request, response);
             return;
         }

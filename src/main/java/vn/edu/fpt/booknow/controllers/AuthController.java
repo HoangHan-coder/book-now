@@ -13,7 +13,7 @@ import vn.edu.fpt.booknow.model.entities.StaffAccount;
 import vn.edu.fpt.booknow.services.JWTService;
 import vn.edu.fpt.booknow.services.RecaptchaService;
 import vn.edu.fpt.booknow.services.customer.CustomerService;
-import vn.edu.fpt.booknow.services.staffadmin.StaffAccountService;
+import vn.edu.fpt.booknow.services.admin.StaffAccountService;
 
 @Controller
 public class AuthController {
