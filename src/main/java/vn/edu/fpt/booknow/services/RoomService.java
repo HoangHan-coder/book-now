@@ -19,14 +19,14 @@ import java.util.Map;
 @Service
 public class RoomService {
     private RoomRepository roomRepository;
-    private AmenityRepo amenityRepo;
+    private AmenityRepository amenityRepo;
     private RoomTypeRepository roomTypeRepository;
     private TimeTableRepository timeTableRepository;
     private BookingRepository bookingRepository;
     private ScheduleRepository scheduleRepository;
 
     public RoomService(RoomRepository roomRepository,
-                       AmenityRepo amenityRepo,
+                       AmenityRepository amenityRepo,
                        BookingRepository bookingRepository,
                        RoomTypeRepository roomTypeRepository,
                        TimeTableRepository timeTableRepository,

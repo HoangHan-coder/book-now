@@ -4,18 +4,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import vn.edu.fpt.booknow.dto.RoomDTO;
 import vn.edu.fpt.booknow.dto.SearchDTO;
-import vn.edu.fpt.booknow.dto.TimeTableDTO;
 import vn.edu.fpt.booknow.entities.*;
-import vn.edu.fpt.booknow.repositories.AmenityRepo;
-import vn.edu.fpt.booknow.repositories.ScheduleRepository;
 import vn.edu.fpt.booknow.services.RoomService;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Controller
