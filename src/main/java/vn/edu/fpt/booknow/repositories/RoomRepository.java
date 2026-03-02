@@ -113,4 +113,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             "JOIN Image i ON i.room.roomId = r.roomId \n" +
             "WHERE r.isDeleted = false AND i.isCover = true")
     List<RoomDTO> findAllRoom();
+
+    Room getByRoomId(Long roomId);
 }

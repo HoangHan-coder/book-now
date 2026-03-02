@@ -11,11 +11,10 @@ import vn.edu.fpt.booknow.dto.BookingDTO;
 import vn.edu.fpt.booknow.dto.RoomDTO;
 import vn.edu.fpt.booknow.dto.SearchDTO;
 import vn.edu.fpt.booknow.dto.TimeTableDTO;
-import vn.edu.fpt.booknow.entities.Amenity;
-import vn.edu.fpt.booknow.entities.Booking;
-import vn.edu.fpt.booknow.entities.Customer;
-import vn.edu.fpt.booknow.entities.Timetable;
+import vn.edu.fpt.booknow.entities.*;
 import vn.edu.fpt.booknow.repositories.CustomerRepository;
+import vn.edu.fpt.booknow.repositories.ImageRepository;
+import vn.edu.fpt.booknow.repositories.RoomRepository;
 import vn.edu.fpt.booknow.services.BookingService;
 import vn.edu.fpt.booknow.services.RoomService;
 
@@ -31,14 +30,17 @@ import java.util.stream.Collectors;
 @Controller
 public class RoomController {
 
+    private final RoomRepository roomRepository;
     private RoomService roomService;
     private BookingService bookingService;
     private CustomerRepository customerRepository;
-
-    public RoomController(RoomService roomService, BookingService bookingService, CustomerRepository customerRepository) {
+    private ImageRepository imageRepository;
+    public RoomController(RoomService roomService, BookingService bookingService, CustomerRepository customerRepository, ImageRepository imageRepository, RoomRepository roomRepository) {
         this.roomService = roomService;
         this.bookingService = bookingService;
         this.customerRepository = customerRepository;
+        this.imageRepository = imageRepository;
+        this.roomRepository = roomRepository;
     }
 
     @GetMapping("/detail/{roomIdString}")
@@ -57,11 +59,12 @@ public class RoomController {
             BookingDTO booking = new BookingDTO();
             List<LocalDateTime> weekDates = new ArrayList<>();
             LocalDateTime today = LocalDateTime.now();
+            Room room = roomRepository.getByRoomId(roomId);
+            List<Image> image = imageRepository.getByRoom(room);
             if (accessToken != null && !accessToken.isEmpty()) {
                 customer = customerRepository.getCustomerByEmail(email);
                 booking.setCustomer(customer);
             }
-
             booking.setCustomer(customer);
             for (int i = 0; i < 7; i++) {
                 weekDates.add(today.plusDays(i));
@@ -80,6 +83,7 @@ public class RoomController {
             model.addAttribute("today", today);
             model.addAttribute("roomDetail", roomDetail);
             model.addAttribute("informBooking", booking);
+            model.addAttribute("image", image);
             return "public/DetailRoom";
         } catch (Exception e) {
             System.out.println(e.getMessage());
