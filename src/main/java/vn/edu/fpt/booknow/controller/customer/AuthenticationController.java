@@ -2,6 +2,7 @@ package vn.edu.fpt.booknow.controller.customer;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -9,11 +10,16 @@ import vn.edu.fpt.booknow.entities.Customer;
 import vn.edu.fpt.booknow.services.customer.AuthService;
 import vn.edu.fpt.booknow.services.customer.OtpService;
 
+import java.util.concurrent.TimeUnit;
+
+
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping(value = "/authen")
 public class AuthenticationController {
-
+    private final RedisTemplate<String, Integer> redisTemplate;
+    private static final long OTP_EXPIRE = 1;
     private final OtpService otpService;
     private final AuthService authService;
 
@@ -34,6 +40,20 @@ public class AuthenticationController {
 
     @GetMapping(value = "/otp")
     public String otp(@RequestParam(name = "email") String email, Model model) {
+        boolean flag = redisTemplate.hasKey("OTP:" + email);
+        String key = "OTP";
+        System.out.println(flag);
+        int count = 0;
+        if (flag) {
+            count++;
+            redisTemplate.opsForValue()
+                    .set("OTP", count, OTP_EXPIRE, TimeUnit.MINUTES);
+            System.out.println(count);
+            if (count == 2){
+                model.addAttribute("otp", "please cannot spam otp");
+                return "authentication/otp";
+            }
+        }
         otpService.sendOtp(email);
         model.addAttribute("email", email);
         return "authentication/otp";
@@ -41,6 +61,8 @@ public class AuthenticationController {
 
     @PostMapping(value = "/verifiedOtp")
     public String verifiedOtp(@RequestParam(name = "email") String email, @RequestParam(name = "otp") String otp, Model model) {
+        System.out.println("running verufiedOtp");
+
         if (otpService.verifyOtp(email,otp)){
         model.addAttribute("email",email);
         return "authentication/registerForm";

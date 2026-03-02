@@ -17,7 +17,7 @@ public class OtpService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final JavaMailSender mailSender;
 
-    private static final long OTP_EXPIRE = 5; // phút
+    private static final long OTP_EXPIRE = 1; // phút
 
     public void sendOtp(String email) {
         String otp = String.valueOf(100000 + new Random().nextInt(900000));

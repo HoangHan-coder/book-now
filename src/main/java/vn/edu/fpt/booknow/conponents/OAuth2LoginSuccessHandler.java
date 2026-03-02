@@ -1,5 +1,6 @@
 package vn.edu.fpt.booknow.conponents;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -28,6 +29,29 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
             response.sendRedirect("/book-now/authen/login");
         } else {
+            String email = oAuth2User.getAttribute("email");
+
+            String token = JwtUtils.generateToken(email);
+
+            // Tạo HttpOnly Cookie
+            Cookie jwtCookie = new Cookie("access_token", token);
+            jwtCookie.setHttpOnly(true);     // JS không đọc được
+            jwtCookie.setSecure(false);      // true nếu dùng HTTPS
+            jwtCookie.setPath("/");
+            jwtCookie.setMaxAge(24 * 60 * 60);
+
+            response.addCookie(jwtCookie);
+
+//            // Trả JSON thay vì redirect
+//            response.setContentType("application/json");
+//            response.setCharacterEncoding("UTF-8");
+//
+//            response.getWriter().write("""
+//            {
+//                "status": "success",
+//                "message": "OAuth2 login successful"
+//            }
+//        """);
 
             response.sendRedirect("/book-now/authen/home");
         }
