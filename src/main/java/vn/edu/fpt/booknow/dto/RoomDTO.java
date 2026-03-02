@@ -18,6 +18,7 @@ public class RoomDTO {
     private Double basePrice;
     private Integer maxGuest;
     private String roomNumber;
+    private String roomType;
     private String description;
     private String imageUrl;
     private String utilities;

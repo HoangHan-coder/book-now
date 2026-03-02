@@ -41,46 +41,65 @@ public class RoomController {
         this.customerRepository = customerRepository;
     }
 
-    @GetMapping("/detail/{roomId}")
-    public String detailRoom(@PathVariable Long roomId,
+    @GetMapping("/detail/{roomIdString}")
+    public String detailRoom(@PathVariable String roomIdString,
                              Model model,
                              @CookieValue(name = "access_token", required = false) String accessToken
     ) {
         // 1. Kiểm tra Access Token
-        String email = "";
-        Customer customer = new Customer();
-        List<RoomDTO> roomDetail = roomService.detailRoomService(roomId);
-        List<Timetable> timetables = roomService.getAllTimeTable();
-        List<TimeTableDTO> getSlot = roomService.getSlot(roomId);
-        BookingDTO booking = new BookingDTO();
-        List<LocalDateTime> weekDates = new ArrayList<>();
-        LocalDateTime today = LocalDateTime.now();
-        if (accessToken != null && !accessToken.isEmpty()) {
-            customer = customerRepository.getCustomerByEmail(email);
+        try {
+            Long roomId = Long.parseLong(roomIdString);
+            String email = "";
+            Customer customer = new Customer();
+            List<RoomDTO> roomDetail = roomService.detailRoomService(roomId);
+            List<Timetable> timetables = roomService.getAllTimeTable();
+            List<TimeTableDTO> getSlot = roomService.getSlot(roomId);
+            BookingDTO booking = new BookingDTO();
+            List<LocalDateTime> weekDates = new ArrayList<>();
+            LocalDateTime today = LocalDateTime.now();
+            if (accessToken != null && !accessToken.isEmpty()) {
+                customer = customerRepository.getCustomerByEmail(email);
+                booking.setCustomer(customer);
+            }
+
             booking.setCustomer(customer);
-        }
+            for (int i = 0; i < 7; i++) {
+                weekDates.add(today.plusDays(i));
+            }
+            Set<String> bookedKeys = new HashSet<>();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMM");
 
-        booking.setCustomer(customer);
-        for (int i = 0; i < 7; i++) {
-            weekDates.add(today.plusDays(i));
+            for (TimeTableDTO s : getSlot) {
+                String key = s.getDate().format(formatter) + "-" + s.getTimetableId();
+                bookedKeys.add(key);
+            }
+            booking.setRoomId(roomId);
+            model.addAttribute("bookedKeys", bookedKeys);
+            model.addAttribute("timeTable", timetables);
+            model.addAttribute("weekDates", weekDates);
+            model.addAttribute("today", today);
+            model.addAttribute("roomDetail", roomDetail);
+            model.addAttribute("informBooking", booking);
+            return "public/DetailRoom";
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return "redirect:/homepage";
         }
-        Set<String> bookedKeys = new HashSet<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMM");
-
-        for (TimeTableDTO s : getSlot) {
-            String key = s.getDate().format(formatter) + "-" + s.getTimetableId();
-            bookedKeys.add(key);
-        }
-        booking.setRoomId(roomId);
-        model.addAttribute("bookedKeys", bookedKeys);
-        model.addAttribute("timeTable", timetables);
-        model.addAttribute("weekDates", weekDates);
-        model.addAttribute("today", today);
-        model.addAttribute("roomDetail", roomDetail);
-        model.addAttribute("informBooking", booking);
-        return "public/DetailRoom";
     }
+    @PostMapping("/booking/process")
+    public String handleBookingRequest(
+            @RequestParam("roomId") Long roomId,
+            @RequestParam("date") String date, // Sẽ nhận chuỗi "2026-03-01"
+            @RequestParam("timetableId") Long timetableId,
+            RedirectAttributes redirectAttributes) {
 
+        // Bước này bạn có thể thực hiện kiểm tra DB:
+        // 1. Phòng có tồn tại không?
+        // 2. Khung giờ này đã bị ai đặt chưa (tránh trường hợp 2 người cùng đặt 1 lúc)?
+
+        // Sau đó truyền dữ liệu sang trang chi tiết thanh toán
+        return "redirect:/detail/" + roomId + "?preDate=" + date + "&preSlotId=" + timetableId;
+    }
     @PostMapping("/search")
     public String searchPost(@ModelAttribute("search") SearchDTO searchDTO,
                              Model model) {

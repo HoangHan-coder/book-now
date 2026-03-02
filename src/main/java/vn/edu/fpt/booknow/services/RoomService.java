@@ -87,6 +87,7 @@ public class RoomService {
                             x.getBasePrice(),
                             x.getMaxGuest(),
                             x.getRoomNumber(),
+                            x.getRoomType(),
                             x.getDescription(),
                             x.getImageUrl(),
                             null,

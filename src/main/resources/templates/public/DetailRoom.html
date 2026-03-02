@@ -78,7 +78,7 @@
         <div class="lg:col-span-2 space-y-8">
             <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
                 <div class="relative h-[400px]">
-                    <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80"
+                    <img th:src="${room.getImageUrl()}"
                          alt="Room Detail"
                          class="w-full h-full object-cover">
                     <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg text-sm font-bold text-gray-800 shadow-sm flex items-center gap-1">
@@ -162,6 +162,7 @@
 
                                             <button th:if="${!bookedKeys.contains(currentKey)}"
                                                     type="button"
+                                                    th:id="'btn-' + ${currentKey}"
                                                     th:data-slot-info="|${#temporals.format(date, 'dd/MM')} ${tItem.slotName}|"
                                                     th:data-price="${currentPrice}"
                                                     onclick="toggleSlot(this, this.getAttribute('data-slot-info'), this.getAttribute('data-price'))"
@@ -192,9 +193,7 @@
                 <form class="space-y-5" onsubmit="return validateBooking(event)"  th:action="@{/booking/save}" method="post" th:object="${informBooking}" enctype="multipart/form-data">
                     <input type="hidden" th:field="*{roomId}">
                     <input type="hidden" name="roomId">
-                    <input name="customer.fullName">
-<!--                    <input type="hidden" th:field="*{customer.fullName}">-->
-
+                    <input type="hidden" th:field="*{customer.fullName}">
                     <input type="hidden" th:field="*{customer.phone}">
                     <input type="hidden" th:field="*{customer.email}">
 
@@ -431,6 +430,37 @@
 
         return true;
     }
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Lấy tham số từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const preDate = urlParams.get('preDate'); // Ví dụ: 2026-03-01
+        const preSlotId = urlParams.get('preSlotId');
+
+        if (preDate && preSlotId) {
+            // 2. Chuyển định dạng date từ YYYY-MM-DD sang ddMM để khớp với currentKey
+            const dateParts = preDate.split('-');
+            if (dateParts.length === 3) {
+                const formattedDateKey = dateParts[2] + dateParts[1]; // ddMM
+                const targetKey = `btn-${formattedDateKey}-${preSlotId}`;
+
+                // 3. Tìm button và thực hiện click giả lập
+                const targetBtn = document.getElementById(targetKey);
+                if (targetBtn) {
+                    // Cuộn màn hình đến vị trí bảng lịch để người dùng thấy
+                    targetBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    // Gọi hàm chọn slot
+                    targetBtn.click();
+
+                    // Xóa tham số trên URL để nếu user F5 sẽ không bị chọn lại
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+        }
+
+        // Giữ nguyên logic renderTable hiện tại của bạn bên dưới...
+        renderTable();
+    });
 </script>
 <div id="toast-container" class="fixed top-5 right-5 z-[200] flex flex-col gap-2"></div>
 </body>
