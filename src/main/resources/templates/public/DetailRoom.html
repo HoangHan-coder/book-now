@@ -102,6 +102,13 @@
                 </div>
                 <div class="p-6 md:p-8">
                     <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-semibold text-blue-600 uppercase tracking-wider">Phòng</span>
+                            <div class="flex items-center">
+                                <i class="fa-solid fa-door-open text-gray-400 mr-2"></i>
+                                <span class="text-2xl font-extrabold text-gray-800" th:text="${room.roomNumber}">101</span>
+                            </div>
+                        </div>
                         <div class="text-right">
                             <div class="bg-blue-50 px-4 py-2 rounded-lg border border-blue-100 inline-block">
                                 <span class="block text-xs text-gray-500">Số người tối đa</span>
@@ -429,13 +436,13 @@
         }
 
         // 2. Kiểm tra ảnh CCCD (nếu muốn bắt buộc)
-        // const front = document.getElementById('cccd_front').files.length;
-        // const back = document.getElementById('cccd_back').files.length;
-        // if (front === 0 || back === 0) {
-        //     event.preventDefault();
-        //     showToast("Vui lòng tải lên cả hai mặt CCCD!", "error");
-        //     return false;
-        // }
+        const front = document.getElementById('cccd_front').files.length;
+        const back = document.getElementById('cccd_back').files.length;
+        if (front === 0 || back === 0) {
+            event.preventDefault();
+            showToast("Vui lòng tải lên cả hai mặt CCCD!", "error");
+            return false;
+        }
 
         return true;
     }

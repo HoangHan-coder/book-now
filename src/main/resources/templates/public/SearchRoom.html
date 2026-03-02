@@ -156,7 +156,9 @@
                                 [[${#numbers.formatDecimal(room.overPrice, 0, 'COMMA', 0, 'POINT')}]]đ <span class="text-xs font-normal text-gray-500">/ đêm</span>
                             </span>
                         </div>
-                        <button class="w-full mt-3 bg-gray-900 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors shadow-md">Xem chi tiết</button>
+                        <a th:href="@{|/detail/${room.getRoomId()}|}">
+                            <button class="w-full mt-3 bg-gray-900 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors shadow-md">Xem chi tiết</button>
+                        </a>
                     </div>
                 </div>
             </div>

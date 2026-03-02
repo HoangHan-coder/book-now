@@ -97,7 +97,7 @@ public class BookingService {
                 case "Sáng" -> start.equals(LocalTime.of(10, 30)) && end.equals(LocalTime.of(13, 30));
                 case "Chiều" -> start.equals(LocalTime.of(14, 0)) && end.equals(LocalTime.of(17, 0));
                 case "Tối" -> start.equals(LocalTime.of(17, 30)) && end.equals(LocalTime.of(20, 30));
-                case "Đêm" -> start.equals(LocalTime.of(21, 0)) && end.equals(LocalTime.of(9, 30));
+                case "Đêm" -> start.equals(LocalTime.of(21, 0)) && end.equals(LocalTime.of(9, 50));
                 default -> false;
             };
 
@@ -243,7 +243,7 @@ public class BookingService {
             case "Sáng"  -> start.equals(LocalTime.of(10, 30)) && end.equals(LocalTime.of(13, 30));
             case "Chiều" -> start.equals(LocalTime.of(14, 0))  && end.equals(LocalTime.of(17, 0));
             case "Tối"   -> start.equals(LocalTime.of(17, 30)) && end.equals(LocalTime.of(20, 30));
-            case "Đêm"   -> start.equals(LocalTime.of(21, 0))  && end.equals(LocalTime.of(9, 30));
+            case "Đêm"   -> start.equals(LocalTime.of(21, 0))  && end.equals(LocalTime.of(9, 50));
             default -> false;
         };
 
