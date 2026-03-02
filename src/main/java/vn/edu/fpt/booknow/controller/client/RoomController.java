@@ -67,7 +67,7 @@ public class RoomController {
             }
             booking.setCustomer(customer);
             for (int i = 0; i < 7; i++) {
-                weekDates.add(today.plusDays(i));
+                weekDates.add(today.plusDays(i+1));
             }
             Set<String> bookedKeys = new HashSet<>();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMM");

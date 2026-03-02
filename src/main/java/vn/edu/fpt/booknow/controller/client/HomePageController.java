@@ -43,7 +43,7 @@ public class HomePageController {
 
 
         for (int i = 0; i < 7; i++) {
-            weekDates.add(today.plusDays(i));
+            weekDates.add(today.plusDays(i+1));
         }
         System.out.println(roomAll.size());
         model.addAttribute("bookedKeys", bookedKeys);
