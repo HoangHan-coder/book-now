@@ -304,24 +304,43 @@
     const formatCurrency = (num) => new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(num);
 
     function toggleSlot(btn, slotName, price) {
-        // Dùng OUTLINE cho trạng thái chọn để không xóa mất RING (viền xanh ngày hôm nay)
-        const selectedStyles = ['bg-blue-600', 'text-white', 'hover:bg-blue-700', 'outline', 'outline-2', 'outline-blue-300', 'scale-105', 'shadow-md'];
-        const availableStyles = ['bg-green-100', 'text-green-700', 'hover:bg-green-200'];
+        // 1. Các class khi nút ở trạng thái ĐƯỢC CHỌN (Xanh dương)
+        const selectedStyles = [
+            'bg-blue-600', 'text-white', 'hover:bg-blue-700',
+            'outline', 'outline-2', 'outline-blue-300',
+            'scale-105', 'shadow-md', 'border-blue-600' // Thêm border đồng màu
+        ];
+
+        // 2. Các class khi nút ở trạng thái TRỐNG (Xanh lá/Xám nhẹ)
+        // Liệt kê tất cả các class border/ring bạn đã viết trong HTML vào đây để xóa sạch khi chọn
+        const availableStyles = [
+            'bg-[#e8fdf1]', 'bg-green-100', 'text-green-700',
+            'hover:bg-[#d1fae5]',
+            'border', 'border-[#c2f5d8]'
+        ];
 
         if (selectedSlotsMap.has(slotName)) {
+            // --- TRẠNG THÁI: BỎ CHỌN (Quay về trống) ---
+            // Xóa style xanh dương
             btn.classList.remove(...selectedStyles);
+            // Thêm lại style mặc định ban đầu
             btn.classList.add(...availableStyles);
+
             btn.innerHTML = 'Trống';
             selectedSlotsMap.delete(slotName);
         } else {
+            // --- TRẠNG THÁI: ĐANG CHỌN (Chuyển sang xanh dương) ---
+            // QUAN TRỌNG: Xóa sạch các class border và ring cũ của trạng thái trống
             btn.classList.remove(...availableStyles);
+
+            // Thêm style xanh dương
             btn.classList.add(...selectedStyles);
+
             btn.innerHTML = '<i class="fa-solid fa-check"></i>';
             selectedSlotsMap.set(slotName, price);
         }
         updateUI();
     }
-
     function updateUI() {
         selectedListEl.innerHTML = "";
         let total = 0;

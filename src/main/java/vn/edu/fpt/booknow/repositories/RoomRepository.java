@@ -38,11 +38,12 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
                 OR (:price = 'mid'  AND t.basePrice BETWEEN 300000 AND 800000)
                 OR (:price = 'high' AND t.basePrice > 800000)
               )
-          AND (:amenityIds IS NULL OR EXISTS (
-                SELECT 1 FROM RoomAmenity ra 
-                JOIN ra.amenity am 
-                WHERE ra.room.roomId = r.roomId AND am.name IN :amenityIds
-              ))
+          AND (:amenityIds IS NULL OR (
+                SELECT COUNT(DISTINCT ra.amenity.name) 
+                FROM RoomAmenity ra 
+                WHERE ra.room.roomId = r.roomId 
+                AND ra.amenity.name IN :amenityIds
+              ) = :amenityCount)
     """,
             countQuery = """
         SELECT COUNT(DISTINCT r.roomId)
@@ -58,19 +59,20 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
                 OR (:price = 'mid'  AND t.basePrice BETWEEN 300000 AND 800000)
                 OR (:price = 'high' AND t.basePrice > 800000)
               )
-          AND (:amenityIds IS NULL OR EXISTS (
-                SELECT 1 FROM RoomAmenity ra 
-                JOIN ra.amenity am 
-                WHERE ra.room.roomId = r.roomId AND am.name IN :amenityIds
-              ))
+          AND (:amenityIds IS NULL OR (
+                SELECT COUNT(DISTINCT ra.amenity.name) 
+                FROM RoomAmenity ra 
+                WHERE ra.room.roomId = r.roomId 
+                AND ra.amenity.name IN :amenityIds
+              ) = :amenityCount)
     """
     )
     Page<RoomDTO> searchRooms(
             @Param("keyword") String keyword,
-            @Param("area") String area,
             @Param("maxGuest") Integer maxGuest,
             @Param("price") String price,
             @Param("amenityIds") List<String> amenityIds,
+            @Param("amenityCount") Long amenityCount, // Thêm dòng này
             Pageable pageable
     );
 

@@ -49,28 +49,29 @@ public class RoomService {
         Sort sort;
         String sortType = searchDTO.getSortType();
 
-        // 1. Logic xác định Sort
+        // 1. Logic xác định Sort (Giữ nguyên của bạn)
         if ("price_asc".equals(sortType)) {
             sort = Sort.by("t.basePrice").ascending();
         } else if ("price_desc".equals(sortType)) {
             sort = Sort.by("t.basePrice").descending();
-        } else if ("popular".equals(sortType)) {
-            sort = Sort.by("r.roomId").ascending();
         } else {
             sort = Sort.by("r.roomId").descending();
         }
 
-        // 2. Khởi tạo Pageable với số trang động 'page'
-        // Quan trọng: Thay vì để số 0 cố định, ta dùng biến 'page' truyền vào
+        // 2. Khởi tạo Pageable
         Pageable pageable = PageRequest.of(page, 2, sort);
 
-        // 3. Gọi Repository
+        // 3. Tính toán số lượng tiện ích để pass vào Query
+        List<String> amenities = searchDTO.getAmenity();
+        Long amenityCount = (amenities != null && !amenities.isEmpty()) ? (long) amenities.size() : 0L;
+
+        // 4. Gọi Repository với tham số amenityCount mới
         return roomRepository.searchRooms(
                 searchDTO.getKeyword(),
-                searchDTO.getArea(),
                 searchDTO.getMaxGuest(),
                 searchDTO.getPrice(),
-                searchDTO.getAmenity(),
+                amenities,
+                amenityCount, // Truyền biến đã tính vào đây
                 pageable
         );
     }

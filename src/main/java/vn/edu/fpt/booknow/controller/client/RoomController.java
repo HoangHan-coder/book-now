@@ -129,6 +129,7 @@ public class RoomController {
 
             return "public/SearchRoom";
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return "redirect:/homepage";
         }
     }

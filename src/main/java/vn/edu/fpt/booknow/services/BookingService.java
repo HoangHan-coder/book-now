@@ -224,17 +224,19 @@ public class BookingService {
     private String validateWorkShiftTime(WorkShift shift) {
         LocalDate today = LocalDate.now();
         LocalDate workDate = shift.getWorkDate().toLocalDate();
-
-        // 1. Kiểm tra ngày
-        if (workDate.isBefore(today)) {
-            return "❌ LỖI: Ngày " + workDate + " đã qua, không thể đặt!";
+        System.out.println(today);
+        // 1. Kiểm tra ngày (Chỉnh sửa: Chỉ cho phép đặt từ ngày mai)
+        // Nếu ngày chọn KHÔNG SAU ngày hôm nay (isAfter(today) == false) -> Báo lỗi
+        if (!workDate.isAfter(today)) {
+            return "❌ LỖI: Bạn chỉ có thể đặt phòng bắt đầu từ ngày mai (" + today.plusDays(1) + ")!";
         }
 
+        // Chặn quá 7 ngày kể từ ngày mai
         if (workDate.isAfter(today.plusDays(7))) {
             return "❌ LỖI: Chỉ được phép đặt phòng trong vòng 7 ngày tới!";
         }
 
-        // 2. Kiểm tra khung giờ
+        // 2. Kiểm tra khung giờ (Giữ nguyên logic của bạn)
         LocalTime start = shift.getStartTime().toLocalTime();
         LocalTime end = shift.getEndTime().toLocalTime();
         String type = shift.getShiftType();
@@ -251,9 +253,8 @@ public class BookingService {
             return "❌ LỖI: Ca " + type + " có giờ (" + start + " - " + end + ") không đúng quy định!";
         }
 
-        return null; // Không có lỗi
+        return null;
     }
-
     /**
      * Kiểm tra xem ca hiện tại có tiếp nối ngay lập tức sau ca trước không
      */
