@@ -223,15 +223,26 @@
             </button>
 
 
-            <button class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors border"
-                    th:classappend="${user.status == 'ACTIVE'
-                         ? 'bg-red-50 text-red-700 hover:bg-red-100 border-red-600'
-                         : 'bg-green-50 text-green-700 hover:bg-green-100 border-green-600'}">
 
-              <i class="fa-solid" th:classappend="${user.status == 'ACTIVE' ? 'fa-user-slash' : 'fa-user-check'}"></i>
+            <form th:action="@{/admin/users/change-status}" method="post" class="flex-1">
+              <input type="hidden" name="userId" th:value="${user.userId}" />
 
-              <span th:text="${user.status == 'ACTIVE' ? 'Ngưng hoạt động' : 'Kích hoạt lại'}">Thao tác</span>
-            </button>
+              <input type="hidden" name="userType" th:value="${user.role}" />
+
+              <input type="hidden" name="status" th:value="${user.status == 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'}" />
+
+              <button type="submit"
+                      onclick="return confirm('Mày có chắc chắn muốn thay đổi trạng thái người dùng này không?')"
+                      class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors border"
+                      th:classappend="${user.status == 'ACTIVE'
+             ? 'bg-red-50 text-red-700 hover:bg-red-100 border-red-600'
+             : 'bg-green-50 text-green-700 hover:bg-green-100 border-green-600'}">
+
+                <i class="fa-solid" th:classappend="${user.status == 'ACTIVE' ? 'fa-user-slash' : 'fa-user-check'}"></i>
+                <span th:text="${user.status == 'ACTIVE' ? 'Ngưng hoạt động' : 'Kích hoạt lại'}">Thao tác</span>
+              </button>
+            </form>
+
 
 
 

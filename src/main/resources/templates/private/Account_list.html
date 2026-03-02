@@ -212,8 +212,20 @@
                     </td>
                     <td class="py-4 px-6 text-right">
 
-                        <a th:href="@{/admin/users/{id}(id=${user.id}, role=${user.role})}"
-                           class="text-blue-600 hover:text-blue-900 font-medium text-sm">Xem chi tiết</a>
+
+                        <a th:href="@{/admin/users/detail(
+        userId=${user.id},
+        userType=${user.role}
+    )}"
+                           class="inline-flex items-center gap-1
+          bg-blue-600 hover:bg-blue-700
+          text-white text-sm font-medium
+          px-3 py-1.5 rounded-lg
+          border border-blue-600
+          shadow-sm transition-colors">
+                            <i class="fa-solid fa-eye text-xs"></i>
+                            Xem chi tiết
+                        </a>
                     </td>
                 </tr>
                 </tbody>

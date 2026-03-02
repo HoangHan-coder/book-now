@@ -17,16 +17,16 @@ public class ViewUserDetailController {
     }
 
     // UC-17.2: View User Detail
-    @GetMapping("/{id}")
-    public String viewUserDetail(@PathVariable("id") String userId,
-                                 @RequestParam("role") String role,
+    @GetMapping("/detail")
+    public String viewUserDetail(@RequestParam("userId") String userId,
+                                 @RequestParam("userType") String userType,
                                  Model model) {
 
         UserDetailDTO userDetail =
-                service.getUserDetail(userId, role);
+                service.getUserDetail(userId, userType);
 
         model.addAttribute("user", userDetail);
 
-        return "private/Account_detail"; // read-only view
+        return "private/Account_detail";
     }
 }

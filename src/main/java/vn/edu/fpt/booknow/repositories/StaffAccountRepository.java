@@ -1,6 +1,7 @@
 package vn.edu.fpt.booknow.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import vn.edu.fpt.booknow.entities.StaffAccount;
@@ -18,6 +19,12 @@ public interface StaffAccountRepository extends JpaRepository<StaffAccount, Long
             @Param("keyword") String keyword
     );
 
+    // UC-17.3: Update staff account status
+    @Modifying
+    @Query("UPDATE StaffAccount s SET s.status = :status WHERE s.staffAccountId = :staffAccountId")
+    int updateStatus(@Param("staffAccountId") Long staffAccountId,
+                     @Param("status") String status);
 
 }
+
 
