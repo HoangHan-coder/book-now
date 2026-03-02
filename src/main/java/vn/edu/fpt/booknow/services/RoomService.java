@@ -113,10 +113,12 @@ public class RoomService {
         List<TimeTableDTO> list = timeTableRepository.getBookingDetailsByRoomId(id);
         return list;
     }
+
     public List<TimeTableDTO> getSlotBooking() {
         List<TimeTableDTO> list = timeTableRepository.getBookingDetails();
         return list;
     }
+
     public List<RoomDTO> getAllRoomService(Sort sort) {
         List<RoomDTO> list = roomRepository.findAllRoomsSorted(sort);
         return list;
@@ -141,6 +143,7 @@ public class RoomService {
         List<Scheduler> list = scheduleRepository.findAll();
         return list;
     }
+
     public List<RoomDTO> roomAll() {
         List<RoomDTO> list = roomRepository.findAllRoom();
         return list;
