@@ -10,8 +10,8 @@ public class MomoRequestDTO {
     @JsonProperty("amount")       private String amount;
     @JsonProperty("orderId")      private String orderId;
     @JsonProperty("orderInfo")    private String orderInfo;
-    @JsonProperty("ipnUrl")      private String ipnUrl;      // ← ĐÚNG
-    @JsonProperty("redirectUrl") private String redirectUrl; // ← ĐÚNG
+    @JsonProperty("ipnUrl")      private String ipnUrl;
+    @JsonProperty("redirectUrl") private String redirectUrl;
     @JsonProperty("extraData")    private String extraData;
     @JsonProperty("requestType")  private String requestType;
     @JsonProperty("signature")    private String signature;

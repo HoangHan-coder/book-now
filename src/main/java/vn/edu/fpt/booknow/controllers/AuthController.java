@@ -11,9 +11,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import vn.edu.fpt.booknow.model.entities.Customer;
 import vn.edu.fpt.booknow.model.entities.StaffAccount;
 import vn.edu.fpt.booknow.services.JWTService;
+import vn.edu.fpt.booknow.services.MailService;
 import vn.edu.fpt.booknow.services.RecaptchaService;
 import vn.edu.fpt.booknow.services.customer.CustomerService;
 import vn.edu.fpt.booknow.services.admin.StaffAccountService;
+
+import java.util.HashMap;
+import java.util.Map;
+
 
 @Controller
 public class AuthController {
@@ -27,8 +32,12 @@ public class AuthController {
     @Autowired
     private StaffAccountService staffAccountService;
 
-    @Autowired
-    private RecaptchaService recaptchaService;
+//    @Autowired
+//    private RecaptchaService recaptchaService;
+//    private RecaptchaService recaptchaService;
+
+
+
 
     @GetMapping("/admin/login")
     public String loginAdminPanel(Model model,
@@ -93,4 +102,24 @@ public class AuthController {
         jwtService.removeCookie(response);
         return "redirect:/auth/login";
     }
+
+
+//    // reset password
+//    @GetMapping("/forgot-password")
+//    public String forgotPasswordPanel() {
+//        return "Forgot_Password_Email";
+//    }
+//
+//    @PostMapping("/forgot-password")
+//    public String forgotPasswordHandle(@RequestParam("email") String email) {
+//        String otp = String.valueOf(new Random().nextInt(899999) + 100000);
+//        System.out.println(otp);
+//        if (!otps.containsKey(email)) {
+//            otps.put(email,otp);
+//            mailService.sendOtp(email, otp);
+//        }
+//        return "Forgot_Password_OTP";
+//    }
+
+
 }

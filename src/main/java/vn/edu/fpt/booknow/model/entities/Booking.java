@@ -1,25 +1,28 @@
 package vn.edu.fpt.booknow.model.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "booking_id", nullable = false)
-    private Long id;
+    private Long bookingId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
@@ -30,10 +33,10 @@ public class Booking {
     private Room room;
 
     @Column(name = "check_in_time", nullable = false)
-    private LocalDate checkInTime;
+    private LocalDateTime checkInTime;
 
     @Column(name = "check_out_time", nullable = false)
-    private LocalDate checkOutTime;
+    private LocalDateTime checkOutTime;
 
     @Nationalized
     @Column(name = "id_card_front_url", nullable = false, length = 500)
@@ -56,18 +59,18 @@ public class Booking {
 
     @ColumnDefault("sysdatetime()")
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "booking")
-    private Set<Feedback> feedbacks = new LinkedHashSet<>();
+    private List<Feedback> feedbacks = new ArrayList<>();
 
     @OneToMany(mappedBy = "booking")
-    private Set<Invoice> invoices = new LinkedHashSet<>();
+    private List<Invoice> invoices = new ArrayList<>();
 
     @OneToMany(mappedBy = "booking")
-    private Set<Payment> payments = new LinkedHashSet<>();
+    private List<Payment> payments = new ArrayList<>();
 
     @OneToMany(mappedBy = "booking")
-    private Set<Scheduler> schedulers = new LinkedHashSet<>();
+    private List<Scheduler> schedulers = new ArrayList<>();
 
 }

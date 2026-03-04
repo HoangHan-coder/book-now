@@ -1,22 +1,23 @@
 package vn.edu.fpt.booknow.model.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id", nullable = false)
-    private Long id;
+    private Long paymentId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "booking_id", nullable = false)
@@ -34,6 +35,6 @@ public class Payment {
 
     @ColumnDefault("sysdatetime()")
     @Column(name = "paid_at", nullable = false)
-    private Instant paidAt;
+    private LocalDateTime paidAt;
 
 }

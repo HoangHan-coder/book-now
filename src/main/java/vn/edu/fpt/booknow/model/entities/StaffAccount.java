@@ -1,24 +1,25 @@
 package vn.edu.fpt.booknow.model.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
-import java.time.Instant;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-@Getter
-@Setter
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "StaffAccounts")
 public class StaffAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "staff_account_id", nullable = false)
-    private Long id;
+    private Long staffAccountId;
 
     @Nationalized
     @Column(name = "email", nullable = false)
@@ -50,16 +51,16 @@ public class StaffAccount {
 
     @ColumnDefault("sysdatetime()")
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     @ColumnDefault("0")
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 
     @OneToMany(mappedBy = "admin")
-    private Set<Feedback> feedbacks = new LinkedHashSet<>();
+    private List<Feedback> feedbacks = new ArrayList<>();
 
     @OneToMany(mappedBy = "staffAccount")
-    private Set<RefreshToken> refreshTokens = new LinkedHashSet<>();
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
 
 }

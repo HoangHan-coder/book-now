@@ -1,22 +1,24 @@
 package vn.edu.fpt.booknow.model.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Amenity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "amenity_id", nullable = false)
-    private Long id;
+    private Long amenityId;
 
     @Nationalized
     @Column(name = "name", nullable = false, length = 100)
@@ -31,6 +33,6 @@ public class Amenity {
     private Boolean isDeleted = false;
 
     @OneToMany(mappedBy = "amenity")
-    private Set<RoomAmenity> roomAmenities = new LinkedHashSet<>();
+    private List<RoomAmenity> roomAmenities = new ArrayList<>();
 
 }
