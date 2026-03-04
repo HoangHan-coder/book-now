@@ -1,0 +1,40 @@
+package vn.edu.fpt.booknow.services.customer;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+import vn.edu.fpt.booknow.model.entities.Customer;
+import vn.edu.fpt.booknow.model.map.CustomerDetails;
+import vn.edu.fpt.booknow.model.map.StaffUserDetails;
+import vn.edu.fpt.booknow.services.JWTService;
+
+@Service
+public class CustomerService {
+
+    @Autowired
+    private AuthenticationManager authManager;
+
+    @Autowired
+    private JWTService jwtService;
+
+    public boolean verify(Customer users, HttpServletResponse response) {
+        System.out.println("Verify is running..");
+        Authentication authentication = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(users.getEmail(), users.getPasswordHash()));
+        if (authentication.isAuthenticated()) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            if (userDetails instanceof StaffUserDetails) {
+                System.out.println("This is Staff or admin");
+                return false;
+            }
+            jwtService.createCookie(users, response);
+            return true;
+        }
+        return false;
+    }
+}

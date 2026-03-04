@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+        th:text trên title: thay đổi tiêu đề tab dựa trên kết quả.
+        Biểu thức ternary Thymeleaf: ${condition} ? 'A' : 'B'
+    -->
+    <title th:text="${success} ? 'Thanh toán thành công ✅' : 'Thanh toán thất bại ❌'">Kết quả thanh toán</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f7f7f7;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 44px 40px;
+            width: 500px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+            text-align: center;
+        }
+        .icon      { font-size: 80px; margin-bottom: 16px; }
+        .title     { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+        .title.ok  { color: #2e7d32; }
+        .title.err { color: #c62828; }
+        .subtitle  { color: #888; font-size: 15px; margin-bottom: 32px; }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            margin-bottom: 28px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .info-table tr { border-bottom: 1px solid #f5f5f5; }
+        .info-table tr:last-child { border-bottom: none; }
+        .info-table td { padding: 11px 14px; font-size: 14px; }
+        .info-table td:first-child {
+            color: #999;
+            width: 42%;
+            font-weight: 500;
+        }
+        .info-table td:last-child { color: #333; font-weight: 600; }
+
+        .amount-cell { color: #a50064 !important; font-size: 19px !important; }
+
+        .badge-success {
+            display: inline-block;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+        .badge-fail {
+            display: inline-block;
+            background: #ffebee;
+            color: #c62828;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .actions { display: flex; gap: 12px; justify-content: center; }
+        .btn {
+            padding: 12px 28px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: opacity 0.2s;
+        }
+        .btn:hover    { opacity: 0.85; }
+        .btn-primary  { background: #a50064; color: #fff; }
+        .btn-secondary{ background: #f0f0f0; color: #555; }
+
+        .warn-note {
+            background: #fff8e1;
+            border: 1px solid #ffe082;
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #795548;
+            font-size: 12px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+
+    <!--
+        th:if="${success}": render block NÀY nếu success = true
+        th:unless="${success}": render block NÀY nếu success = false
+        Hai block loại trừ nhau.
+    -->
+    <div th:if="${success}">
+        <div class="icon">✅</div>
+        <div class="title ok">Thanh toán thành công!</div>
+        <div class="subtitle">Giao dịch của bạn đã được xử lý thành công.</div>
+    </div>
+
+    <div th:unless="${success}">
+        <div class="icon">❌</div>
+        <div class="title err">Thanh toán thất bại</div>
+        <!--
+            th:text="${message}": render giá trị biến message từ Model.
+            Thymeleaf tự động escape HTML → chống XSS.
+        -->
+        <div class="subtitle" th:text="${message}">Đã xảy ra lỗi trong quá trình thanh toán.</div>
+    </div>
+
+    <!--
+        th:if="${success}": Chỉ hiện bảng chi tiết khi thanh toán thành công.
+        #numbers.formatInteger(): utility Thymeleaf định dạng số có dấu phẩy.
+    -->
+    <div class="warn-note" th:if="${success}">
+        ℹ️ Đây là giao dịch <strong>Sandbox</strong>. Tiền thực không bị trừ.
+    </div>
+
+    <table class="info-table" th:if="${success}">
+        <tr>
+            <td>Mã đơn hàng</td>
+            <td th:text="${orderId}">N/A</td>
+        </tr>
+        <tr>
+            <td>Mã giao dịch MoMo</td>
+            <td th:text="${transId}">N/A</td>
+        </tr>
+        <tr>
+            <td>Nội dung</td>
+            <td th:text="${orderInfo}">N/A</td>
+        </tr>
+        <tr>
+            <td>Số tiền</td>
+            <td class="amount-cell"
+                th:text="${#numbers.formatInteger(amount, 0, 'COMMA')} + ' VNĐ'">
+                N/A
+            </td>
+        </tr>
+        <tr>
+            <td>Thời gian</td>
+            <td th:text="${responseTime}">N/A</td>
+        </tr>
+        <tr>
+            <td>Trạng thái</td>
+            <td>
+                <!--
+                    Biểu thức điều kiện lồng nhau:
+                    Nếu errorCode = "0" → hiện badge xanh, ngược lại badge đỏ.
+                -->
+                <span th:if="${resultCode == '0'}"   class="badge-success">✔ Thành công</span>
+                <span th:unless="${resultCode == '0'}" class="badge-fail">✘ Lỗi [[${errorCode}]]</span>
+            </td>
+        </tr>
+    </table>
+
+    <div class="actions">
+        <!--
+            th:href="@{/payment}": Thymeleaf tự thêm context path.
+        -->
+        <a th:href="@{/payment}" class="btn btn-primary">🔄 Thanh toán mới</a>
+        <a href="/"              class="btn btn-secondary">🏠 Trang chủ</a>
+    </div>
+
+</div>
+</body>
+</html>
