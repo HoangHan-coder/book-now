@@ -8,10 +8,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.dto.BookingDTO;
 import vn.edu.fpt.booknow.model.dto.WorkShift;
 import vn.edu.fpt.booknow.model.entities.*;
-import vn.edu.fpt.booknow.repositories.BookingRepository;
-import vn.edu.fpt.booknow.repositories.RoomRepository;
-import vn.edu.fpt.booknow.repositories.ScheduleRepository;
-import vn.edu.fpt.booknow.repositories.TimeTableRepository;
+import vn.edu.fpt.booknow.repositories.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -28,19 +25,23 @@ public class BookingService {
     private TimeTableRepository timeTableRepository;
     private ScheduleRepository scheduleRepository;
     private Cloudinary cloudinary;
-
-    public BookingService(BookingRepository bookingRepository, TimeTableRepository timeTableRepository, RoomRepository roomRepository, ScheduleRepository scheduleRepository, Cloudinary cloudinary) {
+    private CustomerRepository customerRepository;
+    private JWTService jwtService;
+    public BookingService(BookingRepository bookingRepository, TimeTableRepository timeTableRepository, RoomRepository roomRepository, ScheduleRepository scheduleRepository, CustomerRepository customerRepository, Cloudinary cloudinary, JWTService jwtService) {
         this.bookingRepository = bookingRepository;
         this.timeTableRepository = timeTableRepository;
         this.roomRepository = roomRepository;
         this.scheduleRepository = scheduleRepository;
         this.cloudinary = cloudinary;
+        this.customerRepository = customerRepository;
+        this.jwtService = jwtService;
     }
 
     public String saveBooking(BookingDTO bookingDTO,
                               MultipartFile frontImg,
                               MultipartFile backImg,
-                              RedirectAttributes redirectAttributes) {
+                              RedirectAttributes redirectAttributes,
+                              String accessToken) {
         List<WorkShift> allShiftss = new ArrayList<>();
         for (String slot : bookingDTO.getSelectedSlots()) {
             WorkShift shift = this.parseShift(slot);
@@ -171,8 +172,7 @@ public class BookingService {
             System.out.println("====================================");
             // B: TẠO BOOKING
             Booking newBooking = new Booking();
-            Customer customer = new Customer();
-            customer.setCustomerId(1L);
+            Customer customer = customerRepository.getCustomerByEmail(jwtService.extractUserName(accessToken));
             newBooking.setCustomer(customer);
             Room room = new Room();
             room.setRoomId(bookingDTO.getRoomId());

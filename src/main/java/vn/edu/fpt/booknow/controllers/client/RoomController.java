@@ -182,7 +182,7 @@ public class RoomController {
             if (accessToken == null || accessToken.isEmpty()) {
                 return "redirect:/auth/login";
             }
-            bookingService.saveBooking(bookingDTO, frontImg, backImg, redirectAttributes);
+            bookingService.saveBooking(bookingDTO, frontImg, backImg, redirectAttributes, accessToken);
             return "redirect:/payment";
 
         } catch (Exception e) {
