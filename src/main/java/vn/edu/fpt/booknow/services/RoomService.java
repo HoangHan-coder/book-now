@@ -5,9 +5,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import vn.edu.fpt.booknow.dto.RoomDTO;
-import vn.edu.fpt.booknow.dto.SearchDTO;
-import vn.edu.fpt.booknow.dto.TimeTableDTO;
+import vn.edu.fpt.booknow.model.dto.RoomDTO;
+import vn.edu.fpt.booknow.model.dto.SearchDTO;
+import vn.edu.fpt.booknow.model.dto.TimeTableDTO;
 import vn.edu.fpt.booknow.entities.*;
 import vn.edu.fpt.booknow.repositories.*;
 

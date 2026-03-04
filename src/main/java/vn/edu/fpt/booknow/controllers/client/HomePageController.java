@@ -1,11 +1,11 @@
-package vn.edu.fpt.booknow.controller.client;
+package vn.edu.fpt.booknow.controllers.client;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import vn.edu.fpt.booknow.dto.RoomDTO;
-import vn.edu.fpt.booknow.dto.SearchDTO;
+import vn.edu.fpt.booknow.model.dto.RoomDTO;
+import vn.edu.fpt.booknow.model.dto.SearchDTO;
 import vn.edu.fpt.booknow.entities.*;
 import vn.edu.fpt.booknow.services.RoomService;
 

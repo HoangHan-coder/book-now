@@ -2,8 +2,8 @@ package vn.edu.fpt.booknow.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import vn.edu.fpt.booknow.entities.Image;
-import vn.edu.fpt.booknow.entities.Room;
+import vn.edu.fpt.booknow.model.entities.Image;
+import vn.edu.fpt.booknow.model.entities.Room;
 
 import java.util.List;
 

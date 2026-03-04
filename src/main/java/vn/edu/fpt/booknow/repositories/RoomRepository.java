@@ -6,14 +6,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import vn.edu.fpt.booknow.dto.RoomDTO;
-import vn.edu.fpt.booknow.entities.Room;
+import vn.edu.fpt.booknow.model.dto.RoomDTO;
+import vn.edu.fpt.booknow.model.entities.Room;
 
 import java.util.List;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
-    @Query("SELECT DISTINCT new vn.edu.fpt.booknow.dto.RoomDTO(r.roomId,t.basePrice,t.maxGuests,r.roomNumber,t.name,t.description,i.imageUrl,m.name,m.iconUrl,t.overPrice,null)  FROM Room r \n" +
-            "JOIN RoomAmenity a ON r.roomId = a.roomAmenityId \n" +
+    @Query("SELECT DISTINCT new vn.edu.fpt.booknow.model.dto.RoomDTO(r.roomId,t.basePrice,t.maxGuests,r.roomNumber,t.name,t.description,i.imageUrl,m.name,m.iconUrl,t.overPrice,null)  FROM Room r \n" +
+            "JOIN RoomAmenity a ON r.room = a.roomAmenityId \n" +
             "JOIN RoomType t ON t.roomTypeId = r.roomType.roomTypeId\n" +
             "JOIN Amenity m ON m.amenityId= a.roomAmenityId\n" +
             "JOIN Image i ON i.room.roomId = r.roomId \n" +
@@ -76,7 +76,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             Pageable pageable
     );
 
-    @Query("SELECT DISTINCT new vn.edu.fpt.booknow.dto.RoomDTO(r.roomId,t.basePrice,t.maxGuests,r.roomNumber,t.name,t.description,i.imageUrl,m.name,m.iconUrl,t.overPrice,null)  FROM Room r \n" +
+    @Query("SELECT DISTINCT new vn.edu.fpt.booknow.model.dto.RoomDTO(r.roomId,t.basePrice,t.maxGuests,r.roomNumber,t.name,t.description,i.imageUrl,m.name,m.iconUrl,t.overPrice,null)  FROM Room r \n" +
             "JOIN RoomAmenity a ON r.roomId = a.room.roomId \n" +
             "JOIN RoomType t ON t.roomTypeId = r.roomType.roomTypeId\n" +
             "JOIN Amenity m ON m.amenityId= a.roomAmenityId\n" +
@@ -85,7 +85,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     List<RoomDTO> findRoomDetail(@Param("id") Long id);
 
     @Query("""
-                SELECT new vn.edu.fpt.booknow.dto.RoomDTO(
+                SELECT new vn.edu.fpt.booknow.model.dto.RoomDTO(
                     r.roomId,
                     t.basePrice,
                     t.maxGuests,
@@ -108,7 +108,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 // Spring sẽ tự động nối ORDER BY dựa vào tham số Sort truyền vào
     List<RoomDTO> findAllRoomsSorted(Sort sort);
 
-    @Query("SELECT DISTINCT new vn.edu.fpt.booknow.dto.RoomDTO(r.roomId,t.basePrice,t.maxGuests,r.roomNumber, t.name,t.description,i.imageUrl,m.name,m.iconUrl,t.overPrice,null)  FROM Room r \n" +
+    @Query("SELECT DISTINCT new vn.edu.fpt.booknow.model.dto.RoomDTO(r.roomId,t.basePrice,t.maxGuests,r.roomNumber, t.name,t.description,i.imageUrl,m.name,m.iconUrl,t.overPrice,null)  FROM Room r \n" +
             "JOIN RoomAmenity a ON r.roomId = a.roomAmenityId \n" +
             "JOIN RoomType t ON t.roomTypeId = r.roomType.roomTypeId\n" +
             "JOIN Amenity m ON m.amenityId= a.roomAmenityId\n" +

@@ -1,10 +1,10 @@
-package vn.edu.fpt.booknow.dto;
+package vn.edu.fpt.booknow.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.edu.fpt.booknow.entities.Amenity;
+import vn.edu.fpt.booknow.model.entities.Amenity;
 
 import java.util.ArrayList;
 import java.util.List;

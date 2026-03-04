@@ -1,13 +1,10 @@
-package vn.edu.fpt.booknow.dto;
+package vn.edu.fpt.booknow.model.dto;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import vn.edu.fpt.booknow.entities.Customer;
-import vn.edu.fpt.booknow.entities.Invoice;
-import vn.edu.fpt.booknow.entities.Payment;
-import vn.edu.fpt.booknow.entities.Room;
+import vn.edu.fpt.booknow.model.entities.Customer;
 
 import java.time.LocalDate;
 import java.util.List;

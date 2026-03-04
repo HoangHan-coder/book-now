@@ -1,16 +1,15 @@
-package vn.edu.fpt.booknow.controller.client;
+package vn.edu.fpt.booknow.controllers.client;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import vn.edu.fpt.booknow.dto.BookingDTO;
-import vn.edu.fpt.booknow.dto.RoomDTO;
-import vn.edu.fpt.booknow.dto.SearchDTO;
-import vn.edu.fpt.booknow.dto.TimeTableDTO;
+import vn.edu.fpt.booknow.model.dto.BookingDTO;
+import vn.edu.fpt.booknow.model.dto.RoomDTO;
+import vn.edu.fpt.booknow.model.dto.SearchDTO;
+import vn.edu.fpt.booknow.model.dto.TimeTableDTO;
 import vn.edu.fpt.booknow.entities.*;
 import vn.edu.fpt.booknow.repositories.CustomerRepository;
 import vn.edu.fpt.booknow.repositories.ImageRepository;
@@ -18,14 +17,12 @@ import vn.edu.fpt.booknow.repositories.RoomRepository;
 import vn.edu.fpt.booknow.services.BookingService;
 import vn.edu.fpt.booknow.services.RoomService;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Controller
 public class RoomController {

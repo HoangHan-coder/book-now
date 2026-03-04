@@ -3,13 +3,13 @@ package vn.edu.fpt.booknow.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import vn.edu.fpt.booknow.dto.TimeTableDTO;
-import vn.edu.fpt.booknow.entities.Timetable;
+import vn.edu.fpt.booknow.model.dto.TimeTableDTO;
+import vn.edu.fpt.booknow.model.entities.Timetable;
 
 import java.util.List;
 
 public interface TimeTableRepository extends JpaRepository<Timetable, Long> {
-    @Query("SELECT new vn.edu.fpt.booknow.dto.TimeTableDTO(" +
+    @Query("SELECT new vn.edu.fpt.booknow.model.dto.TimeTableDTO(" +
             "    b.bookingId, " +
             "    r.roomId," +
             "    b.bookingStatus, " +
@@ -22,7 +22,7 @@ public interface TimeTableRepository extends JpaRepository<Timetable, Long> {
             "JOIN Timetable t ON t.timetableId = s.timetable.timetableId " +
             "WHERE r.roomId = :roomId")
     List<TimeTableDTO> getBookingDetailsByRoomId(@Param("roomId") Long roomId);
-    @Query("SELECT new vn.edu.fpt.booknow.dto.TimeTableDTO(" +
+    @Query("SELECT new vn.edu.fpt.booknow.model.dto.TimeTableDTO(" +
             "    b.bookingId, " +
             "    r.roomId," +
             "    b.bookingStatus, " +
