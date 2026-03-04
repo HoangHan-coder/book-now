@@ -2,101 +2,67 @@ package vn.edu.fpt.booknow.model.entities;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Nationalized;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "StaffAccounts")
 public class StaffAccount {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "staff_account_id")
+    @Column(name = "staff_account_id", nullable = false)
     private Long staffAccountId;
 
-    @Column(name = "full_name")
-    private String fullName;
-
-    @Column(name = "email")
+    @Nationalized
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "role")
-    private String role;
-
-    @Column(name = "status")
-    private String status;
-
-    @Column(name = "phone")
+    @Nationalized
+    @Column(name = "phone", length = 20)
     private String phone;
 
+    @Nationalized
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+
+    @Nationalized
+    @Column(name = "full_name", length = 50)
+    private String fullName;
+
+    @Nationalized
     @Column(name = "avatar_url")
     private String avatarUrl;
 
-    @Column(name = "created_at")
+    @Nationalized
+    @Column(name = "role", nullable = false, length = 20)
+    private String role;
+
+    @ColumnDefault("'ACTIVE'")
+    @Column(name = "status", nullable = false, length = 50)
+    private String status;
+
+    @ColumnDefault("sysdatetime()")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @ColumnDefault("0")
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
 
+    @OneToMany(mappedBy = "admin")
+    private List<Feedback> feedbacks = new ArrayList<>();
 
-    public Long getStaffAccountId() {
-        return staffAccountId;
-    }
+    @OneToMany(mappedBy = "staffAccount")
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
 
-    public void setStaffAccountId(Long staffAccountId) {
-        this.staffAccountId = staffAccountId;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }
+

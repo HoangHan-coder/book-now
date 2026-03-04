@@ -1,5 +1,6 @@
 package vn.edu.fpt.booknow.repositories;
 
+
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
 import vn.edu.fpt.booknow.model.entities.Customer;
@@ -22,4 +23,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     @Query("UPDATE Customer c SET c.status = :status WHERE c.customerId = :customerId")
     int updateStatus(@Param("customerId") Integer customerId,
                      @Param("status") String status);
+
+            Optional<Customer> findCustomerByEmail(String email);          
+
 }

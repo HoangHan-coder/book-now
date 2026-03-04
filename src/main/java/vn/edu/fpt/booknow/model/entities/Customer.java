@@ -2,90 +2,67 @@ package vn.edu.fpt.booknow.model.entities;
 
 import jakarta.persistence.*;
 
+import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Nationalized;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "Customer")
 public class Customer {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "customer_id")
+    @Column(name = "customer_id", nullable = false)
     private Long customerId;
 
-    @Column(name = "email")
+    @Nationalized
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "full_name")
+    @Nationalized
+    @Column(name = "password_hash")
+    private String passwordHash;
+
+    @Nationalized
+    @Column(name = "full_name", length = 50)
     private String fullName;
 
-    @Column(name = "status")
-    private String status;
-
-    @Column(name = "phone")
-    private String phone;
-
+    @Nationalized
     @Column(name = "avatar_url")
     private String avatarUrl;
 
-    @Column(name = "created_at")
+    @Nationalized
+    @Column(name = "phone", length = 20)
+    private String phone;
+
+    @ColumnDefault("'ACTIVE'")
+    @Column(name = "status", nullable = false, length = 50)
+    private String status;
+
+    @ColumnDefault("sysdatetime()")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
+    @ColumnDefault("0")
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
 
-    public Long getCustomerId() {
-        return customerId;
-    }
+    @OneToMany(mappedBy = "customer")
+    private List<Booking> bookings = new ArrayList<>();
 
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
-    }
+    @OneToMany(mappedBy = "customer")
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }
+
