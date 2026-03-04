@@ -14,7 +14,6 @@ import vn.edu.fpt.booknow.services.JWTService;
 import vn.edu.fpt.booknow.services.MailService;
 import vn.edu.fpt.booknow.services.RecaptchaService;
 import vn.edu.fpt.booknow.services.customer.CustomerService;
-import vn.edu.fpt.booknow.services.admin.StaffAccountService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +28,6 @@ public class AuthController {
     @Autowired
     private JWTService jwtService;
 
-    @Autowired
-    private StaffAccountService staffAccountService;
 
 //    @Autowired
 //    private RecaptchaService recaptchaService;
@@ -53,22 +50,6 @@ public class AuthController {
         return "public/authentication/login-admin";
     }
 
-    @PostMapping("/admin/login")
-    public String loginAdminHandle(@RequestParam(name = "g-recaptcha-response", required = false) String recaptchaResponse,
-                                   @ModelAttribute StaffAccount staffAccount,
-                                   HttpServletResponse response) {
-//        if (recaptchaResponse == null || recaptchaResponse.isEmpty() || !recaptchaService.verify(recaptchaResponse)) {
-//            model.addAttribute("errorRecaptcha", "Captcha không hợp lệ!");
-//            model.addAttribute("staffAccount", staffAccount);
-//            return "public/authentication/login-admin";
-//        }
-        boolean loginStatus = staffAccountService.verify(staffAccount, response);
-        if (!loginStatus) {
-            return  "redirect:/admin/login?error";
-        }
-        return "redirect:/admin/dashboard";
-
-    }
 
     @GetMapping("/auth/login")
     public String loginCustomerPanel(Model model,

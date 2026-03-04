@@ -72,5 +72,5 @@ public class Booking {
 
     @OneToMany(mappedBy = "booking")
     private List<Scheduler> schedulers = new ArrayList<>();
-
+    private String note;
 }

@@ -14,6 +14,7 @@ import vn.edu.fpt.booknow.repositories.ScheduleRepository;
 import vn.edu.fpt.booknow.repositories.TimeTableRepository;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -152,7 +153,7 @@ public class BookingService {
             WorkShift firstShift = group.get(0);
             WorkShift lastShift = group.get(group.size() - 1);
             // B. TÍNH TỔNG TIỀN CHO ĐƠN NÀY (Dựa trên loại ca)
-            Long totalAmount = calculateTotalAmount(group, bookingDTO.getRoomId());
+            BigDecimal totalAmount = BigDecimal.valueOf(calculateTotalAmount(group, bookingDTO.getRoomId()));
             LocalDateTime checkInDate = firstShift.getStartTime();
             LocalDateTime checkOutDate = lastShift.getEndTime();
             if ("Đêm".equals(lastShift.getShiftType())) {
@@ -280,17 +281,17 @@ public class BookingService {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng"));
 
-        double basePrice = room.getRoomType().getBasePrice();
-        double overPrice = room.getRoomType().getOverPrice();
+        BigDecimal basePrice = room.getRoomType().getBasePrice();
+        BigDecimal overPrice = room.getRoomType().getOverPrice();
 
-        double total = 0;
+        int total = 0;
 
         // 2. Duyệt từng ca trong nhóm để cộng dồn tiền
         for (WorkShift shift : group) {
             if ("Đêm".equals(shift.getShiftType())) {
-                total += overPrice;
+                total += overPrice.intValue();
             } else {
-                total += basePrice;
+                total += basePrice.intValue();
             }
         }
 

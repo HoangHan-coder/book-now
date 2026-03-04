@@ -1,6 +1,7 @@
 package vn.edu.fpt.booknow.controllers.client;
 
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -10,11 +11,13 @@ import vn.edu.fpt.booknow.model.dto.BookingDTO;
 import vn.edu.fpt.booknow.model.dto.RoomDTO;
 import vn.edu.fpt.booknow.model.dto.SearchDTO;
 import vn.edu.fpt.booknow.model.dto.TimeTableDTO;
-import vn.edu.fpt.booknow.entities.*;
+import vn.edu.fpt.booknow.model.entities.*;
 import vn.edu.fpt.booknow.repositories.CustomerRepository;
 import vn.edu.fpt.booknow.repositories.ImageRepository;
 import vn.edu.fpt.booknow.repositories.RoomRepository;
 import vn.edu.fpt.booknow.services.BookingService;
+import vn.edu.fpt.booknow.services.CustomUserDetailsService;
+import vn.edu.fpt.booknow.services.JWTService;
 import vn.edu.fpt.booknow.services.RoomService;
 
 import java.time.LocalDateTime;
@@ -32,18 +35,22 @@ public class RoomController {
     private BookingService bookingService;
     private CustomerRepository customerRepository;
     private ImageRepository imageRepository;
-    public RoomController(RoomService roomService, BookingService bookingService, CustomerRepository customerRepository, ImageRepository imageRepository, RoomRepository roomRepository) {
+    private JWTService jwtService;
+    private Customer customer;
+
+    public RoomController(RoomService roomService, BookingService bookingService, CustomerRepository customerRepository, ImageRepository imageRepository, RoomRepository roomRepository, JWTService jwtService) {
         this.roomService = roomService;
         this.bookingService = bookingService;
         this.customerRepository = customerRepository;
         this.imageRepository = imageRepository;
         this.roomRepository = roomRepository;
+        this.jwtService = jwtService;
     }
 
     @GetMapping("/detail/{roomIdString}")
     public String detailRoom(@PathVariable String roomIdString,
                              Model model,
-                             @CookieValue(name = "access_token", required = false) String accessToken
+                             @CookieValue(name = "Access_token", required = false) String accessToken
     ) {
         // 1. Kiểm tra Access Token
         try {
@@ -59,6 +66,8 @@ public class RoomController {
             Room room = roomRepository.getByRoomId(roomId);
             List<Image> image = imageRepository.getByRoom(room);
             if (accessToken != null && !accessToken.isEmpty()) {
+                email = jwtService.extractUserName(accessToken);
+                System.out.println(email);
                 customer = customerRepository.getCustomerByEmail(email);
                 booking.setCustomer(customer);
             }
@@ -165,18 +174,21 @@ public class RoomController {
     @PostMapping("/booking/save")
     public String bookingSave(@ModelAttribute BookingDTO bookingDTO, @RequestParam(value = "cccd_front", required = false) MultipartFile frontImg,
                               @RequestParam(value = "cccd_back", required = false) MultipartFile backImg,
-                              @CookieValue(name = "access_token", required = false) String accessToken,
+                              @CookieValue(name = "Access_token", required = false) String accessToken,
                               RedirectAttributes redirectAttributes) {
-//        if (accessToken == null || accessToken.isEmpty()) {
-//            return "login";
-//        }
+
+
         try {
+            if (accessToken == null || accessToken.isEmpty()) {
+                return "redirect:/auth/login";
+            }
             bookingService.saveBooking(bookingDTO, frontImg, backImg, redirectAttributes);
-            return "redirect:/detail/1";
+            return "redirect:/payment";
 
         } catch (Exception e) {
+            System.out.println("test");
             System.out.println(e.getMessage());
-            return "redirect:/homepage";
+            return "redirect:/auth/login";
         }
     }
 }

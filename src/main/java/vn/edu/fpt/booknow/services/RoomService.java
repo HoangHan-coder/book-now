@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import vn.edu.fpt.booknow.model.dto.RoomDTO;
 import vn.edu.fpt.booknow.model.dto.SearchDTO;
 import vn.edu.fpt.booknow.model.dto.TimeTableDTO;
-import vn.edu.fpt.booknow.entities.*;
+import vn.edu.fpt.booknow.model.entities.*;
 import vn.edu.fpt.booknow.repositories.*;
 
 import java.util.ArrayList;

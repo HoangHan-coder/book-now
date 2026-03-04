@@ -47,7 +47,8 @@ public class SecurityConfig {
                 .securityMatcher("/admin/**")
                 .authenticationProvider(staffAuthProvider())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/login","/auth/logout", "/public/**", "/home","/pay/**", 
+                        .requestMatchers("/admin/login","/auth/login","/auth/logout", "/public/**", "/home","/search","/detail/**","/pay/**",
+                                "/booking/process",
                                 "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -56,7 +57,7 @@ public class SecurityConfig {
                 .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-        
+
 
         return http.build();
     }
@@ -70,8 +71,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login",
                                 "/auth/logout", "/register",
-                                "/public/**", "/home","/pay/**",
-                                "/momo-*", 
+                                "/public/**", "/home","/pay/**", "/home","/search","/detail/**",
+                                "/booking/**",
+                                "/momo-*",
                                 "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password").permitAll()
                         .anyRequest().authenticated()
                 )

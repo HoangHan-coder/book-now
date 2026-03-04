@@ -6,11 +6,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import vn.edu.fpt.booknow.model.dto.RoomDTO;
 import vn.edu.fpt.booknow.model.dto.SearchDTO;
-import vn.edu.fpt.booknow.entities.*;
+import vn.edu.fpt.booknow.model.entities.*;
 import vn.edu.fpt.booknow.services.RoomService;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class HomePageController {
@@ -18,7 +19,7 @@ public class HomePageController {
     public HomePageController(RoomService roomService ) {
         this.roomService = roomService;
     }
-    @GetMapping("/homepage")
+    @GetMapping("/home")
     public String getHomePage(Model model) {
         SearchDTO searchDTO = new SearchDTO();
         Page<RoomDTO> list = roomService.getAllRoomService();
@@ -31,7 +32,14 @@ public class HomePageController {
         LocalDateTime today = LocalDateTime.now();
         List<Scheduler> schedulers = roomService.schedulers(); // Giả sử bạn lấy từ service
         Set<String> bookedKeys = new HashSet<>();
-
+        List<Map<String, Object>> simpleTimetables = timetables.stream().map(t -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("timetableId", t.getTimetableId());
+            map.put("slotName", t.getSlotName()); // Đảm bảo getter đúng tên
+            map.put("startTime", t.getStartTime().toString());
+            map.put("endTime", t.getEndTime().toString());
+            return map;
+        }).collect(Collectors.toList());
         for (Scheduler s : schedulers) {
             // Format: RoomID_LocalDate_TimetableID
             // Lưu ý: s.getDate() trả về LocalDateTime nên cần lấy toLocalDate()
@@ -53,7 +61,7 @@ public class HomePageController {
         model.addAttribute("roomType", roomType);
         model.addAttribute("booking", booking);
         model.addAttribute("bookedKeys", bookedKeys);
-        model.addAttribute("timeTable", timetables);
+        model.addAttribute("timeTable", simpleTimetables);
         model.addAttribute("today", today);
         model.addAttribute("weekDates", weekDates);
         model.addAttribute("roomAll",roomAll);

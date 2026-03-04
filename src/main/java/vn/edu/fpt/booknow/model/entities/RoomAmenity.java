@@ -7,6 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "roomamenity")
 public class RoomAmenity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
