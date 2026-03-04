@@ -1,23 +1,25 @@
 package vn.edu.fpt.booknow.model.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class RoomType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "room_type_id", nullable = false)
-    private Long id;
+    private Long roomTypeId;
 
     @Nationalized
     @Column(name = "name", nullable = false, length = 100)
@@ -45,6 +47,6 @@ public class RoomType {
     private BigDecimal overPrice;
 
     @OneToMany(mappedBy = "roomType")
-    private Set<Room> rooms = new LinkedHashSet<>();
+    private List<Room> rooms = new ArrayList<>();
 
 }

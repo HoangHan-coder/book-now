@@ -1,17 +1,19 @@
 package vn.edu.fpt.booknow.model.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Room {
     @Id
@@ -39,12 +41,12 @@ public class Room {
     private BigDecimal areaM2;
 
     @OneToMany(mappedBy = "room")
-    private Set<Booking> bookings = new LinkedHashSet<>();
+    private List<Booking> bookings = new ArrayList<>();
 
     @OneToMany(mappedBy = "room")
-    private Set<Image> images = new LinkedHashSet<>();
+    private List<Image> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "room")
-    private Set<RoomAmenity> roomAmenities = new LinkedHashSet<>();
+    private List<RoomAmenity> roomAmenities = new ArrayList<>();
 
 }

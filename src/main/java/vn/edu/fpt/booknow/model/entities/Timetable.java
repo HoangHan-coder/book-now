@@ -1,22 +1,24 @@
 package vn.edu.fpt.booknow.model.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Timetable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "timetable_id", nullable = false)
-    private Long id;
+    private Long timetableId;
 
     @Nationalized
     @Column(name = "slot_name", nullable = false, length = 50)
@@ -29,6 +31,6 @@ public class Timetable {
     private LocalTime endTime;
 
     @OneToMany(mappedBy = "timetable")
-    private Set<Scheduler> schedulers = new LinkedHashSet<>();
+    private List<Scheduler> schedulers = new ArrayList<>();
 
 }

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -13,7 +14,7 @@ public class Scheduler {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "scheduler_id", nullable = false)
-    private Long id;
+    private Long schedulerId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "booking_id", nullable = false)
@@ -23,7 +24,7 @@ public class Scheduler {
     @JoinColumn(name = "timetable_id", nullable = false)
     private Timetable timetable;
 
-    @Column(name = "\"date\"", nullable = false)
-    private LocalDate date;
+    @Column(name = "date", nullable = false)
+    private LocalDateTime date;
 
 }
