@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.dto;
+package vn.edu.fpt.booknow.model.dto;
 
 import java.time.LocalDateTime;
 

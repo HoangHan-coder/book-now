@@ -1,26 +1,23 @@
-package vn.edu.fpt.booknow.entities;
+package vn.edu.fpt.booknow.model.entities;
 
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "StaffAccounts")
-public class StaffAccount {
+@Table(name = "Customer")
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "staff_account_id")
-    private Long staffAccountId;
-
-    @Column(name = "full_name")
-    private String fullName;
+    @Column(name = "customer_id")
+    private Long customerId;
 
     @Column(name = "email")
     private String email;
 
-    @Column(name = "role")
-    private String role;
+    @Column(name = "full_name")
+    private String fullName;
 
     @Column(name = "status")
     private String status;
@@ -36,20 +33,12 @@ public class StaffAccount {
 
 
 
-    public Long getStaffAccountId() {
-        return staffAccountId;
+    public Long getCustomerId() {
+        return customerId;
     }
 
-    public void setStaffAccountId(Long staffAccountId) {
-        this.staffAccountId = staffAccountId;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
 
     public String getEmail() {
@@ -60,12 +49,12 @@ public class StaffAccount {
         this.email = email;
     }
 
-    public String getRole() {
-        return role;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getStatus() {

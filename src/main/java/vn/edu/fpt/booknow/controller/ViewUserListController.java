@@ -7,8 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import vn.edu.fpt.booknow.dto.UserDTO;
-import vn.edu.fpt.booknow.entities.StaffAccount;
+import vn.edu.fpt.booknow.model.dto.UserDTO;
 import vn.edu.fpt.booknow.services.ViewUserListService;
 
 import java.util.List;

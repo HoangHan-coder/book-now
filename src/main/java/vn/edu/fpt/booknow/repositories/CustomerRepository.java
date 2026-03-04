@@ -2,7 +2,7 @@ package vn.edu.fpt.booknow.repositories;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
-import vn.edu.fpt.booknow.entities.Customer;
+import vn.edu.fpt.booknow.model.entities.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

@@ -1,8 +1,8 @@
 package vn.edu.fpt.booknow.services;
 
-import vn.edu.fpt.booknow.dto.UserDTO;
-import vn.edu.fpt.booknow.entities.Customer;
-import vn.edu.fpt.booknow.entities.StaffAccount;
+import vn.edu.fpt.booknow.model.dto.UserDTO;
+import vn.edu.fpt.booknow.model.entities.Customer;
+import vn.edu.fpt.booknow.model.entities.StaffAccount;
 import vn.edu.fpt.booknow.repositories.CustomerRepository;
 import vn.edu.fpt.booknow.repositories.StaffAccountRepository;
 import org.springframework.stereotype.Service;
