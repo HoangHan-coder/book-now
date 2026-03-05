@@ -11,18 +11,23 @@ public class Amenity {
     @Column(name = "amenity_id")
     private Long amenityId;
 
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @OneToMany(mappedBy = "amenity")
+    @Column(name = "icon_url")
+    private String iconUrl;
+
+    // Quan hệ trung gian RoomAmenity
+    @OneToMany(mappedBy = "amenity", fetch = FetchType.LAZY)
     private List<RoomAmenity> roomAmenities;
 
     public Amenity() {
     }
 
-    public Amenity(Long amenityId, String name, List<RoomAmenity> roomAmenities) {
+    public Amenity(Long amenityId, String name, String iconUrl) {
         this.amenityId = amenityId;
         this.name = name;
-        this.roomAmenities = roomAmenities;
+        this.iconUrl = iconUrl;
     }
 
     public Long getAmenityId() {
@@ -39,6 +44,14 @@ public class Amenity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getIconUrl() {
+        return iconUrl;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
     }
 
     public List<RoomAmenity> getRoomAmenities() {
