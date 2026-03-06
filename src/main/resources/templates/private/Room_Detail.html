@@ -49,7 +49,6 @@
     </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
-
     <!-- LOGO (Fixed) -->
     <div class="logo-fixed flex items-center gap-3 select-none bg-white/90 backdrop-blur px-3 py-2 rounded-xl shadow-sm lg:shadow-none lg:bg-transparent lg:p-0">
         <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
@@ -280,27 +279,26 @@
         </div>
 
     </main>
-
     <!-- SCRIPT -->
     <script>
-        // Only UI Logic for Sidebar (No form logic needed)
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
+       // Only UI Logic for Sidebar (No form logic needed)
+       const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+       const sidebar = document.getElementById('sidebar');
+       const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-        function toggleSidebar() {
-            const isClosed = sidebar.classList.contains('-translate-x-full');
-            if (isClosed) {
-                sidebar.classList.remove('-translate-x-full');
-                sidebarOverlay.classList.remove('hidden');
-            } else {
-                sidebar.classList.add('-translate-x-full');
-                sidebarOverlay.classList.add('hidden');
-            }
-        }
+       function toggleSidebar() {
+           const isClosed = sidebar.classList.contains('-translate-x-full');
+           if (isClosed) {
+               sidebar.classList.remove('-translate-x-full');
+               sidebarOverlay.classList.remove('hidden');
+           } else {
+               sidebar.classList.add('-translate-x-full');
+               sidebarOverlay.classList.add('hidden');
+           }
+       }
 
-        mobileMenuBtn.addEventListener('click', toggleSidebar);
-        sidebarOverlay.addEventListener('click', toggleSidebar);
+       mobileMenuBtn.addEventListener('click', toggleSidebar);
+       sidebarOverlay.addEventListener('click', toggleSidebar);
     </script>
 </body>
 </html>

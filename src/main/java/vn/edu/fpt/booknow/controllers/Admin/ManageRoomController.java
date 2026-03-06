@@ -76,8 +76,14 @@ public class ManageRoomController {
 
     @GetMapping("/detail/{id}")
     public String viewDetailRoom(Model model, @PathVariable("id") Long id) {
-         Room room = manageRoomServices.findRoomById(id);
-         model.addAttribute("room", room);
+
+        Room room = manageRoomServices.findRoomById(id);
+
+        if (room == null) {
+            return "redirect:/admin/list";
+        }
+
+        model.addAttribute("room", room);
         return "private/Room_Detail";
     }
 
