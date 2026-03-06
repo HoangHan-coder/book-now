@@ -3,6 +3,7 @@ package vn.edu.fpt.booknow.services;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.edu.fpt.booknow.entities.*;
 import vn.edu.fpt.booknow.repositories.*;
@@ -34,28 +35,25 @@ public class ManageRoomServices {
             String roomNumber,
             Pageable pageable
     ) {
-        if (roomNumber != null && !roomNumber.isBlank()) {
-            return roomRepository.findByRoomNumberContaining(
-                    roomNumber.trim(), pageable
-            );
-        }
 
-        if (status != null && !status.isBlank()
-                && type != null && !type.isBlank()) {
-            return roomRepository.findByStatusAndRoomType_Name(
-                    status, type, pageable
-            );
-        }
+        Specification<Room> spec = Specification.where(null);
 
         if (status != null && !status.isBlank()) {
-            return roomRepository.findByStatus(status, pageable);
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("status"), status));
         }
 
         if (type != null && !type.isBlank()) {
-            return roomRepository.findByRoomType_Name(type, pageable);
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("roomType").get("name"), type));
         }
 
-        return roomRepository.findAll(pageable);
+        if (roomNumber != null && !roomNumber.isBlank()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.like(root.get("roomNumber"), "%" + roomNumber + "%"));
+        }
+
+        return roomRepository.findAll(spec, pageable);
     }
 
     @Transactional

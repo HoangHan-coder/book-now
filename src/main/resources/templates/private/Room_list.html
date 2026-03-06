@@ -159,9 +159,16 @@
                 <div class="relative">
                     <select name="status" class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white cursor-pointer">
                         <option value="">Tất cả trạng thái</option>
-                        <option value="AVAILABLE">AVAILABLE</option>
-                        <option value="BOOKED">BOOKED</option>
-                        <option value="MAINTENANCE">MAINTENANCE</option>
+                        <option value="AVAILABLE"
+                                th:selected="${status == 'AVAILABLE'}"
+                        >AVAILABLE</option>
+
+                        <option value="BOOKED"
+                                th:selected="${status == 'BOOKED'}"
+                        >BOOKED</option>
+                        <option value="MAINTENANCE"
+                                th:selected="${status == 'MAINTENANCE'}"
+                        >MAINTENANCE</option>
                     </select>
                     <i class="fa-solid fa-circle-check absolute left-3 top-2.5 text-gray-400"></i>
                     <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-gray-400 pointer-events-none"></i>
@@ -174,9 +181,15 @@
                 <div class="relative">
                     <select name="type" class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white cursor-pointer">
                         <option value="">Tất cả loại phòng</option>
-                        <option value="Gaming Hub Suite">Gaming Hub Suite</option>
-                        <option value="Neon Night Studio">Neon Night Studio</option>
-                        <option value="Ocean City Retreat">Ocean City Retreat</option>
+                        <option value="Gaming Hub Suite"
+                                th:selected="${type == 'Gaming Hub Suite'}"
+                        >Gaming Hub Suite</option>
+                        <option value="Neon Night Studio"
+                                th:selected="${type == 'Neon Night Studio'}"
+                        >Neon Night Studio</option>
+                        <option value="Ocean City Retreat"
+                                th:selected="${type == 'Ocean City Retreat'}"
+                        >Ocean City Retreat</option>
                     </select>
                     <i class="fa-solid fa-bed absolute left-3 top-2.5 text-gray-400"></i>
                     <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-gray-400 pointer-events-none"></i>
@@ -191,6 +204,7 @@
                         <input type="text"
                                name="roomNumber"
                                placeholder="Nhập số phòng..."
+                               th:value="${param.roomNumber}"
                                class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400"></i>
                     </div>
