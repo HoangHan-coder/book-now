@@ -287,7 +287,12 @@
             <div class="flex items-center space-x-1">
                 <button class="px-3 py-1 rounded-md bg-white border border-gray-300 text-gray-500 hover:bg-gray-50 disabled:opacity-50 text-sm"
                         th:disabled="${rooms.first}"
-                        th:onclick="|window.location='@{/admin/list(page=${rooms.number})}'|">
+                        th:onclick="|window.location='@{/admin/list(
+                        page=${rooms.number},
+                        status=${status},
+                        type=${type},
+                        roomNumber=${roomNumber}
+                        )}'|">
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
                 <a th:each="i : ${#numbers.sequence(1, rooms.totalPages)}"
@@ -305,7 +310,12 @@
                 </a>
                 <button class="px-3 py-1 rounded-md bg-white border border-gray-300 text-gray-500 hover:bg-gray-50 disabled:opacity-50 text-sm"
                         th:disabled="${rooms.last}"
-                        th:onclick="|window.location='@{/admin/list(page=${rooms.number + 2})}'|">
+                        th:onclick="|window.location='@{/admin/list(
+                                    page=${rooms.number + 2},
+                                    status=${status},
+                                    type=${type},
+                                    roomNumber=${roomNumber}
+                                    )}'|">
                     <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>

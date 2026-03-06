@@ -41,12 +41,23 @@ public class ManageRoomController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String roomNumber) {
+        if (page < 1) {
+            page = 1;
+        }
         Page<Room> roomlist = manageRoomServices.filterRooms(
                 status,
                 type,
                 roomNumber,
                 PageRequest.of(page - 1, ITEM_PER_PAGE)
         );
+
+        if (page > roomlist.getTotalPages() && roomlist.getTotalPages() > 0) {
+            return "redirect:/admin/list?page=1"
+                    + "&status=" + (status == null ? "" : status)
+                    + "&type=" + (type == null ? "" : type)
+                    + "&roomNumber=" + (roomNumber == null ? "" : roomNumber);
+        }
+
         model.addAttribute("rooms", roomlist);
         model.addAttribute("totalRoom", roomlist.getTotalElements());
         model.addAttribute("totalPages", roomlist.getTotalPages());
