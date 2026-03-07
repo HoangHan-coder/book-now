@@ -74,27 +74,22 @@ public class ForgotPasswordController {
             return "public/authentication/forgot-password";
         }
 
-        // Check if resend is on cooldown
-        if (otpService.isResendOnCooldown(email)) {
-            long remainingSeconds = otpService.getResendCooldownRemaining(email);
-            model.addAttribute("error", 
-                "Vui lòng đợi " + remainingSeconds + " giây trước khi yêu cầu OTP mới.");
-            model.addAttribute("email", email);
-            return "public/authentication/forgot-password";
-        }
-
         // Check if email exists (but don't reveal this to user for security)
         Optional<Customer> customerOpt = customerRepository.findCustomerByEmail(email);
 
         // Always show success message even if email doesn't exist (security best practice)
         if (customerOpt.isPresent()) {
             // Generate and save OTP
-            String otp = otpService.generateAndSaveOtp(email);
+            System.out.println("Email has exist " + otpService.hasOtp(email));
+            String otp = otpService.saveOtp(email);
+            System.out.println("Generate opt "+ otp + " with Email " + email);
 
             // Send OTP via email
             try {
-                mailService.sendOtp(email, otp);
-                System.out.println("sent otp to" + otp);
+                    if (otp != null) {
+                        mailService.sendOtp(email, otp);
+                        System.out.println("sent otp to" + otp);
+                    }
             } catch (Exception e) {
                 // Log error but still show generic message
                 System.err.println("Failed to send OTP email: " + e.getMessage());
@@ -179,9 +174,8 @@ public class ForgotPasswordController {
     public String resendOtp(@RequestParam("email") String email,
                             RedirectAttributes redirectAttributes,
                             Model model) {
-
+        System.out.println("Resending otp...");
         email = email.trim().toLowerCase();
-
         // Check cooldown
         if (otpService.isResendOnCooldown(email)) {
             long remainingSeconds = otpService.getResendCooldownRemaining(email);
@@ -196,13 +190,17 @@ public class ForgotPasswordController {
         // Only resend if email exists and has an active OTP or existed before
         Optional<Customer> customerOpt = customerRepository.findCustomerByEmail(email);
         if (customerOpt.isPresent()) {
-            // Generate new OTP
-            String otp = otpService.generateAndSaveOtp(email);
+            // Generate and save OTP
+            System.out.println("Email has exist " + otpService.hasOtp(email));
+            String otp =  otpService.getOtp(email);
+            System.out.println("Generate opt "+ otp + " with Email" + email);
 
-            // Send OTP
+            // Send OTP via email
             try {
-                System.out.println("sent otp to" + otp);
-                mailService.sendOtp(email, otp);
+                if (!otpService.isResendOnCooldown(email) && otp != null) {
+                    mailService.sendOtp(email, otp);
+                    System.out.println("sent otp to" + otp);
+                }
             } catch (Exception e) {
                 System.err.println("Failed to resend OTP: " + e.getMessage());
             }

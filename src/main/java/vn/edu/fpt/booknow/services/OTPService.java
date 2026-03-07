@@ -1,5 +1,6 @@
 package vn.edu.fpt.booknow.services;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,10 +28,14 @@ public class OTPService {
     /**
      * Generate a 6-digit OTP and store in Redis
      */
-    public String generateAndSaveOtp(String email) {
+    public String saveOtp(String email) {
         String otp = generateOtp();
-        redisService.saveOtp(email, otp, OTP_TTL_MINUTES);
-        return otp;
+        boolean saved =  redisService.saveOtp(email, otp, OTP_TTL_MINUTES);;
+        return saved ? otp : null;
+    }
+
+    public String getOtp(String email) {
+        return redisService.getOtp(email);
     }
 
     /**
@@ -128,6 +133,7 @@ public class OTPService {
     }
 
     // Inner class for validation result
+    @Getter
     public static class OtpValidationResult {
         private final boolean valid;
         private final String message;
@@ -158,16 +164,5 @@ public class OTPService {
                 "Bạn đã nhập sai quá nhiều lần. Vui lòng yêu cầu mã OTP mới.", 0);
         }
 
-        public boolean isValid() {
-            return valid;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public int getRemainingAttempts() {
-            return remainingAttempts;
-        }
     }
 }
