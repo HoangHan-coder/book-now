@@ -18,7 +18,8 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @RequestMapping(value = "/authen")
 public class AuthenticationController {
-    private final RedisTemplate<String, Integer> redisTemplate;
+    private final RedisTemplate<String, Integer> redisTemplateToSaveInt;
+    private final RedisTemplate<String, Object> redisTemplate;
     private static final long OTP_EXPIRE = 1;
     private final OtpService otpService;
     private final AuthService authService;
@@ -43,14 +44,21 @@ public class AuthenticationController {
         boolean flag = redisTemplate.hasKey("OTP:" + email);
         String key = "OTP";
         System.out.println(flag);
-        int count = 0;
+        System.out.println(email);
+        if (email == null || email.isBlank()){
+            model.addAttribute("error", "email is not null");
+            return "authentication/RegisterWithGoogle";
+        }
+
         if (flag) {
+            int count = redisTemplateToSaveInt.opsForValue().get(key).intValue();
             count++;
-            redisTemplate.opsForValue()
+            redisTemplateToSaveInt.opsForValue()
                     .set("OTP", count, OTP_EXPIRE, TimeUnit.MINUTES);
             System.out.println(count);
-            if (count == 2){
+            if (count >= 2){
                 model.addAttribute("otp", "please cannot spam otp");
+                model.addAttribute("email", email);
                 return "authentication/otp";
             }
         }

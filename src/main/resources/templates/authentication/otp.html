@@ -156,7 +156,8 @@
 
             <!-- Nội dung message -->
 
-            <p class="text-sm text-gray-700 font-medium" th:text="${#strings.defaultString(otp)}"></p>
+
+            <p class="text-sm text-gray-700 font-medium" th:text="${#strings.defaultString(otp,'cannot spam otp')}"></p>
 
             <button onclick="this.closest('.fixed').remove()"
                     class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">

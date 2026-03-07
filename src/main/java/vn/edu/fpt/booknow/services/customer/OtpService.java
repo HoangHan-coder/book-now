@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 public class OtpService {
-
+    private final RedisTemplate<String, Integer> redisTemplateToSaveInt;
     private final RedisTemplate<String, Object> redisTemplate;
     private final JavaMailSender mailSender;
 
@@ -21,9 +21,18 @@ public class OtpService {
 
     public void sendOtp(String email) {
         String otp = String.valueOf(100000 + new Random().nextInt(900000));
-
+        boolean flag = redisTemplate.hasKey("OTP:" + email);
         redisTemplate.opsForValue()
                 .set("OTP:" + email, otp, OTP_EXPIRE, TimeUnit.MINUTES);
+        int count;
+        if (flag) {
+            count = 1;
+        } else {
+            count = 0;
+        }
+
+        redisTemplateToSaveInt.opsForValue()
+                .set("OTP", count, OTP_EXPIRE, TimeUnit.MINUTES);
 
         sendEmail(email, otp);
     }

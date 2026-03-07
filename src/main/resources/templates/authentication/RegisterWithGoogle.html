@@ -133,6 +133,26 @@
             <a href="customer_login.html" class="font-semibold text-blue-600 hover:text-blue-500 hover:underline">Đăng nhập</a>
         </p>
     </div>
+
+    <div th:if="${error}"
+         class="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 text-center animate-fade-in">
+            <div class="mb-3">
+                <i class="fa-solid fa-circle-exclamation text-red-500 text-3xl"></i>
+            </div>
+
+            <!-- Nội dung message -->
+
+
+            <p class="text-sm text-gray-700 font-medium" th:text="${#strings.defaultString(error,'email cannot empty')}"></p>
+
+            <button onclick="this.closest('.fixed').remove()"
+                    class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                OK
+            </button>
+        </div>
+    </div>
 </div>
 
 <!-- SCRIPT -->

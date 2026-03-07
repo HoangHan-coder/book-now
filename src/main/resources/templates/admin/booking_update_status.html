@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác minh đặt phòng - BookNow</title>
+    <!-- Tailwind CSS -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            light: '#60a5fa', // blue-400
+                            DEFAULT: '#3b82f6', // blue-500
+                            dark: '#2563eb', // blue-600
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+
+
+    <style>
+        /* Specific Logo Positioning Rule */
+        .logo-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin-top: 25px;
+            margin-left: 25px;
+            z-index: 60; /* Higher than sidebar */
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-icon {
+            color: #3b82f6;
+        }
+
+        /* Sidebar transitions */
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Hide scrollbar for sidebar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Stepper Lines */
+        .step-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #e5e7eb;
+            z-index: 0;
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+<!-- LOGO (Fixed Position) -->
+<div class="logo-fixed flex items-center gap-3 select-none bg-white/90 backdrop-blur px-3 py-2 rounded-xl shadow-sm lg:shadow-none lg:bg-transparent lg:p-0">
+    <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
+        <i class="fa-solid fa-house-chimney gradient-icon text-xl"></i>
+    </div>
+    <div class="flex flex-col justify-center">
+        <span class="text-2xl font-extrabold tracking-tight gradient-text leading-none">BookNow</span>
+        <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider pl-0.5">Homestay System</span>
+    </div>
+</div>
+
+<!-- MOBILE HEADER (Hamburger) -->
+<div class="lg:hidden fixed top-0 w-full bg-white h-20 shadow-sm z-40 flex items-center justify-end px-6">
+    <button id="mobileMenuBtn" class="text-gray-500 hover:text-blue-600 focus:outline-none">
+        <i class="fa-solid fa-bars text-2xl"></i>
+    </button>
+</div>
+
+<!-- SIDEBAR -->
+<aside id="sidebar"
+       class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform -translate-x-full lg:translate-x-0 pt-28 overflow-y-auto no-scrollbar">
+    <!-- Navigation Links -->
+    <nav class="px-4 space-y-2">
+        <a href="#"
+           class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+            <i class="fa-solid fa-chart-line w-5"></i>
+            Bảng điều khiển
+        </a>
+        <a href="#"
+           class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium transition-colors shadow-sm ring-1 ring-black/5">
+            <i class="fa-regular fa-calendar-check w-5"></i>
+            Xác minh đặt phòng
+        </a>
+        <a href="#"
+           class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+            <i class="fa-solid fa-door-open w-5"></i>
+            Phòng
+        </a>
+        <a href="#"
+           class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+            <i class="fa-solid fa-users-gear w-5"></i>
+            Khách hàng
+        </a>
+    </nav>
+
+    <!-- Logout at Bottom -->
+    <div class="absolute bottom-0 w-full p-4 border-t border-gray-100 bg-white">
+        <a href="#"
+           class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
+            <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
+            Đăng xuất
+        </a>
+    </div>
+</aside>
+
+<!-- OVERLAY (for mobile) -->
+<div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden glass-effect"></div>
+
+<!-- MAIN CONTENT -->
+<main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
+
+    <!-- HEADER & ACTIONS -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+        <div class="flex items-center gap-3">
+            <a href="#"
+               class="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-colors">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    Xử lý hồ sơ #BK-2023-001
+                    <!-- Status Badge (Dynamic) -->
+                    <span id="headerStatusBadge"
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                            Chờ kiểm duyệt
+                        </span>
+                </h1>
+                <p class="text-sm text-gray-500 mt-1">Được tạo: 20/01/2026 - 14:30</p>
+            </div>
+        </div>
+
+        <!-- DEMO CONTROL: To switch UI states -->
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-gray-400 uppercase">Demo State:</span>
+            <select id="demoStateSelect"
+                    class="text-sm border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 border">
+                <option value="step1">1. Chờ kiểm duyệt</option>
+                <option value="step1_fail">1. Kiểm duyệt thất bại</option>
+                <option value="step2">2. Chờ thanh toán</option>
+                <option value="step3">3. Đã thanh toán</option>
+                <option value="step4">4. Check-in (Xác thực)</option>
+                <option value="step4_fail">4. Check-in thất bại</option>
+                <option value="step5">5. Đã check-out</option>
+                <option value="step6">6. Hoàn thành</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- TIMELINE STEPPER -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 overflow-x-auto">
+        <div class="min-w-[700px]">
+            <div class="flex justify-between relative z-10">
+                <div class="step-line"></div>
+
+                <!-- Steps -->
+                <div class="relative z-10 text-center group w-1/6" id="tl_step1">
+                    <div class="w-8 h-8 rounded-full bg-yellow-500 text-white flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors ring-2 ring-yellow-500">
+                        1
+                    </div>
+                    <p class="text-xs font-semibold mt-2 text-yellow-600">Chờ kiểm duyệt</p>
+                </div>
+
+                <div class="relative z-10 text-center group w-1/6" id="tl_step2">
+                    <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">
+                        2
+                    </div>
+                    <p class="text-xs font-medium mt-2 text-gray-400">Chờ thanh toán</p>
+                </div>
+
+                <div class="relative z-10 text-center group w-1/6" id="tl_step3">
+                    <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">
+                        3
+                    </div>
+                    <p class="text-xs font-medium mt-2 text-gray-400">Đã thanh toán</p>
+                </div>
+
+                <div class="relative z-10 text-center group w-1/6" id="tl_step4">
+                    <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">
+                        4
+                    </div>
+                    <p class="text-xs font-medium mt-2 text-gray-400">Đã check-in</p>
+                </div>
+
+                <div class="relative z-10 text-center group w-1/6" id="tl_step5">
+                    <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">
+                        5
+                    </div>
+                    <p class="text-xs font-medium mt-2 text-gray-400">Đã check-out</p>
+                </div>
+
+                <div class="relative z-10 text-center group w-1/6" id="tl_step6">
+                    <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">
+                        6
+                    </div>
+                    <p class="text-xs font-medium mt-2 text-gray-400">Hoàn thành</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+        <!-- LEFT: Booking Information (Static) -->
+        <div class="xl:col-span-1 space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden sticky top-24">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+                    <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+                        <i class="fa-regular fa-file-lines text-blue-500"></i>
+                        Thông tin đặt phòng
+                    </h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <!-- Customer -->
+                    <div class="flex items-center gap-3 pb-4 border-b border-gray-100">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
+                            N
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Nguyễn Văn A</h4>
+                            <p class="text-sm text-gray-500">0909 *** 123</p>
+                            <p class="text-xs text-gray-400">nguyenvana@email.com</p>
+                        </div>
+                    </div>
+
+                    <!-- Room -->
+                    <div>
+                        <span class="text-xs font-semibold text-gray-400 uppercase block mb-1">Phòng</span>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-gray-800">P.101 (Single)</span>
+                            <span class="font-bold text-blue-600">500.000đ</span>
+                        </div>
+                    </div>
+
+                    <!-- Dates -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <span class="text-xs font-semibold text-gray-400 uppercase block mb-1">Nhận phòng</span>
+                            <span class="font-medium text-gray-800">24/01/2026</span>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-gray-400 uppercase block mb-1">Trả phòng</span>
+                            <span class="font-medium text-gray-800">25/01/2026</span>
+                        </div>
+                    </div>
+
+                    <!-- Payment Summary -->
+                    <div class="pt-2">
+                        <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <span class="text-sm font-medium text-gray-600">Tổng tiền</span>
+                            <span class="font-bold text-lg text-gray-800">500.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Dynamic Action Panels -->
+        <div class="xl:col-span-2 space-y-6">
+
+            <!-- PANEL 1: Identity Verification (Step 1) -->
+            <div id="panel_identity"
+                 class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
+                <div class="px-6 py-4 border-b border-gray-100 bg-yellow-50 flex justify-between items-center">
+                    <h3 class="font-bold text-yellow-800 flex items-center gap-2">
+                        <i class="fa-solid fa-id-card"></i>
+                        Xác minh danh tính (CCCD)
+                    </h3>
+                    <span class="text-xs font-semibold bg-white text-yellow-700 px-2 py-1 rounded border border-yellow-200">Yêu cầu xử lý</span>
+                </div>
+
+                <div class="p-6">
+                    <p class="text-sm text-gray-600 mb-4">Vui lòng kiểm tra kỹ ảnh chụp mặt trước và mặt sau CCCD so với
+                        thông tin khách hàng cung cấp.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <!-- Front ID -->
+                        <div class="space-y-2">
+                            <span class="text-xs font-semibold text-gray-500 uppercase">Mặt trước</span>
+                            <div class="aspect-video bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative group">
+                                <div class="absolute inset-0 flex items-center justify-center bg-gray-800/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                    <i class="fa-solid fa-magnifying-glass-plus text-white text-2xl"></i>
+                                </div>
+                                <div class="text-center p-4">
+                                    <i class="fa-regular fa-id-card text-4xl text-gray-300 mb-2"></i>
+                                    <p class="text-xs text-gray-400">Ảnh CCCD Mặt trước</p>
+                                </div>
+                                <!-- Simulated Image -->
+                                <img src="https://placehold.co/600x400/e2e8f0/94a3b8?text=CCCD+Mat+Truoc" alt="Front ID"
+                                     class="absolute inset-0 w-full h-full object-cover">
+                            </div>
+                        </div>
+
+                        <!-- Back ID -->
+                        <div class="space-y-2">
+                            <span class="text-xs font-semibold text-gray-500 uppercase">Mặt sau</span>
+                            <div class="aspect-video bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative group">
+                                <div class="absolute inset-0 flex items-center justify-center bg-gray-800/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                    <i class="fa-solid fa-magnifying-glass-plus text-white text-2xl"></i>
+                                </div>
+                                <div class="text-center p-4">
+                                    <i class="fa-regular fa-id-card text-4xl text-gray-300 mb-2"></i>
+                                    <p class="text-xs text-gray-400">Ảnh CCCD Mặt sau</p>
+                                </div>
+                                <!-- Simulated Image -->
+                                <img src="https://placehold.co/600x400/e2e8f0/94a3b8?text=CCCD+Mat+Sau" alt="Back ID"
+                                     class="absolute inset-0 w-full h-full object-cover">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Comparison -->
+                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-6">
+                        <h4 class="text-sm font-bold text-gray-700 mb-3">Thông tin trích xuất (OCR)</h4>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-500 block">Họ và tên:</span>
+                                <span class="font-medium text-gray-800">NGUYEN VAN A</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500 block">Số CCCD:</span>
+                                <span class="font-medium text-gray-800">036098xxxxxx</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500 block">Ngày sinh:</span>
+                                <span class="font-medium text-gray-800">01/01/1990</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500 block">Quê quán:</span>
+                                <span class="font-medium text-gray-800">Cần Thơ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
+                        <button onclick="toggleReasonInput('identity')"
+                                class="px-6 py-2.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 font-medium transition-colors sm:w-auto w-full">
+                            <i class="fa-solid fa-xmark mr-2"></i>Từ chối
+                        </button>
+                        <button class="px-6 py-2.5 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white font-medium shadow-sm transition-colors sm:w-auto w-full sm:ml-auto">
+                            <i class="fa-solid fa-check mr-2"></i>Duyệt & Chuyển bước thanh toán
+                        </button>
+                    </div>
+
+                    <!-- Reason Input (Hidden initially) -->
+                    <div id="reject_identity_reason"
+                         class="hidden mt-4 bg-red-50 p-4 rounded-lg border border-red-100 animate-fade-in">
+                        <label class="block text-sm font-medium text-red-700 mb-2">Lý do từ chối (Gửi cho khách
+                            hàng)</label>
+                        <textarea
+                                class="w-full p-3 border-red-200 rounded-md focus:ring-red-500 focus:border-red-500 text-sm"
+                                rows="3" placeholder="Ví dụ: Ảnh mờ, không rõ số CCCD..."></textarea>
+                        <div class="mt-3 text-right">
+                            <button class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700">
+                                Xác nhận từ chối
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL 2: Payment Status (Step 2) -->
+            <div id="panel_payment"
+                 class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-blue-50 flex justify-between items-center">
+                    <h3 class="font-bold text-blue-800 flex items-center gap-2">
+                        <i class="fa-solid fa-credit-card"></i>
+                        Xác nhận thanh toán
+                    </h3>
+                    <span class="text-xs font-semibold bg-white text-blue-700 px-2 py-1 rounded border border-blue-200">Chờ thanh toán</span>
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-6 mb-6">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Số tiền cần thanh toán</p>
+                            <p class="text-3xl font-bold text-gray-800">500.000đ</p>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded font-medium">Chuyển khoản ngân hàng</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded font-medium">Nội dung: BK2023001</span>
+                            </div>
+                        </div>
+                        <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 text-2xl">
+                            <i class="fa-solid fa-money-bill-transfer"></i>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                        <button onclick="toggleReasonInput('payment')"
+                                class="px-6 py-2.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 font-medium transition-colors sm:w-auto w-full">
+                            <i class="fa-solid fa-xmark mr-2"></i>Đánh dấu thất bại
+                        </button>
+                        <button class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition-colors sm:w-auto w-full sm:ml-auto">
+                            <i class="fa-solid fa-check-double mr-2"></i>Xác nhận đã nhận tiền
+                        </button>
+                    </div>
+
+                    <!-- Reason Input -->
+                    <div id="reject_payment_reason"
+                         class="hidden mt-4 bg-red-50 p-4 rounded-lg border border-red-100 animate-fade-in">
+                        <label class="block text-sm font-medium text-red-700 mb-2">Lý do thất bại</label>
+                        <select class="w-full p-2 border-red-200 rounded-md bg-white text-sm mb-2">
+                            <option>Không nhận được tiền sau 30 phút</option>
+                            <option>Số tiền chuyển không khớp</option>
+                            <option>Khách hàng hủy giao dịch</option>
+                        </select>
+                        <div class="mt-2 text-right">
+                            <button class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700">
+                                Xác nhận thất bại
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL 4: Check-in Verification (Step 4) -->
+            <div id="panel_checkin"
+                 class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-purple-50 flex justify-between items-center">
+                    <h3 class="font-bold text-purple-800 flex items-center gap-2">
+                        <i class="fa-solid fa-user-check"></i>
+                        Xác thực Check-in (Tại quầy)
+                    </h3>
+                    <span class="text-xs font-semibold bg-white text-purple-700 px-2 py-1 rounded border border-purple-200">Khách đang check-in</span>
+                </div>
+                <div class="p-6">
+                    <p class="text-sm text-gray-600 mb-4">Khách hàng cần cung cấp ảnh Selfie hoặc Video xác thực tại
+                        thời điểm nhận phòng.</p>
+
+                    <div class="flex justify-center mb-6">
+                        <div class="relative w-full max-w-sm aspect-[3/4] bg-gray-900 rounded-xl overflow-hidden shadow-lg border-4 border-gray-100">
+                            <div id="mediaContainer" class="w-full h-full flex items-center justify-center text-white">
+                                Waiting for check-in...
+                            </div>
+                            <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs backdrop-blur-sm">
+                                <i class="fa-solid fa-location-dot mr-1"></i> Tại Homestay
+                            </div>
+                            <div class="absolute bottom-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs backdrop-blur-sm">
+                                <i class="fa-regular fa-clock mr-1"></i> 14:05:22
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 pt-2 border-t border-gray-100">
+                        <button onclick="toggleReasonInput('checkin')"
+                                class="px-6 py-2.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 font-medium transition-colors sm:w-auto w-full">
+                            <i class="fa-solid fa-ban mr-2"></i>Từ chối
+                        </button>
+                        <button id="btnApprove" class="px-6 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-sm transition-colors sm:w-auto w-full sm:ml-auto">
+                            <i class="fa-solid fa-key mr-2"></i>Duyệt & Giao phòng
+                        </button>
+                    </div>
+
+                    <!-- Reason Input -->
+                    <div id="reject_checkin_reason"
+                         class="hidden mt-4 bg-red-50 p-4 rounded-lg border border-red-100 animate-fade-in">
+                        <label class="block text-sm font-medium text-red-700 mb-2">Lý do từ chối check-in</label>
+                        <textarea
+                                class="w-full p-3 border-red-200 rounded-md focus:ring-red-500 focus:border-red-500 text-sm"
+                                rows="2" placeholder="Ví dụ: Người nhận phòng không khớp với CCCD..."></textarea>
+                        <div class="mt-3 text-right">
+                            <button class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700">
+                                Xác nhận từ chối
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL EXCEPTION: Failure Alert -->
+            <div id="panel_failure"
+                 class="bg-red-50 rounded-2xl shadow-sm border border-red-100 overflow-hidden hidden">
+                <div class="p-6 text-center">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-red-600 text-3xl mx-auto mb-4">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-red-800 mb-2">Xác minh thất bại</h3>
+                    <p class="text-red-600 mb-6">Booking này đã bị từ chối do không đáp ứng yêu cầu xác thực.</p>
+
+                    <div class="bg-white p-4 rounded-lg border border-red-100 text-left max-w-md mx-auto mb-6">
+                        <span class="text-xs font-bold text-red-500 uppercase block mb-1">Lý do:</span>
+                        <p class="text-gray-800" id="failureReasonText">Ảnh CCCD mờ, không thể đọc được thông tin số
+                            định danh.</p>
+                    </div>
+
+                    <button class="px-6 py-2.5 rounded-lg bg-white border border-red-200 text-red-700 hover:bg-red-50 font-medium transition-colors shadow-sm">
+                        <i class="fa-solid fa-phone mr-2"></i>Liên hệ khách hàng ngay
+                    </button>
+                </div>
+            </div>
+
+            <!-- PANEL: Success/Completed Info -->
+            <div id="panel_success"
+                 class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hidden">
+                <div class="p-8 text-center">
+                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-4xl mx-auto mb-4">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2" id="successTitle">Đặt phòng hoàn tất</h3>
+                    <p class="text-gray-500 mb-6">Mọi quy trình xác minh đã được thông qua.</p>
+                    <div class="grid grid-cols-3 gap-4 max-w-lg mx-auto text-sm">
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                            <span class="block text-gray-400 text-xs uppercase">Thanh toán</span>
+                            <span class="font-bold text-green-600">Thành công</span>
+                        </div>
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                            <span class="block text-gray-400 text-xs uppercase">CCCD</span>
+                            <span class="font-bold text-green-600">Đã duyệt</span>
+                        </div>
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                            <span class="block text-gray-400 text-xs uppercase">Check-in</span>
+                            <span class="font-bold text-green-600">Đã duyệt</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</main>
+
+<!-- SCRIPT for Logic -->
+<script>
+
+
+    // Toggle Reason Inputs
+    function toggleReasonInput(type) {
+        const el = document.getElementById(`reject_${type}_reason`);
+        el.classList.toggle('hidden');
+    }
+
+    // --- DEMO STATE LOGIC ---
+    const demoSelect = document.getElementById('demoStateSelect');
+    const badge = document.getElementById('headerStatusBadge');
+
+    // Panels
+    const panelIdentity = document.getElementById('panel_identity');
+    const panelPayment = document.getElementById('panel_payment');
+    const panelCheckin = document.getElementById('panel_checkin');
+    const panelFailure = document.getElementById('panel_failure');
+    const panelSuccess = document.getElementById('panel_success');
+
+    // Steps elements
+    const steps = {
+        1: document.getElementById('tl_step1'),
+        2: document.getElementById('tl_step2'),
+        3: document.getElementById('tl_step3'),
+        4: document.getElementById('tl_step4'),
+        5: document.getElementById('tl_step5'),
+        6: document.getElementById('tl_step6'),
+    };
+
+    function hideAllPanels() {
+        panelIdentity.classList.add('hidden');
+        panelPayment.classList.add('hidden');
+        panelCheckin.classList.add('hidden');
+        panelFailure.classList.add('hidden');
+        panelSuccess.classList.add('hidden');
+    }
+
+    function resetTimeline() {
+        for (let i = 1; i <= 6; i++) {
+            const circle = steps[i].querySelector('div');
+            const text = steps[i].querySelector('p');
+            // Reset to default gray
+            circle.className = "w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors";
+            text.className = "text-xs font-medium mt-2 text-gray-400";
+        }
+    }
+
+    function updateTimeline(activeStep, statusColor) {
+        resetTimeline();
+        for (let i = 1; i <= 6; i++) {
+            const circle = steps[i].querySelector('div');
+            const text = steps[i].querySelector('p');
+
+            if (i < activeStep) {
+                // Completed steps
+                circle.className = "w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors";
+                circle.innerHTML = '<i class="fa-solid fa-check"></i>';
+                text.className = "text-xs font-medium mt-2 text-green-600";
+            } else if (i === activeStep) {
+                // Active step
+                circle.className = `w-8 h-8 rounded-full bg-${statusColor}-500 text-white flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors ring-2 ring-${statusColor}-500`;
+                circle.innerHTML = i;
+                text.className = `text-xs font-bold mt-2 text-${statusColor}-600`;
+            }
+        }
+    }
+
+    demoSelect.addEventListener('change', (e) => {
+        const val = e.target.value;
+        hideAllPanels();
+
+        // Reset Badge Base
+        badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium";
+
+        if (val === 'step1') {
+            // Pending Review
+            panelIdentity.classList.remove('hidden');
+            badge.classList.add('bg-yellow-100', 'text-yellow-800');
+            badge.textContent = "Chờ kiểm duyệt";
+            updateTimeline(1, 'yellow');
+        } else if (val === 'step1_fail') {
+            panelFailure.classList.remove('hidden');
+            document.getElementById('failureReasonText').textContent = "Ảnh CCCD mờ, không thể đọc được thông tin.";
+            badge.classList.add('bg-red-100', 'text-red-800');
+            badge.textContent = "Kiểm duyệt thất bại";
+            resetTimeline(); // Or keep at step 1 red
+            const circle = steps[1].querySelector('div');
+            circle.className = "w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors";
+            circle.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+        } else if (val === 'step2') {
+            // Pending Payment
+            panelPayment.classList.remove('hidden');
+            badge.classList.add('bg-blue-100', 'text-blue-800');
+            badge.textContent = "Chờ thanh toán";
+            updateTimeline(2, 'blue');
+        } else if (val === 'step3') {
+            // Paid (Waiting for checkin)
+            panelSuccess.classList.remove('hidden');
+            document.getElementById('successTitle').textContent = "Đã thanh toán";
+            badge.classList.add('bg-green-100', 'text-green-800');
+            badge.textContent = "Đã thanh toán";
+            updateTimeline(3, 'green');
+        } else if (val === 'step4') {
+            // Check-in Verification
+            panelCheckin.classList.remove('hidden');
+            badge.classList.add('bg-purple-100', 'text-purple-800');
+            badge.textContent = "Đã check-in (Chờ duyệt)";
+            updateTimeline(4, 'purple');
+        } else if (val === 'step4_fail') {
+            panelFailure.classList.remove('hidden');
+            document.getElementById('failureReasonText').textContent = "Video xác thực không chính chủ.";
+            badge.classList.add('bg-red-100', 'text-red-800');
+            badge.textContent = "Check-in thất bại";
+            updateTimeline(4, 'red');
+        } else if (val === 'step5') {
+            // Checked out
+            panelSuccess.classList.remove('hidden');
+            document.getElementById('successTitle').textContent = "Đã trả phòng";
+            badge.classList.add('bg-gray-100', 'text-gray-800');
+            badge.textContent = "Đã check-out";
+            updateTimeline(5, 'gray');
+        } else if (val === 'step6') {
+            // Completed
+            panelSuccess.classList.remove('hidden');
+            document.getElementById('successTitle').textContent = "Hoàn tất dịch vụ";
+            badge.classList.add('bg-indigo-100', 'text-indigo-800');
+            badge.textContent = "Đã hoàn thành";
+            updateTimeline(6, 'indigo');
+        }
+    });
+
+    // Initialize
+    demoSelect.value = 'step1';
+    demoSelect.dispatchEvent(new Event('change'));
+
+    // Mobile Sidebar
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function toggleSidebar() {
+        const isClosed = sidebar.classList.contains('-translate-x-full');
+        if (isClosed) {
+            sidebar.classList.remove('-translate-x-full');
+            sidebarOverlay.classList.remove('hidden');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        }
+    }
+
+    mobileMenuBtn.addEventListener('click', toggleSidebar);
+    sidebarOverlay.addEventListener('click', toggleSidebar);
+
+
+    const socket = new SockJS('http://localhost:8081/book-now/ws');
+    const stompClient = Stomp.over(socket);
+
+
+
+    stompClient.connect({}, function(frame) {
+
+        console.log("Connected:", frame);
+
+        stompClient.subscribe("/topic/checkin/admin", function(message) {
+
+            console.log("RAW:", message.body);
+
+            const data = JSON.parse(message.body);
+
+            console.log("PARSED:", data);
+
+            showVideo(data.videoUrl, data.bookingId);
+        });
+
+    }, function(error) {
+        console.error("STOMP error:", error);
+    });
+
+    function showVideo(videoUrl, bookingId) {
+
+        const panel = document.getElementById("panel_checkin");
+        panel.classList.remove("hidden");
+
+        const container = document.getElementById("mediaContainer");
+
+        container.innerHTML = `
+    <video
+        src="${videoUrl}"
+        class="w-full h-full object-cover"
+        controls
+        autoplay
+    ></video>
+  `;
+
+        // Gắn bookingId cho nút approve
+        const approveBtn = panel.querySelector("#btnApprove");
+        approveBtn.onclick = () => approve(bookingId);
+    }
+
+    function approve(bookingId) {
+        fetch("/book-now/checkin/approve", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ bookingId: bookingId })
+        })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("Request failed");
+                }
+                return res.text();
+            })
+            .then(data => {
+                console.log("Approve success:", data);
+            })
+            .catch(err => {
+                console.error("Approve error:", err);
+            });
+    }
+</script>
+</body>
+</html>
