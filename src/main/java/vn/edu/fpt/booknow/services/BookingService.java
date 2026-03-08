@@ -2,6 +2,9 @@ package vn.edu.fpt.booknow.services;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Refill;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -12,11 +15,13 @@ import vn.edu.fpt.booknow.repositories.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class BookingService {
@@ -27,6 +32,7 @@ public class BookingService {
     private Cloudinary cloudinary;
     private CustomerRepository customerRepository;
     private JWTService jwtService;
+    private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
     public BookingService(BookingRepository bookingRepository, TimeTableRepository timeTableRepository, RoomRepository roomRepository, ScheduleRepository scheduleRepository, CustomerRepository customerRepository, Cloudinary cloudinary, JWTService jwtService) {
         this.bookingRepository = bookingRepository;
         this.timeTableRepository = timeTableRepository;
@@ -36,12 +42,23 @@ public class BookingService {
         this.customerRepository = customerRepository;
         this.jwtService = jwtService;
     }
-
+    private Bucket createNewBucket() {
+        return Bucket.builder()
+                .addLimit(Bandwidth.classic(1, Refill.intervally(1, Duration.ofMinutes(5))))
+                .build();
+    }
     public String saveBooking(BookingDTO bookingDTO,
                               MultipartFile frontImg,
                               MultipartFile backImg,
                               RedirectAttributes redirectAttributes,
                               String accessToken) {
+        Bucket bucket = cache.computeIfAbsent(jwtService.extractUserName(accessToken), k -> createNewBucket());
+        if (!bucket.tryConsume(1)) {
+            System.out.println("test ratelimited");
+            redirectAttributes.addFlashAttribute("toastMessage", "Thao tác quá nhanh! Vui lòng đợi 5 phút giữa mỗi lần đặt.");
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return "redirect:/detail/" + bookingDTO.getRoomId();
+        }
         List<WorkShift> allShiftss = new ArrayList<>();
         for (String slot : bookingDTO.getSelectedSlots()) {
             WorkShift shift = this.parseShift(slot);
@@ -146,8 +163,8 @@ public class BookingService {
         // --- LẤY DỮ LIỆU TỪ DB MỘT LẦN DUY NHẤT ĐỂ TỐI ƯU ---
         List<Timetable> timetableList = timeTableRepository.findAll();
 
-//        String urlFront = uploadToCloudinary(frontImg);
-//        String urlBack = uploadToCloudinary(backImg);
+        String urlFront = uploadToCloudinary(frontImg);
+        String urlBack = uploadToCloudinary(backImg);
 
         // 4. Lưu vào DB
         for (List<WorkShift> group : bookingGroups) {
@@ -219,7 +236,7 @@ public class BookingService {
         }
         redirectAttributes.addFlashAttribute("toastMessage", "Đặt phòng thành công!");
         redirectAttributes.addFlashAttribute("toastType", "success");
-        return "redirect:/homepage"; // Thành công thì về trang chủ
+        return "redirect:/payment"; // Thành công thì về trang chủ
     }
 
     private String validateWorkShiftTime(WorkShift shift) {

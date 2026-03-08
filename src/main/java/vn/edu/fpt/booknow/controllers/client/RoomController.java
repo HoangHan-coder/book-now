@@ -182,8 +182,8 @@ public class RoomController {
             if (accessToken == null || accessToken.isEmpty()) {
                 return "redirect:/auth/login";
             }
-            bookingService.saveBooking(bookingDTO, frontImg, backImg, redirectAttributes, accessToken);
-            return "redirect:/payment";
+            String rediect =  bookingService.saveBooking(bookingDTO, frontImg, backImg, redirectAttributes, accessToken);
+            return rediect;
 
         } catch (Exception e) {
             System.out.println("test");
