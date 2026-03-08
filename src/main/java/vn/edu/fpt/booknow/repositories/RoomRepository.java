@@ -13,5 +13,5 @@ import java.util.List;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long>, JpaSpecificationExecutor<Room> {
-
+    boolean existsByRoomNumber(String roomNumber);
 }

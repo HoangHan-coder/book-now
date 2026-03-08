@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.entities.Room;
 import vn.edu.fpt.booknow.entities.RoomType;
 import vn.edu.fpt.booknow.services.AmenityService;
@@ -70,7 +71,10 @@ public class ManageRoomController {
     }
 
     @GetMapping("/create")
-    public String createRoom() {
+    public String createRoom(Model model) {
+
+        model.addAttribute("roomType", roomTypeService.findAll());
+        model.addAttribute("allAmenities", amenityService.findAll());
         return "private/Room_create";
     }
 
@@ -167,4 +171,39 @@ public class ManageRoomController {
         return "redirect:/admin/list";
     }
 
+    @PostMapping("/rooms/create")
+    public String createRoom(
+            @RequestParam String roomNumber,
+            @RequestParam Long roomTypeId,
+            @RequestParam Long basePrice,
+            @RequestParam Long overPrice,
+            @RequestParam String status,
+            @RequestParam(required = false) String description,
+
+            @RequestParam(required = false) List<Long> amenityIds,
+            @RequestParam( required = false) List<String> newAmenityNames,
+            RedirectAttributes redirectAttributes
+    ) {
+
+        try {
+
+            manageRoomServices.createRoom(
+                    roomNumber,
+                    roomTypeId,
+                    basePrice,
+                    overPrice,
+                    status,
+                    description,
+                    amenityIds,
+                    newAmenityNames
+            );
+
+            redirectAttributes.addFlashAttribute("successMessage", "Tạo phòng thành công!");
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/admin/list";
+    }
 }

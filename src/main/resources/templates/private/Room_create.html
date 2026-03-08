@@ -104,7 +104,7 @@
                 <i class="fa-regular fa-calendar-check w-5"></i>
                 Đơn đặt phòng
             </a>
-            <a href="room_list.html" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium transition-colors shadow-sm ring-1 ring-black/5">
+            <a th:href="@{/admin/list}" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium transition-colors shadow-sm ring-1 ring-black/5">
                 <i class="fa-solid fa-door-open w-5"></i>
                 Phòng
             </a>
@@ -148,7 +148,10 @@
 
         <!-- FORM CARD -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <form id="createRoomForm" class="p-8">
+            <form id="createRoomForm"
+                  th:action="@{/admin/rooms/create}"
+                  method="post"
+                  class="p-8">
                 
                 <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
                     <!-- LEFT COLUMN: Basic Info (2/3 width) -->
@@ -164,15 +167,24 @@
                                 <!-- Room Number -->
                                 <div class="space-y-1">
                                     <label class="block text-sm font-medium text-gray-700">Số phòng <span class="text-red-500">*</span></label>
-                                    <input type="text" placeholder="Ví dụ: P.101" class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                    <input id="roomNumber"
+                                           name="roomNumber"
+                                           type="text"
+                                           required
+                                           placeholder="Ví dụ: G-Cyber-01"
+                                           class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+
+                                    <p id="roomError" class="text-red-500 text-xs mt-1"></p>
                                 </div>
 
                                 <!-- Initial Status -->
                                 <div class="space-y-1">
                                     <label class="block text-sm font-medium text-gray-700">Trạng thái ban đầu</label>
-                                    <select class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white">
-                                        <option value="available">Còn trống (Sẵn sàng)</option>
-                                        <option value="maintenance">Đang bảo trì / Sửa chữa</option>
+                                    <select name="status"
+                                            class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white">
+                                        <option value="AVAILABLE">AVAILABLE</option>
+                                        <option value="BOOKED">BOOKED</option>
+                                        <option value="MAINTENANCE">MAINTENANCE</option>
                                     </select>
                                 </div>
                             </div>
@@ -181,18 +193,22 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                                 <div class="space-y-1">
                                     <label class="block text-sm font-medium text-gray-700">Loại phòng <span class="text-red-500">*</span></label>
-                                    <select id="roomTypeSelect" class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white mb-2">
-                                        <option value="" disabled selected>Chọn loại phòng</option>
-                                        <option value="single" data-img="https://placehold.co/400x300/e2e8f0/64748b?text=Single+Room">Single Room (Đơn)</option>
-                                        <option value="double" data-img="https://placehold.co/400x300/e2e8f0/64748b?text=Double+Room">Double Room (Đôi)</option>
-                                        <option value="suite" data-img="https://placehold.co/400x300/e2e8f0/64748b?text=Suite+Luxury">Suite (Cao cấp)</option>
-                                        <option value="dorm" data-img="https://placehold.co/400x300/e2e8f0/64748b?text=Dormitory">Dorm (Tập thể)</option>
+                                    <select id="roomTypeSelect"
+                                            name="roomTypeId"
+                                            class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white mb-2">
+
+                                        <option th:each="type : ${roomType}"
+                                                th:value="${type.roomTypeId}"
+                                                th:data-img="${type.imageUrl}"
+                                                th:text="${type.name}">
+                                        </option>
+
                                     </select>
                                     <p class="text-xs text-gray-500 italic">Chọn loại phòng để xem ảnh minh họa chuẩn.</p>
                                 </div>
                                 <div class="hidden md:block">
                                     <div class="w-full aspect-video bg-gray-100 rounded-lg border border-gray-200 overflow-hidden flex items-center justify-center relative">
-                                        <img id="roomTypePreview" src="https://placehold.co/400x300/f3f4f6/cbd5e1?text=Chon+Loai+Phong" alt="Room Type Preview" class="w-full h-full object-cover transition-opacity duration-300">
+                                        <img id="roomTypePreview" th:src="${roomType[0].imageUrl}" alt="Room Type Preview" class="w-full h-full object-cover transition-opacity duration-300">
                                         <div class="absolute inset-0 bg-black/5 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity pointer-events-none">
                                             <span class="bg-white/90 px-2 py-1 rounded text-xs text-gray-700 shadow-sm">Ảnh minh họa</span>
                                         </div>
@@ -203,18 +219,91 @@
                             <!-- Pricing -->
                             <div class="grid grid-cols-2 gap-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
                                 <div class="space-y-1">
-                                    <label class="block text-sm font-medium text-blue-900">Giá / Slot (VND)</label>
-                                    <div class="relative">
-                                        <input type="number" placeholder="0" class="block w-full pl-3 pr-8 py-2.5 border border-blue-200 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                    <label class="block text-sm font-medium text-blue-900">
+                                        Giá / Slot (VND)
+                                    </label>
+                                    <div class="relative group">
+                                        <input type="text"
+                                               name="basePrice"
+                                               data-min="0"
+                                               data-max="10000000"
+                                               data-step="1000"
+                                               th:value="${basePrice != null ? basePrice : 0}"
+                                               class="money-input block w-full pl-3 pr-8 py-2.5 border border-blue-200 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-bold">
+                                        <div class="absolute right-[21px] top-1/2 -translate-y-1/2
+                                                flex flex-col overflow-hidden
+                                                rounded bg-white-50
+                                                shadow-sm
+                                                opacity-0 pointer-events-none
+                                                group-hover:opacity-100 group-hover:pointer-events-auto
+                                                transition-opacity duration-200">
+                                            <!-- UP -->
+                                            <button type="button"
+                                                    data-action="increase"
+                                                    class="price-btn w-6 h-5 flex items-center justify-center
+                                                       text-[9px] text-gray-500
+                                                       hover:bg-gray-100 active:bg-gray-200
+                                                       transition select-none leading-none">
+                                                ▲
+                                            </button>
+
+                                            <!-- DOWN -->
+                                            <button type="button"
+                                                    data-action="decrease"
+                                                    class="price-btn w-6 h-5 flex items-center justify-center
+                                                       text-[9px] text-gray-500
+                                                       hover:bg-gray-100 active:bg-gray-200
+                                                       transition select-none leading-none">
+                                                ▼
+                                            </button>
+                                        </div>
                                         <span class="absolute inset-y-0 right-3 flex items-center text-gray-400 text-xs">₫</span>
                                     </div>
+                                    <p class="price-error hidden text-xs text-red-600 mt-1"></p>
                                 </div>
+
                                 <div class="space-y-1">
-                                    <label class="block text-sm font-medium text-blue-900">Giá / Đêm (VND) <span class="text-red-500">*</span></label>
-                                    <div class="relative">
-                                        <input type="number" placeholder="0" class="block w-full pl-3 pr-8 py-2.5 border border-blue-200 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-bold">
+                                    <label class="block text-sm font-medium text-blue-900">
+                                        Giá / Đêm (VND) <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative group">
+                                        <input type="text"
+                                               name="overPrice"
+                                               data-min="0"
+                                               data-max="10000000"
+                                               data-step="1000"
+                                               th:value="${overPrice != null ? overPrice : 0}"
+                                               class="money-input block w-full pl-3 pr-8 py-2.5 border border-blue-200 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-bold">
+                                        <div class="absolute right-[21px] top-1/2 -translate-y-1/2
+                                                flex flex-col overflow-hidden
+                                                rounded bg-white-50
+                                                shadow-sm
+                                                opacity-0 pointer-events-none
+                                                group-hover:opacity-100 group-hover:pointer-events-auto
+                                                transition-opacity duration-200">
+                                            <!-- UP -->
+                                            <button type="button"
+                                                    data-action="increase"
+                                                    class="price-btn w-6 h-5 flex items-center justify-center
+                                                       text-[9px] text-gray-500
+                                                       hover:bg-gray-100 active:bg-gray-200
+                                                       transition select-none leading-none">
+                                                ▲
+                                            </button>
+
+                                            <!-- DOWN -->
+                                            <button type="button"
+                                                    data-action="decrease"
+                                                    class="price-btn w-6 h-5 flex items-center justify-center
+                                                       text-[9px] text-gray-500
+                                                       hover:bg-gray-100 active:bg-gray-200
+                                                       transition select-none leading-none">
+                                                ▼
+                                            </button>
+                                        </div>
                                         <span class="absolute inset-y-0 right-3 flex items-center text-gray-400 text-xs">₫</span>
                                     </div>
+                                    <p class="price-error hidden text-xs text-red-600 mt-1"></p>
                                 </div>
                             </div>
                         </div>
@@ -249,7 +338,10 @@
                             <!-- Description -->
                             <div class="space-y-1">
                                 <label class="block text-sm font-medium text-gray-700">Mô tả chi tiết</label>
-                                <textarea rows="4" placeholder="Nhập mô tả chi tiết về phòng, view, hướng, điểm nổi bật..." class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                                <textarea
+                                        name="description"
+                                        rows="4"
+                                        placeholder="Nhập mô tả chi tiết về phòng, view, hướng, điểm nổi bật..." class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
                             </div>
                         </div>
                     </div>
@@ -271,38 +363,21 @@
                                 </button>
                             </div>
 
-                            <!-- Amenities List -->
-                            <div id="amenitiesList" class="space-y-2 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
+                            <div id="amenitiesList"
+                                 class="space-y-2 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
                                 <!-- Standard Amenities -->
-                                <label class="flex items-center p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
-                                    <input type="checkbox" class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" checked>
-                                    <span class="ml-2 text-sm text-gray-700">Wifi tốc độ cao</span>
-                                </label>
-                                <label class="flex items-center p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
-                                    <input type="checkbox" class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" checked>
-                                    <span class="ml-2 text-sm text-gray-700">Máy lạnh</span>
-                                </label>
-                                <label class="flex items-center p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
-                                    <input type="checkbox" class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                                    <span class="ml-2 text-sm text-gray-700">Smart TV 4K</span>
-                                </label>
-                                <label class="flex items-center p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
-                                    <input type="checkbox" class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                                    <span class="ml-2 text-sm text-gray-700">Tủ lạnh mini</span>
-                                </label>
-                                <label class="flex items-center p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
-                                    <input type="checkbox" class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                                    <span class="ml-2 text-sm text-gray-700">Máy sấy tóc</span>
-                                </label>
-                                <label class="flex items-center p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
-                                    <input type="checkbox" class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                                    <span class="ml-2 text-sm text-gray-700">Bình đun nước</span>
-                                </label>
-                                <label class="flex items-center p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
-                                    <input type="checkbox" class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                                    <span class="ml-2 text-sm text-gray-700">Ban công</span>
+                                <!-- Amenities List -->
+                                <label th:each="amenity : ${allAmenities}"
+                                       class="flex items-center p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
+                                    <input type="checkbox"
+                                           name="amenityIds"
+                                           th:value="${amenity.amenityId}"
+                                           class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                    <span th:text="${amenity.name}"
+                                          class="ml-2 text-sm text-gray-700"></span>
                                 </label>
                             </div>
+
                         </div>
 
                     </div>
@@ -310,7 +385,7 @@
 
                 <!-- Footer Actions -->
                 <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-end gap-3 sticky bottom-0 bg-white py-4 z-10">
-                    <a href="room_list.html" class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors">
+                    <a th:href="@{/admin/list}" class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors">
                         Hủy bỏ
                     </a>
                     <button type="submit" class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition-colors flex items-center gap-2">
@@ -326,6 +401,185 @@
 
     <!-- SCRIPT -->
     <script>
+        // Format part price
+        /* ===============================
+   PRICE FORMAT
+================================ */
+
+const moneyInputs = document.querySelectorAll('.money-input');
+
+function formatVND(value) {
+    return Number(value).toLocaleString('vi-VN');
+}
+
+function showError(input, msg) {
+
+    const errorEl = input.closest('.space-y-1')?.querySelector('.price-error');
+
+    if (!errorEl) return;
+
+    if (!msg) {
+        errorEl.classList.add('hidden');
+        errorEl.textContent = '';
+        input.classList.remove('border-red-400');
+        return;
+    }
+
+    errorEl.textContent = msg;
+    errorEl.classList.remove('hidden');
+    input.classList.add('border-red-400');
+}
+
+
+/* ===== INIT FORMAT ===== */
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    moneyInputs.forEach(input => {
+
+        const raw = input.value.replace(/[^\d]/g, '');
+
+        const value = raw ? Number(raw) : 0;
+
+        input.value = raw ? formatVND(value) : '';
+
+        input.dataset.lastValid = value;
+
+    });
+
+});
+
+
+/* ===== INPUT REALTIME ===== */
+
+moneyInputs.forEach(input => {
+
+    const MIN = Number(input.dataset.min || 0);
+    const MAX = Number(input.dataset.max || 10000000);
+
+    input.addEventListener('input', () => {
+
+        let raw = input.value.replace(/[^\d]/g, '');
+
+        if (!raw) {
+
+            input.dataset.lastValid = '';
+            input.value = '';
+            showError(input, 'Giá không được để trống');
+
+            return;
+
+        }
+
+        let value = Number(raw);
+
+        if (value > MAX) {
+
+            showError(input, 'Giá không vượt quá 10.000.000₫');
+            input.value = formatVND(input.dataset.lastValid);
+
+            return;
+
+        }
+
+        if (value < MIN) {
+
+            showError(input, 'Giá không được là số âm');
+            input.value = formatVND(MIN);
+            input.dataset.lastValid = MIN;
+
+            return;
+
+        }
+
+        showError(input, null);
+
+        input.dataset.lastValid = value;
+
+        input.value = formatVND(value);
+
+    });
+
+});
+
+
+/* ===== PRICE BUTTON +/- ===== */
+
+document.querySelectorAll('.price-btn').forEach(btn => {
+
+    btn.addEventListener('click', () => {
+
+        const input = btn.closest('.relative').querySelector('.money-input');
+
+        const MIN = Number(input.dataset.min || 0);
+        const MAX = Number(input.dataset.max || 10000000);
+        const STEP = Number(input.dataset.step || 1000);
+
+        let current = Number(input.dataset.lastValid || 0);
+
+        current += (btn.dataset.action === 'increase' ? STEP : -STEP);
+
+        if (current < MIN) current = MIN;
+        if (current > MAX) current = MAX;
+
+        input.dataset.lastValid = current;
+
+        input.value = formatVND(current);
+
+        showError(input, null);
+
+    });
+
+});
+
+        //Validate phần roomNumber
+        const roomInput = document.getElementById("roomNumber");
+const roomError = document.getElementById("roomError");
+
+function validateRoomNumber(){
+
+    let value = roomInput.value.trim();
+    let error = "";
+
+    if(value === ""){
+        error = "Số phòng không được để trống";
+    }
+
+    else if(!value.includes("-")){
+        error = "Phải có dấu '-' để ngăn cách (ví dụ: G-Cyber-01)";
+    }
+
+    else{
+
+        let parts = value.split("-");
+
+        if(parts.length !== 3){
+            error = "Phải có đúng 2 dấu '-' (ví dụ: G-Cyber-01)";
+        }
+
+        else if(!/^[A-Z]$/.test(parts[0])){
+            error = "Chữ đầu phải viết hoa (G, N, O...)";
+        }
+
+        else if(!/^[A-Za-z]+$/.test(parts[1])){
+            error = "Tên phòng chỉ được chứa chữ cái";
+        }
+
+        else if(!/^\d{2}$/.test(parts[2])){
+            error = "Số phòng phải có đúng 2 chữ số (01,02...)";
+        }
+
+    }
+
+    roomError.innerText = error;
+
+    return error === "";
+}
+
+// validate khi nhập
+roomInput.addEventListener("input", validateRoomNumber);
+
+
         // Mobile Sidebar Toggle
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const sidebar = document.getElementById('sidebar');
@@ -389,49 +643,108 @@
         });
 
         // --- ADD NEW AMENITY ---
-        const addAmenityBtn = document.getElementById('addAmenityBtn');
-        const newAmenityInput = document.getElementById('newAmenityInput');
-        const amenitiesList = document.getElementById('amenitiesList');
+const addAmenityBtn = document.getElementById('addAmenityBtn');
+const newAmenityInput = document.getElementById('newAmenityInput');
+const amenitiesList = document.getElementById('amenitiesList');
 
-        function addAmenity() {
-            const value = newAmenityInput.value.trim();
-            if (value) {
-                const label = document.createElement('label');
-                label.className = 'flex items-center p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors animate-pulse';
-                setTimeout(() => label.classList.remove('animate-pulse'), 500);
+function addAmenity() {
 
-                label.innerHTML = `
-                    <input type="checkbox" class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" checked>
-                    <span class="ml-2 text-sm text-gray-700">${value}</span>
-                `;
-                
-                // Add to top of list
-                amenitiesList.insertBefore(label, amenitiesList.firstChild);
-                newAmenityInput.value = '';
-            }
+    const value = newAmenityInput.value.trim();
+
+    // 1. Không được rỗng
+    if (!value) {
+        alert("Tên tiện nghi không được để trống");
+        return;
+    }
+
+    // 2. Ít nhất 2 ký tự
+    if (value.length < 2) {
+        alert("Tên tiện nghi phải có ít nhất 2 ký tự");
+        return;
+    }
+
+    // 3. Tối đa 30 ký tự
+    if (value.length > 30) {
+        alert("Tên tiện nghi tối đa 30 ký tự");
+        return;
+    }
+
+    // 4. Check trùng
+    const amenities = amenitiesList.querySelectorAll("label span");
+    let isDuplicate = false;
+
+    amenities.forEach(a => {
+        if (a.innerText.toLowerCase() === value.toLowerCase()) {
+            isDuplicate = true;
         }
+    });
 
-        addAmenityBtn.addEventListener('click', addAmenity);
-        newAmenityInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault(); // Prevent form submit
-                addAmenity();
-            }
-        });
+    if (isDuplicate) {
+        alert("Tiện nghi này đã tồn tại!");
+        return;
+    }
+
+    // Tạo label mới
+    const label = document.createElement('label');
+    label.className = 'flex items-center p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors animate-pulse';
+
+    setTimeout(() => {
+        label.classList.remove('animate-pulse');
+    }, 500);
+
+    label.innerHTML = `
+    <input type="checkbox"
+           name="newAmenityNames"
+           value="${value}"
+           checked
+           class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+
+    <span class="ml-2 text-sm text-gray-700">${value}</span>
+`;
+
+    // Thêm lên đầu list
+    amenitiesList.insertBefore(label, amenitiesList.firstChild);
+
+    // Reset input
+    newAmenityInput.value = "";
+    newAmenityInput.focus();
+}
+
+
+// --- EVENT LISTENER ---
+
+// Click nút +
+addAmenityBtn.addEventListener("click", addAmenity);
+
+// Nhấn Enter trong input
+newAmenityInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        addAmenity();
+    }
+});
 
         // --- FORM SUBMIT MOCK ---
-        document.getElementById('createRoomForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Đang lưu...';
-            btn.disabled = true;
-            
-            setTimeout(() => {
-                alert('Tạo phòng mới thành công!');
-                window.location.href = 'room_list.html';
-            }, 1000);
-        });
+        document.getElementById('createRoomForm').addEventListener('submit', function (e) {
+
+    // validate room number
+    if(!validateRoomNumber()){
+        e.preventDefault();
+        return;
+    }
+
+    // bỏ dấu phẩy giá
+    document.querySelectorAll(".money-input").forEach(input => {
+        input.value = input.value.replace(/[^\d]/g, '');
+    });
+
+    // demo loading
+    const btn = this.querySelector('button[type="submit"]');
+
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Đang lưu...';
+    btn.disabled = true;
+
+});
     </script>
 </body>
 </html>

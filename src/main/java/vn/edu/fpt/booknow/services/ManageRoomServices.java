@@ -151,4 +151,71 @@ public class ManageRoomServices {
         roomRepository.save(room);
     }
 
+    @Transactional
+    public void createRoom(
+            String roomNumber,
+            Long roomTypeId,
+            Long basePrice,
+            Long overPrice,
+            String status,
+            String description,
+            List<Long> amenityIds,
+            List<String> newAmenityNames
+    ) {
+
+        // CHECK TRÙNG
+        if(roomRepository.existsByRoomNumber(roomNumber)){
+            throw new RuntimeException("Room already exists");
+        }
+
+        /* ===== 1. LẤY ROOM TYPE ===== */
+        RoomType roomType = roomTypeRepository.findById(roomTypeId)
+                .orElseThrow(() -> new RuntimeException("RoomType not found"));
+
+        /* ===== 2. UPDATE ROOM TYPE (TẠM THỜI) ===== */
+        roomType.setBasePrice(BigDecimal.valueOf(basePrice));
+        roomType.setOverPrice(BigDecimal.valueOf(overPrice));
+        roomType.setDescription(description);
+
+        /* ===== 3. TẠO ROOM ===== */
+        Room room = new Room();
+        room.setRoomNumber(roomNumber);
+        room.setStatus(status);
+        room.setRoomType(roomType);
+        room.setIsDeleted(false);
+
+        roomRepository.save(room);
+
+        /* ===== 4. ADD AMENITIES ===== */
+        if (amenityIds != null && !amenityIds.isEmpty()) {
+
+            List<Amenity> amenities = amenityRepository.findAllById(amenityIds);
+
+            for (Amenity amenity : amenities) {
+
+                RoomAmenity ra = new RoomAmenity();
+                ra.setRoom(room);
+                ra.setAmenity(amenity);
+
+                roomAmenityRepository.save(ra);
+            }
+        }
+
+        if (newAmenityNames != null) {
+            for (String name : newAmenityNames) {
+
+                Amenity amenity = new Amenity();
+                amenity.setName(name);
+
+                amenityRepository.save(amenity);
+
+                RoomAmenity ra = new RoomAmenity();
+                ra.setRoom(room);
+                ra.setAmenity(amenity);
+
+                roomAmenityRepository.save(ra);
+            }
+        }
+    }
+
 }
