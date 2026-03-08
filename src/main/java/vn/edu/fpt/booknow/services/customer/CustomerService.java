@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import vn.edu.fpt.booknow.model.entities.Customer;
 import vn.edu.fpt.booknow.model.map.CustomerDetails;
 import vn.edu.fpt.booknow.model.map.StaffUserDetails;
+import vn.edu.fpt.booknow.repositories.CustomerRepository;
 import vn.edu.fpt.booknow.services.JWTService;
 
 @Service
@@ -18,6 +19,9 @@ public class CustomerService {
 
     @Autowired
     private AuthenticationManager authManager;
+
+    @Autowired
+    private CustomerRepository customerRepository;
 
     @Autowired
     private JWTService jwtService;
@@ -36,5 +40,13 @@ public class CustomerService {
             return true;
         }
         return false;
+    }
+
+    public Customer findCusByEmail(String email) {
+        return customerRepository.findCustomerByEmail(email).orElse(null);
+    }
+
+    public void save(Customer customer) {
+        customerRepository.save(customer);
     }
 }

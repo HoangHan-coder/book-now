@@ -86,9 +86,11 @@ public class RedisService {
     }
 
     // OTP Resend Cooldown
-    public void setResendCooldown(String email, long ttlSeconds) {
+    public Boolean setResendCooldown(String email, long ttlSeconds) {
         String key = OTP_RESEND_PREFIX + email;
-        redisTemplate.opsForValue().set(key, "60", ttlSeconds, TimeUnit.SECONDS);
+        Boolean setResendCooldown = redisTemplate.opsForValue()
+                .setIfAbsent(key, "1", ttlSeconds, TimeUnit.SECONDS);
+        return Boolean.TRUE.equals(setResendCooldown);
     }
 
     public boolean isResendOnCooldown(String email) {

@@ -50,16 +50,10 @@
     <!-- Resend OTP Form -->
     <form th:action="@{/resend-otp}" method="post" style="margin-top: 10px;" id="resendForm">
         <input type="hidden" name="email" th:value="${verifyOtpRequest != null ? verifyOtpRequest.email : ''}">
-<!--        <button type="submit"-->
-<!--                class="w-full p-[12px] bg-[#6c757d] text-white border-none rounded-[5px] text-[16px] cursor-pointer transition-transform duration-200 hover:bg-[#5a6268] hover:-translate-y-[2px] disabled:bg-[#ccc] disabled:cursor-not-allowed disabled:transform-none disabled:hover:translate-y-0 mt-[10px]"-->
-<!--                th:disabled="${resendOnCooldown}"-->
-<!--                th:text="${resendOnCooldown} ? 'Gửi lại sau ' + ${resendCooldownSeconds} + 's' : 'Gửi lại OTP'">-->
-<!--            Gửi lại OTP-->
-<!--        </button> -->
         <button type="submit" id="resendBtn" disabled
                 class="w-full p-[12px] bg-[#6c757d] text-white border-none rounded-[5px] text-[16px] cursor-pointer transition-transform duration-200 hover:bg-[#5a6268] hover:-translate-y-[2px]">
             <span id="countdown">Gửi lại sau 60 s</span>
-            <span id="resendOtp" style="display: none;">Gửi lại OTP</span>
+            <span id="resendOtp">Gửi lại OTP</span>
         </button>
     </form>
 

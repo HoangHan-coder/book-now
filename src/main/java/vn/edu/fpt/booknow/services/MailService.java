@@ -11,7 +11,7 @@ public class MailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void sendOtp(String toEmail, String otp) {
+    public void send(String toEmail, String otp) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
         message.setSubject("Mã OTP Reset Mật Khẩu");
