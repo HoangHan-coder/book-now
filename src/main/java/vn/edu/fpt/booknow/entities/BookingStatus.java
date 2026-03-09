@@ -31,7 +31,7 @@ public enum BookingStatus {
             case PENDING_PAYMENT -> "Chờ thanh toán";
             case PAID -> "Đã thanh toán";
             case CHECKED_IN -> "Đã nhận phòng";
-            case CHECKED_OUT -> "Đã trả phòng";
+            case CHECKED_OUT -> "Đang chờ FeedBack";
             case COMPLETED -> "Hoàn thành";
             case REJECT -> "Từ chối";
             case FAILED -> "Thất bại";

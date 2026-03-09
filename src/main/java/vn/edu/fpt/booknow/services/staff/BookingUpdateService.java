@@ -53,6 +53,11 @@ public class BookingUpdateService {
 
             case PAID ->
                     next == BookingStatus.CHECKED_IN;
+            case CHECKED_IN ->
+                    next == BookingStatus.CHECKED_OUT ||
+                    next == BookingStatus.REJECT;
+            case CHECKED_OUT -> next == BookingStatus.COMPLETED;
+
 
             default -> false;
         };
