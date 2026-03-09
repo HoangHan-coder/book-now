@@ -131,28 +131,24 @@
           <p class="text-xs font-semibold mt-2 text-yellow-600">Kiểm duyệt</p>
         </div>
 
+
         <div class="relative z-10 text-center group w-1/6" id="tl_step2">
           <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">2</div>
-          <p class="text-xs font-medium mt-2 text-gray-400">Chờ thanh toán</p>
+          <p class="text-xs font-medium mt-2 text-gray-400">Đã thanh toán</p>
         </div>
 
         <div class="relative z-10 text-center group w-1/6" id="tl_step3">
           <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">3</div>
-          <p class="text-xs font-medium mt-2 text-gray-400">Đã thanh toán</p>
+          <p class="text-xs font-medium mt-2 text-gray-400">Check-in</p>
         </div>
 
         <div class="relative z-10 text-center group w-1/6" id="tl_step4">
           <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">4</div>
-          <p class="text-xs font-medium mt-2 text-gray-400">Check-in</p>
+          <p class="text-xs font-medium mt-2 text-gray-400">Check-out</p>
         </div>
 
         <div class="relative z-10 text-center group w-1/6" id="tl_step5">
           <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">5</div>
-          <p class="text-xs font-medium mt-2 text-gray-400">Check-out</p>
-        </div>
-
-        <div class="relative z-10 text-center group w-1/6" id="tl_step6">
-          <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">6</div>
           <p class="text-xs font-medium mt-2 text-gray-400">Hoàn thành</p>
         </div>
       </div>
@@ -304,22 +300,57 @@
           </div>
 
           <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
-            <form th:action="@{/staff/bookings/update-status}" method="post">
+            <form th:action="@{/staff/bookings/update-status}" method="post" class="w-full space-y-3">
+
               <input type="hidden" name="bookingCode" th:value="${booking.bookingCode}">
               <input type="hidden" name="status" value="REJECT">
 
-              <textarea name="reason"
-                        class="w-full p-3 border-red-200 rounded-md text-sm"
-                        rows="3"
-                        placeholder="Ví dụ: Ảnh mờ..."></textarea>
+              <!-- reason select -->
+              <label class="text-sm font-semibold text-gray-600">
+                Lý do từ chối
+              </label>
+
+              <select name="reason"
+                      class="w-full p-3 border border-red-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+
+                <option value="Ảnh CCCD bị mờ, không thể đọc thông tin">
+                  Ảnh CCCD bị mờ
+                </option>
+
+                <option value="Ảnh CCCD không đúng quy định">
+                  Ảnh CCCD không đúng quy định
+                </option>
+
+                <option value="Thông tin CCCD không trùng khớp với booking">
+                  Thông tin CCCD không khớp
+                </option>
+
+                <option value="Ảnh CCCD không phải của người đặt phòng">
+                  CCCD không phải của khách
+                </option>
+
+                <option value="Ảnh CCCD bị che khuất hoặc thiếu góc">
+                  CCCD bị che khuất
+                </option>
+
+              </select>
+
+              <!-- optional note -->
+              <textarea name="note"
+                        class="w-full p-3 border border-gray-200 rounded-lg text-sm"
+                        rows="2"
+                        placeholder="Ghi chú thêm (không bắt buộc)"></textarea>
 
               <button type="submit"
-                      class="px-4 py-2 bg-red-600 text-white text-sm rounded-lg">
-                Xác nhận từ chối
+                      class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg font-medium">
+                <i class="fa-solid fa-ban mr-2"></i>
+                Từ chối hồ sơ
               </button>
+
             </form>
 
             <form th:action="@{/staff/bookings/update-status}" method="post">
+
               <input type="hidden" name="bookingCode" th:value="${booking.bookingCode}">
               <input type="hidden" name="status" value="PENDING_PAYMENT">
 
@@ -331,55 +362,62 @@
           </div>
         </div>
       </div>
-
-      <!-- PANEL 2: Payment Status -->
+      <!-- 2 PANEL PAYMENT WAITING -->
       <div id="panel_payment" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hidden">
+
         <div class="px-6 py-4 border-b border-gray-100 bg-blue-50 flex justify-between items-center">
           <h3 class="font-bold text-blue-800 flex items-center gap-2">
             <i class="fa-solid fa-credit-card"></i>
-            Xác nhận thanh toán
+            Chờ khách thanh toán
           </h3>
-          <span class="text-xs font-semibold bg-white text-blue-700 px-2 py-1 rounded border border-blue-200">Chờ thanh toán</span>
+
+          <span class="text-xs font-semibold bg-white text-blue-700 px-2 py-1 rounded border border-blue-200">
+      Đang chờ
+    </span>
         </div>
-        <div class="p-6">
-          <div class="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-6 mb-6">
-            <div>
-              <p class="text-sm text-gray-500 mb-1">Số tiền cần thanh toán</p>
-              <p class="text-3xl font-bold text-gray-800"
-                 th:text="${#numbers.formatDecimal(booking.totalAmount,0,'COMMA',0,'POINT')} + ' đ'">
-              </p>
-              <div class="flex items-center gap-2 mt-2">
-                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded font-medium">Chuyển khoản ngân hàng</span>
-                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded font-medium"
-                      th:text="'Nội dung: ' + ${booking.bookingCode}">
-                    </span>
-              </div>
+
+        <div class="p-8 text-center">
+
+          <!-- loading -->
+          <div class="w-20 h-20 mx-auto mb-4 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+
+          <h3 class="text-xl font-bold text-gray-800 mb-2">
+            Đang chờ khách thanh toán
+          </h3>
+
+          <p class="text-gray-500 mb-6">
+            Khách hàng đang thực hiện thanh toán trên ứng dụng.
+          </p>
+
+          <!-- payment info -->
+          <div class="bg-gray-50 border rounded-xl p-4 max-w-md mx-auto">
+
+            <div class="flex justify-between mb-2">
+              <span class="text-gray-500 text-sm">Số tiền</span>
+              <span class="font-bold text-blue-600"
+                    th:text="${#numbers.formatDecimal(booking.totalAmount,0,'COMMA',0,'POINT')} + ' đ'">
+        </span>
             </div>
-            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 text-2xl">
-              <i class="fa-solid fa-money-bill-transfer"></i>
+
+            <div class="flex justify-between mb-2">
+              <span class="text-gray-500 text-sm">Phương thức</span>
+              <span class="font-medium">QR / Banking</span>
             </div>
+
+            <div class="flex justify-between">
+              <span class="text-gray-500 text-sm">Trạng thái</span>
+              <span class="text-blue-600 font-semibold">Đang chờ</span>
+            </div>
+
           </div>
 
-          <div class="flex flex-col sm:flex-row gap-3 pt-2">
-            <form th:action="@{/staff/bookings/update-status}" method="post">
-              <input type="hidden" name="bookingCode" th:value="${booking.bookingCode}">
-              <input type="hidden" name="status" value="FAILED">
-              <button type="submit"
-                      class="px-6 py-2.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 font-medium transition-colors">
-                <i class="fa-solid fa-xmark mr-2"></i>Xác nhận thanh toán thất bại
-              </button>
-            </form>
-
-            <form th:action="@{/staff/bookings/update-status}" method="post">
-              <input type="hidden" name="bookingCode" th:value="${booking.bookingCode}">
-              <input type="hidden" name="status" value="PAID">
-              <button type="submit"
-                      class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition-colors sm:w-auto w-full sm:ml-auto">
-                <i class="fa-solid fa-check-double mr-2"></i>Xác nhận đã nhận tiền
-              </button>
-            </form>
+          <!-- tip -->
+          <div class="mt-6 text-sm text-gray-400">
+            Hệ thống sẽ tự động cập nhật khi khách thanh toán thành công.
           </div>
+
         </div>
+
       </div>
 
       <!-- PANEL 3: Check-in -->
@@ -408,6 +446,7 @@
 
           <div class="flex flex-col sm:flex-row gap-3 pt-2 border-t border-gray-100">
             <form th:action="@{/staff/bookings/update-status}" method="post" class="sm:ml-auto">
+
               <input type="hidden" name="bookingCode" th:value="${booking.bookingCode}">
               <input type="hidden" name="status" value="CHECKED_IN">
 
@@ -472,7 +511,7 @@
   const panelCheckin = document.getElementById('panel_checkin');
   const panelFailure = document.getElementById('panel_failure');
   const panelSuccess = document.getElementById('panel_success');
-  let bookingStatus =document.getElementById('booking-status').value;
+  let bookingStatus = document.getElementById('booking-status')?.value || "PENDING";
 
   const badge = document.getElementById('headerStatusBadge');
 
@@ -482,7 +521,6 @@
     3: document.getElementById('tl_step3'),
     4: document.getElementById('tl_step4'),
     5: document.getElementById('tl_step5'),
-    6: document.getElementById('tl_step6'),
   };
 
   function hideAllPanels() {
@@ -494,7 +532,7 @@
   }
 
   function resetTimeline() {
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 5; i++) {
       const step = steps[i];
       if (!step) continue;
 
@@ -518,30 +556,43 @@
   };
 
   function updateTimeline(activeStep, color) {
+
     resetTimeline();
 
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 5; i++) {
+
       const step = steps[i];
-      console.log(steps[i]);
       if (!step) continue;
 
       const circle = step.querySelector('div');
       const text = step.querySelector('p');
 
       if (i < activeStep) {
+
         circle.className =
                 "w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm";
+
         circle.innerHTML = '<i class="fa-solid fa-check"></i>';
+
         text.className =
                 "text-xs font-medium mt-2 text-green-600";
-      } else if (i === activeStep) {
+
+      }
+
+      else if (i === activeStep) {
+
         circle.className =
                 `w-8 h-8 rounded-full ${colorMap[color][0]} text-white flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm`;
+
         circle.innerHTML = i;
+
         text.className =
                 `text-xs font-bold mt-2 ${colorMap[color][1]}`;
+
       }
+
     }
+
   }
 
   function loadBookingState() {
@@ -558,43 +609,42 @@
         if (badge) badge.textContent = "Chờ kiểm duyệt";
         updateTimeline(1, "yellow");
         break;
-
       case "PENDING_PAYMENT":
         panelPayment?.classList.remove('hidden');
-        badge?.classList.add('bg-blue-100', 'text-blue-800');
-        if (badge) badge.textContent = "Chờ thanh toán";
-        updateTimeline(2, "blue");
+        badge?.classList.add('bg-blue-100','text-blue-800');
+        badge.textContent = "Chờ thanh toán";
+        updateTimeline(2,"blue");
         break;
 
       case "PAID":
         panelCheckin?.classList.remove('hidden');
-        badge?.classList.add('bg-green-100', 'text-green-800');
-        if (badge) badge.textContent = "Đã thanh toán";
-        updateTimeline(3, "green");
+        badge?.classList.add('bg-green-100','text-green-800');
+        badge.textContent = "Đã thanh toán";
+        updateTimeline(3,"purple");
         break;
 
       case "CHECKED_IN":
         panelSuccess?.classList.remove('hidden');
-        badge?.classList.add('bg-green-100', 'text-green-800');
-        if (badge) badge.textContent = "Đã check-in";
-        document.getElementById('successTitle').textContent = "Khách đã nhận phòng";
-        updateTimeline(5, "green");
+        badge?.classList.add('bg-green-100','text-green-800');
+        badge.textContent = "Đã check-in";
+        document.getElementById('successTitle').textContent="Khách đã nhận phòng";
+        updateTimeline(4,"purple");
         break;
 
       case "CHECKED_OUT":
         panelSuccess?.classList.remove('hidden');
-        badge?.classList.add('bg-indigo-100', 'text-indigo-800');
-        if (badge) badge.textContent = "Đang chờ FeedBack";
-        document.getElementById('successTitle').textContent = "Khách đã trả phòng";
-        updateTimeline(6, "indigo");
+        badge?.classList.add('bg-indigo-100','text-indigo-800');
+        badge.textContent = "Đã check-out";
+        document.getElementById('successTitle').textContent="Khách đã trả phòng";
+        updateTimeline(5,"purple");
         break;
 
       case "COMPLETED":
         panelSuccess?.classList.remove('hidden');
-        badge?.classList.add('bg-indigo-100', 'text-indigo-800');
-        if (badge) badge.textContent = "Hoàn tất";
-        document.getElementById('successTitle').textContent = "Booking đã hoàn tất";
-        updateTimeline(6, "indigo");
+        badge?.classList.add('bg-indigo-100','text-indigo-800');
+        badge.textContent = "Hoàn tất";
+        document.getElementById('successTitle').textContent="Booking đã hoàn tất";
+        updateTimeline(6,"green");
         break;
 
       case "REJECT":

@@ -14,13 +14,20 @@ public class BookingUpdateService {
         this.bookingRepository = bookingRepository;
     }
 
-    public void updateStatus(String bookingCode, BookingStatus newStatus) {
+    public void updateStatus(String bookingCode, BookingStatus newStatus, String reason) {
 
         Booking booking = getBookingOrThrow(bookingCode);
 
         validateStatusTransition(booking.getBookingStatus(), newStatus);
 
         booking.setBookingStatus(newStatus);
+
+        if (newStatus == BookingStatus.REJECT) {
+
+            booking.setNote(reason);
+
+            // reset CCCD để khách upload lại
+        }
 
         bookingRepository.save(booking);
     }

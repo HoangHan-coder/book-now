@@ -37,13 +37,25 @@ public class StaBookingUpdateStatusController {
     public String updateStatus(
             @RequestParam("bookingCode") String bookingCode,
             @RequestParam("status") BookingStatus status,
+            @RequestParam(value = "reason", required = false) String reason,
             RedirectAttributes redirectAttributes
     ) {
         try {
-            bookingUpdateService.updateStatus(bookingCode, status);
-            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật trạng thái thành công");
+
+            bookingUpdateService.updateStatus(bookingCode, status, reason);
+
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Cập nhật trạng thái thành công"
+            );
+
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    e.getMessage()
+            );
+
         }
 
         return "redirect:/staff/bookings/update/" + bookingCode;
