@@ -37,6 +37,7 @@ public class Booking {
     private LocalDateTime checkOutTime;
     @Column(name = "check_in_time", nullable = false)
     private LocalDateTime checkInTime;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
@@ -44,6 +45,18 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "booking_id", nullable = false)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "room_id", nullable = false)
+    private Room room;
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -139,6 +152,17 @@ public class Booking {
 
     public Long getId() {
         return id;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updateAt = LocalDateTime.now();
     }
 
 }

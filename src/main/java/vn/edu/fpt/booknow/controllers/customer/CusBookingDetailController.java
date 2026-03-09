@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.controller.customer;
+package vn.edu.fpt.booknow.controllers.customer;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,7 +8,7 @@ import vn.edu.fpt.booknow.repositories.BookingRepository;
 
 @Controller
 @RequestMapping("/user")
-public class CusBookingDetailController {
+public class CusBookingDetailController { /// //// khong can sua cai nay cua thang khac
 
     private final BookingRepository bookingRepository;
 
@@ -27,6 +27,6 @@ public class CusBookingDetailController {
         model.addAttribute("booking", booking);
 
         return "/private/customer-booking-detail";
-        // -> src/main/resources/templates/customer/booking-detail.html
+
     }
 }

@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.controller.customer;
+package vn.edu.fpt.booknow.controllers.customer;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,7 +11,7 @@ import vn.edu.fpt.booknow.services.customer.UpdateProfileService;
 
 @Controller
 @RequestMapping("/user")
-public class CusUpdateProController {
+public class CusUpdateProController {    /// ///////// chua sua
 
     private final UpdateProfileService updateProfileService;
     private final CustomerRepository customerRepository;

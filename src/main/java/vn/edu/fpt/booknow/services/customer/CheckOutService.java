@@ -20,9 +20,9 @@ public class CheckOutService {
     public String checkOut(String bookingCode) {
 
         Booking booking = bookingRepository.findByBookingCode(bookingCode).
-                orElseThrow(()-> new RuntimeException("Booking not found"));
+                orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        if(booking.getBookingStatus() != BookingStatus.CHECKED_IN){
+        if (booking.getBookingStatus() != BookingStatus.CHECKED_IN) {
             return "Booking chưa check-in";
         }
 

@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.controller.customer;
+package vn.edu.fpt.booknow.controllers.customer;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Controller;
