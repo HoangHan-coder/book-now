@@ -1,16 +1,22 @@
 package vn.edu.fpt.booknow.services;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import vn.edu.fpt.booknow.entities.*;
 import vn.edu.fpt.booknow.repositories.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+
+
 
 @Service
 public class ManageRoomServices {
@@ -19,13 +25,23 @@ public class ManageRoomServices {
     private RoomTypeRepository roomTypeRepository;
     private AmenityRepository amenityRepository;
     private ImageRepository imageRepository;
+    private Cloudinary cloudinary;
 
-    public ManageRoomServices(RoomRepository roomRepository, RoomAmenityRepository roomAmenityRepository, RoomTypeRepository roomTypeRepository, AmenityRepository amenityRepository, ImageRepository imageRepository) {
+    private static final long MAX_FILE_SIZE = 2 * 1024 * 1024;
+    private static final java.util.Set<String> ALLOWED_TYPES = java.util.Set.of(
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+    );
+
+
+    public ManageRoomServices(RoomRepository roomRepository, RoomAmenityRepository roomAmenityRepository, RoomTypeRepository roomTypeRepository, AmenityRepository amenityRepository, ImageRepository imageRepository, Cloudinary cloudinary) {
         this.roomRepository = roomRepository;
         this.roomAmenityRepository = roomAmenityRepository;
         this.roomTypeRepository = roomTypeRepository;
         this.amenityRepository = amenityRepository;
         this.imageRepository = imageRepository;
+        this.cloudinary = cloudinary;
     }
 
     @Transactional
@@ -36,7 +52,7 @@ public class ManageRoomServices {
             Pageable pageable
     ) {
 
-        Specification<Room> spec = Specification.where(null);
+        Specification<Room> spec = (root, query, cb) -> cb.conjunction();
 
         if (status != null && !status.isBlank()) {
             spec = spec.and((root, query, cb) ->
@@ -71,6 +87,7 @@ public class ManageRoomServices {
             String roomTypeDescription,
             List<Long> amenityIds,
             List<String> newAmenityNames,
+            MultipartFile[] images,
             String deletedImageIds
     ) {
         /* ===== 1. LẤY ROOM ===== */
@@ -147,7 +164,59 @@ public class ManageRoomServices {
             }
         }
 
-        /* ===== 6. SAVE ===== */
+        /* ===== 6. UPLOAD ẢNH MỚI ===== */
+        if (images != null) {
+
+            for (MultipartFile file : images) {
+
+                if (file == null || file.isEmpty()) continue;
+
+                try {
+
+                    /* ===== VALIDATE ===== */
+
+                    if (file.getSize() > MAX_FILE_SIZE) {
+                        throw new IllegalArgumentException("Image must be <= 2MB");
+                    }
+
+                    if (!ALLOWED_TYPES.contains(file.getContentType())) {
+                        throw new IllegalArgumentException("Only JPEG, PNG, WebP allowed");
+                    }
+
+                    /* ===== UPLOAD CLOUDINARY ===== */
+
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> uploadResult = cloudinary.uploader().upload(
+                            file.getBytes(),
+                            ObjectUtils.asMap(
+                                    "folder", "booknow/rooms"
+                            )
+                    );
+
+                    String imageUrl = (String) uploadResult.get("secure_url");
+                    String publicId = (String) uploadResult.get("public_id");
+
+                    if (imageUrl == null || publicId == null) {
+                        throw new RuntimeException("Failed to upload image");
+                    }
+
+                    /* ===== SAVE IMAGE ===== */
+
+                    Image image = new Image();
+                    image.setImageUrl(imageUrl);
+                    image.setPublicId(publicId);
+                    image.setIsCover(false);
+                    image.setRoom(room);
+
+                    imageRepository.save(image);
+
+                } catch (Exception e) {
+                    throw new RuntimeException("Upload image failed", e);
+                }
+            }
+        }
+
+        /* ===== 7. SAVE ROOM ===== */
         roomRepository.save(room);
     }
 

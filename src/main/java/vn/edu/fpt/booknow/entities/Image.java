@@ -12,8 +12,11 @@ public class Image {
     @Column(name = "image_url", nullable = false, length = 500)
     private String imageUrl;
 
+    @Column(name = "public_id")
+    private String publicId;
+
     @Column(name = "is_cover", nullable = false)
-    private Boolean isCover;
+    private Boolean isCover = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
@@ -22,9 +25,10 @@ public class Image {
     public Image() {
     }
 
-    public Image(Long imageId, String imageUrl, Boolean isCover, Room room) {
+    public Image(Long imageId, String imageUrl, String publicId, Boolean isCover, Room room) {
         this.imageId = imageId;
         this.imageUrl = imageUrl;
+        this.publicId = publicId;
         this.isCover = isCover;
         this.room = room;
     }
@@ -45,12 +49,20 @@ public class Image {
         this.imageUrl = imageUrl;
     }
 
-    public Boolean getCover() {
+    public String getPublicId() {
+        return publicId;
+    }
+
+    public void setPublicId(String publicId) {
+        this.publicId = publicId;
+    }
+
+    public Boolean getIsCover() {
         return isCover;
     }
 
-    public void setCover(Boolean cover) {
-        isCover = cover;
+    public void setIsCover(Boolean isCover) {
+        this.isCover = isCover;
     }
 
     public Room getRoom() {

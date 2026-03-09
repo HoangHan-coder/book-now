@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.entities.Room;
 import vn.edu.fpt.booknow.entities.RoomType;
@@ -91,8 +92,10 @@ public class ManageRoomController {
         return "private/Room_Detail";
     }
 
-    @GetMapping("/update")
-    public String updateRoom() {
+    @GetMapping("/update/{id}")
+    public String updateSttRoom(Model model, @PathVariable("id") Long id) {
+        Room room = manageRoomServices.findRoomById(id);
+        model.addAttribute("room", room);
         return "private/Room_update_stt";
     }
 
@@ -152,6 +155,9 @@ public class ManageRoomController {
             @RequestParam(value = "amenityIds", required = false) List<Long> amenityIds,
             @RequestParam(value = "newAmenityNames", required = false) List<String> newAmenityNames,
 
+            // ===== NEW IMAGES =====
+            @RequestParam(value = "images", required = false) MultipartFile[] images,
+
             // ===== IMAGE DELETE =====
             @RequestParam(value = "deletedImageIds", required = false) String deletedImageIds
     ) {
@@ -165,6 +171,7 @@ public class ManageRoomController {
                 roomTypeDescription,
                 amenityIds,
                 newAmenityNames,
+                images,
                 deletedImageIds
         );
 

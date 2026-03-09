@@ -70,24 +70,24 @@
     <!-- SIDEBAR -->
     <aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform -translate-x-full lg:translate-x-0 pt-28 overflow-y-auto no-scrollbar">
         <nav class="px-4 space-y-2">
-            <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+            <a th:href="@{/admin/dashboard}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
                 <i class="fa-solid fa-chart-line w-5"></i> Bảng điều khiển
             </a>
-            <a href="/admin/bookings" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
                 <i class="fa-regular fa-calendar-check w-5"></i> Đơn đặt phòng
             </a>
-            <a href="/admin/rooms" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium transition-colors shadow-sm ring-1 ring-black/5">
+            <a th:href="@{/admin/list}" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium transition-colors shadow-sm ring-1 ring-black/5">
                 <i class="fa-solid fa-door-open w-5"></i> Phòng
             </a>
-            <a href="/admin/accounts" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
                 <i class="fa-solid fa-users-gear w-5"></i> Tài khoản nhân viên
             </a>
-            <a href="/admin/feedback" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
                 <i class="fa-regular fa-comment-dots w-5"></i> Phản hồi khách hàng
             </a>
         </nav>
         <div class="absolute bottom-0 w-full p-4 border-t border-gray-100 bg-white">
-            <a href="/logout" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
                 <i class="fa-solid fa-arrow-right-from-bracket w-5"></i> Đăng xuất
             </a>
         </div>
@@ -153,7 +153,7 @@
                                     <div th:text="${room.roomType.name}" class="block w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 font-medium sm:text-sm">
                                     </div>
                                     <p class="text-xs text-gray-400 italic mt-1"
-                                       th:text="|Diện tích: 54m² - Tối đa: ${room.roomType.maxGuests} người|">
+                                       th:text="|Diện tích: ${room.areaM2}m² - Tối đa: ${room.roomType.maxGuests} người|">
                                     </p>
                                 </div>
                                 <div class="hidden md:block">
