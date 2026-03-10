@@ -4,19 +4,17 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import vn.edu.fpt.booknow.entities.Booking;
-import vn.edu.fpt.booknow.entities.BookingStatus;
+import vn.edu.fpt.booknow.model.entities.Booking;
+import vn.edu.fpt.booknow.model.entities.BookingStatus;
 import vn.edu.fpt.booknow.services.staff.BookingListService;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
-@RequestMapping("/staff")
+@RequestMapping("/admin")
 public class StaBookingListController {
 
     private final BookingListService bookingListService;

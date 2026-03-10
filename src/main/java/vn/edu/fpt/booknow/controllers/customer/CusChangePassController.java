@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.services.customer.ChangePasswordService;
 
+import java.security.Principal;
 import java.util.Map;
 
 @Controller
@@ -19,32 +20,29 @@ public class CusChangePassController {
     }
 
     // ===== GET =====
-    @GetMapping("/customer-change-password/{id}")
-    public String showChangePasswordPage(
-            @PathVariable("id") Long customerId,
-            Model model
-    ) {
-        if (customerId == null || customerId <= 0) {
-            return "error/400";
+    @GetMapping("/customer-change-password")
+    public String showChangePasswordPage(Principal principal, Model model) {
+        if (principal == null) {
+            return "redirect:/auth/login";
         }
-
-        // customerId có thể đã có từ flash, nhưng add lại cũng không sao
-        model.addAttribute("customerId", customerId);
         return "private/customer-change-password";
     }
 
     // ===== POST =====
-    @PostMapping("/change-password/{id}")
+    @PostMapping("/change-password")
     public String changePassword(
-            @PathVariable("id") Long customerId,
+            Principal principal,
             @RequestParam("currentPassword") String currentPassword,
             @RequestParam("newPassword") String newPassword,
             @RequestParam("confirmPassword") String confirmPassword,
             RedirectAttributes redirectAttributes
     ) {
+        if (principal == null) {
+            return "redirect:/auth/login";
+        }
         try {
             Map<String, String> errors = changePasswordService.changePassword(
-                    customerId,
+                    principal.getName(),
                     currentPassword,
                     newPassword,
                     confirmPassword
@@ -52,22 +50,19 @@ public class CusChangePassController {
 
             if (!errors.isEmpty()) {
                 redirectAttributes.addFlashAttribute("errors", errors);
-                redirectAttributes.addFlashAttribute("customerId", customerId);
-                return "redirect:/user/customer-change-password/" + customerId;
+                return "redirect:/user/customer-change-password";
             }
 
             redirectAttributes.addFlashAttribute(
                     "successMessage",
                     "Đổi mật khẩu thành công"
             );
-            redirectAttributes.addFlashAttribute("customerId", customerId);
 
-            return "redirect:/user/customer-change-password/" + customerId;
+            return "redirect:/user/customer-change-password";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errors", 
+            redirectAttributes.addFlashAttribute("errors",
                     java.util.Collections.singletonMap("global", "Lỗi hệ thống: " + e.getMessage()));
-            redirectAttributes.addFlashAttribute("customerId", customerId);
-            return "redirect:/user/customer-change-password/" + customerId;
+            return "redirect:/user/customer-change-password";
         }
     }
 }

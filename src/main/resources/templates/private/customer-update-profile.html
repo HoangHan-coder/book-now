@@ -79,9 +79,9 @@
 
     <!-- Breadcrumb -->
     <nav class="flex mb-8 text-sm text-gray-500 pl-2">
-        <a href="index.html" class="hover:text-blue-600 transition-colors">Trang chủ</a>
+        <a th:href="@{/home}" class="hover:text-blue-600 transition-colors">Trang chủ</a>
         <span class="mx-2">/</span>
-        <a th:href="@{/user/profile/{id}(id=${customer.customerId})}" class="hover:text-blue-600 transition-colors">Hồ sơ cá nhân</a>
+        <a th:href="@{/user/profile}" class="hover:text-blue-600 transition-colors">Hồ sơ cá nhân</a>
         <span class="mx-2">/</span>
         <span class="text-gray-800 font-medium">Cập nhật thông tin</span>
     </nav>
@@ -124,7 +124,7 @@
                 </div>
 
                 <!-- Form -->
-                <form id="profileForm" method="POST" th:action="@{/user/update-profile/{id}(id=${customerId})}" enctype="multipart/form-data" onsubmit="return validateForm();" class="space-y-6">
+                <form id="profileForm" method="POST" th:action="@{/user/update-profile}" enctype="multipart/form-data" onsubmit="return validateForm();" class="space-y-6">
 
                     <!-- Full Name (Editable) -->
                     <div>

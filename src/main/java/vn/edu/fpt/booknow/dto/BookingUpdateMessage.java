@@ -1,6 +1,6 @@
 package vn.edu.fpt.booknow.dto;
 
-import vn.edu.fpt.booknow.entities.BookingStatus;
+import vn.edu.fpt.booknow.model.entities.BookingStatus;
 
 import java.time.LocalDateTime;
 

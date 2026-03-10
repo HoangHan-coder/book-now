@@ -1,7 +1,8 @@
 package vn.edu.fpt.booknow.services.staff;
 
 import org.springframework.stereotype.Service;
-import vn.edu.fpt.booknow.entities.Booking;
+import org.springframework.transaction.annotation.Transactional;
+import vn.edu.fpt.booknow.model.entities.Booking;
 import vn.edu.fpt.booknow.repositories.BookingRepository;
 
 import java.time.Duration;
@@ -15,8 +16,9 @@ public class BookingDetailService {
         this.bookingRepository = bookingRepository;
     }
 
+    @Transactional(readOnly = true)
     public Booking getBookingDetail(String code) {
-        return bookingRepository.findByBookingCode(code).orElse(null);
+        return bookingRepository.findByBookingCodeWithDetails(code).orElse(null);
     }
 
     // ✅ Tính thời gian lưu trú đẹp

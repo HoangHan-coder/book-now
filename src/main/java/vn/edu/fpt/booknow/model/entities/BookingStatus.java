@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.entities;
+package vn.edu.fpt.booknow.model.entities;
 
 public enum BookingStatus {
     PENDING,

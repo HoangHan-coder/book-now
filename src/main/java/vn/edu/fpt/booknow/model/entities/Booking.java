@@ -3,16 +3,11 @@ package vn.edu.fpt.booknow.model.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.Nationalized;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -38,22 +33,23 @@ public class Booking {
     @Column(name = "check_out_time", nullable = false)
     private LocalDateTime checkOutTime;
 
-    @Nationalized
+
     @Column(name = "id_card_front_url", nullable = false, length = 500)
     private String idCardFrontUrl;
 
-    @Nationalized
+
     @Column(name = "id_card_back_url", nullable = false, length = 500)
     private String idCardBackUrl;
 
-    @Nationalized
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "booking_status", nullable = false, length = 20)
-    private String bookingStatus;
+    private BookingStatus bookingStatus;
 
     @Column(name = "total_amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal totalAmount;
 
-    @Nationalized
+
     @Column(name = "booking_code", length = 500)
     private String bookingCode;
 
@@ -72,5 +68,10 @@ public class Booking {
 
     @OneToMany(mappedBy = "booking")
     private List<Scheduler> schedulers = new ArrayList<>();
+
+    @Column(name = "note")
+    private String note;
+    @Column(name = "update_at")
+    private LocalDateTime updateAt;
 
 }

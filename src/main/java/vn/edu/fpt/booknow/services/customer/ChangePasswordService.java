@@ -2,7 +2,7 @@ package vn.edu.fpt.booknow.services.customer;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import vn.edu.fpt.booknow.entities.Customer;
+import vn.edu.fpt.booknow.model.entities.Customer;
 import vn.edu.fpt.booknow.repositories.CustomerRepository;
 
 import java.util.HashMap;
@@ -24,7 +24,7 @@ public class ChangePasswordService {
     }
 
     public Map<String, String> changePassword(
-            Long customerId,
+            String email,
             String currentPassword,
             String newPassword,
             String confirmPassword
@@ -47,7 +47,7 @@ public class ChangePasswordService {
         if (!errors.isEmpty()) return errors;
 
 
-        Optional<Customer> optional = customerRepository.findById(customerId);
+        Optional<Customer> optional = customerRepository.findByEmail(email);
         if (optional.isEmpty()) {
             errors.put("global", "Không tìm thấy tài khoản");
             return errors;

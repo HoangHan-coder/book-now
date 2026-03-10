@@ -80,7 +80,7 @@
       </p>
     </div>
 
-    <a th:href="@{/staff/bookings}"
+    <a th:href="@{/admin/bookings}"
        class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 text-sm transition">
       ← Quay lại
     </a>
@@ -114,7 +114,7 @@
 
           <div>
             <p class="text-sm text-gray-500">Số khách</p>
-            <p th:text="${booking.room.roomType.getMaxGuests()}"></p>
+            <p th:text="${booking.room.roomType.maxGuests}"></p>
           </div>
 
           <div>
@@ -153,13 +153,13 @@
 
             <div>
               <p class="text-sm text-gray-500">Loại phòng</p>
-              <p th:text="${booking.room.roomType.getName()}"></p>
+              <p th:text="${booking.room.roomType.name}"></p>
             </div>
 
             <div>
               <p class="text-sm text-gray-500">Giá</p>
               <p class="font-semibold"
-                 th:text="${#numbers.formatDecimal(booking.room.roomType.getBasePrice(),0,'COMMA',0,'POINT')} + 'đ'">
+                 th:text="${#numbers.formatDecimal(booking.room.basePrice,0,'COMMA',0,'POINT')} + 'đ'">
               </p>
             </div>
 
@@ -228,8 +228,8 @@
           Hủy đặt phòng
         </button>
 
-        <td class="py-4 px-6 text-right">
-          <a th:href="@{/staff/bookings/update/{bookingCode}(bookingCode=${booking.bookingCode})}"
+        <td class="flex items-center gap-2 bg-white border border-red-200 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg font-medium transition">
+          <a th:href="@{/admin/bookings/update/{bookingCode}(bookingCode=${booking.bookingCode})}"
              class="text-blue-600 hover:text-blue-900 font-medium text-sm">
             Cập nhật trạng thái
           </a>

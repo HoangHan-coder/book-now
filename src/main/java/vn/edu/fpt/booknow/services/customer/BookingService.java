@@ -1,9 +1,8 @@
 package vn.edu.fpt.booknow.services.customer;
 
 import org.springframework.stereotype.Service;
-import vn.edu.fpt.booknow.entities.Booking;
+import vn.edu.fpt.booknow.model.entities.Booking;
 import vn.edu.fpt.booknow.repositories.BookingRepository;
-import vn.edu.fpt.booknow.services.staff.BookingDetailService;
 
 @Service
 public class BookingService {

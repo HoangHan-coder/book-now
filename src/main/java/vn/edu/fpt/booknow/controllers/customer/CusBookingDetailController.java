@@ -3,7 +3,7 @@ package vn.edu.fpt.booknow.controllers.customer;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import vn.edu.fpt.booknow.entities.Booking;
+import vn.edu.fpt.booknow.model.entities.Booking;
 import vn.edu.fpt.booknow.repositories.BookingRepository;
 
 @Controller

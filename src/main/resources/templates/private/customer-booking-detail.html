@@ -59,7 +59,7 @@
         <a href="booking_history.html" class="hover:text-blue-600">Lịch sử đặt phòng</a>
         <span class="mx-2">/</span>
         <span class="text-gray-800 font-medium"
-              th:text="'Chi tiết #' + ${booking.getBookingCode()}"> </span>
+              th:text="'Chi tiết #' + ${booking.bookingCode}"> </span>
     </nav>
     <!-- ERROR MESSAGE -->
     <div th:if="${error}"
@@ -82,7 +82,7 @@
             <div>
                 <p class="text-sm text-gray-500 mb-1">Mã đặt phòng</p>
                 <h1 class="text-3xl font-mono font-bold text-gray-900 tracking-tight"
-                    th:text="'#' + ${booking.getBookingCode()}">
+                    th:text="'#' + ${booking.bookingCode}">
                 </h1>
             </div>
             <div class="flex items-center gap-3">
@@ -178,7 +178,7 @@
             </button>
 
             <!-- Check-out Button (Initially disabled style for logic flow, but enabled for interaction) -->
-            <form th:action="@{/user/check-out/{code}(code=${booking.getBookingCode()})}"
+            <form th:action="@{/user/check-out/{code}(code=${booking.bookingCode})}"
                   method="get"
                   class="flex-1 sm:flex-none">
                 <button type="submit"

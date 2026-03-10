@@ -23,16 +23,20 @@ public class StaffAccountService {
 
     public boolean verify(StaffAccount users, HttpServletResponse response) {
         System.out.println("Verify is running..");
-        Authentication authentication = authManagerProvider.authenticate(
-                new UsernamePasswordAuthenticationToken(users.getEmail(), users.getPasswordHash()));
-        if (authentication.isAuthenticated()) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            if (userDetails instanceof CustomerDetails) {
-                System.out.println("This is customer");
-                return false;
+        try {
+            Authentication authentication = authManagerProvider.authenticate(
+                    new UsernamePasswordAuthenticationToken(users.getEmail(), users.getPasswordHash()));
+            if (authentication.isAuthenticated()) {
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                if (userDetails instanceof CustomerDetails) {
+                    System.out.println("This is customer");
+                    return false;
+                }
+                jwtService.createCookie(users, response);
+                return true;
             }
-            jwtService.createCookie(users, response);
-            return true;
+        } catch (Exception e) {
+            System.out.println("Verify failed: " + e.getMessage());
         }
         return false;
     }

@@ -2,9 +2,10 @@ package vn.edu.fpt.booknow.services.staff;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.edu.fpt.booknow.dto.BookingUpdateMessage;
-import vn.edu.fpt.booknow.entities.Booking;
-import vn.edu.fpt.booknow.entities.BookingStatus;
+import vn.edu.fpt.booknow.model.entities.Booking;
+import vn.edu.fpt.booknow.model.entities.BookingStatus;
 import vn.edu.fpt.booknow.repositories.BookingRepository;
 
 @Service
@@ -19,6 +20,7 @@ public class BookingUpdateService {
         this.messagingTemplate = messagingTemplate;
     }
 
+    @Transactional
     public void updateStatus(String bookingCode, BookingStatus newStatus, String reason) {
 
         Booking booking = getBookingOrThrow(bookingCode);
@@ -57,7 +59,7 @@ public class BookingUpdateService {
     }
 
     public Booking getBookingOrThrow(String bookingCode) {
-        return bookingRepository.findByBookingCode(bookingCode)
+        return bookingRepository.findByBookingCodeWithDetails(bookingCode)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy booking với mã: " + bookingCode));
     }
 

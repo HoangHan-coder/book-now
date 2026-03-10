@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import vn.edu.fpt.booknow.entities.Customer;
+import vn.edu.fpt.booknow.model.entities.Customer;
 import vn.edu.fpt.booknow.repositories.CustomerRepository;
 
 import java.util.Map;
@@ -36,18 +36,18 @@ public class UpdateProfileService {
         this.customerRepository = customerRepository;
         this.cloudinary = cloudinary;
     }
-    public Customer checkCustomerExist(Long customerId) {
-        return customerRepository.findById(customerId)
+    public Customer checkCustomerExistByEmail(String email) {
+        return customerRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new RuntimeException("Customer not found with ID: " + customerId));
+                        new RuntimeException("Customer not found with email: " + email));
     }
     @Transactional
-    public void updateProfile(Long customerId,
+    public void updateProfile(String email,
                               String fullName,
                               String phoneNumber,
                               MultipartFile avatar) throws Exception {
 
-        Customer customer = checkCustomerExist(customerId);
+        Customer customer = checkCustomerExistByEmail(email);
 
         // ===== VALIDATE NAME =====
         if (fullName == null) {

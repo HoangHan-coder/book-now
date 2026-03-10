@@ -28,16 +28,20 @@ public class CustomerService {
 
     public boolean verify(Customer users, HttpServletResponse response) {
         System.out.println("Verify is running..");
-        Authentication authentication = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(users.getEmail(), users.getPasswordHash()));
-        if (authentication.isAuthenticated()) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            if (userDetails instanceof StaffUserDetails) {
-                System.out.println("This is Staff or admin");
-                return false;
+        try {
+            Authentication authentication = authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(users.getEmail(), users.getPasswordHash()));
+            if (authentication.isAuthenticated()) {
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                if (userDetails instanceof StaffUserDetails) {
+                    System.out.println("This is Staff or admin");
+                    return false;
+                }
+                jwtService.createCookie(users, response);
+                return true;
             }
-            jwtService.createCookie(users, response);
-            return true;
+        } catch (Exception e) {
+            System.out.println("Verify failed: " + e.getMessage());
         }
         return false;
     }

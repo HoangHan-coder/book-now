@@ -4,12 +4,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import vn.edu.fpt.booknow.entities.Booking;
-import vn.edu.fpt.booknow.entities.BookingStatus;
+import vn.edu.fpt.booknow.model.entities.Booking;
+import vn.edu.fpt.booknow.model.entities.BookingStatus;
 import vn.edu.fpt.booknow.services.staff.BookingUpdateService;
 
 @Controller
-@RequestMapping("/staff/bookings")
+@RequestMapping("/admin/bookings")
 public class StaBookingUpdateStatusController {
 
     private final BookingUpdateService bookingUpdateService;
@@ -58,6 +58,6 @@ public class StaBookingUpdateStatusController {
 
         }
 
-        return "redirect:/staff/bookings/update/" + bookingCode;
+        return "redirect:/admin/bookings/update/" + bookingCode;
     }
 }
