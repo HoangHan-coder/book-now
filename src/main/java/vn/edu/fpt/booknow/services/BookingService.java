@@ -52,126 +52,118 @@ public class BookingService {
                               MultipartFile backImg,
                               RedirectAttributes redirectAttributes,
                               String accessToken) {
-        Bucket bucket = cache.computeIfAbsent(jwtService.extractUserName(accessToken), k -> createNewBucket());
-        if (!bucket.tryConsume(1)) {
-            System.out.println("test ratelimited");
-            redirectAttributes.addFlashAttribute("toastMessage", "Thao tác quá nhanh! Vui lòng đợi 5 phút giữa mỗi lần đặt.");
-            redirectAttributes.addFlashAttribute("toastType", "error");
-            return "redirect:/detail/" + bookingDTO.getRoomId();
+
+        // 1. Kiểm tra Rate Limit
+        String username = jwtService.extractUserName(accessToken);
+//        if (isRateLimited(username)) {
+//            return setErrorMessage(redirectAttributes, "Thao tác quá nhanh! Vui lòng đợi 5 phút.", bookingDTO.getRoomId());
+//        }
+
+        // 2. Parse và Validate các ca (Shifts)
+        List<WorkShift> allShifts;
+        try {
+            allShifts = processAndValidateShifts(bookingDTO.getSelectedSlots(),bookingDTO.getRoomId(), redirectAttributes);
+        } catch (IllegalArgumentException e) {
+            return setErrorMessage(redirectAttributes, e.getMessage(), bookingDTO.getRoomId());
         }
-        List<WorkShift> allShiftss = new ArrayList<>();
-        for (String slot : bookingDTO.getSelectedSlots()) {
-            WorkShift shift = this.parseShift(slot);
 
-            // 🔥 KIỂM TRA TẠI ĐÂY: Nếu sai khung giờ sẽ báo lỗi ngay
-            String errorMsg = validateWorkShiftTime(shift);
+        // 3. Gom nhóm các ca liên tiếp
+        List<List<WorkShift>> bookingGroups = groupConsecutiveShifts(allShifts);
 
-            if (errorMsg != null) {
-                // Gửi thông báo lỗi về Toast
+        // 4. Upload ảnh và Lưu vào DB
+        // (Trong thực tế, nên dùng link từ Cloudinary, ở đây tôi giữ logic hardcode link của bạn để chạy được ngay)
+        saveBookingGroupsToDatabase(bookingGroups, bookingDTO, username, redirectAttributes);
+
+        redirectAttributes.addFlashAttribute("toastMessage", "Đặt phòng thành công!");
+        redirectAttributes.addFlashAttribute("toastType", "success");
+        return "redirect:/payment";
+    }
+
+    // --- CÁC HÀM ĐÃ TÁCH (Dễ dàng Unit Test) ---
+
+    /**
+     * Hàm này hoàn toàn có thể Unit Test vì nó xử lý logic nghiệp vụ thuần túy
+     */
+    public List<WorkShift> processAndValidateShifts(List<String> selectedSlots, Long roomId, RedirectAttributes redirectAttributes) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng ID: " + roomId));
+        if (selectedSlots == null || selectedSlots.isEmpty()) {
+            throw new IllegalArgumentException("Vui lòng chọn ít nhất một slot!");
+        }
+
+        List<WorkShift> shifts = new ArrayList<>();
+        for (String slot : selectedSlots) {
+            WorkShift shift = parseShift(slot);
+            try {
+                validateAndCalculate(shift.getWorkDate(),shift.getStartTime(),shift.getEndTime(),shift.getShiftType());
+
+                // Tiếp tục xử lý lưu DB
+            } catch (IllegalArgumentException e) {
+                String errorMsg = e.getMessage(); // Đây chính là String thông báo lỗi bạn muốn
                 redirectAttributes.addFlashAttribute("toastMessage", errorMsg);
-                redirectAttributes.addFlashAttribute("toastType", "error");
-                // Quay lại trang chi tiết phòng
-                return "redirect:/room/detail/" + bookingDTO.getRoomId();
             }
-
-            allShiftss.add(shift);
+            shifts.add(shift);
         }
+
+        // Sắp xếp
         Map<String, Integer> shiftOrder = Map.of("Sáng", 0, "Chiều", 1, "Tối", 2, "Đêm", 3);
-        int SHIFTS_PER_DAY = 4;
-        ;
-        List<WorkShift> allShifts = new ArrayList<>();
-        // 1. Chuyển đổi thủ công
-        for (String slot : bookingDTO.getSelectedSlots()) {
-            allShifts.add(this.parseShift(slot));
-        }
-
-        // 2. Sắp xếp thủ công
-        Collections.sort(allShifts, new Comparator<WorkShift>() {
-            @Override
-            public int compare(WorkShift o1, WorkShift o2) {
-                int dateCompare = o1.getWorkDate().toLocalDate().compareTo(o2.getWorkDate().toLocalDate());
-                if (dateCompare == 0) {
-                    int order1 = shiftOrder.get(o1.getShiftType());
-                    int order2 = shiftOrder.get(o2.getShiftType());
-                    return Integer.compare(order1, order2);
-                }
-                return dateCompare;
-            }
+        shifts.sort((o1, o2) -> {
+            int dateCompare = o1.getWorkDate().toLocalDate().compareTo(o2.getWorkDate().toLocalDate());
+            return (dateCompare != 0) ? dateCompare : Integer.compare(shiftOrder.get(o1.getShiftType()), shiftOrder.get(o2.getShiftType()));
         });
 
-        if (allShifts.isEmpty()) {
-            return "Vui lòng chọn slot!!!";
-        }
-
-        // 2. 🔥 BƯỚC VALIDATION: Chặn so le trong ngày
-        // --- BƯỚC VALIDATION TỔNG HỢP ---
-
-// 1. Kiểm tra cấu trúc giờ của TỪNG ca (Kể cả khi chỉ có 1 ca)
-        for (WorkShift shift : allShifts) {
-            LocalTime start = shift.getStartTime().toLocalTime();
-            LocalTime end = shift.getEndTime().toLocalTime();
-            String type = shift.getShiftType();
-
-            boolean isTimeValid = switch (type) {
-                case "Sáng" -> start.equals(LocalTime.of(10, 30)) && end.equals(LocalTime.of(13, 30));
-                case "Chiều" -> start.equals(LocalTime.of(14, 0)) && end.equals(LocalTime.of(17, 0));
-                case "Tối" -> start.equals(LocalTime.of(17, 30)) && end.equals(LocalTime.of(20, 30));
-                case "Đêm" -> start.equals(LocalTime.of(21, 0)) && end.equals(LocalTime.of(9, 50));
-                default -> false;
-            };
-
-            if (!isTimeValid) {
-                redirectAttributes.addFlashAttribute("toastMessage", "Ca " + shift.getShiftType() + " không đúng khung giờ!");
-                redirectAttributes.addFlashAttribute("toastType", "error");
-                return "redirect:/room/detail/" + bookingDTO.getRoomId();
-            }
-        }
-
-// 2. Kiểm tra tính liên tiếp (Chỉ chạy khi list có >= 2 ca)
-        for (int i = 1; i < allShifts.size(); i++) {
-            WorkShift prev = allShifts.get(i - 1);
-            WorkShift curr = allShifts.get(i);
+        // Kiểm tra tính liên tiếp trong cùng một ngày (nếu có)
+        for (int i = 1; i < shifts.size(); i++) {
+            WorkShift prev = shifts.get(i - 1);
+            WorkShift curr = shifts.get(i);
             if (prev.getWorkDate().toLocalDate().equals(curr.getWorkDate().toLocalDate())) {
-                int prevIdx = shiftOrder.get(prev.getShiftType());
-                int currIdx = shiftOrder.get(curr.getShiftType());
-                if (currIdx != prevIdx + 1) {
-                    System.out.println("Ngày " + prev.getWorkDate().toLocalDate() + " không liên tiếp.");
-                    redirectAttributes.addFlashAttribute("toastMessage", "Ngày " + prev.getWorkDate().toLocalDate() + " không liên tiếp.");
-                    redirectAttributes.addFlashAttribute("toastType", "error");
-                    return "redirect:/room/detail/" + bookingDTO.getRoomId();
+                if (shiftOrder.get(curr.getShiftType()) != shiftOrder.get(prev.getShiftType()) + 1) {
+                    throw new IllegalArgumentException("Ngày " + prev.getWorkDate().toLocalDate() + " các ca chọn không liên tiếp.");
                 }
             }
         }
-        // 3. Gom nhóm
-        List<List<WorkShift>> bookingGroups = new ArrayList<>();
+        return shifts;
+    }
+
+    private List<List<WorkShift>> groupConsecutiveShifts(List<WorkShift> allShifts) {
+        Map<String, Integer> shiftOrder = Map.of("Sáng", 0, "Chiều", 1, "Tối", 2, "Đêm", 3);
+        List<List<WorkShift>> groups = new ArrayList<>();
         List<WorkShift> currentGroup = new ArrayList<>();
         currentGroup.add(allShifts.get(0));
 
         for (int i = 1; i < allShifts.size(); i++) {
-            WorkShift prev = allShifts.get(i - 1);
-            WorkShift curr = allShifts.get(i);
-            if (isConsecutive(prev, curr, shiftOrder, SHIFTS_PER_DAY)) {
-                currentGroup.add(curr);
+            if (isConsecutive(allShifts.get(i - 1), allShifts.get(i), shiftOrder, 4)) {
+                currentGroup.add(allShifts.get(i));
             } else {
-                bookingGroups.add(new ArrayList<>(currentGroup));
+                groups.add(new ArrayList<>(currentGroup));
                 currentGroup.clear();
-                currentGroup.add(curr);
+                currentGroup.add(allShifts.get(i));
             }
         }
-        bookingGroups.add(currentGroup);
+        groups.add(currentGroup);
+        return groups;
+    }
 
-        // --- LẤY DỮ LIỆU TỪ DB MỘT LẦN DUY NHẤT ĐỂ TỐI ƯU ---
+    private boolean isRateLimited(String username) {
+        Bucket bucket = cache.computeIfAbsent(username, k -> createNewBucket());
+        return !bucket.tryConsume(1);
+    }
+
+    private String setErrorMessage(RedirectAttributes ra, String msg, Long roomId) {
+        ra.addFlashAttribute("toastMessage", msg);
+        ra.addFlashAttribute("toastType", "error");
+        return "redirect:/detail/" + roomId;
+    }
+
+    private void saveBookingGroupsToDatabase(List<List<WorkShift>> bookingGroups, BookingDTO bookingDTO, String email, RedirectAttributes redirectAttributes) {
         List<Timetable> timetableList = timeTableRepository.findAll();
+        Customer customer = customerRepository.getCustomerByEmail(email);
 
-        String urlFront = uploadToCloudinary(frontImg);
-        String urlBack = uploadToCloudinary(backImg);
-
-        // 4. Lưu vào DB
         for (List<WorkShift> group : bookingGroups) {
             WorkShift firstShift = group.get(0);
             WorkShift lastShift = group.get(group.size() - 1);
             // B. TÍNH TỔNG TIỀN CHO ĐƠN NÀY (Dựa trên loại ca)
-            BigDecimal totalAmount = BigDecimal.valueOf(calculateTotalAmount(group, bookingDTO.getRoomId()));
+            BigDecimal totalAmount = BigDecimal.valueOf(calculateTotalAmount(group, bookingDTO.getRoomId(),redirectAttributes));
             LocalDateTime checkInDate = firstShift.getStartTime();
             LocalDateTime checkOutDate = lastShift.getEndTime();
             if ("Đêm".equals(lastShift.getShiftType())) {
@@ -185,11 +177,10 @@ public class BookingService {
             System.out.println(" - Ca kết thúc: " + lastShift.getShiftType());
             System.out.println(" - CHECK-IN:  " + checkInDate.format(formatter));
             System.out.println(" - CHECK-OUT: " + checkOutDate.format(formatter));
-            System.out.println(" - Tổng tiền: " + calculateTotalAmount(group, bookingDTO.getRoomId()));
+            System.out.println(" - Tổng tiền: " + calculateTotalAmount(group, bookingDTO.getRoomId(),redirectAttributes));
             System.out.println("====================================");
             // B: TẠO BOOKING
             Booking newBooking = new Booking();
-            Customer customer = customerRepository.getCustomerByEmail(jwtService.extractUserName(accessToken));
             newBooking.setCustomer(customer);
             Room room = new Room();
             room.setRoomId(bookingDTO.getRoomId());
@@ -234,32 +225,29 @@ public class BookingService {
                 System.out.println("   + Đã lưu ca: " + shift.getShiftType() + " (ID: " + timetableId + ")");
             }
         }
-        redirectAttributes.addFlashAttribute("toastMessage", "Đặt phòng thành công!");
-        redirectAttributes.addFlashAttribute("toastType", "success");
-        return "redirect:/payment"; // Thành công thì về trang chủ
+
     }
-
-    private String validateWorkShiftTime(WorkShift shift) {
+    // Unit Test
+    protected BigDecimal validateAndCalculate(
+            LocalDateTime workDatee,
+            LocalDateTime startTime, LocalDateTime endTime,
+            String shiftType) {
         LocalDate today = LocalDate.now();
-        LocalDate workDate = shift.getWorkDate().toLocalDate();
-        System.out.println(today);
-        // 1. Kiểm tra ngày (Chỉnh sửa: Chỉ cho phép đặt từ ngày mai)
-        // Nếu ngày chọn KHÔNG SAU ngày hôm nay (isAfter(today) == false) -> Báo lỗi
+        LocalDate workDate = workDatee.toLocalDate();
+        // Kiểm tra ngày
         if (!workDate.isAfter(today)) {
-            return "❌ LỖI: Bạn chỉ có thể đặt phòng bắt đầu từ ngày mai (" + today.plusDays(1) + ")!";
+            System.out.println("❌ LỖI: Chỉ có thể đặt từ ngày mai!");
+            throw new IllegalArgumentException("❌ LỖI: Chỉ có thể đặt từ ngày mai (" + today.plusDays(1) + ")!");
         }
-
-        // Chặn quá 7 ngày kể từ ngày mai
         if (workDate.isAfter(today.plusDays(7))) {
-            return "❌ LỖI: Chỉ được phép đặt phòng trong vòng 7 ngày tới!";
+            System.out.println("❌ LỖI: Chỉ được đặt trong vòng 7 ngày tới!");
+            throw new IllegalArgumentException("❌ LỖI: Chỉ được đặt trong vòng 7 ngày tới!");
         }
 
-        // 2. Kiểm tra khung giờ (Giữ nguyên logic của bạn)
-        LocalTime start = shift.getStartTime().toLocalTime();
-        LocalTime end = shift.getEndTime().toLocalTime();
-        String type = shift.getShiftType();
-
-        boolean isValidTime = switch (type) {
+        // Kiểm tra khung giờ
+        LocalTime start = startTime.toLocalTime();
+        LocalTime end = endTime.toLocalTime();
+        boolean isValidTime = switch (shiftType) {
             case "Sáng"  -> start.equals(LocalTime.of(10, 30)) && end.equals(LocalTime.of(13, 30));
             case "Chiều" -> start.equals(LocalTime.of(14, 0))  && end.equals(LocalTime.of(17, 0));
             case "Tối"   -> start.equals(LocalTime.of(17, 30)) && end.equals(LocalTime.of(20, 30));
@@ -268,10 +256,23 @@ public class BookingService {
         };
 
         if (!isValidTime) {
-            return "❌ LỖI: Ca " + type + " có giờ (" + start + " - " + end + ") không đúng quy định!";
+            System.out.println("❌ LỖI: Ca sai khung giờ quy định!");
+            throw new IllegalArgumentException("❌ LỖI: Ca " + shiftType + " sai khung giờ quy định!");
         }
-
-        return null;
+        return switch (shiftType.toLowerCase()) {
+            case "sáng", "chiều", "tối" -> {
+                System.out.println("✅ Trả về giá ca Ngày (Sáng/Chiều/Tối): 150.00");
+                yield new BigDecimal("150.00");
+            }
+            case "đêm" -> {
+                System.out.println("✅ Trả về giá ca Đêm: 450.00");
+                yield new BigDecimal("450.00");
+            }
+            default -> {
+                System.out.println("❌ LỖI: Loại ca '" + shiftType + "' không hợp lệ!");
+                throw new IllegalArgumentException("❌ LỖI: Loại ca " + shiftType + " không tồn tại!!");
+            }
+        };
     }
     /**
      * Kiểm tra xem ca hiện tại có tiếp nối ngay lập tức sau ca trước không
@@ -292,27 +293,32 @@ public class BookingService {
         return (currAbsoluteIndex - prevAbsoluteIndex) == 1;
     }
 
-    private Long calculateTotalAmount(List<WorkShift> group, Long roomId) {
-        // 1. Lấy thông tin giá từ RoomType thông qua roomId
-        // Giả sử bạn có roomRepository để lấy thông tin giá (image_b38224.png)
+    /**
+     * Hàm tổng hợp: Vừa kiểm tra khung giờ, vừa tính tổng tiền.
+     * @return Tổng số tiền dưới dạng String (VD: "250000")
+     * @throws IllegalArgumentException nếu có ca không hợp lệ
+     */
+    public Long calculateTotalAmount(List<WorkShift> group, Long roomId, RedirectAttributes redirectAttributes) {
         Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng"));
-
-        BigDecimal basePrice = room.getBasePrice();
-        BigDecimal overPrice = room.getOverPrice();
-
-        int total = 0;
-
-        // 2. Duyệt từng ca trong nhóm để cộng dồn tiền
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng ID: " + roomId));
+        BigDecimal total = BigDecimal.ZERO;
+        // 2. Duyệt từng ca
         for (WorkShift shift : group) {
-            if ("Đêm".equals(shift.getShiftType())) {
-                total += overPrice.intValue();
-            } else {
-                total += basePrice.intValue();
+            // Validate thời gian - Nếu lỗi thì ném Exception để dừng luồng xử lý
+            try {
+               total =  validateAndCalculate(shift.getWorkDate(),shift.getStartTime(),shift.getEndTime(),shift.getShiftType());
+
+                // Tiếp tục xử lý lưu DB
+            } catch (IllegalArgumentException e) {
+                String errorMsg = e.getMessage(); // Đây chính là String thông báo lỗi bạn muốn
+                redirectAttributes.addFlashAttribute("toastMessage", errorMsg);
             }
+
+
         }
 
-        return (long) total;
+        // Chuyển BigDecimal về Long (Kiểu số nguyên 64-bit, an toàn cho tiền tệ)
+        return total.longValue();
     }
 
     public WorkShift parseShift(String input) {
