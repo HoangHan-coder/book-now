@@ -36,15 +36,19 @@ public class UpdateProfileService {
         this.customerRepository = customerRepository;
         this.cloudinary = cloudinary;
     }
-
+    public Customer checkCustomerExist(Long customerId) {
+        return customerRepository.findById(customerId)
+                .orElseThrow(() ->
+                        new RuntimeException("Customer not found with ID: " + customerId));
+    }
     @Transactional
     public void updateProfile(Long customerId,
                               String fullName,
                               String phoneNumber,
                               MultipartFile avatar) throws Exception {
 
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new RuntimeException("Customer not found with ID: " + customerId));
+        Customer customer = checkCustomerExist(customerId);
+
         // ===== VALIDATE NAME =====
         if (fullName == null) {
             throw new IllegalArgumentException("Full name is required");

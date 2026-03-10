@@ -14,18 +14,18 @@ import vn.edu.fpt.booknow.services.customer.UpdateProfileService;
 public class CusUpdateProController {    /// ///////// chua sua
 
     private final UpdateProfileService updateProfileService;
-    private final CustomerRepository customerRepository;
+
 
     public CusUpdateProController(UpdateProfileService updateProfileService,
                                   CustomerRepository customerRepository) {
         this.updateProfileService = updateProfileService;
-        this.customerRepository = customerRepository;
+
     }
 
     @GetMapping("/update-profile/{id}")
     public String showUpdateProfilePage(@PathVariable(name = "id") Long customerId, Model model) {
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new RuntimeException("Customer not found with ID: " + customerId));
+        Customer customer = updateProfileService.checkCustomerExist(customerId);
+
         
         model.addAttribute("customerId", customerId);
         model.addAttribute("customer", customer);

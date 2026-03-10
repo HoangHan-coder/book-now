@@ -1,6 +1,8 @@
 package vn.edu.fpt.booknow.services.staff;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import vn.edu.fpt.booknow.dto.BookingUpdateMessage;
 import vn.edu.fpt.booknow.entities.Booking;
 import vn.edu.fpt.booknow.entities.BookingStatus;
 import vn.edu.fpt.booknow.repositories.BookingRepository;
@@ -9,9 +11,12 @@ import vn.edu.fpt.booknow.repositories.BookingRepository;
 public class BookingUpdateService {
 
     private final BookingRepository bookingRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public BookingUpdateService(BookingRepository bookingRepository) {
+    public BookingUpdateService(BookingRepository bookingRepository,
+                               SimpMessagingTemplate messagingTemplate) {
         this.bookingRepository = bookingRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     public void updateStatus(String bookingCode, BookingStatus newStatus, String reason) {
@@ -29,7 +34,26 @@ public class BookingUpdateService {
             // reset CCCD để khách upload lại
         }
 
-        bookingRepository.save(booking);
+        Booking savedBooking = bookingRepository.save(booking);
+
+        // Send real-time update via WebSocket
+        notifyBookingUpdate(savedBooking);
+    }
+
+    private void notifyBookingUpdate(Booking booking) {
+        BookingUpdateMessage message = new BookingUpdateMessage(
+                booking.getBookingCode(),
+                booking.getBookingStatus(),
+                booking.getCustomer().getFullName(),
+                booking.getRoom().getRoomNumber(),
+                booking.getCheckInTime(),
+                booking.getCheckOutTime(),
+                booking.getUpdateAt(),
+                "STATUS_CHANGED"
+        );
+
+        // Send to all staff members listening on /topic/booking-updates
+        messagingTemplate.convertAndSend("/topic/booking-updates", message);
     }
 
     public Booking getBookingOrThrow(String bookingCode) {
