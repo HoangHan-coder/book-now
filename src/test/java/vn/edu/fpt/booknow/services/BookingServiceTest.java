@@ -185,10 +185,8 @@ class BookingServiceTest {
 
     private void setupRoomMock(String base, String over) {
         Room mockRoom = new Room();
-        RoomType type = new RoomType();
-        type.setBasePrice(new BigDecimal(base));
-        type.setOverPrice(new BigDecimal(over));
-        mockRoom.setRoomType(type);
+        mockRoom.setBasePrice(new BigDecimal(base));
+        mockRoom.setOverPrice(new BigDecimal(over));
         when(roomRepository.findById(1L)).thenReturn(Optional.of(mockRoom));
     }
 

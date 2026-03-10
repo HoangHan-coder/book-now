@@ -44,7 +44,7 @@ public class BookingService {
     }
     private Bucket createNewBucket() {
         return Bucket.builder()
-                .addLimit(Bandwidth.classic(1, Refill.intervally(1, Duration.ofMinutes(5))))
+                .addLimit(Bandwidth.classic(1, Refill.intervally(1, Duration.ofMinutes(1))))
                 .build();
     }
     public String saveBooking(BookingDTO bookingDTO,
@@ -298,8 +298,8 @@ public class BookingService {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng"));
 
-        BigDecimal basePrice = room.getRoomType().getBasePrice();
-        BigDecimal overPrice = room.getRoomType().getOverPrice();
+        BigDecimal basePrice = room.getBasePrice();
+        BigDecimal overPrice = room.getOverPrice();
 
         int total = 0;
 

@@ -24,19 +24,21 @@ public class RoomService {
     private TimeTableRepository timeTableRepository;
     private BookingRepository bookingRepository;
     private ScheduleRepository scheduleRepository;
-
+    private ImageRepository imageRepository;
     public RoomService(RoomRepository roomRepository,
                        AmenityRepository amenityRepo,
                        BookingRepository bookingRepository,
                        RoomTypeRepository roomTypeRepository,
                        TimeTableRepository timeTableRepository,
-                       ScheduleRepository scheduleRepository) {
+                       ScheduleRepository scheduleRepository,
+                       ImageRepository imageRepository) {
         this.amenityRepo = amenityRepo;
         this.roomRepository = roomRepository;
         this.roomTypeRepository = roomTypeRepository;
         this.timeTableRepository = timeTableRepository;
         this.bookingRepository = bookingRepository;
         this.scheduleRepository = scheduleRepository;
+        this.imageRepository = imageRepository;
     }
 
     public Page<RoomDTO> getAllRoomService() {
@@ -114,17 +116,14 @@ public class RoomService {
         List<TimeTableDTO> list = timeTableRepository.getBookingDetailsByRoomId(id);
         return list;
     }
-
-    public List<TimeTableDTO> getSlotBooking() {
-        List<TimeTableDTO> list = timeTableRepository.getBookingDetails();
+    public Room findRoom(Long id) {
+        Room rooms = roomRepository.getByRoomId(id);
+        return rooms;
+    }
+    public List<Image> getImgRoom(Room room) {
+        List<Image> list = imageRepository.getByRoom(room);
         return list;
     }
-
-    public List<RoomDTO> getAllRoomService(Sort sort) {
-        List<RoomDTO> list = roomRepository.findAllRoomsSorted(sort);
-        return list;
-    }
-
     public List<RoomType> getAllRoomType() {
         List<RoomType> roomTypes = roomTypeRepository.findAll();
         return roomTypes;

@@ -27,12 +27,6 @@ public class RoomType {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Nationalized
-    @Column(name = "description", length = 500)
-    private String description;
-
-    @Column(name = "base_price", nullable = false, precision = 12, scale = 2)
-    private BigDecimal basePrice;
 
     @Nationalized
     @Column(name = "image_url", length = 500)
@@ -45,8 +39,7 @@ public class RoomType {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 
-    @Column(name = "over_price", nullable = false, precision = 12, scale = 2)
-    private BigDecimal overPrice;
+
 
     @OneToMany(mappedBy = "roomType")
     private List<Room> rooms = new ArrayList<>();

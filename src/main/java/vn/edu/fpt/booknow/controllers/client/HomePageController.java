@@ -48,7 +48,7 @@ public class HomePageController {
                     s.getTimetable().getTimetableId();
             bookedKeys.add(key);
         }
-
+        System.out.println(list.getTotalPages());
 
         for (int i = 0; i < 7; i++) {
             weekDates.add(today.plusDays(i+1));

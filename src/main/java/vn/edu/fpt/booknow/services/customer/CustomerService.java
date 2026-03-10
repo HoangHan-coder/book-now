@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import vn.edu.fpt.booknow.model.entities.Customer;
 import vn.edu.fpt.booknow.model.map.CustomerDetails;
 import vn.edu.fpt.booknow.model.map.StaffUserDetails;
+import vn.edu.fpt.booknow.repositories.CustomerRepository;
 import vn.edu.fpt.booknow.services.JWTService;
 
 @Service
@@ -21,7 +22,8 @@ public class CustomerService {
 
     @Autowired
     private JWTService jwtService;
-
+     @Autowired
+    private CustomerRepository customerRepository;
     public boolean verify(Customer users, HttpServletResponse response) {
         System.out.println("Verify is running..");
         Authentication authentication = authManager.authenticate(
@@ -36,5 +38,9 @@ public class CustomerService {
             return true;
         }
         return false;
+    }
+    public Customer findCustomer(String email) {
+        Customer customer = customerRepository.getCustomerByEmail(email);
+        return customer;
     }
 }

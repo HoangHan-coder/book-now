@@ -49,7 +49,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/login","/auth/login","/auth/logout", "/public/**", "/home","/search","/detail/**","/pay/**",
                                 "/booking/process",
-                                "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password").permitAll()
+                                "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password",
+                                "/404").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -74,7 +75,8 @@ public class SecurityConfig {
                                 "/public/**", "/home","/pay/**", "/home","/search","/detail/**",
                                 "/booking/**",
                                 "/momo-*",
-                                "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password").permitAll()
+                                "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password",
+                                "/404").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

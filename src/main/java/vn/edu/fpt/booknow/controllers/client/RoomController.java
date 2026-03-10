@@ -1,50 +1,47 @@
 package vn.edu.fpt.booknow.controllers.client;
 
 import org.springframework.data.domain.Page;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import vn.edu.fpt.booknow.model.dto.BookingDTO;
-import vn.edu.fpt.booknow.model.dto.RoomDTO;
-import vn.edu.fpt.booknow.model.dto.SearchDTO;
-import vn.edu.fpt.booknow.model.dto.TimeTableDTO;
+import vn.edu.fpt.booknow.model.dto.*;
 import vn.edu.fpt.booknow.model.entities.*;
 import vn.edu.fpt.booknow.repositories.CustomerRepository;
+import vn.edu.fpt.booknow.repositories.FeedBackRepository;
 import vn.edu.fpt.booknow.repositories.ImageRepository;
 import vn.edu.fpt.booknow.repositories.RoomRepository;
 import vn.edu.fpt.booknow.services.BookingService;
-import vn.edu.fpt.booknow.services.CustomUserDetailsService;
+import vn.edu.fpt.booknow.services.FeedBackService;
 import vn.edu.fpt.booknow.services.JWTService;
 import vn.edu.fpt.booknow.services.RoomService;
+import vn.edu.fpt.booknow.services.customer.CustomerService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 public class RoomController {
 
-    private final RoomRepository roomRepository;
+    private final CustomerService customerService;
     private RoomService roomService;
     private BookingService bookingService;
-    private CustomerRepository customerRepository;
-    private ImageRepository imageRepository;
     private JWTService jwtService;
-    private Customer customer;
+    private FeedBackService feedbackService;
 
-    public RoomController(RoomService roomService, BookingService bookingService, CustomerRepository customerRepository, ImageRepository imageRepository, RoomRepository roomRepository, JWTService jwtService) {
+    public RoomController(RoomService roomService, BookingService bookingService, JWTService jwtService, FeedBackService feedBackService, CustomerService customerService) {
         this.roomService = roomService;
         this.bookingService = bookingService;
-        this.customerRepository = customerRepository;
-        this.imageRepository = imageRepository;
-        this.roomRepository = roomRepository;
         this.jwtService = jwtService;
+        this.feedbackService = feedBackService;
+        this.customerService = customerService;
+    }
+
+    @GetMapping("/404")
+    public String error404() {
+        return "404";
     }
 
     @GetMapping("/detail/{roomIdString}")
@@ -58,22 +55,26 @@ public class RoomController {
             String email = "";
             Customer customer = new Customer();
             List<RoomDTO> roomDetail = roomService.detailRoomService(roomId);
+            if (roomDetail.isEmpty()) {
+                return "redirect:/404";
+            }
             List<Timetable> timetables = roomService.getAllTimeTable();
             List<TimeTableDTO> getSlot = roomService.getSlot(roomId);
             BookingDTO booking = new BookingDTO();
             List<LocalDateTime> weekDates = new ArrayList<>();
             LocalDateTime today = LocalDateTime.now();
-            Room room = roomRepository.getByRoomId(roomId);
-            List<Image> image = imageRepository.getByRoom(room);
+            Room room = roomService.findRoom(roomId);
+            List<Image> image = roomService.getImgRoom(room);
+            Map<String, Object> feedbackData = feedbackService.getRoomFeedbackData(roomId);
             if (accessToken != null && !accessToken.isEmpty()) {
                 email = jwtService.extractUserName(accessToken);
                 System.out.println(email);
-                customer = customerRepository.getCustomerByEmail(email);
+                customer = customerService.findCustomer(email);
                 booking.setCustomer(customer);
             }
             booking.setCustomer(customer);
             for (int i = 0; i < 7; i++) {
-                weekDates.add(today.plusDays(i+1));
+                weekDates.add(today.plusDays(i + 1));
             }
             Set<String> bookedKeys = new HashSet<>();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMM");
@@ -90,12 +91,15 @@ public class RoomController {
             model.addAttribute("roomDetail", roomDetail);
             model.addAttribute("informBooking", booking);
             model.addAttribute("image", image);
+            model.addAttribute("feedbackStats", feedbackData.get("stats"));
+            model.addAttribute("feedbackList", feedbackData.get("list"));
             return "public/DetailRoom";
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return "redirect:/homepage";
         }
     }
+
     @PostMapping("/booking/process")
     public String handleBookingRequest(
             @RequestParam("roomId") Long roomId,
@@ -110,6 +114,7 @@ public class RoomController {
         // Sau đó truyền dữ liệu sang trang chi tiết thanh toán
         return "redirect:/detail/" + roomId + "?preDate=" + date + "&preSlotId=" + timetableId;
     }
+
     @PostMapping("/search")
     public String searchPost(@ModelAttribute("search") SearchDTO searchDTO,
                              Model model) {
@@ -164,7 +169,7 @@ public class RoomController {
             model.addAttribute("search", searchDTO);
             model.addAttribute("pageNumbers", pageNumbers);
             model.addAttribute("amenities", roomService.getAllAmenity());
-
+            System.out.println(rooms.getTotalPages() + " Get");
             return "public/SearchRoom";
         } catch (Exception e) {
             return "redirect:/homepage";
@@ -182,7 +187,7 @@ public class RoomController {
             if (accessToken == null || accessToken.isEmpty()) {
                 return "redirect:/auth/login";
             }
-            String rediect =  bookingService.saveBooking(bookingDTO, frontImg, backImg, redirectAttributes, accessToken);
+            String rediect = bookingService.saveBooking(bookingDTO, frontImg, backImg, redirectAttributes, accessToken);
             return rediect;
 
         } catch (Exception e) {
