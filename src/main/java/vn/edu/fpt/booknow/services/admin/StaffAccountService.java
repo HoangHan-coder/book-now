@@ -22,7 +22,7 @@ public class StaffAccountService {
     private JWTService jwtService;
 
     public boolean verify(StaffAccount users, HttpServletResponse response) {
-        System.out.println("Verify is running..");
+        System.out.println("Verify staff or admin is running..");
         Authentication authentication = authManagerProvider.authenticate(
                 new UsernamePasswordAuthenticationToken(users.getEmail(), users.getPasswordHash()));
         if (authentication.isAuthenticated()) {

@@ -110,6 +110,7 @@ public class AuthController {
                                       @ModelAttribute Customer customer,
                                       HttpServletResponse response) {
         boolean loginStatus = customerService.verify(customer, response);
+        System.out.println("login status: " + loginStatus);
         if (!loginStatus) {
             return  "redirect:/auth/login?error";
         }

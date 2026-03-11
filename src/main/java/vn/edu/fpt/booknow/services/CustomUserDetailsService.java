@@ -29,15 +29,17 @@ public class CustomUserDetailsService implements UserDetailsService {
         // check staff account
         StaffAccount staffAccount = staffAccountRepository.findStaffAccountByEmail(username).orElse(null);
         if (staffAccount != null) {
+            System.out.println("Load staff or admin with " + username);
             return new StaffUserDetails(staffAccount);
         }
         
         // check customer
         Customer customer = customerRepository.findCustomerByEmail(username).orElse(null);
         if (customer != null) {
+            System.out.println("load customer with " + username);
             return new CustomerDetails(customer);
         }
-        
+        System.out.println("Not found user with " + username);
         throw new UsernameNotFoundException("Not found user with " + username);
     }
 }

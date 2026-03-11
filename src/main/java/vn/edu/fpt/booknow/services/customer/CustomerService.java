@@ -27,17 +27,23 @@ public class CustomerService {
     private JWTService jwtService;
 
     public boolean verify(Customer users, HttpServletResponse response) {
-        System.out.println("Verify is running..");
-        Authentication authentication = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(users.getEmail(), users.getPasswordHash()));
+        System.out.println("Verify customer is running..");
+        try {
+            Authentication authentication = authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(users.getEmail(), users.getPasswordHash()));
+
         if (authentication.isAuthenticated()) {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            System.out.println("customer is authenticated");
             if (userDetails instanceof StaffUserDetails) {
                 System.out.println("This is Staff or admin");
                 return false;
             }
             jwtService.createCookie(users, response);
             return true;
+        }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
         return false;
     }
