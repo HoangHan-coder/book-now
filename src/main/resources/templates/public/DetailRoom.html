@@ -173,7 +173,7 @@
                                     <th:block th:with="currentKey=${#temporals.format(date, 'ddMM')} + '-' + ${tItem.timetableId}">
                                         <div class="w-full py-1"
                                              th:with="isNightSlot=${tItem.slotName.contains('Đêm') or tItem.timetableId > 4},
-                              currentPrice=${isNightSlot ? 450000 : 150000}">
+                              currentPrice=${isNightSlot ? room.overPrice : room.basePrice}">
                                             <button th:if="${!bookedKeys.contains(currentKey)}"
                                                     type="button"
                                                     th:id="'btn-' + ${currentKey}"
@@ -480,6 +480,7 @@
             reader.readAsDataURL(input.files[0]);
         }
     }
+
     window.onload = function() {
         /* Lấy dữ liệu từ FlashAttributes của Spring Boot */
         const message = /*[[${toastMessage}]]*/ null;
@@ -533,6 +534,14 @@
 
         return true;
     }
+    const uploadField = document.getElementById("cccd_front");
+
+    uploadField.onchange = function() {
+        if(this.files[0].size > 2097152){ // 2MB = 1024 * 1024 * 2
+            alert("File quá lớn! Vui lòng chọn file dưới 2MB.");
+            this.value = "";
+        };
+    };
     document.addEventListener('DOMContentLoaded', () => {
         // 1. Lấy tham số từ URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -560,9 +569,6 @@
                 }
             }
         }
-
-        // Giữ nguyên logic renderTable hiện tại của bạn bên dưới...
-        renderTable();
     });
     document.addEventListener('DOMContentLoaded', function() {
         // 1. Khởi tạo Swiper (Hiệu ứng lướt)
@@ -584,13 +590,6 @@
                     prevEl: ".swiper-button-prev",
                 },
             });
-        }
-
-        // 2. Kiểm tra và chạy hàm renderTable của bạn
-        if (typeof renderTable === 'function') {
-            renderTable();
-        } else {
-            console.warn("Hàm renderTable chưa được định nghĩa. Hãy kiểm tra lại file script chứa logic bảng.");
         }
     });
     var swiper = new Swiper(".mySwiper", {

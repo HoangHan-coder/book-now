@@ -5,7 +5,9 @@ import com.cloudinary.utils.ObjectUtils;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.dto.BookingDTO;
@@ -33,7 +35,12 @@ public class BookingService {
     private CustomerRepository customerRepository;
     private JWTService jwtService;
     private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
-    public BookingService(BookingRepository bookingRepository, TimeTableRepository timeTableRepository, RoomRepository roomRepository, ScheduleRepository scheduleRepository, CustomerRepository customerRepository, Cloudinary cloudinary, JWTService jwtService) {
+    public BookingService(BookingRepository bookingRepository,
+                          TimeTableRepository timeTableRepository,
+                          RoomRepository roomRepository,
+                          ScheduleRepository scheduleRepository,
+                          CustomerRepository customerRepository, Cloudinary cloudinary,
+                          JWTService jwtService) {
         this.bookingRepository = bookingRepository;
         this.timeTableRepository = timeTableRepository;
         this.roomRepository = roomRepository;
@@ -42,27 +49,28 @@ public class BookingService {
         this.customerRepository = customerRepository;
         this.jwtService = jwtService;
     }
+
     private Bucket createNewBucket() {
         return Bucket.builder()
                 .addLimit(Bandwidth.classic(1, Refill.intervally(1, Duration.ofMinutes(1))))
                 .build();
     }
+
     public String saveBooking(BookingDTO bookingDTO,
                               MultipartFile frontImg,
                               MultipartFile backImg,
                               RedirectAttributes redirectAttributes,
-                              String accessToken) {
+                              String accessToken, Model model) {
 
         // 1. Kiểm tra Rate Limit
         String username = jwtService.extractUserName(accessToken);
 //        if (isRateLimited(username)) {
 //            return setErrorMessage(redirectAttributes, "Thao tác quá nhanh! Vui lòng đợi 5 phút.", bookingDTO.getRoomId());
 //        }
-
         // 2. Parse và Validate các ca (Shifts)
         List<WorkShift> allShifts;
         try {
-            allShifts = processAndValidateShifts(bookingDTO.getSelectedSlots(),bookingDTO.getRoomId(), redirectAttributes);
+            allShifts = processAndValidateShifts(bookingDTO.getSelectedSlots(), bookingDTO.getRoomId(), redirectAttributes);
         } catch (IllegalArgumentException e) {
             return setErrorMessage(redirectAttributes, e.getMessage(), bookingDTO.getRoomId());
         }
@@ -72,10 +80,11 @@ public class BookingService {
 
         // 4. Upload ảnh và Lưu vào DB
         // (Trong thực tế, nên dùng link từ Cloudinary, ở đây tôi giữ logic hardcode link của bạn để chạy được ngay)
-        saveBookingGroupsToDatabase(bookingGroups, bookingDTO, username, redirectAttributes);
+        saveBookingGroupsToDatabase(bookingGroups, bookingDTO, username, redirectAttributes, frontImg, backImg);
 
         redirectAttributes.addFlashAttribute("toastMessage", "Đặt phòng thành công!");
         redirectAttributes.addFlashAttribute("toastType", "success");
+        model.addAttribute("bookingDTO", bookingDTO);
         return "redirect:/payment";
     }
 
@@ -85,8 +94,6 @@ public class BookingService {
      * Hàm này hoàn toàn có thể Unit Test vì nó xử lý logic nghiệp vụ thuần túy
      */
     public List<WorkShift> processAndValidateShifts(List<String> selectedSlots, Long roomId, RedirectAttributes redirectAttributes) {
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng ID: " + roomId));
         if (selectedSlots == null || selectedSlots.isEmpty()) {
             throw new IllegalArgumentException("Vui lòng chọn ít nhất một slot!");
         }
@@ -95,7 +102,7 @@ public class BookingService {
         for (String slot : selectedSlots) {
             WorkShift shift = parseShift(slot);
             try {
-                validateAndCalculate(shift.getWorkDate(),shift.getStartTime(),shift.getEndTime(),shift.getShiftType());
+                validateAndCalculate(shift.getWorkDate(), shift.getStartTime(), shift.getEndTime(), shift.getShiftType(), roomId);
 
                 // Tiếp tục xử lý lưu DB
             } catch (IllegalArgumentException e) {
@@ -155,7 +162,11 @@ public class BookingService {
         return "redirect:/detail/" + roomId;
     }
 
-    private void saveBookingGroupsToDatabase(List<List<WorkShift>> bookingGroups, BookingDTO bookingDTO, String email, RedirectAttributes redirectAttributes) {
+    private void saveBookingGroupsToDatabase(List<List<WorkShift>> bookingGroups,
+                                             BookingDTO bookingDTO,
+                                             String email,
+                                             RedirectAttributes redirectAttributes, MultipartFile frontImg,
+                                             MultipartFile backImg){
         List<Timetable> timetableList = timeTableRepository.findAll();
         Customer customer = customerRepository.getCustomerByEmail(email);
 
@@ -163,12 +174,14 @@ public class BookingService {
             WorkShift firstShift = group.get(0);
             WorkShift lastShift = group.get(group.size() - 1);
             // B. TÍNH TỔNG TIỀN CHO ĐƠN NÀY (Dựa trên loại ca)
-            BigDecimal totalAmount = BigDecimal.valueOf(calculateTotalAmount(group, bookingDTO.getRoomId(),redirectAttributes));
+            BigDecimal totalAmount = calculateTotalAmount(group, bookingDTO.getRoomId(), redirectAttributes);
             LocalDateTime checkInDate = firstShift.getStartTime();
             LocalDateTime checkOutDate = lastShift.getEndTime();
             if ("Đêm".equals(lastShift.getShiftType())) {
                 checkOutDate = checkOutDate.plusDays(1);
             }
+            String front = uploadToCloudinary(frontImg);
+            String back = uploadToCloudinary(backImg);
 // --- DÒNG SOUT KIỂM TRA ---
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
             System.out.println("====================================");
@@ -177,7 +190,7 @@ public class BookingService {
             System.out.println(" - Ca kết thúc: " + lastShift.getShiftType());
             System.out.println(" - CHECK-IN:  " + checkInDate.format(formatter));
             System.out.println(" - CHECK-OUT: " + checkOutDate.format(formatter));
-            System.out.println(" - Tổng tiền: " + calculateTotalAmount(group, bookingDTO.getRoomId(),redirectAttributes));
+            System.out.println(" - Tổng tiền: " + calculateTotalAmount(group, bookingDTO.getRoomId(), redirectAttributes));
             System.out.println("====================================");
             // B: TẠO BOOKING
             Booking newBooking = new Booking();
@@ -188,8 +201,10 @@ public class BookingService {
             newBooking.setCheckInTime(checkInDate);
             newBooking.setCheckOutTime(checkOutDate);
             newBooking.setTotalAmount(totalAmount);
-            newBooking.setIdCardFrontUrl("https://res.cloudinary.com/dzlfgmtbc/image/upload/v1771992352/zhygftc1kh85gswqjuz8.png");
-            newBooking.setIdCardBackUrl("https://res.cloudinary.com/dzlfgmtbc/image/upload/v1771992129/zrvphumlgu2tscz8hcbk.png");
+//            newBooking.setIdCardFrontUrl("https://res.cloudinary.com/dzlfgmtbc/image/upload/v1771992352/zhygftc1kh85gswqjuz8.png");
+//            newBooking.setIdCardBackUrl("https://res.cloudinary.com/dzlfgmtbc/image/upload/v1771992129/zrvphumlgu2tscz8hcbk.png");
+            newBooking.setIdCardFrontUrl(front);
+            newBooking.setIdCardBackUrl(back);
             newBooking.setBookingStatus("PENDING");
             newBooking.setBookingCode("BK-" + System.currentTimeMillis());
             newBooking.setCreatedAt(LocalDateTime.now());
@@ -231,9 +246,16 @@ public class BookingService {
     protected BigDecimal validateAndCalculate(
             LocalDateTime workDatee,
             LocalDateTime startTime, LocalDateTime endTime,
-            String shiftType) {
+            String shiftType, Long roomId) {
+        Room room = roomRepository.getByRoomId(roomId);
+        if (room == null) {
+            System.out.println("❌ Không tìm thấy phòng ID: " + roomId);
+            throw new IllegalArgumentException("Không tìm thấy phòng ID: " + roomId);
+        }
         LocalDate today = LocalDate.now();
         LocalDate workDate = workDatee.toLocalDate();
+        BigDecimal basePrice = room.getBasePrice();
+        BigDecimal overPrice = room.getOverPrice();
         // Kiểm tra ngày
         if (!workDate.isAfter(today)) {
             System.out.println("❌ LỖI: Chỉ có thể đặt từ ngày mai!");
@@ -248,10 +270,10 @@ public class BookingService {
         LocalTime start = startTime.toLocalTime();
         LocalTime end = endTime.toLocalTime();
         boolean isValidTime = switch (shiftType) {
-            case "Sáng"  -> start.equals(LocalTime.of(10, 30)) && end.equals(LocalTime.of(13, 30));
-            case "Chiều" -> start.equals(LocalTime.of(14, 0))  && end.equals(LocalTime.of(17, 0));
-            case "Tối"   -> start.equals(LocalTime.of(17, 30)) && end.equals(LocalTime.of(20, 30));
-            case "Đêm"   -> start.equals(LocalTime.of(21, 0))  && end.equals(LocalTime.of(9, 50));
+            case "Sáng" -> start.equals(LocalTime.of(10, 30)) && end.equals(LocalTime.of(13, 30));
+            case "Chiều" -> start.equals(LocalTime.of(14, 0)) && end.equals(LocalTime.of(17, 0));
+            case "Tối" -> start.equals(LocalTime.of(17, 30)) && end.equals(LocalTime.of(20, 30));
+            case "Đêm" -> start.equals(LocalTime.of(21, 0)) && end.equals(LocalTime.of(9, 50));
             default -> false;
         };
 
@@ -259,21 +281,19 @@ public class BookingService {
             System.out.println("❌ LỖI: Ca sai khung giờ quy định!");
             throw new IllegalArgumentException("❌ LỖI: Ca " + shiftType + " sai khung giờ quy định!");
         }
-        return switch (shiftType.toLowerCase()) {
-            case "sáng", "chiều", "tối" -> {
+        switch (shiftType.toLowerCase()) {
+            case "sáng", "chiều", "tối":
                 System.out.println("✅ Trả về giá ca Ngày (Sáng/Chiều/Tối): 150.00");
-                yield new BigDecimal("150.00");
-            }
-            case "đêm" -> {
+                return basePrice;
+            case "đêm" :
                 System.out.println("✅ Trả về giá ca Đêm: 450.00");
-                yield new BigDecimal("450.00");
-            }
-            default -> {
+                return overPrice;
+            default:
                 System.out.println("❌ LỖI: Loại ca '" + shiftType + "' không hợp lệ!");
                 throw new IllegalArgumentException("❌ LỖI: Loại ca " + shiftType + " không tồn tại!!");
-            }
-        };
+        }
     }
+
     /**
      * Kiểm tra xem ca hiện tại có tiếp nối ngay lập tức sau ca trước không
      */
@@ -295,10 +315,11 @@ public class BookingService {
 
     /**
      * Hàm tổng hợp: Vừa kiểm tra khung giờ, vừa tính tổng tiền.
+     *
      * @return Tổng số tiền dưới dạng String (VD: "250000")
      * @throws IllegalArgumentException nếu có ca không hợp lệ
      */
-    public Long calculateTotalAmount(List<WorkShift> group, Long roomId, RedirectAttributes redirectAttributes) {
+    public BigDecimal calculateTotalAmount(List<WorkShift> group, Long roomId, RedirectAttributes redirectAttributes) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng ID: " + roomId));
         BigDecimal total = BigDecimal.ZERO;
@@ -306,8 +327,14 @@ public class BookingService {
         for (WorkShift shift : group) {
             // Validate thời gian - Nếu lỗi thì ném Exception để dừng luồng xử lý
             try {
-               total =  validateAndCalculate(shift.getWorkDate(),shift.getStartTime(),shift.getEndTime(),shift.getShiftType());
-
+                BigDecimal shiftPrice = validateAndCalculate(
+                        shift.getWorkDate(),
+                        shift.getStartTime(),
+                        shift.getEndTime(),
+                        shift.getShiftType(), roomId
+                );
+                total = total.add(shiftPrice);
+                System.out.println(total + " ");
                 // Tiếp tục xử lý lưu DB
             } catch (IllegalArgumentException e) {
                 String errorMsg = e.getMessage(); // Đây chính là String thông báo lỗi bạn muốn
@@ -318,7 +345,7 @@ public class BookingService {
         }
 
         // Chuyển BigDecimal về Long (Kiểu số nguyên 64-bit, an toàn cho tiền tệ)
-        return total.longValue();
+        return total;
     }
 
     public WorkShift parseShift(String input) {

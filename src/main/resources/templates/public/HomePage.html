@@ -112,7 +112,7 @@
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 pb-24">
 
-<a th:href="@{/homepage}">
+<a th:href="@{/home}">
     <!-- LOGO (Fixed Position) -->
     <div class="logo-fixed flex items-center gap-3 select-none cursor-pointer" >
         <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
@@ -442,10 +442,9 @@
         </button>
     </div>
 </div>
-<form id="bookingSubmitForm" th:action="@{/booking/process}" method="post" style="display: none;">
-    <input type="hidden" name="roomId" id="formRoomId">
-    <input type="hidden" name="date" id="formDate">
-    <input type="hidden" name="timetableId" id="formTimetableId">
+<form id="bookingSubmitForm" method="GET" style="display: none;">
+    <input type="hidden" name="preDate" id="formDate">
+    <input type="hidden" name="preSlotId" id="formTimetableId">
 </form>
 <!-- FOOTER -->
 <footer class="bg-gray-900 text-white pt-12 pb-6">
@@ -532,7 +531,7 @@
     // Map thông tin phòng (Dùng đúng roomId từ Entity)
     const roomInfo = roomsData.map((r, index) => ({
         id: r.roomId || r.id || `temp-${index}`,
-        name: r.name || 'N/A'
+        name: r.roomNumber || 'N/A'
     }));
 
     // Map khung giờ (Dùng đúng timetableId từ Entity Timetable)
@@ -619,26 +618,23 @@
         });
     }
     function submitBooking() {
-        // 1. Kiểm tra xem người dùng đã chọn ô nào chưa
+        // 1. Kiểm tra xem người dùng đã chọn slot chưa
         if (!selectedSlot) {
-            alert("Vui lòng chọn một phòng và khung giờ trên bảng lịch!");
+            alert("Vui lòng chọn một khung giờ trước khi đặt!");
             return;
         }
 
-        // 2. Điền dữ liệu vào form ẩn
-        // roomId này lấy từ roomInfo mà chúng ta đã map từ rawRooms
-        document.getElementById('formRoomId').value = selectedSlot.roomId;
+        const form = document.getElementById('bookingSubmitForm');
+
+        // 2. Gán giá trị từ đối tượng selectedSlot vào các input ẩn của form
         document.getElementById('formDate').value = selectedSlot.date;
         document.getElementById('formTimetableId').value = selectedSlot.slotId;
 
-        // 3. Log để kiểm tra lần cuối trước khi gửi
-        console.log("--- SUBMITTING BOOKING ---");
-        console.log("Room ID:", selectedSlot.roomId);
-        console.log("Date:", selectedSlot.date);
-        console.log("Timetable ID:", selectedSlot.slotId);
+        // 3. Cập nhật action URL: /book-now/detail/{roomId}
+        form.action = '/book-now/detail/' + selectedSlot.roomId;
 
-        // 4. Gửi form qua Backend
-        document.getElementById('bookingSubmitForm').submit();
+        // 4. Gửi form
+        form.submit();
     }
     function handleSlotClick(room, date, slot) {
         const bookingBar = document.getElementById('bookingBar');

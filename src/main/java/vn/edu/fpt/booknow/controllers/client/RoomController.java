@@ -24,16 +24,12 @@ import java.util.*;
 
 @Controller
 public class RoomController {
-
     private final CustomerService customerService;
     private RoomService roomService;
-    private BookingService bookingService;
     private JWTService jwtService;
     private FeedBackService feedbackService;
-
-    public RoomController(RoomService roomService, BookingService bookingService, JWTService jwtService, FeedBackService feedBackService, CustomerService customerService) {
+    public RoomController(RoomService roomService, JWTService jwtService, FeedBackService feedBackService, CustomerService customerService) {
         this.roomService = roomService;
-        this.bookingService = bookingService;
         this.jwtService = jwtService;
         this.feedbackService = feedBackService;
         this.customerService = customerService;
@@ -47,6 +43,8 @@ public class RoomController {
     @GetMapping("/detail/{roomIdString}")
     public String detailRoom(@PathVariable String roomIdString,
                              Model model,
+                             @RequestParam(value = "preDate", required = false) String preDate,
+                             @RequestParam(value = "preSlotId", required = false) Long preSlotId,
                              @CookieValue(name = "Access_token", required = false) String accessToken
     ) {
         // 1. Kiểm tra Access Token
@@ -54,6 +52,7 @@ public class RoomController {
             Long roomId = Long.parseLong(roomIdString);
             String email = "";
             Customer customer = new Customer();
+            System.out.println(roomId + " detailRoomService");
             List<RoomDTO> roomDetail = roomService.detailRoomService(roomId);
             if (roomDetail.isEmpty()) {
                 return "redirect:/404";
@@ -93,26 +92,13 @@ public class RoomController {
             model.addAttribute("image", image);
             model.addAttribute("feedbackStats", feedbackData.get("stats"));
             model.addAttribute("feedbackList", feedbackData.get("list"));
+//            model.addAttribute("preDate", preDate);
+//            model.addAttribute("preSlotId", preSlotId);
             return "public/DetailRoom";
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return "redirect:/homepage";
+            return "redirect:/home";
         }
-    }
-
-    @PostMapping("/booking/process")
-    public String handleBookingRequest(
-            @RequestParam("roomId") Long roomId,
-            @RequestParam("date") String date, // Sẽ nhận chuỗi "2026-03-01"
-            @RequestParam("timetableId") Long timetableId,
-            RedirectAttributes redirectAttributes) {
-
-        // Bước này bạn có thể thực hiện kiểm tra DB:
-        // 1. Phòng có tồn tại không?
-        // 2. Khung giờ này đã bị ai đặt chưa (tránh trường hợp 2 người cùng đặt 1 lúc)?
-
-        // Sau đó truyền dữ liệu sang trang chi tiết thanh toán
-        return "redirect:/detail/" + roomId + "?preDate=" + date + "&preSlotId=" + timetableId;
     }
 
     @PostMapping("/search")
@@ -141,7 +127,7 @@ public class RoomController {
             return "public/SearchRoom";
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return "redirect:/homepage";
+            return "redirect:/home";
         }
     }
 
@@ -172,28 +158,8 @@ public class RoomController {
             System.out.println(rooms.getTotalPages() + " Get");
             return "public/SearchRoom";
         } catch (Exception e) {
-            return "redirect:/homepage";
+            return "redirect:/home";
         }
     }
 
-    @PostMapping("/booking/save")
-    public String bookingSave(@ModelAttribute BookingDTO bookingDTO, @RequestParam(value = "cccd_front", required = false) MultipartFile frontImg,
-                              @RequestParam(value = "cccd_back", required = false) MultipartFile backImg,
-                              @CookieValue(name = "Access_token", required = false) String accessToken,
-                              RedirectAttributes redirectAttributes) {
-
-
-        try {
-            if (accessToken == null || accessToken.isEmpty()) {
-                return "redirect:/auth/login";
-            }
-            String rediect = bookingService.saveBooking(bookingDTO, frontImg, backImg, redirectAttributes, accessToken);
-            return rediect;
-
-        } catch (Exception e) {
-            System.out.println("test");
-            System.out.println(e.getMessage());
-            return "redirect:/auth/login";
-        }
-    }
 }
