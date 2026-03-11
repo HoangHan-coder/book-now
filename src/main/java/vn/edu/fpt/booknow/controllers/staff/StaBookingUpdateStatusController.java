@@ -60,4 +60,35 @@ public class StaBookingUpdateStatusController {
 
         return "redirect:/admin/bookings/update/" + bookingCode;
     }
+
+    @PostMapping("/cancel/{bookingCode}")
+    public String cancelBooking(
+            @PathVariable String bookingCode,
+            @RequestParam BookingStatus status,
+            @RequestParam(required = false) String reason,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+
+            bookingUpdateService.updateStatus(
+                    bookingCode,
+                    status,
+                    reason
+            );
+
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Cập nhật trạng thái thành công"
+            );
+
+        } catch (Exception e) {
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    e.getMessage()
+            );
+        }
+
+        return "redirect:/admin/bookings";
+    }
 }

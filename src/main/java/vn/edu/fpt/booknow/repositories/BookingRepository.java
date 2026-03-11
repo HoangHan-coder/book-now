@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import vn.edu.fpt.booknow.model.entities.Booking;
+import vn.edu.fpt.booknow.model.entities.BookingStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,4 +29,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
        JOIN FETCH b.room
        """)
     List<Booking> findAllWithCustomer();
+    List<Booking> findByBookingStatus(BookingStatus status);
 }
