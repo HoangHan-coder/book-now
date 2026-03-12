@@ -42,7 +42,7 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/authen/verifiedOtp","/authen/login", "/authen/registerEmail","/authen/otp","/authen/registerForm","/book-now/checkin/bookinAdmin","/checkin/start").permitAll()
+                        .requestMatchers("/authen/verifiedOtp","/authen/login", "/authen/registerEmail","/authen/otp","/authen/registerForm","/book-now/staff/bookings/update/*","/checkin/start").permitAll()
                         .anyRequest().authenticated()
                 ).addFilterBefore(jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class)

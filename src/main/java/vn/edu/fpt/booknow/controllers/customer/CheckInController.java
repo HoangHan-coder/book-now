@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.controller.customer;
+package vn.edu.fpt.booknow.controllers.customer;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import vn.edu.fpt.booknow.conponents.CheckInHandler;
 import vn.edu.fpt.booknow.entities.ApproveRequest;
-import vn.edu.fpt.booknow.entities.CheckInMessage;
-import vn.edu.fpt.booknow.services.CheckInService;
+import vn.edu.fpt.booknow.entities.Booking;
+import vn.edu.fpt.booknow.entities.BookingStatus;
+import vn.edu.fpt.booknow.services.customer.BookingService;
+import vn.edu.fpt.booknow.services.staff.BookingUpdateService;
 
 @Controller
 @RequiredArgsConstructor
@@ -20,10 +22,13 @@ import vn.edu.fpt.booknow.services.CheckInService;
 public class CheckInController {
     private final CheckInHandler checkInHandler;
     private final SimpMessagingTemplate messagingTemplate;
+    private final BookingService bookingService;
+    private final BookingUpdateService bookingUpdateService;
 
     @GetMapping(value = "/page")
-    public String pageCheckin(@RequestParam (name = "id") int id, Model model) {
-        model.addAttribute("id", id);
+    public String pageCheckin(@RequestParam (name = "code") String code, Model model) {
+        Booking booking = bookingService.getBookingDetail(code);
+        model.addAttribute("booking", booking);
         return "/customer/check_in";
     }
 
@@ -41,14 +46,28 @@ public class CheckInController {
     public ResponseEntity<Void> approve(
             @RequestBody ApproveRequest req
     ) {
+        Booking booking = bookingService.findById(req.getBookingId());
+        bookingUpdateService.updateStatus(booking.getBookingCode(), BookingStatus.CHECKED_IN, null);
         checkInHandler.approve(req.getBookingId());
+
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(value = "/bookinAdmin")
-    public String bookinAdmin(Model model) {
-        return "/admin/booking_update_status";
+    @PostMapping("/reject")
+    public ResponseEntity<Void> reject(
+            @RequestBody ApproveRequest req
+    ) {
+        Booking booking = bookingService.findById(req.getBookingId());
+        bookingUpdateService.updateStatus(booking.getBookingCode(), BookingStatus.REJECT, req.getReason());
+        checkInHandler.reject(req.getBookingId());
+        return ResponseEntity.ok().build();
     }
+
+//    @GetMapping(value = "/bookinAdmin")
+//    public String bookinAdmin(Model model) {
+//
+//        return "/admin/booking_update_status";
+//    }
 
 
 

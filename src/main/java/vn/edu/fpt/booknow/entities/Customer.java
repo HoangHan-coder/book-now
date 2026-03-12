@@ -16,26 +16,29 @@ public class Customer {
     private String passwordHash;
     private String fullName;
     private String avatarUrl;
+    private String avatarPublicId;
     private String phone;
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean isDeleted;
 
-    public Customer() {
-    }
-
-    public Customer(Long customerId, String email, String passwordHash, String fullName, String avatarUrl, String phone, String status, LocalDateTime createdDate, LocalDateTime updatedDate, boolean isDeleted) {
+    public Customer(Long customerId, String email, String passwordHash, String fullName, String avatarPublicId, String avatarUrl, String status, String phone, LocalDateTime createdAt, LocalDateTime updatedAt, boolean isDeleted) {
         this.customerId = customerId;
         this.email = email;
         this.passwordHash = passwordHash;
         this.fullName = fullName;
+        this.avatarPublicId = avatarPublicId;
         this.avatarUrl = avatarUrl;
-        this.phone = phone;
         this.status = status;
-        this.createdAt = createdDate;
-        this.updatedAt = updatedDate;
+        this.phone = phone;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.isDeleted = isDeleted;
+    }
+
+    public Customer() {
+
     }
 
     public Long getCustomerId() {
@@ -76,6 +79,14 @@ public class Customer {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public String getAvatarPublicId() {
+        return avatarPublicId;
+    }
+
+    public void setAvatarPublicId(String avatarPublicId) {
+        this.avatarPublicId = avatarPublicId;
     }
 
     public String getPhone() {

@@ -11,7 +11,7 @@
 <video id="preview" autoplay muted class="w-full"></video>
 
 <div class="flex gap-2 mt-3">
-    <input type="hidden" id="bookingId" th:value="${id}">
+    <input type="hidden" id="bookingId" th:value="${booking.id}">
     <button id="startBtn">Start Recording</button>
     <button id="stopBtn" disabled>Stop</button>
     <button id="submitBtn" disabled>Submit</button>
@@ -23,11 +23,21 @@
     const socket = new SockJS('http://localhost:8081/book-now/ws');
     const stompClient = Stomp.over(socket);
 
-    stompClient.connect({}, () => {
-        stompClient.subscribe(
-            '/topic/checkin/user/' + bookingId,
-            msg => alert("Check-in thành công!")
-        );
+    stompClient.connect({}, function(frame) {
+
+        console.log("Connected:", frame);
+
+        stompClient.subscribe("/topic/checkin/user/" + bookingId, function(message) {
+
+            console.log("RAW:", message.body);
+
+            const data = JSON.parse(message.body);
+            alert(data.message);
+
+        });
+
+    }, function(error) {
+        console.error("STOMP error:", error);
     });
 
     const videoElement = document.getElementById("preview");
