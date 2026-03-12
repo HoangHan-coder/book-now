@@ -22,17 +22,21 @@ public class StaffAccountService {
     private JWTService jwtService;
 
     public boolean verify(StaffAccount users, HttpServletResponse response) {
-        System.out.println("Verify staff or admin is running..");
-        Authentication authentication = authManagerProvider.authenticate(
-                new UsernamePasswordAuthenticationToken(users.getEmail(), users.getPasswordHash()));
-        if (authentication.isAuthenticated()) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            if (userDetails instanceof CustomerDetails) {
-                System.out.println("This is customer");
-                return false;
+        System.out.println("Verify is running..");
+        try {
+            Authentication authentication = authManagerProvider.authenticate(
+                    new UsernamePasswordAuthenticationToken(users.getEmail(), users.getPasswordHash()));
+            if (authentication.isAuthenticated()) {
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                if (userDetails instanceof CustomerDetails) {
+                    System.out.println("This is customer");
+                    return false;
+                }
+                jwtService.createCookie(users, response);
+                return true;
             }
-            jwtService.createCookie(users, response);
-            return true;
+        } catch (Exception e) {
+            System.out.println("Verify failed: " + e.getMessage());
         }
         return false;
     }

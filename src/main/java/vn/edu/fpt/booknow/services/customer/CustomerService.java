@@ -39,8 +39,8 @@ public class CustomerService {
                 System.out.println("This is Staff or admin");
                 return false;
             }
-            jwtService.createCookie(users, response);
-            return true;
+        } catch (Exception e) {
+            System.out.println("Verify failed: " + e.getMessage());
         }
         } catch (Exception e) {
             System.out.println(e.getMessage());

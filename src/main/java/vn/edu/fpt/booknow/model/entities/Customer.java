@@ -5,12 +5,9 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -37,6 +34,9 @@ public class Customer {
     @Nationalized
     @Column(name = "avatar_url")
     private String avatarUrl;
+
+    @Column(name = "avatar_public_id")
+    private String avatarPublicId;
 
     @Nationalized
     @Column(name = "phone", length = 20)

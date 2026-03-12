@@ -1,6 +1,7 @@
 package vn.edu.fpt.booknow.model.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
@@ -15,6 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "Room")
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,5 +50,13 @@ public class Room {
 
     @OneToMany(mappedBy = "room")
     private List<RoomAmenity> roomAmenities = new ArrayList<>();
+    @Column(name = "base_price")
+    private BigDecimal basePrice;
+    @Column(name = "over_price", precision = 12, scale = 2)
+    private BigDecimal overPrice;
+    @Size(max = 500)
+    @Nationalized
+    @Column(name = "description", length = 500)
+    private String description;
 
 }
