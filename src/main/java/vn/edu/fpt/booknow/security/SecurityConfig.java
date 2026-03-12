@@ -30,73 +30,73 @@ public class SecurityConfig {
     @Autowired
     private CustomUserDetailsService detailsService;
 
-    @Autowired
-    private RecaptchaFilter recaptchaFilter;
+//    @Autowired
+//    private RecaptchaFilter recaptchaFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
-
-
-    @Bean
-    @Order(1)
-    public SecurityFilterChain StaffAccountFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .securityMatcher("/admin/**")
-                .authenticationProvider(staffAuthProvider())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/login","/auth/logout", "/public/**", "/home","/pay/**", 
-                                "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-        
-
-        return http.build();
-    }
-
-    @Bean
-    @Order(2)
-    public SecurityFilterChain CustomerFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authenticationProvider(customerAuthProvider())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login",
-                                "/auth/logout", "/register",
-                                "/public/**", "/home","/pay/**",
-                                "/momo-*", 
-                                "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-                return http.build();
-    }
-
-
-    @Bean
-    public AuthenticationProvider customerAuthProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(detailsService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
-    }
-
-    @Bean
-    public AuthenticationProvider staffAuthProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(detailsService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
-    }
-
+//
+//
+//    @Bean
+//    @Order(1)
+//    public SecurityFilterChain StaffAccountFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .securityMatcher("/admin/**")
+//                .authenticationProvider(staffAuthProvider())
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/admin/login","/auth/logout", "/public/**", "/home","/pay/**",
+//                                "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .sessionManagement(session -> session
+//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+////                .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+//
+//
+//
+//        return http.build();
+//    }
+//
+//    @Bean
+//    @Order(2)
+//    public SecurityFilterChain CustomerFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .authenticationProvider(customerAuthProvider())
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/auth/login",
+//                                "/auth/logout", "/register",
+//                                "/public/**", "/home","/pay/**",
+//                                "/momo-*",
+//                                "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .sessionManagement(session -> session
+//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+////                .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+//                return http.build();
+//    }
+//
+//
+//    @Bean
+//    public AuthenticationProvider customerAuthProvider() {
+//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(detailsService);
+//        provider.setPasswordEncoder(passwordEncoder());
+//        return provider;
+//    }
+//
+//    @Bean
+//    public AuthenticationProvider staffAuthProvider() {
+//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(detailsService);
+//        provider.setPasswordEncoder(passwordEncoder());
+//        return provider;
+//    }
+//
     @Bean
     public AuthenticationManager manager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
