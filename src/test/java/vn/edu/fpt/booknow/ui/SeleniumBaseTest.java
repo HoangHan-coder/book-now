@@ -2,7 +2,9 @@ package vn.edu.fpt.booknow.ui;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.BeforeAll;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -16,9 +18,7 @@ import java.time.Duration;
  * Chiến lược dùng chung phiên đăng nhập:
  * ─────────────────────────────────────────────────────────────────────────────
  *  • Lần đầu chạy bất kỳ test class nào kế thừa class này, trình duyệt sẽ
- *    tự mở và điều hướng đến trang admin.
- *  • Nếu Spring Security redirect sang trang login, hãy đăng nhập thủ công
- *    (bỏ qua CAPTCHA). Test sẽ đợi tối đa LOGIN_TIMEOUT_SECONDS giây.
+ *    tự mở và tự động thực hiện đăng nhập.
  *  • Sau khi đăng nhập thành công, các test class khác reuse cùng WebDriver
  *    instance mà không cần đăng nhập lại.
  *  • Trình duyệt đóng tự động khi JVM tắt (shutdown hook).
@@ -34,8 +34,8 @@ public abstract class SeleniumBaseTest {
     /** URL gốc của ứng dụng đang chạy */
     protected static final String BASE_URL = "http://localhost:8080";
 
-    /** Thời gian chờ đăng nhập thủ công (giây) */
-    private static final int LOGIN_TIMEOUT_SECONDS = 120;
+    /** Thời gian chờ tối đa cho các thao tác đăng nhập (giây) */
+    private static final int LOGIN_TIMEOUT_SECONDS = 15;
 
     /** Implicit wait mặc định cho mỗi thao tác tìm element (giây) */
     protected static final int ELEMENT_WAIT_SECONDS = 5;
@@ -47,7 +47,7 @@ public abstract class SeleniumBaseTest {
     private static boolean sessionInitialized = false;
 
     /**
-     * Khởi tạo WebDriver và xử lý bước đăng nhập thủ công một lần duy nhất.
+     * Khởi tạo WebDriver và tự động đăng nhập một lần duy nhất.
      * Phương thức này được kế thừa và gọi tự động trước test class con nào.
      */
     @BeforeAll
@@ -75,32 +75,47 @@ public abstract class SeleniumBaseTest {
             }
         }));
 
-        // ── Điều hướng đến trang admin và đợi đăng nhập ──────────────────────
-        driver.get(BASE_URL + "/admin/bookings");
+        // ── Tự động đăng nhập ───────────────────────────────────────────────
+        try {
+            System.out.println(">>> [SeleniumBaseTest] Bắt đầu tự động đăng nhập...");
+            driver.get(BASE_URL + "/admin/login");
 
-        printLoginBanner();
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(LOGIN_TIMEOUT_SECONDS));
 
-        // Đợi cho đến khi URL không còn chứa "login" và chứa "/admin"
-        new WebDriverWait(driver, Duration.ofSeconds(LOGIN_TIMEOUT_SECONDS))
-                .until(d -> !d.getCurrentUrl().contains("login")
-                        && d.getCurrentUrl().contains("/admin"));
+            // Đợi và nhập username (form HTML sử dụng name="email" qua th:field="*{email}" hoặc id="email")
+            WebElement emailInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("email")));
+            emailInput.clear();
+            emailInput.sendKeys("staff.customer@booknow.vn");
 
-        System.out.println(">>> [SeleniumBaseTest] Đăng nhập thành công! Bắt đầu chạy test UI...\n");
+            // Nhập password (form HTML sử dụng name="passwordHash" qua th:field hoặc id="password")
+            WebElement passwordInput = driver.findElement(By.id("password"));
+            passwordInput.clear();
+            passwordInput.sendKeys("User@123");
+
+            // Chờ và click submit button
+            WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
+            submitButton.click();
+
+            // Chờ redirect sang trang danh sách bookings
+            wait.until(ExpectedConditions.urlContains("/admin/bookings"));
+            
+            // Điều hướng lại cho chắc chắn sau khi xử lý đăng nhập 
+            driver.get(BASE_URL + "/admin/bookings");
+
+            System.out.println(">>> [SeleniumBaseTest] Đăng nhập thành công! Bắt đầu chạy test UI...\n");
+        } catch (Exception e) {
+            if (driver != null) {
+                driver.quit();
+            }
+            throw new RuntimeException("Lỗi: Quá trình tự động đăng nhập thất bại. Kiểm tra backend hoặc thông tin tài khoản.", e);
+        }
+
         sessionInitialized = true;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
     // Helper
     // ─────────────────────────────────────────────────────────────────────────
-
-    private static void printLoginBanner() {
-        System.out.println("\n" + "=".repeat(65));
-        System.out.println("  [SeleniumBaseTest] Trình duyệt đã mở.");
-        System.out.println("  Nếu bạn thấy trang ĐĂNG NHẬP, hãy đăng nhập thủ công.");
-        System.out.println("  Test sẽ tự động tiếp tục sau khi phát hiện phiên admin.");
-        System.out.println("  Thời gian chờ tối đa: " + LOGIN_TIMEOUT_SECONDS + " giây.");
-        System.out.println("=".repeat(65) + "\n");
-    }
 
     /**
      * Tiện ích: tạo WebDriverWait với timeout tuỳ chỉnh.

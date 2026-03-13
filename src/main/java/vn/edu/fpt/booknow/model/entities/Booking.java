@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,5 +74,9 @@ public class Booking {
     private String note;
     @Column(name = "update_at")
     private LocalDateTime updateAt;
+    @Column(name = "actual_check_in_time")
+    private Instant actualCheckInTime;
+    @Column(name = "actual_check_out_time")
+    private Instant actualCheckOutTime;
 
 }

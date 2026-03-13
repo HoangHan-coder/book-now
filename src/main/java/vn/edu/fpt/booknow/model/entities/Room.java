@@ -39,9 +39,6 @@ public class Room {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 
-    @Column(name = "area_m2", precision = 10, scale = 2)
-    private BigDecimal areaM2;
-
     @OneToMany(mappedBy = "room")
     private List<Booking> bookings = new ArrayList<>();
 
@@ -50,13 +47,5 @@ public class Room {
 
     @OneToMany(mappedBy = "room")
     private List<RoomAmenity> roomAmenities = new ArrayList<>();
-    @Column(name = "base_price")
-    private BigDecimal basePrice;
-    @Column(name = "over_price", precision = 12, scale = 2)
-    private BigDecimal overPrice;
-    @Size(max = 500)
-    @Nationalized
-    @Column(name = "description", length = 500)
-    private String description;
 
 }

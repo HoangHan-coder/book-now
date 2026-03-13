@@ -36,7 +36,7 @@ public class BookingUpdateService {
 
         booking.setBookingStatus(newStatus);
 
-        if (newStatus == BookingStatus.REJECT) {
+        if (newStatus == BookingStatus.REJECTED) {
 
             booking.setNote(reason);
 
@@ -97,7 +97,7 @@ public class BookingUpdateService {
 
             case PENDING ->
                     next == BookingStatus.PENDING_PAYMENT ||
-                            next == BookingStatus.REJECT ||
+                    next == BookingStatus.REJECTED ||
                             next == BookingStatus.FAILED;
 
             case PENDING_PAYMENT ->
@@ -108,7 +108,7 @@ public class BookingUpdateService {
                     next == BookingStatus.CHECKED_IN;
             case CHECKED_IN ->
                     next == BookingStatus.CHECKED_OUT ||
-                    next == BookingStatus.REJECT;
+                    next == BookingStatus.REJECTED;
             case CHECKED_OUT -> next == BookingStatus.COMPLETED;
 
 
