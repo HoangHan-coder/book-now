@@ -58,6 +58,16 @@ public class CreateStaffAccountService {
             throw new RuntimeException("Email không hợp lệ");
         }
 
+        if (dto.getPassword() == null || dto.getPassword().isBlank()) {
+            throw new RuntimeException("Mật khẩu không được bỏ trống");
+        }
+
+        if (!isValidPassword(dto.getPassword())) {
+            throw new RuntimeException(
+                    "Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường và số"
+            );
+        }
+
         if (!dto.getPassword().equals(dto.getConfirmPassword())) {
             throw new RuntimeException("Mật khẩu xác nhận không khớp");
         }
@@ -89,6 +99,13 @@ public class CreateStaffAccountService {
         return org.springframework.security.crypto.bcrypt.BCrypt
                 .hashpw(password,
                         org.springframework.security.crypto.bcrypt.BCrypt.gensalt());
+    }
+
+    private boolean isValidPassword(String password){
+
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
+
+        return password.matches(regex);
     }
 
 }

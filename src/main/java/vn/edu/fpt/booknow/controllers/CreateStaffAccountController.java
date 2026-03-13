@@ -1,5 +1,6 @@
 package vn.edu.fpt.booknow.controllers;
 
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.dto.StaffAccountCreateDTO;
 import vn.edu.fpt.booknow.services.admin.CreateStaffAccountService;
 
@@ -29,21 +30,23 @@ public class CreateStaffAccountController {
     @PostMapping("/admin/create_staff_account")
     public String createStaffAccount(
             @ModelAttribute("staffDTO") StaffAccountCreateDTO dto,
+            RedirectAttributes redirectAttributes,
             Model model) {
 
         try {
 
             service.createStaffAccount(dto);
 
-            model.addAttribute("success",
-                    "Tạo tài khoản thành công");
+            redirectAttributes.addFlashAttribute(
+                    "success",
+                    "Tạo tài khoản thành công!"
+            );
 
             return "redirect:/admin/account_list";
 
         } catch (Exception e) {
 
-            model.addAttribute("error",
-                    e.getMessage());
+            model.addAttribute("error", e.getMessage());
 
             return "private/Staff_acc_create";
         }
