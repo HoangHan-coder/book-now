@@ -26,6 +26,14 @@ public class ViewUserListService {
                                      String statusFilter,
                                      String keyword) {
 
+        // FIX SEARCH SPACE
+        if (keyword != null) {
+            keyword = keyword.trim().replaceAll("\\s+", " ");
+            if (keyword.isEmpty()) {
+                keyword = null;
+            }
+        }
+
         List<UserDTO> result = new ArrayList<>();
 
         // STAFF (trừ khi filter là CUSTOMER)

@@ -108,6 +108,16 @@
 
 <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
 
+    <!-- thông báo tạo tài khoản thành công -->
+    <div th:if="${success}"
+         class="mb-6 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded-r-lg shadow-sm flex items-center gap-3">
+
+        <i class="fa-solid fa-circle-check"></i>
+
+        <span th:text="${success}"></span>
+
+    </div>
+
     <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
         <div>
             <h1 class="text-2xl font-bold text-gray-800">Danh sách tài khoản</h1>
@@ -258,6 +268,14 @@
     }
     mobileMenuBtn.addEventListener('click', toggleSidebar);
     sidebarOverlay.addEventListener('click', toggleSidebar);
+
+    setTimeout(function() {
+        const alertBox = document.querySelector('.bg-green-50');
+        if(alertBox){
+            alertBox.style.display = 'none';
+        }
+    }, 2000);
+
 </script>
 </body>
 </html>
