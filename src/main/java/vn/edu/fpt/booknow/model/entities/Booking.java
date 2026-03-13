@@ -75,8 +75,8 @@ public class Booking {
     @Column(name = "update_at")
     private LocalDateTime updateAt;
     @Column(name = "actual_check_in_time")
-    private Instant actualCheckInTime;
+    private LocalDateTime actualCheckInTime;
     @Column(name = "actual_check_out_time")
-    private Instant actualCheckOutTime;
+    private LocalDateTime actualCheckOutTime;
 
 }
