@@ -11,6 +11,7 @@ import vn.edu.fpt.booknow.model.dto.TimeTableDTO;
 import vn.edu.fpt.booknow.model.entities.*;
 import vn.edu.fpt.booknow.repositories.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -106,7 +107,17 @@ public class RoomService {
         List<RoomDTO> roomDTO = new ArrayList<>(map.values());
         return roomDTO;
     }
+    public boolean isBetween(LocalDateTime currentData, Long currentSlotId, TimeTableDTO start, TimeTableDTO end) {
+        // Chuyển đổi thành một con số duy nhất để so sánh (Năm + Tháng + Ngày + Slot)
+        // Ví dụ: Ngày 12/03 Slot 2 -> 2026031202
+        long currentVal = currentData.getYear() * 1000000L + currentData.getMonthValue() * 10000L + currentData.getDayOfMonth() * 100L + currentSlotId;
 
+        long startVal = start.getDate().getYear() * 1000000L + start.getDate().getMonthValue() * 10000L + start.getDate().getDayOfMonth() * 100L + start.getTimetableId();
+
+        long endVal = end.getDate().getYear() * 1000000L + end.getDate().getMonthValue() * 10000L + end.getDate().getDayOfMonth() * 100L + end.getTimetableId();
+
+        return currentVal >= startVal && currentVal <= endVal;
+    }
     public List<Timetable> getAllTimeTable() {
         List<Timetable> list = timeTableRepository.findAll();
         return list;
@@ -146,6 +157,10 @@ public class RoomService {
 
     public List<RoomDTO> roomAll() {
         List<RoomDTO> list = roomRepository.findAllRoom();
+        return list;
+    }
+    public List<Booking> getAllBookingStatus() {
+        List<Booking> list = bookingRepository.getByBookingStatus("PENDING");
         return list;
     }
 }

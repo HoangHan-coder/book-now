@@ -21,6 +21,7 @@ import vn.edu.fpt.booknow.services.customer.CustomerService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class RoomController {
@@ -78,9 +79,33 @@ public class RoomController {
             Set<String> bookedKeys = new HashSet<>();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMM");
 
-            for (TimeTableDTO s : getSlot) {
-                String key = s.getDate().format(formatter) + "-" + s.getTimetableId();
-                bookedKeys.add(key);
+            if (!getSlot.isEmpty()) {
+                // Nhóm các slot theo BookingId để xử lý các khoảng đặt dài
+                Map<Long, List<TimeTableDTO>> bookingsGrouped = getSlot.stream()
+                        .filter(s -> s.getBookingId() != null)
+                        .collect(Collectors.groupingBy(TimeTableDTO::getBookingId));
+
+                for (List<TimeTableDTO> slotsInBooking : bookingsGrouped.values()) {
+                    // Tìm slot bắt đầu và kết thúc của mỗi đơn đặt
+                    TimeTableDTO first = slotsInBooking.stream()
+                            .min(Comparator.comparing(TimeTableDTO::getDate)
+                                    .thenComparing(TimeTableDTO::getTimetableId)).get();
+
+                    TimeTableDTO last = slotsInBooking.stream()
+                            .max(Comparator.comparing(TimeTableDTO::getDate)
+                                    .thenComparing(TimeTableDTO::getTimetableId)).get();
+
+                    // Chuyển ngày và slot thành một con số tuyến tính để dễ so sánh (ví dụ: ngày * 10 + slotId)
+                    // Hoặc đơn giản là lặp qua danh sách weekDates và timetables để kiểm tra
+                    for (LocalDateTime d : weekDates) {
+                        for (Timetable t : timetables) {
+                            // Kiểm tra xem (d, t) có nằm giữa (first.date, first.slotId) và (last.date, last.slotId) không
+                            if (roomService.isBetween(d, t.getTimetableId(), first, last)) {
+                                bookedKeys.add(d.format(formatter) + "-" + t.getTimetableId());
+                            }
+                        }
+                    }
+                }
             }
             booking.setRoomId(roomId);
             model.addAttribute("bookedKeys", bookedKeys);
@@ -92,8 +117,8 @@ public class RoomController {
             model.addAttribute("image", image);
             model.addAttribute("feedbackStats", feedbackData.get("stats"));
             model.addAttribute("feedbackList", feedbackData.get("list"));
-//            model.addAttribute("preDate", preDate);
-//            model.addAttribute("preSlotId", preSlotId);
+            model.addAttribute("preDate", preDate);
+            model.addAttribute("preSlotId", preSlotId);
             return "public/DetailRoom";
         } catch (Exception e) {
             System.out.println(e.getMessage());

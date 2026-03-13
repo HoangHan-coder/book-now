@@ -44,4 +44,14 @@ public class RoomType {
     @OneToMany(mappedBy = "roomType")
     private List<Room> rooms = new ArrayList<>();
 
+    @Column(name = "area_m2", precision = 10, scale = 2)
+    private BigDecimal areaM2;
+    @Nationalized
+    @Column(name = "description", length = 500)
+    private String description;
+
+    @Column(name = "base_price", nullable = false, precision = 12, scale = 2)
+    private BigDecimal basePrice;
+    @Column(name = "over_price", nullable = false, precision = 12, scale = 2)
+    private BigDecimal overPrice;
 }

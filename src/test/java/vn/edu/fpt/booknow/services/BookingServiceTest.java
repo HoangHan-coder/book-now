@@ -1,53 +1,48 @@
 package vn.edu.fpt.booknow.services;
 
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.math.RoundingMode;
 
 import static org.junit.jupiter.api.Assertions.*;
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class BookingServiceTest {
-
-    @Autowired
+    @InjectMocks
     private BookingService bookingService;
-    @ParameterizedTest(name = "Case {index}: {3} (Phòng ID: {4})")
+
+    @ParameterizedTest(name = "Phòng={0}, Ca={1}, Slot={2}, VIP={3} => Kỳ vọng={4}")
     @CsvSource({
-            // 1. CÁC CASE ĐÚNG (Hợp lệ)
-            // workDate, startTime, endTime, shift, roomId
-            "2030-01-02T00:00, 2030-01-02T10:30, 2030-01-02T13:30, Sáng, 1",
-            "2030-01-02T00:00, 2030-01-02T14:00, 2030-01-02T17:00, Chiều, 1",
-            "2030-01-02T00:00, 2030-01-02T17:30, 2030-01-02T20:30, Tối, 1",
-            "2030-01-02T00:00, 2030-01-02T21:00, 2030-01-02T09:50, Đêm, 1",
-            "2026-03-12T00:00, 2026-03-12T10:30, 2026-03-12T13:30, Sáng, 1",
+            // --- 1. KIỂM THỬ LOẠI PHÒNG (RoomType) ---
+            "'Ocean City', 'Sáng', 1, false, 95000",   // Base 100k
+            "'Mellow',     'Sáng', 1, false, 151050",  // Base 159k (159k * 0.95)
+            "'Unknown',    'Sáng', 1, false, -1",      // RoomType không hợp lệ -> -1
 
-            // 2. CÁC CASE LỖI (Kỳ vọng ném ngoại lệ)
-            // Lỗi ngày quá khứ
-            "2020-01-01T00:00, 2020-01-01T10:30, 2020-01-01T13:30, Sáng, 1",
-            // Lỗi ngày quá 7 ngày
-            "2035-01-01T00:00, 2035-01-01T10:30, 2035-01-01T13:30, Sáng, 1",
-            // Lỗi sai khung giờ ca sáng (11:00 thay vì 10:30)
-            "2030-01-02T00:00, 2030-01-02T11:00, 2030-01-02T13:30, Sáng, 999"
+            // --- 2. KIỂM THỬ CÁC CA (ShiftType) ---
+            "'Ocean City', 'Sáng',  1, false, 95000",   // x 1.0
+            "'Ocean City', 'Chiều', 1, false, 104500",  // x 1.1
+            "'Ocean City', 'Tối',   1, false, 114000",  // x 1.2
+            "'Ocean City', 'Đêm',   1, false, 142500",  // x 1.5
+            "'Ocean City', 'Khác',  1, false, -1",      // ShiftType không hợp lệ -> -1
+
+            // --- 3. KIỂM THỬ BIÊN SLOT (SlotCount) ---
+            "'Ocean City', 'Sáng',  3, false, 285000",  // Biên 3: Giảm 5% (300k * 0.95)
+            "'Ocean City', 'Sáng',  4, false, 372000",  // Biên 4: Giảm 7% (400k * 0.93)
+
+            // --- 4. KIỂM THỬ VIP (isVip) ---
+            "'Ocean City', 'Sáng',  1, true,  85000",   // 5% (slot) + 10% (VIP) = 15% -> 100k * 0.85
+
     })
-    @DisplayName("Test logic tính tiền: Sáng/Chiều/Tối (150) và Đêm (450)")
-    void testValidateAndCalculate_Parameterized(String workDate, String start, String end, String shift, Long roomId) {
-        // Chuyển đổi String sang LocalDateTime
-        LocalDateTime ws = LocalDateTime.parse(workDate);
-        LocalDateTime startTime = LocalDateTime.parse(start);
-        LocalDateTime endTime = LocalDateTime.parse(end);
-
-        try {
-            BigDecimal result = bookingService.validateAndCalculate(ws, startTime, endTime, shift, roomId);
-            System.out.println(result);
-            assertNotNull(result);
-        } catch (RuntimeException e) {
-            // Dùng assertTrue để JUnit kiểm tra logic message
-            String msg = e.getMessage();
-//            System.out.println("👉 Case Lỗi (Kỳ vọng): " + msg);
-        }
+    void testCalculatePricing(String roomType, String shiftType, int slotCount, boolean isVip, long expectedAmount) {
+        // Gọi hàm thực tế trả về long
+        long result = bookingService.calculatePricing(roomType, shiftType, slotCount, isVip);
+        System.out.println("Result: " + result);
+        // So sánh trực tiếp hai giá trị long
+        assertEquals(expectedAmount, result,
+                String.format("Sai logic tại: %s, %s, %d slots, VIP: %b", roomType, shiftType, slotCount, isVip));
     }
 }

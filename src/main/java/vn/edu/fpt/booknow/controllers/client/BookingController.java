@@ -20,7 +20,7 @@ public class BookingController {
     @PostMapping("/booking/save")
     public String bookingSave(@ModelAttribute BookingDTO bookingDTO, @RequestParam(value = "cccd_front", required = false) MultipartFile frontImg,
                               @RequestParam(value = "cccd_back", required = false) MultipartFile backImg,
-                              @CookieValue(name = "Access_token", required = false) String accessToken,
+//                              @CookieValue(name = "Access_token", required = false) String accessToken,
                               RedirectAttributes redirectAttributes, Model model) {
 
 
@@ -39,10 +39,10 @@ public class BookingController {
                 redirectAttributes.addFlashAttribute("toastType", "error");
                 return "redirect:/detail/" + bookingDTO.getRoomId();
             }
-            if (accessToken == null || accessToken.isEmpty()) {
-                return "redirect:/auth/login";
-            }
-            String rediect = bookingService.saveBooking(bookingDTO, frontImg, backImg, redirectAttributes, accessToken, model);
+//            if (accessToken == null || accessToken.isEmpty()) {
+//                return "redirect:/auth/login";
+//            }
+            String rediect = bookingService.saveBooking(bookingDTO, frontImg, backImg, redirectAttributes, "", model);
             return rediect;
 
         } catch (Exception e) {

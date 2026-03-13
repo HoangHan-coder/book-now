@@ -173,23 +173,30 @@
                                     <th:block th:with="currentKey=${#temporals.format(date, 'ddMM')} + '-' + ${tItem.timetableId}">
                                         <div class="w-full py-1"
                                              th:with="isNightSlot=${tItem.slotName.contains('Đêm') or tItem.timetableId > 4},
-                              currentPrice=${isNightSlot ? room.overPrice : room.basePrice}">
+                  currentPrice=${isNightSlot ? room.overPrice : room.basePrice}">
+
                                             <button th:if="${!bookedKeys.contains(currentKey)}"
                                                     type="button"
                                                     th:id="'btn-' + ${currentKey}"
+                                                    th:data-index="${(dateStat.index * 4) + tItemStat.index}"
                                                     th:data-slot-info="|${#temporals.format(date, 'dd/MM')} ${tItem.slotName}|"
                                                     th:data-price="${currentPrice}"
                                                     onclick="toggleSlot(this, this.getAttribute('data-slot-info'), this.getAttribute('data-price'))"
                                                     th:classappend="${date.isEqual(today)} ? 'ring-1 ring-green-400 bg-green-100' : 'bg-[#e8fdf1]'"
-                                                    class="w-full hover:bg-[#d1fae5] text-green-700 border border-[#c2f5d8] text-sm py-3 rounded-lg font-medium transition-all duration-200 shadow-sm active:scale-95">
-                                                <span class="block">Trống</span>
+                                                    class="slot-button w-full relative hover:bg-[#d1fae5] text-green-700 border border-[#c2f5d8] text-sm py-3 rounded-lg font-medium transition-all duration-200 shadow-sm active:scale-95 overflow-hidden group">
+
+                                                <span class="slot-label transition-all duration-200">Trống</span>
+
+                                                <div class="check-mark absolute inset-0 bg-blue-600 text-white flex items-center justify-center opacity-0 translate-y-full transition-all duration-200">
+                                                    <i class="fa-solid fa-check"></i>
+                                                </div>
                                             </button>
 
                                             <button th:if="${bookedKeys.contains(currentKey)}"
                                                     type="button"
                                                     disabled
-                                                    class="w-full bg-[#e5e7eb] text-[#9ca3af] border border-[#d1d5db] text-sm py-3 rounded-lg font-medium cursor-not-allowed opacity-80">
-                                                Đã đặt
+                                                    class="w-full bg-gray-200 text-gray-400 border border-gray-300 text-sm py-3 rounded-lg font-medium cursor-not-allowed opacity-70">
+                                                <span th:text="${bookedKeys.contains(currentKey)} ? 'Đã đặt' : 'Không khả dụng'"></span>
                                             </button>
                                         </div>
                                     </th:block>
@@ -267,7 +274,31 @@
                         </div>
                     </div>
                 </div>
+                <div class="flex  mt-6">
+                    <div class="bg-gray-50 border-l-4 border-blue-500 p-4 rounded-r-xl shadow-sm max-w-lg">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fa-solid fa-circle-info text-blue-600"></i>
+                            <span class="text-xs font-bold text-gray-800 uppercase tracking-wider">Thông tin đặt phòng qua Email</span>
+                        </div>
+
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            Khách hàng có thể đặt phòng bằng cách gửi mail đến:
+                            <span class="text-blue-600 font-bold">nguyenvana@gmail.com</span>
+                        </p>
+
+                        <div class="mt-3 pt-3 border-t border-gray-200">
+                            <p class="text-[11px] text-gray-400 font-semibold uppercase mb-1">Định dạng nội dung mail:</p>
+                            <code class="text-xs text-blue-700 bg-blue-50 px-2 py-1 rounded font-mono block">
+                                [Mã phòng] - [Ngày] - [Ca] - [Khung giờ]
+                            </code>
+                            <p class="text-[11px] text-gray-500 mt-2 italic">
+                                Ví dụ: <span class="font-medium text-gray-700">CE - 13/2/2000 - Sáng - (12:20 - 13:00)</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
+
         </div>
         <div class="lg:col-span-1">
             <div class="bg-white p-6 rounded-2xl shadow-lg border border-blue-100 sticky top-32">
@@ -364,6 +395,15 @@
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
 <script th:inline="javascript">
+
+
+    // Thêm hàm copy nhanh (Tùy chọn)
+    function copyToClipboard() {
+        const text = document.getElementById('email-preview-content').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            showToast("Đã sao chép nội dung!", "success");
+        });
+    }
     const selectedSlotsMap = new Map();
     const selectedListEl = document.getElementById('selected-list');
     const containerEl = document.getElementById('selected-slots-container');
@@ -372,42 +412,85 @@
     const formatCurrency = (num) => new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(num);
 
     function toggleSlot(btn, slotName, price) {
-        // 1. Các class khi nút ở trạng thái ĐƯỢC CHỌN (Xanh dương)
-        const selectedStyles = [
-            'bg-blue-600', 'text-white', 'hover:bg-blue-700',
-            'outline', 'outline-2', 'outline-blue-300',
-            'scale-105', 'shadow-md', 'border-blue-600' // Thêm border đồng màu
-        ];
-
-        // 2. Các class khi nút ở trạng thái TRỐNG (Xanh lá/Xám nhẹ)
-        // Liệt kê tất cả các class border/ring bạn đã viết trong HTML vào đây để xóa sạch khi chọn
-        const availableStyles = [
-            'bg-[#e8fdf1]', 'bg-green-100', 'text-green-700',
-            'hover:bg-[#d1fae5]',
-            'border', 'border-[#c2f5d8]'
-        ];
+        const currentIndex = parseInt(btn.getAttribute('data-index'));
 
         if (selectedSlotsMap.has(slotName)) {
-            // --- TRẠNG THÁI: BỎ CHỌN (Quay về trống) ---
-            // Xóa style xanh dương
-            btn.classList.remove(...selectedStyles);
-            // Thêm lại style mặc định ban đầu
-            btn.classList.add(...availableStyles);
-
-            btn.innerHTML = 'Trống';
-            selectedSlotsMap.delete(slotName);
+            // Nếu click vào ô đã chọn: Hủy chọn ô đó và tất cả các ô có index LỚN HƠN nó
+            const allButtons = Array.from(document.querySelectorAll('.slot-button:not([disabled])'));
+            allButtons.forEach(b => {
+                const idx = parseInt(b.getAttribute('data-index'));
+                if (idx >= currentIndex) {
+                    deselectSlot(b, b.getAttribute('data-slot-info'));
+                }
+            });
         } else {
-            // --- TRẠNG THÁI: ĐANG CHỌN (Chuyển sang xanh dương) ---
-            // QUAN TRỌNG: Xóa sạch các class border và ring cũ của trạng thái trống
-            btn.classList.remove(...availableStyles);
-
-            // Thêm style xanh dương
-            btn.classList.add(...selectedStyles);
-
-            btn.innerHTML = '<i class="fa-solid fa-check"></i>';
-            selectedSlotsMap.set(slotName, price);
+            // Nếu click vào ô chưa chọn:
+            if (selectedSlotsMap.size > 0) {
+                fillGaps(currentIndex);
+            } else {
+                selectSlot(btn, slotName, price);
+            }
         }
         updateUI();
+    }
+
+    function fillGaps(newIndex) {
+        let minIdx = newIndex;
+        let maxIdx = newIndex;
+
+        // Tìm dải index hiện tại đang được chọn
+        selectedSlotsMap.forEach((val, key) => {
+            const btn = document.querySelector(`button[data-slot-info="${key}"]`);
+            if (btn) {
+                const idx = parseInt(btn.getAttribute('data-index'));
+                minIdx = Math.min(minIdx, idx);
+                maxIdx = Math.max(maxIdx, idx);
+            }
+        });
+
+        const start = Math.min(minIdx, newIndex);
+        const end = Math.max(maxIdx, newIndex);
+
+        // Kiểm tra xem dải mới có bị chặn bởi ô đã đặt (disabled) không
+        for (let i = start; i <= end; i++) {
+            const btn = document.querySelector(`button[data-index="${i}"]`);
+            if (!btn || btn.disabled) {
+                alert("Không thể chọn dải này vì có ca đã được đặt ở giữa!");
+                return; // Thoát và không làm gì cả nếu bị chặn
+            }
+        }
+
+        // Nếu không bị chặn, tiến hành chọn toàn bộ dải
+        const allButtons = Array.from(document.querySelectorAll('.slot-button:not([disabled])'));
+        allButtons.forEach(btn => {
+            const idx = parseInt(btn.getAttribute('data-index'));
+            const sName = btn.getAttribute('data-slot-info');
+            const sPrice = btn.getAttribute('data-price');
+
+            if (idx >= start && idx <= end) {
+                selectSlot(btn, sName, sPrice);
+            }
+        });
+    }
+
+    function selectSlot(btn, slotName, price) {
+        const selectedStyles = ['bg-blue-600', 'text-white', 'hover:bg-blue-700', 'outline', 'outline-2', 'outline-blue-300', 'scale-105', 'shadow-md', 'border-blue-600'];
+        const availableStyles = ['bg-[#e8fdf1]', 'bg-green-100', 'text-green-700', 'hover:bg-[#d1fae5]', 'border', 'border-[#c2f5d8]'];
+
+        btn.classList.remove(...availableStyles);
+        btn.classList.add(...selectedStyles);
+        btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+        selectedSlotsMap.set(slotName, price);
+    }
+
+    function deselectSlot(btn, slotName) {
+        const selectedStyles = ['bg-blue-600', 'text-white', 'hover:bg-blue-700', 'outline', 'outline-2', 'outline-blue-300', 'scale-105', 'shadow-md', 'border-blue-600'];
+        const availableStyles = ['bg-[#e8fdf1]', 'bg-green-100', 'text-green-700', 'hover:bg-[#d1fae5]', 'border', 'border-[#c2f5d8]'];
+
+        btn.classList.remove(...selectedStyles);
+        btn.classList.add(...availableStyles);
+        btn.innerHTML = 'Trống';
+        selectedSlotsMap.delete(slotName);
     }
     function updateUI() {
         selectedListEl.innerHTML = "";
@@ -526,22 +609,14 @@
         // 2. Kiểm tra ảnh CCCD (nếu muốn bắt buộc)
         const front = document.getElementById('cccd_front').files.length;
         const back = document.getElementById('cccd_back').files.length;
-        if (front === 0 || back === 0) {
-            event.preventDefault();
-            showToast("Vui lòng tải lên cả hai mặt CCCD!", "error");
-            return false;
-        }
+        // if (front === 0 || back === 0) {
+        //     event.preventDefault();
+        //     showToast("Vui lòng tải lên cả hai mặt CCCD!", "error");
+        //     return false;
+        // }
 
         return true;
     }
-    const uploadField = document.getElementById("cccd_front");
-
-    uploadField.onchange = function() {
-        if(this.files[0].size > 2097152){ // 2MB = 1024 * 1024 * 2
-            alert("File quá lớn! Vui lòng chọn file dưới 2MB.");
-            this.value = "";
-        };
-    };
     document.addEventListener('DOMContentLoaded', () => {
         // 1. Lấy tham số từ URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -571,15 +646,26 @@
         }
     });
     document.addEventListener('DOMContentLoaded', function() {
-        // 1. Khởi tạo Swiper (Hiệu ứng lướt)
-        if (typeof Swiper !== 'undefined') {
+        if (typeof Swiper === 'undefined') return;
+
+        const swiperContainer = document.querySelector(".mySwiper");
+        if (!swiperContainer) return;
+
+        // Đếm số lượng slide thực tế
+        const slideCount = swiperContainer.querySelectorAll('.swiper-slide').length;
+
+        if (slideCount > 0) {
             const swiper = new Swiper(".mySwiper", {
-                loop: true,
-                grabCursor: true,
-                autoplay: {
-                    delay: 4000,
+                // CHỈ BẬT LOOP KHI CÓ TỪ 3 ẢNH TRỞ LÊN (hoặc tùy vào cấu hình của bạn)
+                loop: slideCount > 1,
+
+                spaceBetween: 0,
+                centeredSlides: true,
+                autoplay: slideCount > 1 ? {
+                    delay: 3500,
                     disableOnInteraction: false,
-                },
+                } : false, // Tắt autoplay nếu chỉ có 1 ảnh
+
                 pagination: {
                     el: ".swiper-pagination",
                     clickable: true,
@@ -589,29 +675,27 @@
                     nextEl: ".swiper-button-next",
                     prevEl: ".swiper-button-prev",
                 },
+                effect: 'slide',
+                speed: 800,
+
+                // Tự động ẩn các nút điều hướng nếu chỉ có 1 slide
+                watchOverflow: true
             });
+
+            // Nếu chỉ có 1 slide, ẩn luôn các nút điều hướng cho đẹp
+            if (slideCount === 1) {
+                const nextBtn = swiperContainer.querySelector('.swiper-button-next');
+                const prevBtn = swiperContainer.querySelector('.swiper-button-prev');
+                const pagination = swiperContainer.querySelector('.swiper-pagination');
+
+                if (nextBtn) nextBtn.style.display = 'none';
+                if (prevBtn) prevBtn.style.display = 'none';
+                if (pagination) pagination.style.display = 'none';
+            }
+        } else {
+            // Trường hợp không có ảnh nào: Ẩn luôn khung Swiper
+            swiperContainer.style.display = 'none';
         }
-    });
-    var swiper = new Swiper(".mySwiper", {
-        loop: true,
-        spaceBetween: 0,
-        centeredSlides: true,
-        autoplay: {
-            delay: 3500,
-            disableOnInteraction: false,
-        },
-        pagination: {
-            el: ".swiper-pagination",
-            clickable: true,
-            dynamicBullets: true,
-        },
-        navigation: {
-            nextEl: ".swiper-button-next",
-            prevEl: ".swiper-button-prev",
-        },
-        // Hiệu ứng lướt nhẹ nhàng
-        effect: 'slide',
-        speed: 800,
     });
 </script>
 <div id="toast-container" class="fixed top-5 right-5 z-[200] flex flex-col gap-2"></div>
