@@ -90,9 +90,9 @@
       <i class="fa-solid fa-door-open w-5"></i> Phòng
     </a>
     <a th:href="@{/admin/account_list}" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium transition-colors shadow-sm ring-1 ring-black/5">
-      <i class="fa-solid fa-users-gear w-5"></i> Tài khoản hệ thống
+      <i class="fa-solid fa-users-gear w-5"></i> Tài khoản nhân viên
     </a>
-    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+    <a href="/admin/feedback" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
       <i class="fa-regular fa-comment-dots w-5"></i> Phản hồi khách hàng
     </a>
   </nav>
@@ -217,10 +217,11 @@
         </div>
         <div class="p-6">
           <div class="flex flex-col sm:flex-row gap-3">
-            <button class="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium transition-colors shadow-sm">
+            <a th:href="@{/admin/users/edit(userId=${user.userId})}"
+               class="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium transition-colors shadow-sm">
               <i class="fa-regular fa-pen-to-square"></i>
               <span>Chỉnh sửa hồ sơ</span>
-            </button>
+            </a>
 
 
 
@@ -232,7 +233,7 @@
               <input type="hidden" name="status" th:value="${user.status == 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'}" />
 
               <button type="submit"
-                      onclick="return confirm('Mày có chắc chắn muốn thay đổi trạng thái người dùng này không?')"
+                      onclick="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái người dùng này không?')"
                       class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors border"
                       th:classappend="${user.status == 'ACTIVE'
              ? 'bg-red-50 text-red-700 hover:bg-red-100 border-red-600'
