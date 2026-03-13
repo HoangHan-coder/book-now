@@ -412,7 +412,7 @@
                         </div>
 
                         <!-- if don't have amenity -->
-                        <div th:if="${empty allAmenities}">
+                        <div th:if="${allAmenities == null or #lists.isEmpty(allAmenities)}"
                              class="text-sm text-gray-400 italic">
                             Không có tiện nghi
                         </div>
@@ -455,7 +455,7 @@
 
 </main>
 
-<script>
+<script th:inline="javascript">
 
     /* ===============================
        EDIT PRICE – MULTI INPUT
