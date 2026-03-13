@@ -25,21 +25,25 @@ public class ViewUserListController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String search,
             Model model) {
+        try {
+            String roleParam = (role != null && !role.isBlank()) ? role.toUpperCase() : null;
+            String statusParam = (status != null && !status.isBlank()) ? status.toUpperCase() : null;
+            String keywordParam = (search != null && !search.isBlank()) ? search : null;
 
-        String roleParam = (role != null && !role.isBlank()) ? role.toUpperCase() : null;
-        String statusParam = (status != null && !status.isBlank()) ? status.toUpperCase() : null;
-        String keywordParam = (search != null && !search.isBlank()) ? search : null;
+            List<UserDTO> users =
+                    service.getUserList(roleParam, statusParam, keywordParam);
 
-        List<UserDTO> users =
-                service.getUserList(roleParam, statusParam, keywordParam);
+            model.addAttribute("users", users);
 
-        model.addAttribute("users", users);
+            if (users.isEmpty()) {
+                model.addAttribute("message", "Không tìm thấy người dùng nào.");
+            }
 
-        if (users.isEmpty()) {
-            model.addAttribute("message", "Không tìm thấy người dùng nào.");
+            return "private/Account_list";
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            return "error-page";
         }
-
-        return "private/Account_list";
     }
 }
 

@@ -29,19 +29,23 @@ public class ViewFeedbackListController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Model model) {
+        try {
+            Page<FeedbackListDTO> feedbackPage =
+                    viewFeedbackListService.getFeedbackList(rating, hidden, keyword, page, size);
 
-        Page<FeedbackListDTO> feedbackPage =
-                viewFeedbackListService.getFeedbackList(rating, hidden, keyword, page, size);
+            model.addAttribute("feedbackList", feedbackPage.getContent());
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", feedbackPage.getTotalPages());
+            model.addAttribute("totalItems", feedbackPage.getTotalElements());
 
-        model.addAttribute("feedbackList", feedbackPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", feedbackPage.getTotalPages());
-        model.addAttribute("totalItems", feedbackPage.getTotalElements());
+            model.addAttribute("rating", rating);
+            model.addAttribute("hidden", hidden);
+            model.addAttribute("keyword", keyword);
 
-        model.addAttribute("rating", rating);
-        model.addAttribute("hidden", hidden);
-        model.addAttribute("keyword", keyword);
-
-        return "private/Feedback_list";
+            return "private/Feedback_list";
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            return "error-page";
+        }
     }
 }

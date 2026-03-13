@@ -32,14 +32,18 @@ public class EditStaffAccountController {
 
     // UC-17.x: Submit Edit Staff Account
     @PostMapping("/edit")
-    public String updateStaffAccount(@RequestParam("userId") Long userId,
-                                     @RequestParam("fullName") String fullName,
-                                     @RequestParam("phone") String phone,
-                                     @RequestParam("role") String role,
-                                     @RequestParam("status") String status) {
+    public String updateStaffAccount(@RequestParam(value = "userId", required = false) Long userId,
+                                     @RequestParam(value = "fullName", required = false) String fullName,
+                                     @RequestParam(value = "phone", required = false) String phone,
+                                     @RequestParam(value = "role", required = false) String role,
+                                     @RequestParam(value = "status", required = false) String status) {
 
-        service.updateStaffAccount(userId, fullName, phone, role, status);
+        try {
+            service.updateStaffAccount(userId, fullName, phone, role, status);
 
-        return "redirect:/admin/users/detail?userId=" + userId + "&userType=STAFF";
+            return "redirect:/admin/users/detail?userId=" + userId + "&userType=STAFF";
+        } catch (Exception e) {
+            return "redirect:/admin/users/edit?userId=" + userId + "&userType=STAFF";
+        }
     }
 }

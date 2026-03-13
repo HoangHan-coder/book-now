@@ -21,12 +21,15 @@ public class ViewUserDetailController {
     public String viewUserDetail(@RequestParam("userId") String userId,
                                  @RequestParam("userType") String userType,
                                  Model model) {
+        try {
+            UserDetailDTO userDetail =
+                    service.getUserDetail(userId, userType);
 
-        UserDetailDTO userDetail =
-                service.getUserDetail(userId, userType);
+            model.addAttribute("user", userDetail);
 
-        model.addAttribute("user", userDetail);
-
-        return "private/Account_detail";
+            return "private/Account_detail";
+        } catch (Exception e) {
+            return "redirect:/admin/account_list";
+        }
     }
 }
