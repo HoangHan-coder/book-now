@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi tiết phản hồi - BookNow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: { brand: { light: '#60a5fa', DEFAULT: '#3b82f6', dark: '#2563eb' } }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .logo-fixed { position: fixed; top: 0; left: 0; margin-top: 25px; margin-left: 25px; z-index: 60; }
+    .gradient-text { background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .gradient-icon { color: #3b82f6; }
+    .sidebar { transition: transform 0.3s ease-in-out; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+<div class="logo-fixed flex items-center gap-3 select-none bg-white/90 backdrop-blur px-3 py-2 rounded-xl shadow-sm lg:shadow-none lg:bg-transparent lg:p-0">
+  <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
+    <i class="fa-solid fa-house-chimney gradient-icon text-xl"></i>
+  </div>
+  <div class="flex flex-col justify-center">
+    <span class="text-2xl font-extrabold tracking-tight gradient-text leading-none">BookNow</span>
+    <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider pl-0.5">Homestay System</span>
+  </div>
+</div>
+
+<aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform -translate-x-full lg:translate-x-0 pt-28 overflow-y-auto no-scrollbar">
+  <nav class="px-4 space-y-2">
+    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition-colors">
+      <i class="fa-solid fa-chart-line w-5"></i> Bảng điều khiển
+    </a>
+    <a th:href="@{/admin/feedback}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition-colors">
+      <i class="fa-regular fa-calendar-check w-5"></i> Đơn đặt phòng
+    </a>
+    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+      <i class="fa-solid fa-door-open w-5"></i>
+      Phòng
+    </a>
+    <a href="/admin/account_list" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+      <i class="fa-solid fa-users-gear w-5"></i>
+      Tài khoản nhân viên
+    </a>
+    <a href="/admin/feedback" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium shadow-sm ring-1 ring-black/5">
+      <i class="fa-regular fa-comment-dots w-5"></i> Phản hồi khách hàng
+    </a>
+  </nav>
+</aside>
+
+<main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
+  <div th:if="${feedback != null}">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+      <div class="flex items-center gap-3">
+        <a th:href="@{/admin/feedback}" class="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:text-blue-600 transition-colors">
+          <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+            Chi tiết phản hồi <span th:text="'#FB-' + ${#numbers.formatInteger(feedback.feedbackId, 5)}">#FB-00000</span>
+            <span id="statusBadge" th:class="${feedback.isHidden} ? 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600' : 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800'">
+              <i th:class="${feedback.isHidden} ? 'fa-regular fa-eye-slash mr-1.5' : 'fa-regular fa-eye mr-1.5'"></i>
+              <span th:text="${feedback.isHidden} ? 'Đã ẩn' : 'Đang hiển thị'">Trạng thái</span>
+            </span>
+          </h1>
+          <p class="text-sm text-gray-500 mt-1" th:text="'Đánh giá ngày ' + ${#temporals.format(feedback.createdAt, 'dd/MM/yyyy')}">Ngày tạo</p>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <!-- UC-14.3 Hide/Show Feedback -->
+        <form th:action="@{/admin/feedback/{id}/visibility(id=${feedback.feedbackId})}" method="post">
+          <input type="hidden" name="isHidden" th:value="${!feedback.isHidden}" />
+
+          <button type="submit"
+                  class="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg font-medium shadow-sm transition-colors">
+
+            <i th:class="${feedback.isHidden} ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash'"></i>
+
+            <span th:text="${feedback.isHidden} ? 'Hiện phản hồi' : 'Ẩn phản hồi'"></span>
+
+          </button>
+        </form>
+
+        <!-- Back to Feedback List -->
+        <a th:href="@{/admin/feedback}"
+           class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-sm font-medium transition-colors">
+          <i class="fa-solid fa-reply"></i>
+          <span>Trở lại</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div class="xl:col-span-2 space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="p-8">
+            <div class="flex items-center gap-2 mb-6 text-yellow-400 text-xl">
+              <i th:each="i : ${#numbers.sequence(1, 5)}" th:class="${i <= feedback.rating} ? 'fa-solid fa-star' : 'fa-regular fa-star text-gray-300'"></i>
+              <span class="text-lg font-bold text-gray-800 ml-2" th:text="${feedback.rating + '.0'}">0.0</span>
+            </div>
+            <div class="relative">
+              <i class="fa-solid fa-quote-left absolute -top-4 -left-4 text-gray-100 text-5xl -z-10"></i>
+              <h3 class="text-xl font-medium text-gray-800 italic leading-relaxed" th:text="${feedback.content}">Nội dung</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+          <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+            <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+              <i class="fa-solid fa-reply text-blue-500"></i> Phản hồi
+            </h3>
+          </div>
+
+          <div class="p-6">
+
+            <!-- UC-14.4 Reply Form -->
+            <form th:action="@{/admin/feedback/reply}" method="post">
+
+              <!-- feedbackId gửi về controller -->
+              <input type="hidden"
+                     name="feedbackId"
+                     th:value="${feedback.feedbackId}"/>
+
+              <!-- reply content -->
+              <textarea
+                      name="replyContent"
+                      class="w-full p-4 border border-gray-300 rounded-xl outline-none min-h-[120px] text-sm"
+                      placeholder="Nhập phản hồi từ Homestay..."
+                      th:text="${feedback.contentReply}">
+      </textarea>
+
+              <div class="flex justify-end mt-4">
+                <button type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium shadow-sm transition-colors">
+                  Gửi
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+            <h3 class="font-semibold text-gray-800 flex items-center gap-2"><i class="fa-regular fa-user text-blue-500"></i> Khách hàng</h3>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-4 mb-6">
+              <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-2xl font-bold"
+                   th:text="${feedback.booking?.customer?.fullName != null ? #strings.substring(feedback.booking.customer.fullName, 0, 1).toUpperCase() : '?'}">?</div>
+              <div>
+                <h4 class="text-lg font-bold text-gray-800" th:text="${feedback.booking?.customer?.fullName}">Tên khách</h4>
+                <p class="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full inline-block mt-1 font-medium" th:text="${feedback.booking?.customer?.status}">Trạng thái</p>
+              </div>
+            </div>
+            <div class="space-y-4 text-sm">
+              <div class="flex items-center gap-3"><i class="fa-regular fa-envelope text-gray-400"></i> <span th:text="${feedback.booking?.customer?.email}">Email</span></div>
+              <div class="flex items-center gap-3"><i class="fa-solid fa-phone text-gray-400"></i> <span th:text="${feedback.booking?.customer?.phone}">SĐT</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+            <h3 class="font-semibold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-bed text-blue-500"></i> Lưu trú</h3>
+          </div>
+          <div class="p-6 space-y-4">
+            <div class="flex justify-between items-center pb-4 border-b border-gray-100">
+              <div><p class="text-xs text-gray-500">Số phòng</p><p class="text-lg font-bold text-gray-800" th:text="${feedback.booking?.room?.roomNumber}">000</p></div>
+              <div class="text-right"><p class="text-xs text-gray-500">Mã đơn</p><p class="text-sm font-medium text-blue-600" th:text="${feedback.booking?.bookingCode}">Code</p></div>
+            </div>
+            <div class="text-sm font-medium">
+              <p class="text-xs text-gray-500 mb-2">Thời gian</p>
+              <span th:text="${#temporals.format(feedback.booking?.checkInTime, 'dd/MM/yyyy')}"></span>
+              <i class="fa-solid fa-arrow-right text-gray-300 mx-1"></i>
+              <span th:text="${#temporals.format(feedback.booking?.checkOutTime, 'dd/MM/yyyy')}"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>
