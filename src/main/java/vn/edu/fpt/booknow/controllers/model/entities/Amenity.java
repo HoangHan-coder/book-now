@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.entities;
+package vn.edu.fpt.booknow.controllers.model.entities;
 
 import jakarta.persistence.*;
 

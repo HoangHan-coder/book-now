@@ -98,7 +98,7 @@
             <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
                 <i class="fa-regular fa-calendar-check w-5"></i> Đơn đặt phòng
             </a>
-            <a th:href="@{/admin/list}" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl font-medium transition-colors shadow-sm ring-1 ring-black/5">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl font-medium transition-colors shadow-sm ring-1 ring-black/5">
                 <i class="fa-solid fa-door-open w-5"></i> Quản lý phòng
             </a>
             
@@ -126,7 +126,7 @@
                 <p class="text-sm text-gray-500 mt-1">Chỉ nhân viên mới có quyền cập nhật trạng thái tại đây.</p>
             </div>
             
-            <a th:href="@{/admin/list}" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+            <a href="#" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                 <i class="fa-solid fa-arrow-left mr-2"></i> Quay lại danh sách
             </a>
         </div>
@@ -177,18 +177,11 @@
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Tên phòng</label>
-                            <div class="read-only-field w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700">
-                                Phòng Tiêu Chuẩn 101 (View Vườn)
-                            </div>
-                        </div>
-
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Giá / Đêm</label>
-                                <div th:text="${room.roomType != null
-                                      ? #numbers.formatDecimal(room.roomType.overPrice,0,'POINT',0,'COMMA') + '₫'
+                                <div th:text="${room != null
+                                      ? #numbers.formatDecimal(room.overPrice,0,'POINT',0,'COMMA') + '₫'
                                       : 'N/A'}"
                                         class="read-only-field w-full px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium text-blue-600">
                                 </div>
@@ -203,7 +196,7 @@
 
                         <div>
                             <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Mô tả phòng</label>
-                            <div th:text="${room.roomType.description}"
+                            <div th:text="${room.description}"
                                     class="read-only-field w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 h-24 overflow-y-auto">
                             </div>
                         </div>
@@ -244,33 +237,28 @@
                         </h3>
                     </div>
                     <div class="p-6">
-                        <form id="updateStatusForm" class="space-y-6">
-                            
+                        <form id="updateStatusForm"
+                              th:action="@{/staff/update}"
+                              method="post"
+                              class="space-y-6">
+                            <input type="hidden" name="roomId" th:value="${room.roomId}">
                             <!-- Transition Logic UI -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Chọn trạng thái tiếp theo</label>
                                 <div class="relative">
-                                    <select id="newStatusSelect" class="block w-full pl-11 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white shadow-sm cursor-pointer transition-colors disabled:bg-gray-100 disabled:text-gray-400">
+                                    <select id="newStatusSelect"
+                                            name="status"
+                                            class="block w-full pl-11 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white shadow-sm cursor-pointer transition-colors disabled:bg-gray-100 disabled:text-gray-400">
                                         <option value="" disabled selected>-- Chọn trạng thái --</option>
                                         <!-- Options populated by JS based on rules -->
                                     </select>
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fa-solid fa-list-check text-gray-400"></i>
                                     </div>
-                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
-                                        <i class="fa-solid fa-chevron-down text-xs"></i>
-                                    </div>
                                 </div>
                                 <p id="transitionHint" class="mt-2 text-xs text-blue-600 bg-blue-50 p-2 rounded border border-blue-100 inline-block">
                                     <i class="fa-solid fa-lightbulb mr-1"></i>
-                                    Từ "Trống", bạn chỉ có thể chuyển sang "Đã đặt trước" hoặc "Bảo trì".
                                 </p>
-                            </div>
-
-                            <!-- Note -->
-                            <div>
-                                <label for="statusNote" class="block text-sm font-medium text-gray-700 mb-2">Ghi chú thay đổi (Tùy chọn)</label>
-                                <textarea id="statusNote" rows="3" class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm resize-none" placeholder="Ví dụ: Khách check-in sớm, phát hiện hỏng đèn..."></textarea>
                             </div>
 
                             <!-- Actions -->
@@ -286,64 +274,6 @@
                         </form>
                     </div>
                 </div>
-
-                <!-- HISTORY PANEL -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                        <h3 class="font-semibold text-gray-800 flex items-center gap-2">
-                            <i class="fa-solid fa-clock-rotate-left text-gray-500"></i>
-                            Lịch sử trạng thái
-                        </h3>
-                        <button class="text-xs text-blue-600 hover:underline">Xem tất cả</button>
-                    </div>
-                    <div class="p-6 relative timeline-line" id="historyContainer">
-                        <!-- History Item 1 -->
-                        <div class="flex gap-4 mb-6 relative z-10">
-                            <div class="w-8 h-8 rounded-full bg-green-100 border-2 border-white shadow-sm flex items-center justify-center flex-shrink-0 text-green-600 text-xs">
-                                <i class="fa-solid fa-check"></i>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-sm font-bold text-gray-800">Trống (Available)</span>
-                                    <span class="text-xs text-gray-400">• 10:30 AM, Hôm nay</span>
-                                </div>
-                                <p class="text-sm text-gray-600 bg-gray-50 p-2 rounded border border-gray-100 inline-block">
-                                    Dọn phòng hoàn tất. Sẵn sàng đón khách.
-                                </p>
-                                <p class="text-xs text-gray-400 mt-1">Bởi: Nguyễn Văn Staff</p>
-                            </div>
-                        </div>
-
-                        <!-- History Item 2 -->
-                        <div class="flex gap-4 mb-6 relative z-10">
-                            <div class="w-8 h-8 rounded-full bg-yellow-100 border-2 border-white shadow-sm flex items-center justify-center flex-shrink-0 text-yellow-600 text-xs">
-                                <i class="fa-solid fa-broom"></i>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-sm font-bold text-gray-800">Đang dọn dẹp</span>
-                                    <span class="text-xs text-gray-400">• 09:15 AM, Hôm nay</span>
-                                </div>
-                                <p class="text-xs text-gray-400 mt-1">Bởi: Lê Thị Maid</p>
-                            </div>
-                        </div>
-
-                        <!-- History Item 3 -->
-                        <div class="flex gap-4 relative z-10">
-                            <div class="w-8 h-8 rounded-full bg-red-100 border-2 border-white shadow-sm flex items-center justify-center flex-shrink-0 text-red-600 text-xs">
-                                <i class="fa-solid fa-user"></i>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-sm font-bold text-gray-800">Đang có khách</span>
-                                    <span class="text-xs text-gray-400">• 23/01/2026</span>
-                                </div>
-                                <p class="text-xs text-gray-400 mt-1">Bởi: Hệ thống (Check-in)</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
 
@@ -358,14 +288,6 @@
         colorClass: 'bg-green-100 text-green-700 border-green-200',
         dotColor: 'bg-green-500',
         icon: 'fa-check'
-    },
-
-    'RESERVED': {
-        label: 'Đã đặt trước (Reserved)',
-        desc: 'Phòng đã được giữ chỗ cho khách hàng sắp đến.',
-        colorClass: 'bg-blue-100 text-blue-700 border-blue-200',
-        dotColor: 'bg-blue-500',
-        icon: 'fa-calendar-check'
     },
 
     'BOOKED': {
@@ -403,16 +325,17 @@
 
         // Strict Transition Rules
         const TRANSITIONS = {
-    'AVAILABLE': ['RESERVED', 'MAINTENANCE'],
+    'AVAILABLE': ['BOOKED', 'MAINTENANCE'],
     'BOOKED': ['OCCUPIED', 'MAINTENANCE'],
-    'RESERVED': ['OCCUPIED', 'MAINTENANCE'],
     'OCCUPIED': ['CLEANING', 'MAINTENANCE'],
     'CLEANING': ['AVAILABLE', 'MAINTENANCE'],
     'MAINTENANCE': ['AVAILABLE']
 };
 /* ========= CURRENT STATUS FROM THYMELEAF ========= */
 let currentStatusKey = /*[[${room.status}]]*/ "AVAILABLE";
-
+            if (currentStatusKey === "DELETED") {
+             window.location.href = "/admin/list";
+                      }
 
         // DOM Elements
         const currentStatusDisplay = document.getElementById('currentStatusDisplay');
@@ -421,7 +344,6 @@ let currentStatusKey = /*[[${room.status}]]*/ "AVAILABLE";
         const transitionHint = document.getElementById('transitionHint');
         const updateBtn = document.getElementById('updateBtn');
         const updateStatusForm = document.getElementById('updateStatusForm');
-        const historyContainer = document.getElementById('historyContainer');
         const resetBtn = document.getElementById('resetBtn');
 
         // --- FUNCTIONS ---
@@ -442,7 +364,7 @@ let currentStatusKey = /*[[${room.status}]]*/ "AVAILABLE";
             newStatusSelect.innerHTML = '<option value="" disabled selected>-- Chọn trạng thái --</option>';
             
             const allowedNext = TRANSITIONS[currentStatusKey];
-            
+
             if (allowedNext && allowedNext.length > 0) {
                 allowedNext.forEach(statusKey => {
                     const option = document.createElement('option');
@@ -463,76 +385,36 @@ let currentStatusKey = /*[[${room.status}]]*/ "AVAILABLE";
             }
         }
 
-        function addHistoryEntry(oldStatus, newStatus, note) {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ', Hôm nay';
-            const config = STATUS_CONFIG[newStatus];
-            
-            const entryHtml = `
-                <div class="flex gap-4 mb-6 relative z-10 animate-fade-in-down">
-                    <div class="w-8 h-8 rounded-full ${config.colorClass.replace('text-', 'bg-').replace('bg-', 'bg-opacity-20 ')} border-2 border-white shadow-sm flex items-center justify-center flex-shrink-0">
-                        <i class="fa-solid ${config.icon} text-xs"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-sm font-bold text-gray-800">${config.label}</span>
-                            <span class="text-xs text-gray-400">• ${timeString}</span>
-                        </div>
-                        ${note ? `<p class="text-sm text-gray-600 bg-gray-50 p-2 rounded border border-gray-100 inline-block">${note}</p>` : ''}
-                        <p class="text-xs text-gray-400 mt-1">Bởi: Bạn (Staff)</p>
-                    </div>
-                </div>
-            `;
-            
-            historyContainer.insertAdjacentHTML('afterbegin', entryHtml);
-        }
+resetBtn.addEventListener('click', () => {
+    newStatusSelect.value = "";
+    updateBtn.disabled = true;
+});
+
+resetBtn.addEventListener('click', () => {
+    newStatusSelect.value = "";
+    updateBtn.disabled = true;
+});
+
+newStatusSelect.addEventListener('change', () => {
+    updateBtn.disabled = false;
+});
 
         // --- EVENT LISTENERS ---
 
-        newStatusSelect.addEventListener('change', () => {
-            updateBtn.disabled = false;
-        });
+       updateStatusForm.addEventListener('submit', function(e) {
 
-        resetBtn.addEventListener('click', () => {
-            newStatusSelect.value = "";
-            document.getElementById('statusNote').value = "";
-            updateBtn.disabled = true;
-        });
+    const nextStatus = newStatusSelect.value;
 
-        updateStatusForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const nextStatus = newStatusSelect.value;
-            const note = document.getElementById('statusNote').value;
-            
-            if (!nextStatus) return;
+    if (!nextStatus) {
+        e.preventDefault();
+        alert("Vui lòng chọn trạng thái");
+        return;
+    }
 
-            // Simulate Loading
-            const originalBtnContent = updateBtn.innerHTML;
-            updateBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Đang cập nhật...';
-            updateBtn.disabled = true;
+    updateBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Đang cập nhật...';
+    updateBtn.disabled = true;
 
-            setTimeout(() => {
-                // Update Logic
-                const prevStatus = currentStatusKey;
-                currentStatusKey = nextStatus;
-                
-                // Refresh UI
-                renderCurrentStatus();
-                populateDropdown();
-                addHistoryEntry(prevStatus, currentStatusKey, note);
-                
-                // Reset Form
-                updateBtn.innerHTML = originalBtnContent;
-                newStatusSelect.value = "";
-                document.getElementById('statusNote').value = "";
-                updateBtn.disabled = true;
-                
-                // Show toast or alert (simulated)
-                // alert(`Đã cập nhật trạng thái phòng thành: ${STATUS_CONFIG[currentStatusKey].label}`);
-                
-            }, 800);
-        });
+});
 
         // --- INIT ---
         renderCurrentStatus();

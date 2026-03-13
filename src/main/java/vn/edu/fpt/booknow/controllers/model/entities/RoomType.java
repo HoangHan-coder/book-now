@@ -1,11 +1,11 @@
-package vn.edu.fpt.booknow.entities;
+package vn.edu.fpt.booknow.controllers.model.entities;
 
 import jakarta.persistence.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
+@Table(name = "RoomType")
 public class RoomType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,12 +15,6 @@ public class RoomType {
     @Column(name = "name", length = 100, nullable = false)
     private String name;
 
-    @Column(name = "description", length = 500)
-    private String description;
-
-    @Column(name = "base_price", precision = 12, scale = 2, nullable = false)
-    private BigDecimal basePrice;
-
     @Column(name = "image_url", length = 500)
     private String imageUrl;
 
@@ -28,10 +22,7 @@ public class RoomType {
     private Integer maxGuests;
 
     @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted;
-
-    @Column(name = "over_price", precision = 12, scale = 2, nullable = false)
-    private BigDecimal overPrice;
+    private Boolean isDeleted = false;
 
     // Quan hệ ngược (KHÔNG bắt buộc)
     @OneToMany(mappedBy = "roomType", fetch = FetchType.LAZY)
@@ -58,21 +49,6 @@ public class RoomType {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigDecimal getBasePrice() {
-        return basePrice;
-    }
-
-    public void setBasePrice(BigDecimal basePrice) {
-        this.basePrice = basePrice;
-    }
 
     public String getImageUrl() {
         return imageUrl;
@@ -90,19 +66,19 @@ public class RoomType {
         this.maxGuests = maxGuests;
     }
 
-    public BigDecimal getOverPrice() {
-        return overPrice;
-    }
-
-    public void setOverPrice(BigDecimal overPrice) {
-        this.overPrice = overPrice;
-    }
-
     public Boolean getIsDeleted() {
         return isDeleted;
     }
 
     public void setIsDeleted(Boolean isDeleted) {
         this.isDeleted = isDeleted;
+    }
+
+    public List<Room> getRooms() {
+        return rooms;
+    }
+
+    public void setRooms(List<Room> rooms) {
+        this.rooms = rooms;
     }
 }

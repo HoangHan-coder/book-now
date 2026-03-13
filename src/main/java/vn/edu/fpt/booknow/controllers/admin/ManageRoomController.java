@@ -1,5 +1,6 @@
-package vn.edu.fpt.booknow.controllers.Admin;
+package vn.edu.fpt.booknow.controllers.admin;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
@@ -7,20 +8,24 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import vn.edu.fpt.booknow.entities.Room;
-import vn.edu.fpt.booknow.entities.RoomType;
+import vn.edu.fpt.booknow.controllers.model.dto.DashboardDTO;
+import vn.edu.fpt.booknow.controllers.model.entities.Room;
+import vn.edu.fpt.booknow.controllers.model.entities.RoomType;
 import vn.edu.fpt.booknow.services.AmenityService;
 import vn.edu.fpt.booknow.services.ManageRoomServices;
 import vn.edu.fpt.booknow.services.RoomTypeService;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 @RequestMapping(value = "/admin")
 public class ManageRoomController {
-    final static int ITEM_PER_PAGE = 5;
+    final static int ITEM_PER_PAGE = 10;
     private ManageRoomServices manageRoomServices;
     private RoomTypeService roomTypeService;
     private AmenityService amenityService;
@@ -32,8 +37,66 @@ public class ManageRoomController {
     }
 
     @GetMapping("/dashboard")
-    public String adminDashboard() {
+    public String adminDashboard(
+            Model model,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+
+        String lastUpdate = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy"));
+
+        DashboardDTO data =
+                manageRoomServices.getDashboard(startDate, endDate);
+
+        DateTimeFormatter displayFormat =
+                DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        LocalDate start;
+        LocalDate end;
+
+        if (startDate == null || endDate == null) {
+            start = LocalDate.now().withDayOfMonth(1);
+            end = LocalDate.now();
+        } else {
+            start = LocalDate.parse(startDate.substring(0, 10));
+            end = LocalDate.parse(endDate.substring(0, 10));
+        }
+
+        String dateLabel =
+                start.format(displayFormat) + " – " + end.format(displayFormat);
+
+        model.addAttribute("startDate", start);
+        model.addAttribute("endDate", end);
+        model.addAttribute("dashboard", data);
+        model.addAttribute("lastUpdate", lastUpdate);
+        model.addAttribute("dateLabel", dateLabel);
+
         return "private/Admin_dashboard";
+    }
+
+    @GetMapping("/dashboard/export/{type}")
+    public void exportDashboard(
+            @PathVariable String type,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            HttpServletResponse response) throws Exception {
+        System.out.println("EXPORT CSV TRIGGERED" + type);
+        switch (type.toLowerCase()) {
+            case "csv":
+                manageRoomServices.exportCSV(startDate, endDate, response);
+                break;
+
+            case "excel":
+                manageRoomServices.exportExcel(startDate, endDate, response);
+                break;
+
+            case "pdf":
+                manageRoomServices.exportPDF(startDate, endDate, response);
+                break;
+
+            default:
+                throw new RuntimeException("Invalid export type");
+        }
     }
 
     @GetMapping(value = "/list")
@@ -73,9 +136,9 @@ public class ManageRoomController {
 
     @GetMapping("/create")
     public String createRoom(Model model) {
-
         model.addAttribute("roomType", roomTypeService.findAll());
         model.addAttribute("allAmenities", amenityService.findAll());
+
         return "private/Room_create";
     }
 
@@ -92,11 +155,12 @@ public class ManageRoomController {
         return "private/Room_Detail";
     }
 
-    @GetMapping("/update/{id}")
-    public String updateSttRoom(Model model, @PathVariable("id") Long id) {
-        Room room = manageRoomServices.findRoomById(id);
-        model.addAttribute("room", room);
-        return "private/Room_update_stt";
+    @PostMapping("/room/delete/{id}")
+    public String softDeleteRoom(@PathVariable Long id) {
+        System.out.println("ĐÃ vào đây!");
+        manageRoomServices.softDeleteRoom(id);
+
+        return "redirect:/admin/list";
     }
 
     @GetMapping("/edit/{id}")
@@ -110,12 +174,12 @@ public class ManageRoomController {
         Long basePrice = 0L;
         Long overPrice = 0L;
 
-        if (room.getRoomType().getBasePrice() != null) {
-            basePrice = room.getRoomType().getBasePrice().longValue();
+        if (room.getBasePrice() != null) {
+            basePrice = room.getBasePrice().longValue();
         }
 
-        if (room.getRoomType().getOverPrice() != null) {
-            overPrice = room.getRoomType().getOverPrice().longValue();
+        if (room.getOverPrice() != null) {
+            overPrice = room.getOverPrice().longValue();
         }
 
         if (room.getRoomAmenities() == null) {
@@ -132,8 +196,8 @@ public class ManageRoomController {
         model.addAttribute("roomType",roomTypeService.findAll());
         model.addAttribute("allAmenities", amenityService.findAll());
         model.addAttribute("roomAmenityIds", roomAmenityIds);
-        model.addAttribute("basePrice", room.getRoomType().getBasePrice().longValue());
-        model.addAttribute("overPrice", room.getRoomType().getOverPrice().longValue());
+        model.addAttribute("basePrice", room.getBasePrice().longValue());
+        model.addAttribute("overPrice", room.getOverPrice().longValue());
         return "private/Room_edit";
     }
 
@@ -175,7 +239,7 @@ public class ManageRoomController {
                 deletedImageIds
         );
 
-        return "redirect:/admin/list";
+        return "redirect:/admin/detail/" + roomId;
     }
 
     @PostMapping("/rooms/create")
@@ -189,9 +253,11 @@ public class ManageRoomController {
 
             @RequestParam(required = false) List<Long> amenityIds,
             @RequestParam( required = false) List<String> newAmenityNames,
+
+            @RequestParam(required = false) MultipartFile[] images,
+
             RedirectAttributes redirectAttributes
     ) {
-
         try {
 
             manageRoomServices.createRoom(
@@ -202,7 +268,8 @@ public class ManageRoomController {
                     status,
                     description,
                     amenityIds,
-                    newAmenityNames
+                    newAmenityNames,
+                    images
             );
 
             redirectAttributes.addFlashAttribute("successMessage", "Tạo phòng thành công!");

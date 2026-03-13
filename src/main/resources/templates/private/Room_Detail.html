@@ -153,7 +153,7 @@
                                     <div th:text="${room.roomType.name}" class="block w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 font-medium sm:text-sm">
                                     </div>
                                     <p class="text-xs text-gray-400 italic mt-1"
-                                       th:text="|Diện tích: ${room.areaM2}m² - Tối đa: ${room.roomType.maxGuests} người|">
+                                       th:text="|Diện tích: ${room.areaM2}m&sup2; - Tối đa: ${room.roomType.maxGuests} người|">
                                     </p>
                                 </div>
                                 <div class="hidden md:block">
@@ -169,15 +169,15 @@
                             <div class="grid grid-cols-2 gap-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
                                 <div class="space-y-1">
                                     <label class="block text-sm font-medium text-blue-900/70">Giá / Slot (Giờ)</label>
-                                    <div th:text="${room.roomType != null
-                                      ? #numbers.formatDecimal(room.roomType.basePrice,0,'POINT',0,'COMMA') + '₫'
+                                    <div th:text="${room != null
+                                      ? #numbers.formatDecimal(room.basePrice,0,'POINT',0,'COMMA') + '₫'
                                       : 'N/A'}" class="text-blue-800 text-2xl font-bold">
                                     </div>
                                 </div>
                                 <div class="space-y-1">
                                     <label class="block text-sm font-medium text-blue-900/70">Giá / Đêm</label>
-                                    <div th:text="${room.roomType != null
-                                      ? #numbers.formatDecimal(room.roomType.overPrice,0,'POINT',0,'COMMA') + '₫'
+                                    <div th:text="${room != null
+                                      ? #numbers.formatDecimal(room.overPrice,0,'POINT',0,'COMMA') + '₫'
                                       : 'N/A'}" class="text-blue-800 text-2xl font-bold">
                                     </div>
                                 </div>
@@ -211,7 +211,7 @@
                             <!-- Description -->
                             <div class="space-y-1">
                                 <label class="block text-sm font-medium text-gray-500">Mô tả chi tiết</label>
-                                <div th:text="${room.roomType.description}"
+                                <div th:text="${room.description}"
                                         class="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 sm:text-sm min-h-[100px] whitespace-pre-line"></div>
                             </div>
                         </div>
@@ -227,7 +227,7 @@
                             </h3>
 
                             <!-- Nếu không có tiện nghi -->
-                            <div th:if="${room.roomAmenities == null or room.roomAmenities.empty}"
+                            <div th:if="${room.roomAmenities == null or #lists.isEmpty(room.roomAmenities)}"
                                  class="text-sm text-gray-400 italic">
                                 Không có tiện nghi
                             </div>
@@ -250,24 +250,24 @@
                             </div>
                         </div>
 
-                        <!-- Meta Info (Created/Updated) -->
-                        <div class="px-2">
-                             <p class="text-xs text-gray-400">
-                                Ngày tạo: <span class="font-medium text-gray-600">01/01/2024 10:00</span>
-                             </p>
-                             <p class="text-xs text-gray-400 mt-1">
-                                Cập nhật lần cuối: <span class="font-medium text-gray-600">03/02/2026 15:30</span>
-                             </p>
-                        </div>
-
                     </div>
                 </div>
 
                 <!-- Footer Actions -->
                 <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-end gap-3 sticky bottom-0 bg-white py-4 z-10">
-                    <a th:href="@{/admin/list}" class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors flex items-center gap-2">
-                        <i class="fa-solid fa-arrow-left"></i> Quay lại
-                    </a>
+                    <form th:action="@{/admin/room/delete/{id}(id=${room.roomId})}"
+                          method="post"
+                          th:if="${room.status == 'AVAILABLE'}">
+
+                        <button type="submit"
+                                onclick="return confirm('Bạn có chắc muốn xóa phòng này?')"
+                                class="px-6 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium shadow-sm transition-colors flex items-center gap-2">
+
+                            <i class="fa-solid fa-trash"></i>
+                            Xóa phòng
+                        </button>
+
+                    </form>
                     
                     <a th:href="@{/admin/edit/{id}(id=${room.roomId})}"  class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition-colors flex items-center gap-2">
                         <i class="fa-regular fa-pen-to-square"></i>

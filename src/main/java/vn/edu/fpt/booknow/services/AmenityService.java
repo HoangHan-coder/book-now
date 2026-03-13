@@ -2,8 +2,7 @@ package vn.edu.fpt.booknow.services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import vn.edu.fpt.booknow.entities.Amenity;
-import vn.edu.fpt.booknow.entities.RoomAmenity;
+import vn.edu.fpt.booknow.controllers.model.entities.Amenity;
 import vn.edu.fpt.booknow.repositories.AmenityRepository;
 
 import java.util.List;

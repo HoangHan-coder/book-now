@@ -151,6 +151,7 @@
             <form id="createRoomForm"
                   th:action="@{/admin/rooms/create}"
                   method="post"
+                  enctype="multipart/form-data"
                   class="p-8">
                 
                 <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
@@ -185,6 +186,7 @@
                                         <option value="AVAILABLE">AVAILABLE</option>
                                         <option value="BOOKED">BOOKED</option>
                                         <option value="MAINTENANCE">MAINTENANCE</option>
+                                        <option value="OCCUPIED">OCCUPIED</option>
                                     </select>
                                 </div>
                             </div>
@@ -208,7 +210,7 @@
                                 </div>
                                 <div class="hidden md:block">
                                     <div class="w-full aspect-video bg-gray-100 rounded-lg border border-gray-200 overflow-hidden flex items-center justify-center relative">
-                                        <img id="roomTypePreview" th:src="${roomType[0].imageUrl}" alt="Room Type Preview" class="w-full h-full object-cover transition-opacity duration-300">
+                                        <img id="roomTypePreview" th:src="${roomType.size() > 0 ? roomType[0].imageUrl : '/images/default-room.jpg'}" alt="Room Type Preview" class="w-full h-full object-cover transition-opacity duration-300">
                                         <div class="absolute inset-0 bg-black/5 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity pointer-events-none">
                                             <span class="bg-white/90 px-2 py-1 rounded text-xs text-gray-700 shadow-sm">Ảnh minh họa</span>
                                         </div>
@@ -318,7 +320,12 @@
                             <div class="space-y-2">
                                 <label class="block text-sm font-medium text-gray-700">Thư viện ảnh phòng</label>
                                 <div class="upload-area w-full border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer transition-colors relative" id="dropZone">
-                                    <input type="file" id="fileInput" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                    <input type="file"
+                                           id="fileInput"
+                                           name="images"
+                                           multiple
+                                           accept="image/*"
+                                           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                                     <div class="space-y-2">
                                         <div class="mx-auto h-12 w-12 text-gray-300">
                                             <i class="fa-solid fa-cloud-arrow-up text-4xl"></i>
@@ -326,7 +333,7 @@
                                         <div class="text-sm text-gray-600">
                                             <span class="font-medium text-blue-600 hover:text-blue-500">Tải ảnh lên</span> hoặc kéo thả vào đây
                                         </div>
-                                        <p class="text-xs text-gray-500">PNG, JPG, GIF tối đa 5MB</p>
+                                        <p class="text-xs text-gray-500">PNG, JPG, GIF tối đa 2MB</p>
                                     </div>
                                 </div>
                                 <!-- Image Preview Grid -->
@@ -615,32 +622,88 @@ roomInput.addEventListener("input", validateRoomNumber);
             }
         });
 
-        // --- IMAGE UPLOAD PREVIEW ---
-        const fileInput = document.getElementById('fileInput');
-        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        /* ===============================
+   IMAGE UPLOAD PREVIEW
+================================ */
 
-        fileInput.addEventListener('change', function(e) {
-            const files = Array.from(e.target.files);
-            
-            // For demo, we just append. In real app, manage state.
-            files.forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const div = document.createElement('div');
-                        div.className = 'relative aspect-square rounded-lg overflow-hidden border border-gray-200 group';
-                        div.innerHTML = `
-                            <img src="${event.target.result}" class="w-full h-full object-cover">
-                            <button type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity" onclick="this.parentElement.remove()">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        `;
-                        imagePreviewContainer.appendChild(div);
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-        });
+const fileInput = document.getElementById('fileInput');
+const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+
+const MAX_FILES = 5;
+
+let dt = new DataTransfer();
+
+function removeNewImage(btn){
+
+    const wrapper = btn.closest('.relative');
+    const index = Array.from(imagePreviewContainer.children).indexOf(wrapper);
+
+    dt.items.remove(index);
+
+    fileInput.files = dt.files;
+
+    wrapper.remove();
+}
+
+fileInput?.addEventListener('change', function (e) {
+
+    const files = Array.from(e.target.files);
+
+    files.forEach(file => {
+
+        if (dt.items.length >= MAX_FILES) {
+            alert("Chỉ được upload tối đa 5 ảnh");
+            return;
+        }
+
+        if (!file.type.startsWith('image/')) {
+            alert("Chỉ được upload ảnh");
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            alert("Ảnh phải nhỏ hơn 2MB");
+            return;
+        }
+
+        dt.items.add(file);
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+
+            const div = document.createElement('div');
+
+            div.className =
+                'relative aspect-square rounded-lg overflow-hidden border border-gray-200 group';
+
+            div.innerHTML = `
+                <img src="${event.target.result}" class="w-full h-full object-cover">
+
+                <button type="button"
+                        class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5
+                               flex items-center justify-center text-xs opacity-0
+                               group-hover:opacity-100 transition-opacity"
+                        onclick="removeNewImage(this)">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                <span class="absolute bottom-1 right-1 bg-blue-500 text-white text-[10px] px-1 rounded">
+                    Mới
+                </span>
+            `;
+
+            imagePreviewContainer.appendChild(div);
+
+        };
+
+        reader.readAsDataURL(file);
+
+    });
+
+    fileInput.files = dt.files;
+
+});
 
         // --- ADD NEW AMENITY ---
 const addAmenityBtn = document.getElementById('addAmenityBtn');
@@ -744,6 +807,18 @@ newAmenityInput.addEventListener("keydown", function (e) {
     btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Đang lưu...';
     btn.disabled = true;
 
+});
+
+        let isChanged = false;
+
+const form = document.getElementById("createRoomForm");
+
+form.addEventListener("input", () => {
+    isChanged = true;
+});
+
+form.addEventListener("change", () => {
+    isChanged = true;
 });
     </script>
 </body>

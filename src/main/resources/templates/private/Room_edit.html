@@ -97,27 +97,27 @@
        class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform -translate-x-full lg:translate-x-0 pt-28 overflow-y-auto no-scrollbar">
     <!-- Navigation Links -->
     <nav class="px-4 space-y-2">
-        <a href="admin_dashboard.html"
+        <a th:href="@{/admin/dashboard}"
            class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
             <i class="fa-solid fa-chart-line w-5"></i>
             Bảng điều khiển
         </a>
-        <a href="booking_list.html"
+        <a href="#"
            class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
             <i class="fa-regular fa-calendar-check w-5"></i>
             Đơn đặt phòng
         </a>
-        <a href="room_list.html"
+        <a th:href="@{/admin/list}"
            class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium transition-colors shadow-sm ring-1 ring-black/5">
             <i class="fa-solid fa-door-open w-5"></i>
             Phòng
         </a>
-        <a href="account_list.html"
+        <a href="#"
            class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
             <i class="fa-solid fa-users-gear w-5"></i>
             Tài khoản nhân viên
         </a>
-        <a href="feedback_list.html"
+        <a href="#"
            class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
             <i class="fa-regular fa-comment-dots w-5"></i>
             Phản hồi khách hàng
@@ -126,7 +126,7 @@
 
     <!-- Logout at Bottom -->
     <div class="absolute bottom-0 w-full p-4 border-t border-gray-100 bg-white">
-        <a href="login.html"
+        <a href="#"
            class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
             <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
             Đăng xuất
@@ -149,8 +149,7 @@
             </a>
             <div>
                 <h1 class="text-2xl font-bold text-gray-800">Chỉnh sửa thông tin phòng</h1>
-                <p class="text-sm text-gray-500 mt-1">Cập nhật thông tin cho phòng <span th:text="${room.roomNumber}"
-                                                                                         class="font-bold text-gray-700"></span>
+                <p class="text-sm text-gray-500 mt-1">Cập nhật thông tin cho phòng <span th:text="${room.roomNumber}" class="font-bold text-gray-700"></span>
                 </p>
             </div>
         </div>
@@ -191,20 +190,22 @@
                                 <label class="block text-sm font-medium text-gray-700">Trạng thái hiện tại</label>
                                 <select name="status"
                                         class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white">
+                                    <option value="">Tất cả trạng thái</option>
                                     <option value="AVAILABLE"
-                                            th:selected="${room.status == 'AVAILABLE'}">
-                                        AVAILABLE
-                                    </option>
-
+                                            th:selected="${status == 'AVAILABLE'}"
+                                    >AVAILABLE</option>
                                     <option value="BOOKED"
-                                            th:selected="${room.status == 'BOOKED'}">
-                                        BOOKED
-                                    </option>
-
+                                            th:selected="${room.status == 'BOOKED'}"
+                                    >BOOKED</option>
                                     <option value="MAINTENANCE"
-                                            th:selected="${room.status == 'MAINTENANCE'}">
-                                        MAINTENANCE
-                                    </option>
+                                            th:selected="${room.status == 'MAINTENANCE'}"
+                                    >MAINTENANCE</option>
+                                    <option value="OCCUPIED"
+                                            th:selected="${room.status == 'OCCUPIED'}"
+                                    >OCCUPIED</option>
+                                    <option value="CLEANING"
+                                            th:selected="${room.status == 'CLEANING'}"
+                                    >CLEANING</option>
                                 </select>
                             </div>
                         </div>
@@ -347,7 +348,7 @@
                                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                         <button type="button"
                                                 class="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
-                                                onclick="removeImage(this, [[${img.imageId}]])">
+                                                th:onclick="'removeImage(this,' + ${img.imageId} + ')'">
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
                                     </div>
@@ -385,13 +386,8 @@
                             <textarea rows="5"
                                       name="roomTypeDescription"
                                       class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                      th:text="${room.roomType.description}"
+                                      th:text="${room.description}"
                             ></textarea>
-
-                            <p class="text-xs text-gray-500 italic">
-                                * Thay đổi nội dung này sẽ ảnh hưởng đến tất cả phòng thuộc loại
-                                <strong th:text="${room.roomType.name}"></strong>
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -416,7 +412,7 @@
                         </div>
 
                         <!-- if don't have amenity -->
-                        <div th:if="${allAmenities == null or allAmenities.empty}"
+                        <div th:if="${empty allAmenities}">
                              class="text-sm text-gray-400 italic">
                             Không có tiện nghi
                         </div>
@@ -563,6 +559,7 @@
 
             showError(input, null);
 
+             isChanged = true;
         });
 
     });
@@ -629,6 +626,7 @@
         const imageWrapper = button.closest('.relative');
         imageWrapper.remove();
 
+         isChanged = true;
     }
 
 
@@ -711,9 +709,6 @@
         });
 
         fileInput.files = dt.files;
-
-        /* reset input để có thể chọn lại cùng 1 file */
-        fileInput.value = "";
 
     });
 
