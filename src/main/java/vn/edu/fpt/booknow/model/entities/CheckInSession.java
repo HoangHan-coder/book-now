@@ -13,48 +13,45 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "Feedback", schema = "dbo")
-public class Feedback {
+@Table(name = "CheckInSession", schema = "dbo")
+public class CheckInSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "feedback_id", nullable = false)
-    private Long feedbackId;
+    @Column(name = "check_in_session_id", nullable = false)
+    private Long checkInSessionId;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "booking_id", nullable = false)
     private Booking booking;
 
+    @Size(max = 500)
+    @NotNull
+    @Nationalized
+    @Column(name = "video_url", nullable = false, length = 500)
+    private String videoUrl;
+
+    @Size(max = 255)
+    @Nationalized
+    @Column(name = "video_public_id")
+    private String videoPublicId;
+
+    @Size(max = 20)
+    @NotNull
+    @ColumnDefault("'PENDING'")
+    @Column(name = "status", nullable = false, length = 20)
+    private String status;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id")
-    private StaffAccount admin;
-
-    @NotNull
-    @Column(name = "rating", nullable = false)
-    private Integer rating;
-
-    @Size(max = 1000)
-    @NotNull
-    @Nationalized
-    @Column(name = "content", nullable = false, length = 1000)
-    private String content;
-
-    @Size(max = 1000)
-    @Nationalized
-    @Column(name = "content_reply", length = 1000)
-    private String contentReply;
-
-    @NotNull
-    @ColumnDefault("0")
-    @Column(name = "is_hidden", nullable = false)
-    private Boolean isHidden = false;
+    @JoinColumn(name = "reviewed_by")
+    private StaffAccount reviewedBy;
 
     @NotNull
     @ColumnDefault("sysdatetime()")
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "reply_at")
-    private LocalDateTime replyAt;
+    @Column(name = "reviewed_at")
+    private LocalDateTime reviewedAt;
 
 }

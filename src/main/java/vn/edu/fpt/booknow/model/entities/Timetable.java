@@ -1,36 +1,36 @@
 package vn.edu.fpt.booknow.model.entities;
 
 import jakarta.persistence.*;
-import lombok.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 @Entity
+@Table(name = "Timetable", schema = "dbo")
 public class Timetable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "timetable_id", nullable = false)
     private Long timetableId;
 
+    @Size(max = 50)
+    @NotNull
     @Nationalized
     @Column(name = "slot_name", nullable = false, length = 50)
     private String slotName;
 
+    @NotNull
     @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
 
+    @NotNull
     @Column(name = "end_time", nullable = false)
     private LocalTime endTime;
-
-    @OneToMany(mappedBy = "timetable")
-    private List<Scheduler> schedulers = new ArrayList<>();
 
 }
