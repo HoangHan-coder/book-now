@@ -90,10 +90,10 @@
             <i class="fa-solid fa-door-open w-5"></i> Phòng
         </a>
         <a th:href="@{/admin/account_list}" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium transition-colors shadow-sm ring-1 ring-black/5">
-            <i class="fa-solid fa-users-gear w-5"></i> Tài khoản hệ thống
+            <i class="fa-solid fa-users-gear w-5"></i> Tài khoản nhân viên
         </a>
-        <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-            <i class="fa-regular fa-comment-dots w-5"></i> Phản hồi
+        <a href="/admin/feedback" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+            <i class="fa-regular fa-comment-dots w-5"></i> Phản hồi khách hàng
         </a>
     </nav>
 
@@ -113,10 +113,13 @@
             <h1 class="text-2xl font-bold text-gray-800">Danh sách tài khoản</h1>
             <p class="text-sm text-gray-500 mt-1">Quản lý tài khoản truy cập hệ thống (Admin, Staff, Customer)</p>
         </div>
-        <button class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg shadow-sm font-medium transition-colors">
+        <a href="/admin/create_staff_account"
+           class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg shadow-sm font-medium transition-colors">
+
             <i class="fa-solid fa-user-plus"></i>
             <span>Tạo tài khoản</span>
-        </button>
+
+        </a>
     </div>
 
     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
