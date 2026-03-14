@@ -13,16 +13,18 @@ import java.time.LocalDateTime;
 @Entity
 public class Feedback {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "feedback_id", nullable = false)
+    @Column(name = "feedback_id") // , nullable = false
     private Long feedbackId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "booking_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)  // , optional = false
+    @JoinColumn(name = "booking_id")  // , nullable = false
     private Booking booking;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "admin_id", nullable = false)
+//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+//    @JoinColumn(name = "admin_id", nullable = false)
+//    private StaffAccount admin;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_id")
     private StaffAccount admin;
 
     @Column(name = "rating", nullable = false)

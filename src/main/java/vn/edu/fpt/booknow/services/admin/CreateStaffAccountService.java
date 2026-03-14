@@ -68,7 +68,7 @@ public class CreateStaffAccountService {
             );
         }
 
-        if (!dto.getPassword().equals(dto.getConfirmPassword())) {
+        if (!dto.getPassword().equals(dto.getConfirmPassword())) {  
             throw new RuntimeException("Mật khẩu xác nhận không khớp");
         }
     }
