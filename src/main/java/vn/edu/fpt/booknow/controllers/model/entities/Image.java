@@ -3,6 +3,7 @@ package vn.edu.fpt.booknow.controllers.model.entities;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "Image")
 public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

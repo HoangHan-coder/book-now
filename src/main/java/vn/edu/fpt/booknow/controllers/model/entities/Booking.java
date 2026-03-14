@@ -3,75 +3,83 @@ package vn.edu.fpt.booknow.controllers.model.entities;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table( name = "Booking")
+@Table(name = "Booking")
 public class Booking {
+
+    // ===== PRIMARY KEY =====
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "booking_id")
     private Long bookingId;
 
-    // ================== RELATION ==================
+    // ===== CUSTOMER =====
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
+    // ===== ROOM =====
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
 
-    // ================== FIELDS ==================
+    // ===== CHECK IN TIME =====
     @Column(name = "check_in_time", nullable = false)
     private LocalDateTime checkInTime;
 
+    // ===== CHECK OUT TIME =====
     @Column(name = "check_out_time", nullable = false)
     private LocalDateTime checkOutTime;
 
-    @Column(name = "id_card_front_url", nullable = false, length = 500)
+    // ===== ACTUAL CHECK IN =====
+    @Column(name = "actual_check_in_time")
+    private LocalDateTime actualCheckInTime;
+
+    // ===== ACTUAL CHECK OUT =====
+    @Column(name = "actual_check_out_time")
+    private LocalDateTime actualCheckOutTime;
+
+    // ===== ID CARD FRONT =====
+    @Column(name = "id_card_front_url", length = 500, nullable = false)
     private String idCardFrontUrl;
 
-    @Column(name = "id_card_back_url", nullable = false, length = 500)
+    // ===== ID CARD BACK =====
+    @Column(name = "id_card_back_url", length = 500, nullable = false)
     private String idCardBackUrl;
 
-    @Column(name = "booking_status", nullable = false, length = 20)
+    // ===== BOOKING STATUS =====
+    @Column(name = "booking_status", length = 20, nullable = false)
     private String bookingStatus;
 
-    @Column(name = "total_amount", nullable = false)
-    private Double totalAmount;
+    // ===== TOTAL AMOUNT =====
+    @Column(name = "total_amount", precision = 12, scale = 2, nullable = false)
+    private BigDecimal totalAmount;
 
+    // ===== BOOKING CODE =====
     @Column(name = "booking_code", length = 500)
     private String bookingCode;
 
+    // ===== CREATED AT =====
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    // ===== NOTE =====
     @Column(name = "note", length = 255)
     private String note;
 
+    // ===== UPDATED AT =====
     @Column(name = "update_at")
     private LocalDateTime updateAt;
 
+    // ===== CONSTRUCTOR =====
     public Booking() {
     }
 
-    public Booking(Long bookingId, Customer customer, Room room, LocalDateTime checkInTime, LocalDateTime checkOutTime, String idCardFrontUrl, String idCardBackUrl, String bookingStatus, Double totalAmount, String bookingCode, LocalDateTime createdAt, String note, LocalDateTime updateAt) {
-        this.bookingId = bookingId;
-        this.customer = customer;
-        this.room = room;
-        this.checkInTime = checkInTime;
-        this.checkOutTime = checkOutTime;
-        this.idCardFrontUrl = idCardFrontUrl;
-        this.idCardBackUrl = idCardBackUrl;
-        this.bookingStatus = bookingStatus;
-        this.totalAmount = totalAmount;
-        this.bookingCode = bookingCode;
-        this.createdAt = createdAt;
-        this.note = note;
-        this.updateAt = updateAt;
-    }
+    // ===== GETTERS AND SETTERS =====
 
     public Long getBookingId() {
         return bookingId;
@@ -113,6 +121,22 @@ public class Booking {
         this.checkOutTime = checkOutTime;
     }
 
+    public LocalDateTime getActualCheckInTime() {
+        return actualCheckInTime;
+    }
+
+    public void setActualCheckInTime(LocalDateTime actualCheckInTime) {
+        this.actualCheckInTime = actualCheckInTime;
+    }
+
+    public LocalDateTime getActualCheckOutTime() {
+        return actualCheckOutTime;
+    }
+
+    public void setActualCheckOutTime(LocalDateTime actualCheckOutTime) {
+        this.actualCheckOutTime = actualCheckOutTime;
+    }
+
     public String getIdCardFrontUrl() {
         return idCardFrontUrl;
     }
@@ -137,11 +161,11 @@ public class Booking {
         this.bookingStatus = bookingStatus;
     }
 
-    public Double getTotalAmount() {
+    public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(Double totalAmount) {
+    public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
     }
 

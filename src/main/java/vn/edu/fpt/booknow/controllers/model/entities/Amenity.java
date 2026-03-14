@@ -17,6 +17,10 @@ public class Amenity {
     @Column(name = "icon_url")
     private String iconUrl;
 
+    // ===== SOFT DELETE =====
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
+
     // Quan hệ trung gian RoomAmenity
     @OneToMany(mappedBy = "amenity", fetch = FetchType.LAZY)
     private List<RoomAmenity> roomAmenities;
@@ -60,5 +64,13 @@ public class Amenity {
 
     public void setRoomAmenities(List<RoomAmenity> roomAmenities) {
         this.roomAmenities = roomAmenities;
+    }
+
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
     }
 }

@@ -181,13 +181,11 @@
                                 <!-- Initial Status -->
                                 <div class="space-y-1">
                                     <label class="block text-sm font-medium text-gray-700">Trạng thái ban đầu</label>
-                                    <select name="status"
-                                            class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white">
-                                        <option value="AVAILABLE">AVAILABLE</option>
-                                        <option value="BOOKED">BOOKED</option>
-                                        <option value="MAINTENANCE">MAINTENANCE</option>
-                                        <option value="OCCUPIED">OCCUPIED</option>
-                                    </select>
+                                    <input type="text"
+                                           value="AVAILABLE"
+                                           disabled
+                                           class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-gray-100 text-gray-500 cursor-not-allowed sm:text-sm">
+                                    <input type="hidden" name="status" value="AVAILABLE">
                                 </div>
                             </div>
 

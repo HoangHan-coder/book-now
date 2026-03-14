@@ -133,10 +133,10 @@ public class ManageRoomServices {
             String roomTypeDescription,
             List<Long> amenityIds,
             List<String> newAmenityNames,
+            List<MultipartFile> newAmenityIcons,
             MultipartFile[] images,
             String deletedImageIds
     ) {
-
         /* ===== 1. FIND ROOM ===== */
 
         Room room = roomRepository.findById(roomId)
@@ -144,8 +144,8 @@ public class ManageRoomServices {
 
         /* ===== 2. UPDATE ROOM ===== */
 
-        room.setBasePrice(basePrice);
-        room.setOverPrice(overPrice);
+        room.getRoomType().setBasePrice(basePrice);
+        room.getRoomType().setOverPrice(overPrice);
         room.setStatus(status);
 
         /* ===== 3. UPDATE ROOM TYPE ===== */
@@ -154,11 +154,12 @@ public class ManageRoomServices {
                 .orElseThrow(() -> new RuntimeException("RoomType not found"));
 
         room.setRoomType(roomType);
-        room.setDescription(roomTypeDescription);
+        room.getRoomType().setDescription(roomTypeDescription);
 
         /* ===== 4. UPDATE AMENITIES ===== */
 
         roomAmenityRepository.deleteByRoom(room);
+        room.getRoomAmenities().clear();
 
         if (amenityIds != null && !amenityIds.isEmpty()) {
 
@@ -171,22 +172,65 @@ public class ManageRoomServices {
                 ra.setAmenity(amenity);
 
                 roomAmenityRepository.save(ra);
+                room.getRoomAmenities().add(ra);
             }
         }
 
-        if (newAmenityNames != null) {
+        /* ===== ADD NEW AMENITIES ===== */
+        System.out.println("Amenity names: " + newAmenityNames);
+        System.out.println("Amenity icons: " + newAmenityIcons);
 
-            for (String name : newAmenityNames) {
+        if (newAmenityNames != null && !newAmenityNames.isEmpty()) {
 
-                name = name.trim();
+            for (int i = 0; i < newAmenityNames.size(); i++) {
+
+                String name = newAmenityNames.get(i).trim();
+
+                if (name.isBlank()) continue;
 
                 Amenity amenity = amenityRepository.findByNameIgnoreCase(name);
 
+                /* ===== CREATE IF NOT EXISTS ===== */
+
                 if (amenity == null) {
+
                     amenity = new Amenity();
                     amenity.setName(name);
+
+                    /* ===== UPLOAD ICON ===== */
+
+                    if (newAmenityIcons != null && i < newAmenityIcons.size()) {
+
+                        MultipartFile icon = newAmenityIcons.get(i);
+                        System.out.println("File name: " + icon.getOriginalFilename());
+                        System.out.println("File size: " + icon.getSize());
+                        System.out.println("Is empty: " + icon.isEmpty());
+
+                        if (icon != null && !icon.isEmpty()) {
+
+                            try {
+
+                                Map upload = cloudinary.uploader().upload(
+                                        icon.getBytes(),
+                                        ObjectUtils.asMap("folder", "booknow/amenities")
+                                );
+
+                                String iconUrl = (String) upload.get("secure_url");
+
+                                amenity.setIconUrl(iconUrl);
+
+                            } catch (Exception e) {
+
+                                throw new RuntimeException("Upload amenity icon failed");
+
+                            }
+                        }
+                    }
+
                     amenityRepository.save(amenity);
                 }
+
+                /* ===== LINK ROOM ===== */
 
                 RoomAmenity ra = new RoomAmenity();
                 ra.setRoom(room);
@@ -195,6 +239,8 @@ public class ManageRoomServices {
                 roomAmenityRepository.save(ra);
             }
         }
+
+
 
         /* ===== 5. DELETE IMAGE ===== */
 
@@ -279,12 +325,12 @@ public class ManageRoomServices {
         room.setRoomNumber(roomNumber);
         room.setStatus(status);
         room.setRoomType(roomType);
-        room.setIsDeleted(false);
+        room.getRoomType().setIsDeleted(false);
 
-        room.setBasePrice(basePrice != null ? BigDecimal.valueOf(basePrice) : BigDecimal.ZERO);
-        room.setOverPrice(overPrice != null ? BigDecimal.valueOf(overPrice) : BigDecimal.ZERO);
+        room.getRoomType().setBasePrice(basePrice != null ? BigDecimal.valueOf(basePrice) : BigDecimal.ZERO);
+        room.getRoomType().setOverPrice(overPrice != null ? BigDecimal.valueOf(overPrice) : BigDecimal.ZERO);
 
-        room.setDescription(description);
+        room.getRoomType().setDescription(description);
 
         roomRepository.save(room);
 
@@ -649,38 +695,7 @@ public class ManageRoomServices {
 
             LocalDate current = start.withDayOfMonth(1);
 
-            while (!current.isAfter(end)) {
-
-                LocalDate monthStart = current;
-                LocalDate monthEnd =
-                        current.withDayOfMonth(current.lengthOfMonth());
-                if (monthEnd.isAfter(end)) {
-                    monthEnd = end;
-                }
-
-
-                int count = bookingRepository.countByCreatedAtBetween(
-                        monthStart.atStartOfDay(),
-                        monthEnd.atTime(23,59,59)
-                );
-
-                long monthRevenue = bookingRepository
-                        .findByCheckOutTimeBetween(
-                                monthStart.atStartOfDay(),
-                                monthEnd.atTime(23,59,59)
-                        )
-                        .stream()
-                        .mapToLong(b -> b.getTotalAmount().longValue())
-                        .sum();
-
-                chartData.add(count);
-                chartLabels.add("Tháng " + current.getMonthValue());
-
-                revenueData.add(monthRevenue);
-                revenueLabels.add("Tháng " + current.getMonthValue());
-
-                current = current.plusMonths(1);
-            }
+            while (!current.isAfter(end))
 
             chartTitle = "Từ " + start.getDayOfMonth() +  "/" + start.getMonthValue() + "/" + start.getYear() +
                     " đến " + end.getDayOfMonth()+  "/" + end.getMonthValue() + "/" + end.getYear();
@@ -789,7 +804,7 @@ public class ManageRoomServices {
             String checkIn = b.getCheckInTime().format(formatter);
             String checkOut = b.getCheckOutTime().format(formatter);
             String status = b.getBookingStatus();
-            Double total = b.getTotalAmount();
+            BigDecimal total = b.getTotalAmount();
 
             writer.println(
                     bookingCode + "," +

@@ -153,7 +153,7 @@
                                     <div th:text="${room.roomType.name}" class="block w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 font-medium sm:text-sm">
                                     </div>
                                     <p class="text-xs text-gray-400 italic mt-1"
-                                       th:text="|Diện tích: ${room.areaM2}m&sup2; - Tối đa: ${room.roomType.maxGuests} người|">
+                                       th:text="|Diện tích: ${room.roomType.areaM2}m&sup2; - Tối đa: ${room.roomType.maxGuests} người|">
                                     </p>
                                 </div>
                                 <div class="hidden md:block">
@@ -170,14 +170,14 @@
                                 <div class="space-y-1">
                                     <label class="block text-sm font-medium text-blue-900/70">Giá / Slot (Giờ)</label>
                                     <div th:text="${room != null
-                                      ? #numbers.formatDecimal(room.basePrice,0,'POINT',0,'COMMA') + '₫'
+                                      ? #numbers.formatDecimal(room.roomType.basePrice,0,'POINT',0,'COMMA') + '₫'
                                       : 'N/A'}" class="text-blue-800 text-2xl font-bold">
                                     </div>
                                 </div>
                                 <div class="space-y-1">
                                     <label class="block text-sm font-medium text-blue-900/70">Giá / Đêm</label>
                                     <div th:text="${room != null
-                                      ? #numbers.formatDecimal(room.overPrice,0,'POINT',0,'COMMA') + '₫'
+                                      ? #numbers.formatDecimal(room.roomType.overPrice,0,'POINT',0,'COMMA') + '₫'
                                       : 'N/A'}" class="text-blue-800 text-2xl font-bold">
                                     </div>
                                 </div>
@@ -211,7 +211,7 @@
                             <!-- Description -->
                             <div class="space-y-1">
                                 <label class="block text-sm font-medium text-gray-500">Mô tả chi tiết</label>
-                                <div th:text="${room.description}"
+                                <div th:text="${room.roomType.description}"
                                         class="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 sm:text-sm min-h-[100px] whitespace-pre-line"></div>
                             </div>
                         </div>

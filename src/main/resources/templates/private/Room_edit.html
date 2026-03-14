@@ -190,9 +190,9 @@
                                 <label class="block text-sm font-medium text-gray-700">Trạng thái hiện tại</label>
                                 <select name="status"
                                         class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white">
-                                    <option value="">Tất cả trạng thái</option>
+                                    <option value="" disabled>Tất cả trạng thái</option>
                                     <option value="AVAILABLE"
-                                            th:selected="${status == 'AVAILABLE'}"
+                                            th:selected="${room.status == 'AVAILABLE'}"
                                     >AVAILABLE</option>
                                     <option value="BOOKED"
                                             th:selected="${room.status == 'BOOKED'}"
@@ -249,8 +249,8 @@
                                 <div class="relative group">
                                     <input type="text"
                                            name="basePrice"
-                                           data-min="0"
-                                           data-max="10000000"
+                                           data-min="100000"
+                                           data-max="5000000"
                                            data-step="1000"
                                            th:value="${basePrice != null ? basePrice : 0}"
                                            class="money-input block w-full pl-3 pr-8 py-2.5 border border-blue-200 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-bold">
@@ -293,8 +293,8 @@
                                 <div class="relative group">
                                     <input type="text"
                                            name="overPrice"
-                                           data-min="0"
-                                           data-max="10000000"
+                                           data-min="200000"
+                                           data-max="5000000"
                                            data-step="1000"
                                            th:value="${overPrice != null ? overPrice : 0}"
                                            class="money-input block w-full pl-3 pr-8 py-2.5 border border-blue-200 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-bold">
@@ -386,7 +386,7 @@
                             <textarea rows="5"
                                       name="roomTypeDescription"
                                       class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                      th:text="${room.description}"
+                                      th:text="${room.roomType.description}"
                             ></textarea>
                         </div>
                     </div>
@@ -402,13 +402,87 @@
                         </h3>
 
                         <!-- Add New Amenity -->
-                        <div class="flex gap-2 mb-4">
-                            <input type="text" id="newAmenityInput" placeholder="Thêm tiện nghi..."
-                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <button type="button" id="addAmenityBtn"
-                                    class="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
-                                <i class="fa-solid fa-plus"></i>
+                        <div class="mb-4">
+                            <button type="button"
+                                    id="openAmenityModal"
+                                    class="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700">
+
+        <span class="w-6 h-6 flex items-center justify-center rounded-full bg-blue-600 text-white text-xs">
+            <i class="fa-solid fa-plus"></i>
+        </span>
+
+                                Thêm tiện nghi
                             </button>
+                        </div>
+
+                        <div id="amenityModal"
+                             class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
+
+                            <div class="bg-white w-full max-w-md rounded-xl p-6 shadow-lg">
+
+                                <h3 class="text-lg font-semibold mb-4">
+                                    Thêm tiện nghi mới
+                                </h3>
+
+                                <!-- Name -->
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium mb-1">
+                                        Tên tiện nghi
+                                    </label>
+
+                                    <input type="text"
+                                           id="amenityNameInput"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+
+                                <!-- Image -->
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium mb-1">
+                                        Ảnh tiện nghi
+                                    </label>
+
+                                    <div id="amenityDropZone"
+                                         class="upload-area w-full border-2 border-dashed border-gray-300 rounded-xl p-4 text-center cursor-pointer transition-colors relative">
+
+                                        <input type="file"
+                                               id="amenityImageInput"
+                                               name="newAmenityIcons"
+                                               accept="image/*"
+                                               class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+
+                                        <div class="space-y-1" id="amenityUploadText">
+                                            <div class="mx-auto h-8 w-8 text-gray-300">
+                                                <i class="fa-solid fa-image text-2xl"></i>
+                                            </div>
+                                            <p class="text-xs text-gray-500">
+                                                Nhấn hoặc kéo thả ảnh tiện nghi (chỉ 1 ảnh)
+                                            </p>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- preview -->
+                                    <div id="amenityPreview" class="mt-3 hidden"></div>
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="flex justify-end gap-2">
+
+                                    <button type="button"
+                                            id="closeAmenityModal"
+                                            class="px-4 py-2 text-sm border rounded-lg hover:bg-gray-50">
+                                        Hủy
+                                    </button>
+
+                                    <button type="button"
+                                            id="saveAmenityBtn"
+                                            class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                        Thêm tiện nghi
+                                    </button>
+
+                                </div>
+
+                            </div>
                         </div>
 
                         <!-- if don't have amenity -->
@@ -422,14 +496,21 @@
                              class="space-y-2 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
                             <!-- Standard Amenities -->
                             <label th:each="amenity : ${allAmenities}"
-                                   class="flex items-center p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
+                                   class="flex items-center gap-2 p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
+
                                 <input type="checkbox"
                                        name="amenityIds"
                                        th:value="${amenity.amenityId}"
                                        th:checked="${#lists.contains(roomAmenityIds, amenity.amenityId)}"
                                        class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+
+                                <img th:if="${amenity.iconUrl != null}"
+                                     th:src="${amenity.iconUrl}"
+                                     class="w-5 h-5 object-cover rounded">
+
                                 <span th:text="${amenity.name}"
-                                      class="ml-2 text-sm text-gray-700"></span>
+                                      class="text-sm text-gray-700"></span>
+
                             </label>
                         </div>
                     </div>
@@ -468,7 +549,10 @@
     }
 
     function showError(input, msg) {
-        const errorEl = input.closest('.space-y-1')?.querySelector('.price-error');
+
+        const wrapper = input.closest('.space-y-1');
+        const errorEl = wrapper ? wrapper.parentElement.querySelector('.price-error') : null;
+
         if (!errorEl) return;
 
         if (!msg) {
@@ -515,15 +599,12 @@
             let value = Number(raw);
 
             if (value > MAX) {
-                showError(input, 'Giá không vượt quá 10.000.000₫');
-                input.value = formatVND(input.dataset.lastValid);
+                showError(input, `Giá không vượt quá ${formatVND(MAX)}₫`);
                 return;
             }
 
             if (value < MIN) {
-                showError(input, 'Giá không được là số âm');
-                input.value = formatVND(MIN);
-                input.dataset.lastValid = MIN;
+                showError(input, `Giá tối thiểu là ${formatVND(MIN)}₫`);
                 return;
             }
 
@@ -559,7 +640,7 @@
 
             showError(input, null);
 
-             isChanged = true;
+            isChanged = true;
         });
 
     });
@@ -626,7 +707,7 @@
         const imageWrapper = button.closest('.relative');
         imageWrapper.remove();
 
-         isChanged = true;
+        isChanged = true;
     }
 
 
@@ -685,20 +766,20 @@
                     'relative aspect-square rounded-lg overflow-hidden border border-gray-200 group';
 
                 div.innerHTML = `
-                    <img src="${event.target.result}" class="w-full h-full object-cover">
+                <img src="${event.target.result}" class="w-full h-full object-cover">
 
-                    <button type="button"
-                            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5
-                                   flex items-center justify-center text-xs opacity-0
-                                   group-hover:opacity-100 transition-opacity"
-                            onclick="removeNewImage(this)">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+                <button type="button"
+                        class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5
+                               flex items-center justify-center text-xs opacity-0
+                               group-hover:opacity-100 transition-opacity"
+                        onclick="removeNewImage(this)">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
 
-                    <span class="absolute bottom-1 right-1 bg-blue-500 text-white text-[10px] px-1 rounded">
-                        Mới
-                    </span>
-                `;
+                <span class="absolute bottom-1 right-1 bg-blue-500 text-white text-[10px] px-1 rounded">
+                    Mới
+                </span>
+            `;
 
                 newImagePreviewContainer.appendChild(div);
 
@@ -713,72 +794,290 @@
     });
 
 
-    /* ===============================
+    /* =====================================================
+   AMENITY MODAL OPEN / CLOSE
+===================================================== */
+
+    const openAmenityModal = document.getElementById("openAmenityModal");
+    const amenityModal = document.getElementById("amenityModal");
+    const closeAmenityModal = document.getElementById("closeAmenityModal");
+
+    openAmenityModal?.addEventListener("click", () => {
+        amenityModal.classList.remove("hidden");
+    });
+
+    closeAmenityModal?.addEventListener("click", () => {
+        amenityModal.classList.add("hidden");
+    });
+
+
+
+    /* =====================================================
+       AMENITY IMAGE UPLOAD (DRAG & DROP)
+    ===================================================== */
+
+    const amenityDropZone = document.getElementById("amenityDropZone");
+    const amenityInput = document.getElementById("amenityImageInput");
+    const amenityPreview = document.getElementById("amenityPreview");
+    const amenityUploadText = document.getElementById("amenityUploadText");
+
+    let amenityFile = null;
+
+
+    /* -------- render preview -------- */
+
+    function renderAmenityPreview(file){
+
+        const reader = new FileReader();
+
+        reader.onload = function(e){
+
+            amenityPreview.innerHTML = `
+            <div class="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200">
+
+                <img src="${e.target.result}"
+                     class="w-full h-full object-cover">
+
+                <button type="button"
+                        onclick="removeAmenityImage()"
+                        class="absolute top-1 right-1 bg-red-500 text-white
+                               w-5 h-5 rounded-full text-xs
+                               flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+            </div>
+        `;
+
+            amenityPreview.classList.remove("hidden");
+            amenityUploadText.classList.add("hidden");
+
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+
+    /* -------- remove image -------- */
+
+    function removeAmenityImage(){
+
+        amenityFile = null;
+
+        if(amenityInput){
+            amenityInput.value = "";
+        }
+
+        amenityPreview.classList.add("hidden");
+        amenityPreview.innerHTML = "";
+
+        amenityUploadText.classList.remove("hidden");
+    }
+
+
+    /* -------- input select image -------- */
+
+    amenityInput?.addEventListener("change", function(e){
+
+        const file = e.target.files[0];
+
+        if(!file) return;
+
+        /* chỉ cho 1 ảnh */
+        if(amenityFile){
+            alert("Chỉ được upload 1 ảnh cho tiện nghi");
+            amenityInput.value = "";
+            return;
+        }
+
+        if(!file.type.startsWith("image/")){
+            alert("Chỉ được upload ảnh");
+            amenityInput.value = "";
+            return;
+        }
+
+        if(file.size > 2 * 1024 * 1024){
+            alert("Ảnh phải nhỏ hơn 2MB");
+            amenityInput.value = "";
+            return;
+        }
+
+        amenityFile = file;
+
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        amenityInput.files = dt.files;
+
+        renderAmenityPreview(file);
+
+    });
+
+
+    /* -------- drag over -------- */
+
+    amenityDropZone?.addEventListener("dragover", (e)=>{
+        e.preventDefault();
+        amenityDropZone.classList.add("border-blue-400");
+    });
+
+
+    /* -------- drag leave -------- */
+
+    amenityDropZone?.addEventListener("dragleave", ()=>{
+        amenityDropZone.classList.remove("border-blue-400");
+    });
+
+
+    /* -------- drop image -------- */
+
+    amenityDropZone?.addEventListener("drop", (e)=>{
+
+        e.preventDefault();
+
+        amenityDropZone.classList.remove("border-blue-400");
+
+        const file = e.dataTransfer.files[0];
+
+        if(!file) return;
+
+        /* chỉ cho 1 ảnh */
+        if(amenityFile){
+            alert("Chỉ được upload 1 ảnh cho tiện nghi");
+            return;
+        }
+
+        if(!file.type.startsWith("image/")){
+            alert("Chỉ được upload ảnh");
+            return;
+        }
+
+        if(file.size > 2 * 1024 * 1024){
+            alert("Ảnh phải nhỏ hơn 2MB");
+            return;
+        }
+
+        amenityFile = file;
+
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        amenityInput.files = dt.files;
+
+        renderAmenityPreview(file);
+
+    });
+
+
+    /* =====================================================
        ADD NEW AMENITY
-    ================================ */
+    ===================================================== */
 
-    const addAmenityBtn = document.getElementById('addAmenityBtn');
-    const newAmenityInput = document.getElementById('newAmenityInput');
-    const amenitiesList = document.getElementById('amenitiesList');
+    const saveAmenityBtn = document.getElementById("saveAmenityBtn");
+    const amenityNameInput = document.getElementById("amenityNameInput");
+    const amenitiesList = document.getElementById("amenitiesList");
 
-    function addAmenity() {
 
-        const value = newAmenityInput.value.trim();
+    saveAmenityBtn?.addEventListener("click", function () {
 
-        if (!value) {
-            alert("Tên tiện nghi không được để trống");
+
+
+        const name = amenityNameInput.value.trim();
+        const imageFile = amenityFile;
+
+        if (!name || !imageFile) {
+            alert("Phải nhập tên và chọn ảnh tiện nghi");
             return;
         }
 
-        if (value.length < 2 || value.length > 30) {
-            alert("Tên tiện nghi phải từ 2 đến 30 ký tự");
-            return;
-        }
+
+
+        /* ----- check duplicate ----- */
 
         const existingAmenities = document.querySelectorAll('#amenitiesList span');
 
         for (let el of existingAmenities) {
 
-            if (el.textContent.trim().toLowerCase() === value.toLowerCase()) {
+            if (el.textContent.trim().toLowerCase() === name.toLowerCase()) {
 
                 alert("Tiện nghi này đã tồn tại!");
-                newAmenityInput.value = '';
                 return;
 
             }
         }
 
+
+        /* ----- create new amenity ----- */
+
         const label = document.createElement('label');
 
         label.className =
-            'flex items-center p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors';
+            'flex items-center p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors gap-2';
+
+
+        let imgHTML = "";
+
+        if (imageFile) {
+
+            const url = URL.createObjectURL(imageFile);
+
+            imgHTML = `<img src="${url}" class="w-5 h-5 object-cover rounded">`;
+
+        }
+
 
         label.innerHTML = `
-            <input type="checkbox"
-                   name="newAmenityNames"
-                   value="${value}"
-                   class="h-4 w-4 text-blue-600 rounded border-gray-300"
-                   checked>
+        <input type="checkbox"
+               name="newAmenityNames"
+               value="${name}"
+               class="h-4 w-4 text-blue-600 rounded border-gray-300"
+               checked>
 
-            <span class="ml-2 text-sm text-gray-700">${value}</span>
-        `;
+        ${imgHTML}
+
+        <span class="text-sm text-gray-700">${name}</span>
+    `;
 
         amenitiesList.prepend(label);
 
-        newAmenityInput.value = '';
 
-    }
+        /* ----- reset form ----- */
 
-    addAmenityBtn?.addEventListener('click', addAmenity);
+        amenityNameInput.value = "";
 
-    newAmenityInput?.addEventListener('keydown', function(e){
+        removeAmenityImage();
 
-        if(e.key === "Enter"){
-            e.preventDefault();
-            addAmenity();
-        }
+
+        amenityModal.classList.add("hidden");
 
     });
+
+
+    /* ===============================
+       PRICE RELATION VALIDATE
+    ================================ */
+
+    function validatePriceRelation() {
+
+        const baseInput = document.querySelector('input[name="basePrice"]');
+        const overInput = document.querySelector('input[name="overPrice"]');
+
+        const basePrice = Number(baseInput.dataset.lastValid || 0);
+        const overPrice = Number(overInput.dataset.lastValid || 0);
+
+        if (basePrice < 100000) {
+            showError(baseInput, "Giá / slot tối thiểu là 100.000₫");
+            return false;
+        }
+
+        if (overPrice < basePrice + 100000) {
+            showError(overInput, "Giá đêm phải cao hơn giá phòng ít nhất 100.000₫");
+            return false;
+        }
+
+        showError(baseInput, null);
+        showError(overInput, null);
+
+        return true;
+    }
 
 
     /* ===============================
@@ -797,6 +1096,11 @@
     });
 
     form.addEventListener("submit", function (e) {
+
+        if (!validatePriceRelation()) {
+            e.preventDefault();
+            return;
+        }
 
         if (!isChanged) {
             alert("Bạn chưa thay đổi thông tin nào");

@@ -42,4 +42,6 @@ public class RefreshTokens {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
+
+
 }

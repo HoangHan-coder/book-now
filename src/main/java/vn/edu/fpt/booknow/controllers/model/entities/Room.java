@@ -1,8 +1,6 @@
 package vn.edu.fpt.booknow.controllers.model.entities;
 
 import jakarta.persistence.*;
-
-import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -31,22 +29,6 @@ public class Room {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 
-    // ===== AREA =====
-    @Column(name = "area_m2", precision = 10, scale = 2)
-    private BigDecimal areaM2;
-
-    // ===== BASE PRICE =====
-    @Column(name = "base_price", precision = 12, scale = 2)
-    private BigDecimal basePrice;
-
-    // ===== EXTRA PRICE =====
-    @Column(name = "over_price", precision = 12, scale = 2)
-    private BigDecimal overPrice;
-
-    // ===== DESCRIPTION =====
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
-
     // ===== ROOM IMAGES =====
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<Image> images;
@@ -55,10 +37,9 @@ public class Room {
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoomAmenity> roomAmenities;
 
-    // ===== Constructors =====
     public Room() {}
 
-    // ===== Getters & Setters =====
+    // ===== GETTERS SETTERS =====
 
     public Long getRoomId() {
         return roomId;
@@ -92,44 +73,12 @@ public class Room {
         this.status = status;
     }
 
-    public Boolean getIsDeleted() {
+    public Boolean getDeleted() {
         return isDeleted;
     }
 
-    public void setIsDeleted(Boolean isDeleted) {
-        this.isDeleted = isDeleted;
-    }
-
-    public BigDecimal getAreaM2() {
-        return areaM2;
-    }
-
-    public void setAreaM2(BigDecimal areaM2) {
-        this.areaM2 = areaM2;
-    }
-
-    public BigDecimal getBasePrice() {
-        return basePrice;
-    }
-
-    public void setBasePrice(BigDecimal basePrice) {
-        this.basePrice = basePrice;
-    }
-
-    public BigDecimal getOverPrice() {
-        return overPrice;
-    }
-
-    public void setOverPrice(BigDecimal overPrice) {
-        this.overPrice = overPrice;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
     }
 
     public List<Image> getImages() {
