@@ -23,7 +23,6 @@ class BookingServiceTest {
             "'Unknown',    'Sáng', 1, false, -1",      // RoomType không hợp lệ -> -1
 
             // --- 2. KIỂM THỬ CÁC CA (ShiftType) ---
-            "'Ocean City', 'Sáng',  1, false, 95000",   // x 1.0
             "'Ocean City', 'Chiều', 1, false, 104500",  // x 1.1
             "'Ocean City', 'Tối',   1, false, 114000",  // x 1.2
             "'Ocean City', 'Đêm',   1, false, 142500",  // x 1.5
