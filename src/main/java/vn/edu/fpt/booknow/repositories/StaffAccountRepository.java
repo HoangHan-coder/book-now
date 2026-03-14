@@ -1,5 +1,6 @@
 package vn.edu.fpt.booknow.repositories;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.Modifying;
@@ -22,6 +23,7 @@ public interface StaffAccountRepository extends JpaRepository<StaffAccount, Long
     );
 
     // UC-17.3: Update staff account status
+    @Transactional
     @Modifying
     @Query("UPDATE StaffAccount s SET s.status = :status WHERE s.staffAccountId = :staffAccountId")
     int updateStatus(@Param("staffAccountId") Long staffAccountId,

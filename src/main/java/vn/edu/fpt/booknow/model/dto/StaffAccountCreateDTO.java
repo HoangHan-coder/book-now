@@ -1,6 +1,7 @@
 package vn.edu.fpt.booknow.model.dto;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class StaffAccountCreateDTO {
@@ -17,4 +18,5 @@ public class StaffAccountCreateDTO {
 
     private String role;
 
+    private MultipartFile avatar;
 }

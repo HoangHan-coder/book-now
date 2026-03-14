@@ -17,6 +17,7 @@ public class CreateStaffAccountController {
         this.service = service;
     }
 
+
     // UC-17.X: Open Create Staff Account Page
     @GetMapping("/admin/create_staff_account")
     public String showCreateForm(Model model) {
@@ -44,7 +45,7 @@ public class CreateStaffAccountController {
 
             return "redirect:/admin/account_list";
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
 
             model.addAttribute("error", e.getMessage());
 

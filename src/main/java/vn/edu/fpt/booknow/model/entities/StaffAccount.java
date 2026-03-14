@@ -42,6 +42,9 @@ public class StaffAccount {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
+    @Column(name = "avatar_public_id")
+    private String avatar_public_id;
+
     @Nationalized
     @Column(name = "role", nullable = false, length = 20)
     private String role;
@@ -63,6 +66,8 @@ public class StaffAccount {
 
     @OneToMany(mappedBy = "staffAccount")
     private List<RefreshToken> refreshTokens = new ArrayList<>();
+
+
 
 }
 
