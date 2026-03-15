@@ -33,12 +33,17 @@ public class CheckInController {
     }
 
     @GetMapping(value = "/success")
-    public String checkInSuccess(Model model,@RequestBody ApproveRequest req) {
-        Booking booking = bookingService.findById(req.getBookingId());
+    public String checkInSuccess(Model model,@RequestParam(name = "bookingId")  Long bookingId) {
+        Booking booking = bookingService.findById(bookingId);
         String roomCode = String.valueOf(100000 + new Random().nextInt(900000));
         model.addAttribute("booking", booking);
         model.addAttribute("roomCode", roomCode);
         return "customer/checkin_success";
+    }
+
+    @GetMapping(value = "/fail")
+    public String checkInSuccess(Model model) {
+        return "customer/checkin_fail";
     }
 
     @GetMapping(value = "/page")
