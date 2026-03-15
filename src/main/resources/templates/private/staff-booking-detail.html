@@ -119,8 +119,10 @@
 
           <div>
             <p class="text-sm text-gray-500">Thời gian lưu trú</p>
-            <p class="font-semibold text-blue-600"
-               th:text="${durationText}"></p>
+            <p id="durationText"
+               class="font-semibold text-blue-600"
+               th:text="${duration}">
+            </p>
           </div>
 
         </div>
@@ -159,7 +161,7 @@
             <div>
               <p class="text-sm text-gray-500">Giá</p>
               <p class="font-semibold"
-                 th:text="${#numbers.formatDecimal(booking.room.basePrice,0,'COMMA',0,'POINT')} + 'đ'">
+                 th:text="${#numbers.formatDecimal(booking.room.roomType.basePrice,0,'COMMA',0,'POINT')} + 'đ'">
               </p>
             </div>
 

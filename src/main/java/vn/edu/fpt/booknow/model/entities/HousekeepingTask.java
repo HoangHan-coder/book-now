@@ -21,7 +21,7 @@ public class HousekeepingTask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "task_id", nullable = false)
-    private Long taskId;
+    private Long id;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -45,17 +45,17 @@ public class HousekeepingTask {
     @Column(name = "task_type", nullable = false, length = 30)
     private String taskType;
 
-    @Size(max = 20)
+    @Enumerated(EnumType.STRING)
     @NotNull
     @ColumnDefault("'PENDING'")
     @Column(name = "task_status", nullable = false, length = 20)
-    private String taskStatus;
+    private TaskStatus status;
 
-    @Size(max = 10)
+    @Enumerated(EnumType.STRING)
     @NotNull
     @ColumnDefault("'NORMAL'")
     @Column(name = "priority", nullable = false, length = 10)
-    private String priority;
+    private PriorityStatus priority;
 
     @Size(max = 1000)
     @Nationalized

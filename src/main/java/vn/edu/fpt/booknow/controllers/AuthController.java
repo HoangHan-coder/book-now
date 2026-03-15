@@ -81,7 +81,7 @@ public class AuthController {
         if (!loginStatus) {
             return  "redirect:/admin/login?error";
         }
-        return "redirect:/admin/dashboard";
+        return "redirect:/admin/bookings";
 
     }
 

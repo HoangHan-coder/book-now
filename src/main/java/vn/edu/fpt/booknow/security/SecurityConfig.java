@@ -30,8 +30,8 @@ public class SecurityConfig {
     @Autowired
     private CustomUserDetailsService detailsService;
 
-    @Autowired
-    private RecaptchaFilter recaptchaFilter;
+//    @Autowired
+//    private RecaptchaFilter recaptchaFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -47,16 +47,16 @@ public class SecurityConfig {
                 .securityMatcher("/admin/**")
                 .authenticationProvider(staffAuthProvider())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/login","/auth/logout", "/public/**", "/home","/pay/**", 
+                        .requestMatchers("/admin/login","/auth/logout", "/public/**", "/home","/pay/**",
                                 "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-        
+
 
         return http.build();
     }
@@ -81,7 +81,7 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
                 return http.build();
     }

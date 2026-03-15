@@ -108,6 +108,10 @@
             <i class="fa-solid fa-door-open w-5"></i>
             Phòng
         </a>
+        <a href="/admin/manage-housekeeping" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+            <i class="fa-solid fa-broom"></i>
+            Dọn dẹp
+        </a>
         <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
             <i class="fa-solid fa-users-gear w-5"></i>
             Khách hàng
@@ -122,9 +126,6 @@
         </a>
     </div>
 </aside>
-
-<!-- OVERLAY (for mobile) -->
-<div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden glass-effect"></div>
 
 <!-- MAIN CONTENT -->
 <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
@@ -191,12 +192,14 @@
                         focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white">
 
                         <option value="">Tất cả</option>
+                        <option value="PENDING">Chờ kiểm duyệt</option>
                         <option value="PENDING_PAYMENT">Chờ thanh toán</option>
                         <option value="PAID">Đã thanh toán</option>
                         <option value="CHECKED_IN">Đã nhận phòng</option>
                         <option value="CHECKED_OUT">Đã trả phòng</option>
                         <option value="COMPLETED">Hoàn thành</option>
                         <option value="FAILED">Thất bại</option>
+                        <option value="REJECTED">Từ chối</option>
 
                     </select>
                     <i class="fa-solid fa-filter absolute left-3 top-2.5 text-gray-400"></i>
@@ -405,7 +408,7 @@
                 'CHECKED_OUT': { text: 'Đã trả phòng', class: 'status-confirmed' },
                 'COMPLETED': { text: 'Hoàn thành', class: 'status-completed' },
                 'FAILED': { text: 'Thất bại', class: 'status-cancelled' },
-                'REJECT': { text: 'Từ chối', class: 'status-cancelled' }
+                'REJECTED': { text: 'Từ chối', class: 'status-cancelled' }
             };
 
             const statusInfo = statusMap[newStatus] || { text: newStatus, class: 'status-pending' };

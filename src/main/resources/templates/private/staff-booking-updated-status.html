@@ -303,7 +303,7 @@
             <form th:action="@{/admin/bookings/update-status}" method="post" class="w-full space-y-3">
 
               <input type="hidden" name="bookingCode" th:value="${booking.bookingCode}">
-              <input type="hidden" name="status" value="REJECT">
+              <input type="hidden" name="status" value="REJECTED">
 
               <!-- reason select -->
               <label class="text-sm font-semibold text-gray-600">
@@ -335,11 +335,6 @@
 
               </select>
 
-              <!-- optional note -->
-              <textarea name="note"
-                        class="w-full p-3 border border-gray-200 rounded-lg text-sm"
-                        rows="2"
-                        placeholder="Ghi chú thêm (không bắt buộc)"></textarea>
 
               <button type="submit"
                       class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg font-medium">
@@ -681,7 +676,7 @@
         updateTimeline(6,"green");
         break;
 
-      case "REJECT":
+      case "REJECTED":
         panelFailure?.classList.remove('hidden');
         badge?.classList.add('bg-red-100', 'text-red-800');
         if (badge) badge.textContent = "Bị từ chối";

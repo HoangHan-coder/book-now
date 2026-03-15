@@ -46,11 +46,10 @@ public class StaffAccount {
 
     @Size(max = 255)
     @Nationalized
-    @Column(name = "avatar_url")
+    @Column(name = "avatar_url",columnDefinition = "nvarchar(255)")
     private String avatarUrl;
-
-    @Size(max = 20)
-    @NotNull
+    @Column(name = "avatar_public_id",columnDefinition = "nvarchar(255)")
+    private String avatarPublicUrl;
     @Nationalized
     @Column(name = "role", nullable = false, length = 20)
     private String role;

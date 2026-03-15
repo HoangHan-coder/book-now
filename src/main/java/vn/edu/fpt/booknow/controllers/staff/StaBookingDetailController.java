@@ -31,7 +31,7 @@ public class StaBookingDetailController {
         String durationText = bookingDetailService.calculateDuration(booking);
 
         model.addAttribute("booking", booking);
-        model.addAttribute("durationText", durationText);
+        model.addAttribute("duration", durationText);
 
         return "private/staff-booking-detail";
     }

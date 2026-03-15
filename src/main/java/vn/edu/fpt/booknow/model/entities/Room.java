@@ -33,15 +33,24 @@ public class Room {
     @Column(name = "room_number", nullable = false, length = 50)
     private String roomNumber;
 
-    @Size(max = 50)
-    @NotNull
+
+    @Enumerated(EnumType.STRING)
     @ColumnDefault("'AVAILABLE'")
     @Column(name = "status", nullable = false, length = 50)
-    private String status;
+    private RoomStatus status;
 
     @NotNull
     @ColumnDefault("0")
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
+
+    @OneToMany(mappedBy = "room")
+    private List<Booking> bookings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "room")
+    private List<Image> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "room")
+    private List<RoomAmenity> roomAmenities = new ArrayList<>();
 
 }
