@@ -36,7 +36,8 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/assets/**","/admin/create/**", "/admin/detail/**","/admin/list","/admin/edit/**", "/staff/update/**", "/admin/dashboard", "/admin/dashboard/export/**", "/admin/room/delete/**").permitAll() // permitAll = cho phép công cộng
+                        .requestMatchers("/assets/**","/admin/create/**","/admin/rooms/create"
+                                , "/admin/detail/**","/admin/list","/admin/edit/**", "/staff/update/**", "/admin/dashboard", "/admin/dashboard/export/**", "/admin/room/delete/**").permitAll() // permitAll = cho phép công cộng
                         //.requestMatchers("/artist/list").hasRole("ADMIN")
                         .anyRequest().authenticated() // anyReq = tất cả các request còn lại, buộc phải xác thực
                 )

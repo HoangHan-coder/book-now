@@ -167,18 +167,23 @@ public class ManageRoomServices {
 
             for (Amenity amenity : amenities) {
 
-                RoomAmenity ra = new RoomAmenity();
-                ra.setRoom(room);
-                ra.setAmenity(amenity);
+                boolean exists = roomAmenityRepository
+                        .existsByRoomAndAmenity(room, amenity);
 
-                roomAmenityRepository.save(ra);
-                room.getRoomAmenities().add(ra);
+                if (!exists) {
+
+                    RoomAmenity ra = new RoomAmenity();
+                    ra.setRoom(room);
+                    ra.setAmenity(amenity);
+
+                    roomAmenityRepository.save(ra);
+                    room.getRoomAmenities().add(ra);
+                }
+
             }
         }
 
         /* ===== ADD NEW AMENITIES ===== */
-        System.out.println("Amenity names: " + newAmenityNames);
-        System.out.println("Amenity icons: " + newAmenityIcons);
 
         if (newAmenityNames != null && !newAmenityNames.isEmpty()) {
 
@@ -202,9 +207,6 @@ public class ManageRoomServices {
                     if (newAmenityIcons != null && i < newAmenityIcons.size()) {
 
                         MultipartFile icon = newAmenityIcons.get(i);
-                        System.out.println("File name: " + icon.getOriginalFilename());
-                        System.out.println("File size: " + icon.getSize());
-                        System.out.println("Is empty: " + icon.isEmpty());
 
                         if (icon != null && !icon.isEmpty()) {
 
@@ -310,6 +312,7 @@ public class ManageRoomServices {
             String description,
             List<Long> amenityIds,
             List<String> newAmenityNames,
+            List<MultipartFile> newAmenityIcons,
             MultipartFile[] images
     ) {
 
@@ -350,19 +353,55 @@ public class ManageRoomServices {
             }
         }
 
-        if (newAmenityNames != null) {
+        if (newAmenityNames != null && !newAmenityNames.isEmpty()) {
 
-            for (String name : newAmenityNames) {
+            for (int i = 0; i < newAmenityNames.size(); i++) {
 
-                name = name.trim();
+                String name = newAmenityNames.get(i).trim();
+
+                if (name.isBlank()) continue;
 
                 Amenity amenity = amenityRepository.findByNameIgnoreCase(name);
 
+                /* ===== CREATE IF NOT EXISTS ===== */
+
                 if (amenity == null) {
+
                     amenity = new Amenity();
                     amenity.setName(name);
+
+                    /* ===== UPLOAD ICON ===== */
+                    System.out.println("NEW AMENITIES: " + newAmenityNames);
+                    System.out.println("NEW ICONS: " + newAmenityIcons);
+                    if (newAmenityIcons != null && i < newAmenityIcons.size()) {
+
+                        MultipartFile icon = newAmenityIcons.get(i);
+
+                        if (icon != null && !icon.isEmpty()) {
+
+                            try {
+
+                                Map upload = cloudinary.uploader().upload(
+                                        icon.getBytes(),
+                                        ObjectUtils.asMap("folder", "booknow/amenities")
+                                );
+
+                                String iconUrl = (String) upload.get("secure_url");
+
+                                amenity.setIconUrl(iconUrl);
+
+                            } catch (Exception e) {
+
+                                throw new RuntimeException("Upload amenity icon failed");
+
+                            }
+                        }
+                    }
+
                     amenityRepository.save(amenity);
                 }
+
+                /* ===== LINK ROOM ===== */
 
                 RoomAmenity ra = new RoomAmenity();
                 ra.setRoom(room);
@@ -371,6 +410,8 @@ public class ManageRoomServices {
                 roomAmenityRepository.save(ra);
             }
         }
+
+
 
         /* ===== UPLOAD IMAGE ===== */
 

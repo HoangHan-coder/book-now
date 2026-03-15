@@ -3,6 +3,7 @@ package vn.edu.fpt.booknow.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
+import vn.edu.fpt.booknow.controllers.model.entities.Amenity;
 import vn.edu.fpt.booknow.controllers.model.entities.Room;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface RoomRepository extends JpaRepository<Room, Long>, JpaSpecificat
 
     // tổng phòng (không tính DELETED)
     int countByStatusNot(String status);
+
+
 }

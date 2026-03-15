@@ -233,21 +233,23 @@
                             </div>
 
                             <!-- Amenities List (Read Only) -->
-                            <div th:if="${room.roomAmenities != null and !#lists.isEmpty(room.roomAmenities)}"
-                                    class="space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
-                                
-                                <!-- Hardcoded Amenities based on IDs provided -->
-                                <div th:each="ra : ${room.roomAmenities}"
-                                        class="flex items-center p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-                                    <div class="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center text-green-600 flex-shrink-0">
-                                        <i class="fa-solid fa-check text-xs"></i>
-                                    </div>
-                                    <span class="ml-3 text-sm font-medium text-gray-700"
-                                          th:text="${ra.amenity.name}"
-                                    ></span>
-                                </div>
+                            <label th:each="ra : ${room.roomAmenities}"
+                                   class="flex items-center gap-2 p-2 bg-white rounded border border-gray-200">
 
-                            </div>
+                                <input type="checkbox"
+                                       checked
+                                       disabled
+                                       class="h-4 w-4 text-blue-600 rounded border-gray-300">
+
+                                <img th:if="${ra.amenity.iconUrl != null}"
+                                     th:src="${ra.amenity.iconUrl}"
+                                     class="w-5 h-5 object-cover rounded">
+
+                                <span th:text="${ra.amenity.name}"
+                                      class="text-sm text-gray-700">
+    </span>
+
+                            </label>
                         </div>
 
                     </div>

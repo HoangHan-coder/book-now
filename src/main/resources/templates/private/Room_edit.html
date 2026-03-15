@@ -165,6 +165,7 @@
               class="p-8">
             <input type="hidden" name="roomId" th:value="${room.roomId}">
             <input type="hidden" name="deletedImageIds">
+            <input type="hidden" name="deletedAmenityIds">
 
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
                 <!-- LEFT COLUMN: Basic Info (2/3 width) -->
@@ -446,7 +447,6 @@
 
                                         <input type="file"
                                                id="amenityImageInput"
-                                               name="newAmenityIcons"
                                                accept="image/*"
                                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
 
@@ -496,20 +496,23 @@
                              class="space-y-2 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
                             <!-- Standard Amenities -->
                             <label th:each="amenity : ${allAmenities}"
-                                   class="flex items-center gap-2 p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
+                                   class="flex items-center justify-between p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
 
-                                <input type="checkbox"
-                                       name="amenityIds"
-                                       th:value="${amenity.amenityId}"
-                                       th:checked="${#lists.contains(roomAmenityIds, amenity.amenityId)}"
-                                       class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                <!-- LEFT CONTENT -->
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox"
+                                           name="amenityIds"
+                                           th:value="${amenity.amenityId}"
+                                           th:checked="${#lists.contains(roomAmenityIds, amenity.amenityId)}"
+                                           class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
 
-                                <img th:if="${amenity.iconUrl != null}"
-                                     th:src="${amenity.iconUrl}"
-                                     class="w-5 h-5 object-cover rounded">
+                                    <img th:if="${amenity.iconUrl != null}"
+                                         th:src="${amenity.iconUrl}"
+                                         class="w-5 h-5 object-cover rounded">
 
-                                <span th:text="${amenity.name}"
-                                      class="text-sm text-gray-700"></span>
+                                    <span th:text="${amenity.name}"
+                                          class="text-sm text-gray-700"></span>
+                                </div>
 
                             </label>
                         </div>
@@ -936,11 +939,15 @@
 
         amenityDropZone.classList.remove("border-blue-400");
 
-        const file = e.dataTransfer.files[0];
+        const file = e.dataTransfer.files[0];   // ✅ LẤY FILE
 
         if(!file) return;
 
-        /* chỉ cho 1 ảnh */
+        if(e.dataTransfer.files.length > 1){
+            alert("Chỉ được upload 1 ảnh!");
+            return;
+        }
+
         if(amenityFile){
             alert("Chỉ được upload 1 ảnh cho tiện nghi");
             return;
@@ -1035,6 +1042,20 @@
 
         <span class="text-sm text-gray-700">${name}</span>
     `;
+
+        // tạo input file mới cho form
+        const hiddenFileInput = document.createElement("input");
+
+        hiddenFileInput.type = "file";
+        hiddenFileInput.name = "newAmenityIcons";
+        hiddenFileInput.style.display = "none";
+
+        const dt = new DataTransfer();
+        dt.items.add(imageFile);
+
+        hiddenFileInput.files = dt.files;
+
+        document.getElementById("editRoomForm").appendChild(hiddenFileInput);
 
         amenitiesList.prepend(label);
 

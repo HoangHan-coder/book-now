@@ -154,6 +154,47 @@ public class ManageRoomController {
         return "private/Room_create";
     }
 
+    @PostMapping("/rooms/create")
+    public String createRoom(
+            @RequestParam String roomNumber,
+            @RequestParam Long roomTypeId,
+            @RequestParam Long basePrice,
+            @RequestParam Long overPrice,
+            @RequestParam String status,
+            @RequestParam(required = false) String description,
+
+            @RequestParam(required = false) List<Long> amenityIds,
+            @RequestParam(required = false) List<String> newAmenityNames,
+            @RequestParam(required = false) List<MultipartFile> newAmenityIcons,
+
+            @RequestParam(required = false) MultipartFile[] images,
+
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+
+            manageRoomServices.createRoom(
+                    roomNumber,
+                    roomTypeId,
+                    basePrice,
+                    overPrice,
+                    status,
+                    description,
+                    amenityIds,
+                    newAmenityNames,
+                    newAmenityIcons,
+                    images
+            );
+            System.out.println("CREATE ROOM TRIGGERED");
+            redirectAttributes.addFlashAttribute("successMessage", "Tạo phòng thành công!");
+
+        } catch (Exception e) {
+            throw new InternalServerException("Create room failed: " + e.getMessage());
+        }
+
+        return "redirect:/admin/list";
+    }
+
     @GetMapping("/detail/{id}")
     public String viewDetailRoom(Model model, @PathVariable("id") Long id) {
 
@@ -244,7 +285,8 @@ public class ManageRoomController {
             @RequestParam(value = "images", required = false) MultipartFile[] images,
 
             // ===== IMAGE DELETE =====
-            @RequestParam(value = "deletedImageIds", required = false) String deletedImageIds
+            @RequestParam(value = "deletedImageIds", required = false) String deletedImageIds,
+            @RequestParam( required = false) String deletedAmenityIds
     ) {
         try {
 
@@ -269,42 +311,4 @@ public class ManageRoomController {
         return "redirect:/admin/detail/" + roomId;
     }
 
-    @PostMapping("/rooms/create")
-    public String createRoom(
-            @RequestParam String roomNumber,
-            @RequestParam Long roomTypeId,
-            @RequestParam Long basePrice,
-            @RequestParam Long overPrice,
-            @RequestParam String status,
-            @RequestParam(required = false) String description,
-
-            @RequestParam(required = false) List<Long> amenityIds,
-            @RequestParam( required = false) List<String> newAmenityNames,
-
-            @RequestParam(required = false) MultipartFile[] images,
-
-            RedirectAttributes redirectAttributes
-    ) {
-        try {
-
-            manageRoomServices.createRoom(
-                    roomNumber,
-                    roomTypeId,
-                    basePrice,
-                    overPrice,
-                    status,
-                    description,
-                    amenityIds,
-                    newAmenityNames,
-                    images
-            );
-
-            redirectAttributes.addFlashAttribute("successMessage", "Tạo phòng thành công!");
-
-        } catch (Exception e) {
-            throw new InternalServerException("Create room failed: " + e.getMessage());
-        }
-
-        return "redirect:/admin/list";
-    }
 }
