@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.entities.Customer;
-import vn.edu.fpt.booknow.services.customer.ProfileService;
+import vn.edu.fpt.booknow.services.ProfileService;
 
 import java.security.Principal;
 

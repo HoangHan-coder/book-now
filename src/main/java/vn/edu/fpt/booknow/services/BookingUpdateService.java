@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.services.staff;
+package vn.edu.fpt.booknow.services;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -7,7 +7,6 @@ import vn.edu.fpt.booknow.dto.BookingUpdateMessage;
 import vn.edu.fpt.booknow.model.entities.Booking;
 import vn.edu.fpt.booknow.model.entities.BookingStatus;
 import vn.edu.fpt.booknow.repositories.BookingRepository;
-import vn.edu.fpt.booknow.services.MailService;
 
 import java.time.LocalDateTime;
 import java.util.List;

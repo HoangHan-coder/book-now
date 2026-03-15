@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import vn.edu.fpt.booknow.model.entities.Booking;
 import vn.edu.fpt.booknow.model.entities.BookingStatus;
-import vn.edu.fpt.booknow.services.staff.BookingListService;
+import vn.edu.fpt.booknow.services.BookingListService;
 
 import java.time.LocalDate;
 import java.util.List;

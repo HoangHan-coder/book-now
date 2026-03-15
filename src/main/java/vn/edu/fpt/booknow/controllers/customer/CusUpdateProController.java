@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.entities.Customer;
-import vn.edu.fpt.booknow.services.customer.UpdateProfileService;
+import vn.edu.fpt.booknow.services.UpdateProfileService;
 
 import java.security.Principal;
 

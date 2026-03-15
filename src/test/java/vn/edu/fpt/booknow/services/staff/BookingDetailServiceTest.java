@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import vn.edu.fpt.booknow.model.entities.Booking;
 import vn.edu.fpt.booknow.repositories.BookingRepository;
+import vn.edu.fpt.booknow.services.BookingDetailService;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

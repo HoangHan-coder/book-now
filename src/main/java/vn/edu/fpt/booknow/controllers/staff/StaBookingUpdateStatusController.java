@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.entities.Booking;
 import vn.edu.fpt.booknow.model.entities.BookingStatus;
-import vn.edu.fpt.booknow.services.staff.BookingUpdateService;
+import vn.edu.fpt.booknow.services.BookingUpdateService;
 
 @Controller
 @RequestMapping("/admin/bookings")

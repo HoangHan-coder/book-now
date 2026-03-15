@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.services.staff;
+package vn.edu.fpt.booknow.services;
 
 import org.springframework.stereotype.Service;
 import vn.edu.fpt.booknow.model.entities.Booking;

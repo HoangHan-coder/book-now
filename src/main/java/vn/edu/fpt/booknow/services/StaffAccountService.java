@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.services.admin;
+package vn.edu.fpt.booknow.services;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import vn.edu.fpt.booknow.model.entities.StaffAccount;
 import vn.edu.fpt.booknow.model.map.CustomerDetails;
-import vn.edu.fpt.booknow.services.JWTService;
 
 @Service
 public class StaffAccountService {

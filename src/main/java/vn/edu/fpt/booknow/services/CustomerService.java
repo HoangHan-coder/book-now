@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.services.customer;
+package vn.edu.fpt.booknow.services;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import vn.edu.fpt.booknow.model.entities.Customer;
 import vn.edu.fpt.booknow.model.map.StaffUserDetails;
 import vn.edu.fpt.booknow.repositories.CustomerRepository;
-import vn.edu.fpt.booknow.services.JWTService;
 
 @Service
 public class CustomerService {

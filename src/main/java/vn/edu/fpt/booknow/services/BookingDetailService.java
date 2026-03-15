@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.services.staff;
+package vn.edu.fpt.booknow.services;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

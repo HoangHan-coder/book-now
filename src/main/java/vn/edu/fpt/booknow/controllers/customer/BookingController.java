@@ -5,12 +5,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.dto.BookingDTO;
 import vn.edu.fpt.booknow.model.dto.PaymentDTO;
 import vn.edu.fpt.booknow.model.dto.RoomDTO;
-import vn.edu.fpt.booknow.model.entities.Booking;
-import vn.edu.fpt.booknow.model.entities.Payment;
-import vn.edu.fpt.booknow.model.entities.Room;
+import vn.edu.fpt.booknow.model.entities.*;
 import vn.edu.fpt.booknow.services.BookingService;
 import vn.edu.fpt.booknow.services.FeedbackService;
 import vn.edu.fpt.booknow.services.JWTService;
@@ -107,7 +106,6 @@ public class BookingController {
                                     @RequestParam("idCardFront") MultipartFile idCardFront,
                                     @RequestParam("idCardBack") MultipartFile idCardBack,
                                     Model model) {
-
         try {
             Long bookingId = Long.parseLong(id);
 
@@ -124,5 +122,63 @@ public class BookingController {
         }
 
     }
+
+    @GetMapping("/{id}/feedback")
+    public String feedbackForm(@PathVariable("id") String id,
+                               @RequestParam(value = "error", required = false) String error,
+                               Model model) {
+        try {
+            Long bookingId = Long.parseLong(id);
+            Booking booking = bookingService.getBookingById(bookingId);
+
+            if (error != null && !error.isBlank()) {
+                model.addAttribute("error", error);
+            }
+
+            model.addAttribute("booking", new BookingDTO(booking));
+            model.addAttribute("room", new RoomDTO(booking.getRoom()));
+            return "feedback_form";
+        } catch (Exception e) {
+            return "error/404";
+        }
+    }
+
+    @PostMapping("/{id}/feedback")
+    public String feedbackHandle(@PathVariable("id") String id,
+                                 @RequestParam(value = "rating", required = false) String ratingRaw,
+                                 @RequestParam(value = "comment", required = false) String content,
+                                 @RequestParam(value = "bookingCode", required = false) String bookingCode,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            Long bookingId = Long.parseLong(id);
+
+            if (ratingRaw == null || ratingRaw.isBlank()) {
+                System.out.println("Bạn chưa chọn số sao.");
+                redirectAttributes.addFlashAttribute("error", "Bạn chưa chọn số sao.");
+                return "redirect:/bookings/" + bookingId + "/feedback";
+            }
+
+            if (content == null || content.isBlank()) {
+                System.out.println("Nội dung feedback ko được bỏ trống.");
+                redirectAttributes.addFlashAttribute("error", "Nội dung feedback ko được bỏ trống.");
+                return "redirect:/bookings/" + bookingId + "/feedback";
+            }
+
+            Integer rating = Integer.parseInt(ratingRaw);
+            Feedback feedback = feedbackService.createFeedback(bookingId, rating, content);
+
+            if (feedback == null) {
+                return "error/500";
+            }
+            bookingService.updateStatus(BookingStatus.COMPLETED, bookingCode);
+            return "redirect:/bookings/" + bookingId;
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return "error/404";
+        }
+
+    }
+
 
 }

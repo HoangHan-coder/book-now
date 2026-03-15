@@ -57,4 +57,14 @@ public class Feedback {
     @Column(name = "reply_at")
     private LocalDateTime replyAt;
 
+    public Feedback() {
+
+    }
+
+    public Feedback(Booking booking, String content, Integer rating) {
+        this.booking = booking;
+        this.content = content;
+        this.rating = rating;
+        this.createdAt = LocalDateTime.now();
+    }
 }

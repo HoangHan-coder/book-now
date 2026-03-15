@@ -4,7 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import vn.edu.fpt.booknow.services.customer.ChangePasswordService;
+import vn.edu.fpt.booknow.services.ChangePasswordService;
 
 import java.security.Principal;
 import java.util.Map;

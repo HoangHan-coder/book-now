@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.services.customer;
+package vn.edu.fpt.booknow.services;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

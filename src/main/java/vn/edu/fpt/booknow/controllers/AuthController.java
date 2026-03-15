@@ -19,8 +19,8 @@ import vn.edu.fpt.booknow.model.entities.Customer;
 import vn.edu.fpt.booknow.model.entities.StaffAccount;
 import vn.edu.fpt.booknow.services.JWTService;
 import vn.edu.fpt.booknow.services.OTPService;
-import vn.edu.fpt.booknow.services.customer.CustomerService;
-import vn.edu.fpt.booknow.services.admin.StaffAccountService;
+import vn.edu.fpt.booknow.services.CustomerService;
+import vn.edu.fpt.booknow.services.StaffAccountService;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
