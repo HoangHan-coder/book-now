@@ -11,7 +11,7 @@
 <video id="preview" autoplay muted class="w-full"></video>
 
 <div class="flex gap-2 mt-3">
-    <input type="hidden" id="bookingId" th:value="${booking.id}">
+    <input type="hidden" id="bookingId" th:value="${booking.bookingId}">
     <button id="startBtn">Start Recording</button>
     <button id="stopBtn" disabled>Stop</button>
     <button id="submitBtn" disabled>Submit</button>
@@ -30,9 +30,22 @@
         stompClient.subscribe("/topic/checkin/user/" + bookingId, function(message) {
 
             console.log("RAW:", message.body);
-
             const data = JSON.parse(message.body);
             alert(data.message);
+            if (data.bookingStatus.name() === 'REJECT'){
+                window.location.href = 'checkin_fail.html'
+            } else if (data.bookingStatus.name() === 'CHECKED_IN'){
+
+                    fetch("/book-now/checkin/success", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ bookingId: bookingId})
+                    })
+
+                }
+
 
         });
 

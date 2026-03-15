@@ -26,6 +26,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         boolean isNewUser = (boolean) oAuth2User.getAttribute("isNewUser");
 
         if (isNewUser) {
+            System.out.println("O day");
 
             response.sendRedirect("/book-now/authen/login");
         } else {

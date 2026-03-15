@@ -5,11 +5,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
-import vn.edu.fpt.booknow.entities.Customer;
+import vn.edu.fpt.booknow.model.entities.Customer;
 import vn.edu.fpt.booknow.repositories.CustomerRepository;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Service
 public class AuthService {

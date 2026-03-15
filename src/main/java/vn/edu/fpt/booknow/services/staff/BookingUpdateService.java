@@ -1,8 +1,8 @@
 package vn.edu.fpt.booknow.services.staff;
 
 import org.springframework.stereotype.Service;
-import vn.edu.fpt.booknow.entities.Booking;
-import vn.edu.fpt.booknow.entities.BookingStatus;
+import vn.edu.fpt.booknow.model.entities.Booking;
+import vn.edu.fpt.booknow.model.entities.BookingStatus;
 import vn.edu.fpt.booknow.repositories.BookingRepository;
 
 @Service
@@ -33,6 +33,7 @@ public class BookingUpdateService {
 
         bookingRepository.save(booking);
     }
+
 
     public Booking getBookingOrThrow(String bookingCode) {
         return bookingRepository.findByBookingCode(bookingCode)

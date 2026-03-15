@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.entities;
+package vn.edu.fpt.booknow.model.entities;
 
 import lombok.Data;
 
@@ -6,4 +6,5 @@ import lombok.Data;
 public class ApproveRequest {
     private Long bookingId;
     private String reason;
+    private Long taskId;
 }

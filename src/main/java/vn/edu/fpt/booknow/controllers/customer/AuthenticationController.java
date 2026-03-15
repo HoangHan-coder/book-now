@@ -5,7 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import vn.edu.fpt.booknow.entities.Customer;
+import vn.edu.fpt.booknow.model.entities.Customer;
 import vn.edu.fpt.booknow.services.customer.AuthService;
 import vn.edu.fpt.booknow.services.customer.OtpService;
 

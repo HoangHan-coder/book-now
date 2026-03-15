@@ -4,8 +4,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import vn.edu.fpt.booknow.entities.Booking;
-import vn.edu.fpt.booknow.entities.BookingStatus;
+import vn.edu.fpt.booknow.model.entities.Booking;
+import vn.edu.fpt.booknow.model.entities.BookingStatus;
 import vn.edu.fpt.booknow.services.staff.BookingUpdateService;
 
 @Controller
@@ -59,5 +59,36 @@ public class StaBookingUpdateStatusController {
         }
 
         return "redirect:/staff/bookings/update/" + bookingCode;
+    }
+
+    @PostMapping("/cancel/{bookingCode}")
+    public String cancelBooking(
+            @PathVariable String bookingCode,
+            @RequestParam BookingStatus status,
+            @RequestParam(required = false) String reason,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+
+            bookingUpdateService.updateStatus(
+                    bookingCode,
+                    status,
+                    reason
+            );
+
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Cập nhật trạng thái thành công"
+            );
+
+        } catch (Exception e) {
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    e.getMessage()
+            );
+        }
+
+        return "redirect:/admin/bookings";
     }
 }
