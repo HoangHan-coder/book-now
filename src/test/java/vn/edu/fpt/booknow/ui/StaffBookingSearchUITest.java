@@ -137,13 +137,16 @@ class StaffBookingSearchUITest extends SeleniumBaseTest {
         keywordInput.sendKeys("BK");
 
         driver.findElement(FILTER_BUTTON).click();
-        waitFor(30).until(ExpectedConditions.presenceOfElementLocated(TABLE_ROWS));
+
+        waitFor(30).until(ExpectedConditions.refreshed(
+                ExpectedConditions.presenceOfAllElementsLocatedBy(TABLE_ROWS)
+        ));
 
         List<WebElement> rows = driver.findElements(TABLE_ROWS);
 
-        // Nếu database trống thì skip – không thể kiểm tra giao diện với data rỗng
         assumeFalse(rows.isEmpty() || rows.get(0).getAttribute("colspan") != null,
                 "[SKIP] Không có booking trong database – test UI-S04 bị bỏ qua");
+
 
         // Mỗi dòng trong bảng phải có mã bắt đầu bằng BK (cột đầu tiên)
         for (WebElement row : rows) {

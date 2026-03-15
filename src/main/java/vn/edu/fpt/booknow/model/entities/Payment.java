@@ -2,11 +2,9 @@ package vn.edu.fpt.booknow.model.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Data
@@ -33,8 +31,7 @@ public class Payment {
     @Column(name = "payment_status", nullable = false, length = 20)
     private String paymentStatus;
 
-    @ColumnDefault("sysdatetime()")
-    @Column(name = "paid_at", nullable = false)
+    @Column(name = "paid_at")
     private LocalDateTime paidAt;
 
 }

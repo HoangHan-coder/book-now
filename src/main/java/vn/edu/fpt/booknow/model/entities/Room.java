@@ -31,9 +31,11 @@ public class Room {
     @Column(name = "room_number", nullable = false, length = 50)
     private String roomNumber;
 
+
+    @Enumerated(EnumType.STRING)
     @ColumnDefault("'AVAILABLE'")
     @Column(name = "status", nullable = false, length = 50)
-    private String status;
+    private RoomStatus status;
 
     @ColumnDefault("0")
     @Column(name = "is_deleted", nullable = false)
