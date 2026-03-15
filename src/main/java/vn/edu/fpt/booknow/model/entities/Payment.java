@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -41,6 +41,17 @@ public class Payment {
     private String paymentStatus;
 
     @Column(name = "paid_at")
-    private Instant paidAt;
+    private LocalDateTime paidAt;
 
+    public Payment(Booking booking, BigDecimal amount, String method, String paymentStatus) {
+        this.booking = booking;
+        this.amount = amount;
+        this.method = method;
+        this.paymentStatus = paymentStatus;
+        this.paidAt = LocalDateTime.now();
+    }
+
+    public Payment() {
+
+    }
 }

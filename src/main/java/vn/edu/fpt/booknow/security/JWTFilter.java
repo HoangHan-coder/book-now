@@ -36,7 +36,7 @@ public class JWTFilter extends OncePerRequestFilter {
         if (requestPath.contains("/auth/login") || requestPath.contains("/admin/login") || 
             requestPath.contains("/register") || requestPath.contains("/public") ||
             requestPath.contains("/auth/logout") ||
-                requestPath.contains("/momo") || requestPath.contains("/forgot-password")) {
+                requestPath.contains("/pay") || requestPath.contains("/forgot-password")) {
             filterChain.doFilter(request, response);
             return;
         }

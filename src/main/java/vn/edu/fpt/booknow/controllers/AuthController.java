@@ -18,14 +18,10 @@ import vn.edu.fpt.booknow.model.dto.VerifyOtpRequest;
 import vn.edu.fpt.booknow.model.entities.Customer;
 import vn.edu.fpt.booknow.model.entities.StaffAccount;
 import vn.edu.fpt.booknow.services.JWTService;
-import vn.edu.fpt.booknow.services.MailService;
 import vn.edu.fpt.booknow.services.OTPService;
-import vn.edu.fpt.booknow.services.RecaptchaService;
 import vn.edu.fpt.booknow.services.customer.CustomerService;
 import vn.edu.fpt.booknow.services.admin.StaffAccountService;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 

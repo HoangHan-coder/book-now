@@ -1,6 +1,5 @@
 package vn.edu.fpt.booknow.services.customer;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,7 +8,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import vn.edu.fpt.booknow.model.entities.Customer;
-import vn.edu.fpt.booknow.model.map.CustomerDetails;
 import vn.edu.fpt.booknow.model.map.StaffUserDetails;
 import vn.edu.fpt.booknow.repositories.CustomerRepository;
 import vn.edu.fpt.booknow.services.JWTService;
@@ -39,11 +37,12 @@ public class CustomerService {
                 System.out.println("This is Staff or admin");
                 return false;
             }
-        } catch (Exception e) {
-            System.out.println("Verify failed: " + e.getMessage());
+            jwtService.createCookie(users,response);
+            return true;
         }
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            return false;
         }
         return false;
     }

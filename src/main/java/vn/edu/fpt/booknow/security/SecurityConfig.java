@@ -71,8 +71,12 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login",
                                 "/auth/logout", "/register",
                                 "/public/**", "/home",
-                                "/momo-*", 
-                                "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password").permitAll()
+                                "/pay/**",
+                                "/forgot-password",
+                                "/verify-otp",
+                                "/resend-otp",
+                                "/reset-password",
+                                "/error/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

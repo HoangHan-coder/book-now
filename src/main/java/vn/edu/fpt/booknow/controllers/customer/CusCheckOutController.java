@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+//import vn.edu.fpt.booknow.services.customer.BookingService;
 import vn.edu.fpt.booknow.model.entities.Booking;
-import vn.edu.fpt.booknow.services.customer.BookingService;
+import vn.edu.fpt.booknow.services.BookingService;
 import vn.edu.fpt.booknow.services.customer.CheckOutService;
 
 import java.security.Principal;

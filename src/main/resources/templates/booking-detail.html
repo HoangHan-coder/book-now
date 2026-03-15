@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${'Đặt phòng ' + booking.bookingCode + ' - BookNow'}">Chi tiết đặt phòng - BookNow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 min-h-screen">
+
+    <!-- ===== LOGO ===== -->
+    <div class="fixed top-5 left-5 z-50 bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow border border-gray-100">
+        <a th:href="@{/home}" href="index.html" class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100">
+                <i class="fa-solid fa-house-chimney text-blue-600 text-base"></i>
+            </div>
+            <span class="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-blue-700">BookNow</span>
+        </a>
+    </div>
+
+    <!-- ===== MAIN LAYOUT ===== -->
+    <div class="max-w-5xl mx-auto px-4 md:px-8 pt-24 pb-14">
+
+        <!-- ===== MAIN CARD ===== -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+            <!-- ===========================================
+                 SECTION A: BOOKING HEADER
+                 =========================================== -->
+            <div class="px-6 sm:px-8 py-6 border-b border-gray-100">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+
+                    <!-- Booking Reference & Date -->
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Mã đặt phòng</p>
+                        <h1 class="text-3xl font-mono font-bold text-gray-900 tracking-tight"
+                            th:text="${booking.bookingCode}">BK20260312001</h1>
+                        <p class="text-xs text-gray-400 mt-2">
+                            <i class="fa-regular fa-calendar mr-1"></i>
+                            Đặt vào
+                            <span class="font-medium text-gray-600"
+                                  th:text="${booking.getActualCheckInDate()} + ', ' + ${booking.getActualCheckInTime()}">
+                                12 Mar 2026, 09:30
+                            </span>
+                        </p>
+                    </div>
+
+                    <!-- Status Badges -->
+                    <div class="flex flex-wrap gap-2">
+
+                        <!--
+                            BOOKING STATUS BADGES
+                            DB values: PENDING | PENDING_PAYMENT | PAID | CHECKED_IN | CHECKED_OUT | COMPLETED | FAILED | REJECTED | CANCELLED
+                        -->
+                        <span th:if="${booking.bookingStatus.name() == 'PENDING'}"
+                              class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-700 border border-yellow-200">
+                            <i class="fa-regular fa-clock text-xs"></i> Chờ phê duyệt
+                        </span>
+                        <span th:if="${booking.bookingStatus.name() == 'PENDING_PAYMENT'}"
+                              class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-orange-100 text-orange-700 border border-orange-200">
+                            <i class="fa-solid fa-credit-card text-xs"></i> Chờ thanh toán
+                        </span>
+                        <span th:if="${booking.bookingStatus.name() == 'PAID'}"
+                              class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+                            <i class="fa-solid fa-circle-check text-xs"></i> Xác nhận
+                        </span>
+                        <span th:if="${booking.bookingStatus.name() == 'CHECKED_IN'}"
+                              class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-green-100 text-green-700 border border-green-200">
+                            <i class="fa-solid fa-door-open text-xs"></i> Đã nhận phòng
+                        </span>
+                        <span th:if="${booking.bookingStatus.name() == 'CHECKED_OUT'}"
+                              class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-teal-100 text-teal-700 border border-teal-200">
+                            <i class="fa-solid fa-door-closed text-xs"></i> Đã trả phòng
+                        </span>
+                        <span th:if="${booking.bookingStatus.name() == 'COMPLETED'}"
+                              class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-100 text-gray-600 border border-gray-200">
+                            <i class="fa-solid fa-circle-check text-xs"></i> Hoàn thành
+                        </span>
+                        <span th:if="${booking.bookingStatus.name() == 'CANCELLED'}"
+                              class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-red-100 text-red-700 border border-red-200">
+                            <i class="fa-solid fa-ban text-xs"></i> Đã hủy
+                        </span>
+                        <span th:if="${booking.bookingStatus.name() == 'FAILED' or booking.bookingStatus.name() == 'REJECTED'}"
+                              class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-red-100 text-red-700 border border-red-200"
+                              th:text="${booking.bookingStatus.name()}">
+                            <i class="fa-solid fa-xmark text-xs"></i> Failed
+                        </span>
+
+                        <!--
+                            PAYMENT STATUS BADGE
+                        -->
+                        <span th:if="${payment == null}"
+                              class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-50 text-gray-400 border border-gray-200">
+                            <i class="fa-regular fa-credit-card text-xs"></i> Chưa thanh toán
+                        </span>
+                        <span th:if="${payment != null and payment.paymentStatus == 'PENDING'}"
+                              class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-yellow-50 text-yellow-600 border border-yellow-200">
+                            <i class="fa-solid fa-receipt text-xs"></i> Thanh toán đang chờ
+                        </span>
+                        <span th:if="${payment != null and payment.paymentStatus == 'SUCCESS'}"
+                              class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-green-100 text-green-700 border border-green-200">
+                            <i class="fa-solid fa-receipt text-xs"></i> Đã thanh toán
+                        </span>
+                        <span th:if="${payment != null and payment.paymentStatus == 'FAILED'}"
+                              class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-red-100 text-red-700 border border-red-200">
+                            <i class="fa-solid fa-receipt text-xs"></i> Thanh toán thất bại
+                        </span>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== BODY ===== -->
+            <div class="p-6 sm:p-8 space-y-8">
+
+                <!-- TOP GRID: Customer Info + Stay Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                    <!-- ===========================================
+                         SECTION B: CUSTOMER INFORMATION
+                         =========================================== -->
+                    <div>
+                        <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">
+                            <i class="fa-regular fa-user mr-2"></i>Thông tin khách hàng
+                        </h2>
+                        <div class="space-y-3">
+
+                            <!-- Full Name -->
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 shrink-0">
+                                    <i class="fa-regular fa-id-card text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-400">Tên đầy đủ</p>
+                                    <p class="font-semibold text-gray-900"
+                                       th:text="${booking.customer.fullName}">Nguyen Van A</p>
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 shrink-0">
+                                    <i class="fa-regular fa-envelope text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-400">Email</p>
+                                    <p class="font-semibold text-gray-900"
+                                       th:text="${booking.customer.email}">customer@email.com</p>
+                                </div>
+                            </div>
+
+                            <!-- Phone -->
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 shrink-0">
+                                    <i class="fa-solid fa-phone text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-400">Điện thoại</p>
+                                    <p class="font-semibold text-gray-900"
+                                       th:text="${booking.customer.phone}">0987 654 321</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- ===========================================
+                         SECTION D: STAY INFORMATION
+                         =========================================== -->
+                    <div>
+                        <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">
+                            <i class="fa-regular fa-calendar-days mr-2"></i>Thông tin lưu trú
+                        </h2>
+
+                        <div class="bg-blue-50 rounded-xl border border-blue-100 overflow-hidden divide-y divide-blue-100">
+
+                            <!-- Check-in -->
+                            <div class="px-5 py-3.5 flex justify-between items-center">
+                                <span class="text-sm text-gray-500 flex items-center gap-2">
+                                    <i class="fa-solid fa-plane-arrival text-blue-400 w-4"></i>
+                                    Nhận phòng
+                                </span>
+                                <span class="text-sm font-semibold text-gray-800"
+                                      th:text="${booking.getCheckInDate()} + ', ' + ${booking.getCheckInTime()}">
+                                    12 Mar 2026, 14:00
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <!-- Guest Note (if any) -->
+                        <div th:if="${booking.note != null and !#strings.isEmpty(booking.note)}"
+                             class="mt-4 bg-amber-50 rounded-xl border border-amber-100 px-5 py-4">
+                            <p class="text-xs text-amber-500 font-semibold mb-1">
+                                <i class="fa-regular fa-note-sticky mr-1"></i> Ghi chú từ khách
+                            </p>
+                            <p class="text-sm text-gray-700" th:text="${booking.note}">
+                                Please prepare an extra blanket.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ===========================================
+                     SECTION C: ROOM DETAILS
+                     =========================================== -->
+                <div>
+                    <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">
+                        <i class="fa-solid fa-door-open mr-2"></i>Thông tin phòng
+                    </h2>
+                    
+                    <!-- Room Card -->
+                    <div class="bg-white border border-gray-100 rounded-xl overflow-hidden flex flex-col sm:flex-row gap-4 p-4 sm:p-6">
+                        
+                        <!-- Room Image -->
+                        <div class="w-full sm:w-36 sm:h-32 shrink-0">
+                            <img th:src="${room.roomType.imageUrl}" src="https://via.placeholder.com/200x150?text=Room+101"
+                                 alt="Room" class="w-full h-full object-cover rounded-lg">
+                        </div>
+                        
+                        <!-- Room Info -->
+                        <div class="flex-1 space-y-4">
+                            
+                            <!-- Room Title & Location -->
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-1"
+                                    th:text="${room.roomNumber + ' - ' + room.roomType.name}">
+                                    Phòng Tiêu Chuẩn P.101
+                                </h3>
+                            </div>
+                            
+                            <!-- Room Amenities -->
+                            <div class="grid grid-cols-2 gap-3 pt-2">
+                                
+                                <!-- Guest Capacity -->
+                                <div class="flex items-center gap-2 text-sm">
+                                    <i class="fa-solid fa-users text-blue-500 w-4"></i>
+                                    <span class="text-gray-700">
+                                        <span class="font-semibold" th:text="${room.roomType.maxGuests}">2</span>
+                                        <span class="text-gray-500">Người tối đa</span>
+                                    </span>
+                                </div>
+                                
+                                <!-- Room Size (if available) -->
+                                <div class="flex items-center gap-2 text-sm">
+                                    <i class="fa-solid fa-vector-square text-blue-500 w-4"></i>
+                                    <span class="text-gray-700">
+                                        <span class="font-semibold" th:if="${room.roomType.areaM2 != null}" th:text="${room.roomType.areaM2}">35</span>
+                                        <span class="text-gray-500" th:if="${room.roomType.areaM2 != null}">m²</span>
+                                        <span class="text-gray-400 italic" th:if="${room.roomType.areaM2 == null}">N/A</span>
+                                    </span>
+                                </div>
+                                
+                                <!-- Check-in Date -->
+                                <div class="flex items-center gap-2 text-sm">
+                                    <i class="fa-solid fa-calendar text-blue-500 w-4"></i>
+                                    <div>
+                                        <p class="text-gray-500 text-xs">Ngày nhận phòng</p>
+                                        <p class="font-semibold text-gray-800 text-sm"
+                                           th:text="${booking.getCheckInDate()}">
+                                            27/06/2026
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Check-in Time -->
+                                <div class="flex items-center gap-2 text-sm">
+                                    <i class="fa-solid fa-clock text-blue-500 w-4"></i>
+                                    <div>
+                                        <p class="text-gray-500 text-xs">Khung giờ</p>
+                                        <p class="font-semibold text-blue-600 text-sm"
+                                           th:text="${booking.getCheckInTime()} + ' - ' + ${booking.getCheckOutDate()}">
+                                            21:00 - 09:30 (Qua đêm)
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                        </div>
+                        
+                        <!-- Price Info (Right side) -->
+                        <div class="sm:border-l border-gray-100 sm:pl-6 pt-4 sm:pt-0 flex flex-col justify-center items-end gap-3">
+                            <div class="text-right">
+                                <p class="text-xs text-gray-500 mb-1">Giá slot</p>
+                                <p class="text-lg font-bold text-gray-900"
+                                   th:text="${room.roomType.getBasePriceFormated()}">
+                                    $80.00
+                                </p>
+                            </div>
+                        </div>
+                        <div class="sm:border-l border-gray-100 sm:pl-6 pt-4 sm:pt-0 flex flex-col justify-center items-end gap-3">
+                            <div class="text-right">
+                                <p class="text-xs text-gray-500 mb-1">Giá / Đêm</p>
+                                <p class="text-lg font-bold text-gray-900"
+                                   th:text="${room.roomType.getOverPriceFormated()}">
+                                    $80.00
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===========================================
+                     SECTION E: PAYMENT SUMMARY
+                     =========================================== -->
+                <div>
+                    <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">
+                        <i class="fa-solid fa-file-invoice-dollar mr-2"></i>Tóm tắt thanh toán
+                    </h2>
+                    <div class="border border-gray-100 rounded-xl overflow-hidden">
+
+                        <!-- Payment Method Info (only when payment exists) -->
+                        <div th:if="${payment != null}"
+                             class="px-6 py-4 bg-gray-50 border-b border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-xs text-gray-400 mb-1">Phương thức thanh toán</p>
+                                <p class="text-sm font-bold text-gray-800" th:text="${payment.method}">MOMO</p>
+                            </div>
+                            <div th:if="${payment.paidAt != null}">
+                                <p class="text-xs text-gray-400 mb-1">Thanh toán vào</p>
+                                <p class="text-sm font-semibold text-gray-800"
+                                   th:text="${payment.getPaymentAtFormated()} + ', ' + ${payment.getPaymentAtTime()}">
+                                    12 Mar 2026, 09:45
+                                </p>
+                            </div>
+                            <div th:if="${payment.paidAt == null}">
+                                <p class="text-xs text-gray-400 mb-1">Thanh toán vào</p>
+                                <p class="text-sm text-gray-400 italic">Chưa thanh toán</p>
+                            </div>
+                        </div>
+
+                        <!-- Cost Breakdown -->
+                        <div class="px-6 py-5 space-y-3">
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-gray-500">Tổng phòng</span>
+                                <span class="font-medium text-gray-800"
+                                      th:text="${booking.getTotalAmountVND()}">$240.00</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+                                <span class="text-base font-bold text-gray-900">Tổng thanh toán</span>
+                                <span class="text-2xl font-bold text-blue-700"
+                                      th:text="${booking.getTotalAmountVND()}">$240.00</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ===========================================
+                 REJECT REASON ALERT (only when REJECTED)
+                 =========================================== -->
+            <div th:if="${booking.bookingStatus.name() == 'REJECTED' and booking.note != null and !#strings.isEmpty(booking.note)}"
+                 class="mx-6 sm:mx-8 mb-0 mt-0 py-0">
+                <div class="bg-red-50 rounded-xl border border-red-100 px-5 py-4">
+                    <p class="text-xs text-red-500 font-semibold mb-1">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> Lý do từ chối
+                    </p>
+                    <p class="text-sm text-red-700 font-medium" th:text="${booking.note}">
+                        Ảnh căn cước công dân bị mờ, không đọc được thông tin.
+                    </p>
+                </div>
+            </div>
+
+            <!-- ===========================================
+                 ACTION BUTTONS (conditional by booking_status)
+                 ===========================================
+                 Map of actions:
+                   PENDING         → Cancel Booking
+                   PENDING_PAYMENT → Pay Now  +  Cancel
+                   PAID            → Start Check-in
+                   CHECKED_IN      → Check-out
+                   CHECKED_OUT / COMPLETED → Leave Feedback (if !hasFeedback)
+                   CANCELLED / FAILED → (no primary action)
+                   REJECTED → Update Info (upload lại CCCD)
+                 -->
+            <div class="px-6 sm:px-8 py-5 bg-gray-50 border-t border-gray-100">
+                <div class="flex flex-wrap gap-3 justify-end">
+
+                    <!-- Back to history (always visible) -->
+                    <a th:href="@{/customer/bookings}" href="booking-history.html"
+                       class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors">
+                        <i class="fa-solid fa-arrow-left text-xs"></i> Quay lại
+                    </a>
+
+                    <!-- PENDING: Cancel Booking -->
+                    <form th:if="${booking.bookingStatus.name() == 'PENDING'}"
+                          th:action="@{/bookings/{id}}"
+                          method="post"
+                          onsubmit="return confirm('Bạn có chắc chắn muốn hủy đặt phòng này không?')">
+                        <button type="submit"
+                                class="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 shadow-sm transition-colors">
+                            <i class="fa-solid fa-ban text-xs"></i> Hủy đặt phòng
+                        </button>
+                    </form>
+
+                    <!-- PENDING_PAYMENT: Cancel + Pay Now -->
+                    <form th:if="${booking.bookingStatus.name() == 'PENDING_PAYMENT'}"
+                          th:action="@{/bookings/{id}}"
+                          method="post"
+                          onsubmit="return confirm('Bạn có chắc chắn muốn hủy đặt phòng này không?')">
+                        <button type="submit"
+                                class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-red-200 text-red-600 text-sm font-medium rounded-lg hover:bg-red-50 transition-colors">
+                            <i class="fa-solid fa-ban text-xs"></i> Hủy
+                        </button>
+                    </form>
+                    <form th:if="${booking.bookingStatus.name() == 'PENDING_PAYMENT'}"
+                       th:action="@{/pay/create-payment}" method="post"
+                       class="inline-flex items-center gap-2 px-6 py-2.5 bg-pink-600 text-white text-sm font-semibold rounded-lg hover:bg-pink-700 shadow-sm transition-colors">
+                        <input type="hidden" name="bookingCode" th:value="${booking.bookingCode}">
+                        <input type="hidden"name="totalAmount" th:value="${booking.totalAmount.longValue()}">
+                        <button type="submit"><i class="fa-solid fa-credit-card text-xs"></i> Thanh toán ngay</button>
+                    </form>
+
+                    <!-- CHECKED_IN: Check-out -->
+                    <a th:if="${booking.bookingStatus.name() == 'CHECKED_IN'}"
+                       th:href="@{/bookings/{id}/checkout(id=${booking.bookingId})}"
+                       class="inline-flex items-center gap-2 px-6 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 shadow-md shadow-green-500/20 transition-colors">
+                        <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i> Trả phòng
+                    </a>
+
+                    <!-- CHECKED_OUT or COMPLETED: Leave Feedback (if not yet submitted) -->
+                    <a th:if="${(booking.bookingStatus.name() == 'CHECKED_OUT' or booking.bookingStatus == 'COMPLETED') and !hasFeedback}"
+                       th:href="@{/bookings/{id}/feedback(id=${booking.bookingId})}"
+                       class="inline-flex items-center gap-2 px-6 py-2.5 bg-amber-500 text-white text-sm font-semibold rounded-lg hover:bg-amber-600 shadow-sm transition-colors">
+                        <i class="fa-regular fa-star text-xs"></i> Để lại đánh giá
+                    </a>
+                    <span th:if="${(booking.bookingStatus.name() == 'CHECKED_OUT' or booking.bookingStatus == 'COMPLETED') and hasFeedback}"
+                          class="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-100 text-gray-400 text-sm font-medium rounded-lg cursor-not-allowed">
+                        <i class="fa-solid fa-star text-xs"></i> Đã gửi đánh giá
+                    </span>
+
+                    <!-- REJECTED: Update Info (upload lại CCCD) -->
+                    <a th:if="${booking.bookingStatus.name() == 'REJECTED'}"
+                       th:href="@{/bookings/{id}/update-info(id=${booking.bookingId})}"
+                       class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 shadow-sm transition-colors">
+                        <i class="fa-solid fa-pen-to-square text-xs"></i> Cập nhật thông tin
+                    </a>
+
+                </div>
+            </div>
+
+            <!-- Support Footer -->
+            <div class="px-6 py-3 bg-gray-100/60 text-center text-xs text-gray-400 border-t border-gray-100">
+                Cần trợ giúp? Liên hệ
+                <a href="#" class="text-blue-500 hover:underline">support@booknow.vn</a>
+                hoặc gọi
+                <a href="tel:19001234" class="text-blue-500 hover:underline">1900 1234</a>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

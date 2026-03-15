@@ -87,4 +87,12 @@ public class Booking {
     @Column(name = "update_at")
     private LocalDateTime updateAt;
 
+    @Size(max = 255)
+    @Column(name = "id_card_font_public_id")
+    private String idCardFontPublicId;
+
+    @Size(max = 255)
+    @Column(name = "id_card_back_public_id")
+    private String idCardBackPublicId;
+
 }
