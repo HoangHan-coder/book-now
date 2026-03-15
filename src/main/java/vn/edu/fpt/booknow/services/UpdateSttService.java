@@ -2,6 +2,7 @@ package vn.edu.fpt.booknow.services;
 
 import org.springframework.stereotype.Service;
 import vn.edu.fpt.booknow.controllers.model.entities.Room;
+import vn.edu.fpt.booknow.controllers.model.entities.RoomStatus;
 import vn.edu.fpt.booknow.repositories.RoomRepository;
 
 @Service
@@ -12,7 +13,7 @@ public class UpdateSttService {
         this.roomRepository = roomRepository;
     }
 
-    public void updateRoomStatus(Long roomId, String status) {
+    public void updateRoomStatus(Long roomId, RoomStatus status) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("không tìm thấy phòng"));
         if ("DELETED".equals(room.getStatus())) {
             throw new RuntimeException("Phòng đã bị xóa");

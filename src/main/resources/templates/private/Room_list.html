@@ -171,25 +171,11 @@
                 <div class="relative">
                     <select name="status" class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white cursor-pointer">
                         <option value="">Tất cả trạng thái</option>
-                        <option value="AVAILABLE"
-                                th:selected="${status == 'AVAILABLE'}"
-                        >AVAILABLE</option>
-
-                        <option value="BOOKED"
-                                th:selected="${status == 'BOOKED'}"
-                        >BOOKED</option>
-                        <option value="MAINTENANCE"
-                                th:selected="${status == 'MAINTENANCE'}"
-                        >MAINTENANCE</option>
-                        <option value="OCCUPIED"
-                                th:selected="${status == 'OCCUPIED'}"
-                        >OCCUPIED</option>
-                        <option value="CLEANING"
-                                th:selected="${status == 'CLEANING'}"
-                        >CLEANING</option>
-                        <option value="DELETED"
-                                th:selected="${status == 'DELETED'}"
-                        >DELETED</option>
+                        <option th:each="s : ${T(vn.edu.fpt.booknow.controllers.model.entities.RoomStatus).values()}"
+                                th:value="${s}"
+                                th:text="${s}"
+                                th:selected="${s == status}">
+                        </option>
                     </select>
                     <i class="fa-solid fa-circle-check absolute left-3 top-2.5 text-gray-400"></i>
                     <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-gray-400 pointer-events-none"></i>
@@ -202,15 +188,11 @@
                 <div class="relative">
                     <select name="type" class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white cursor-pointer">
                         <option value="">Tất cả loại phòng</option>
-                        <option value="Gaming Hub Suite"
-                                th:selected="${type == 'Gaming Hub Suite'}"
-                        >Gaming Hub Suite</option>
-                        <option value="Neon Night Studio"
-                                th:selected="${type == 'Neon Night Studio'}"
-                        >Neon Night Studio</option>
-                        <option value="Ocean City Retreat"
-                                th:selected="${type == 'Ocean City Retreat'}"
-                        >Ocean City Retreat</option>
+                        <option th:each="roomTypeItem : ${roomType}"
+                                th:value="${roomTypeItem.roomTypeId}"
+                                th:selected="${roomTypeItem.roomTypeId == type}"
+                                th:text="${roomTypeItem.name}">
+                        </option>
                     </select>
                     <i class="fa-solid fa-bed absolute left-3 top-2.5 text-gray-400"></i>
                     <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-gray-400 pointer-events-none"></i>
@@ -276,12 +258,11 @@
                                       : 'N/A'}"></span>
                     </td>
                     <td class="py-4 px-6">
-                                <span th:text="${room.status}"
-                                      th:classappend="${room.status == 'DELETED'} ?
-          ' bg-red-50 text-red-700 ring-red-600/20' :
-          ' bg-green-50 text-green-700 ring-green-600/20'"
+                                <span th:classappend="${room.status.cssEnumClass}"
                                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>
+                                     <span class="w-1.5 h-1.5 rounded-full mr-1.5"
+                                           th:classappend="${room.status.cssEnumClass}"></span>
+                                    <span th:text="${room.status.displayRoomName}"></span>
                                 </span>
                     </td>
                     <td class="py-4 px-6 text-right">

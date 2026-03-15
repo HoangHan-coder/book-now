@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.controllers.model.dto.DashboardDTO;
 import vn.edu.fpt.booknow.controllers.model.entities.Room;
+import vn.edu.fpt.booknow.controllers.model.entities.RoomStatus;
 import vn.edu.fpt.booknow.controllers.model.entities.RoomType;
 import vn.edu.fpt.booknow.exceptions.InternalServerException;
 import vn.edu.fpt.booknow.exceptions.ResourceNotFoundException;
@@ -58,12 +59,19 @@ public class ManageRoomController {
             LocalDate start;
             LocalDate end;
 
-            if (startDate == null || endDate == null) {
+            if (startDate == null || endDate == null || startDate.isBlank() || endDate.isBlank()) {
                 start = LocalDate.now().withDayOfMonth(1);
                 end = LocalDate.now();
             } else {
-                start = LocalDate.parse(startDate.substring(0, 10));
-                end = LocalDate.parse(endDate.substring(0, 10));
+                try {
+                    // Accept full ISO date-time strings or plain dates
+                    start = LocalDate.parse(startDate.length() >= 10 ? startDate.substring(0, 10) : startDate);
+                    end = LocalDate.parse(endDate.length() >= 10 ? endDate.substring(0, 10) : endDate);
+                } catch (Exception ex) {
+                    // Fallback to defaults if parsing fails (e.g., invalid format)
+                    start = LocalDate.now().withDayOfMonth(1);
+                    end = LocalDate.now();
+                }
             }
 
             String dateLabel =
@@ -111,8 +119,8 @@ public class ManageRoomController {
     public String listRoom(
             Model model,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String type,
+            @RequestParam(required = false) RoomStatus status,
+            @RequestParam(required = false) Long type,
             @RequestParam(required = false) String roomNumber) {
         if (page < 1) {
             page = 1;
@@ -136,6 +144,7 @@ public class ManageRoomController {
         model.addAttribute("rooms", roomlist);
         model.addAttribute("totalRoom", roomlist.getTotalElements());
         model.addAttribute("totalPages", roomlist.getTotalPages());
+        model.addAttribute("roomType", roomTypeService.findAll());
         } catch (Exception e) {
             throw new InternalServerException("Cannot load room list");
         }
@@ -148,9 +157,10 @@ public class ManageRoomController {
 
     @GetMapping("/create")
     public String createRoom(Model model) {
+
+        model.addAttribute("roomNumber", manageRoomServices.getRoomNumbers());
         model.addAttribute("roomType", roomTypeService.findAll());
         model.addAttribute("allAmenities", amenityService.findAll());
-
         return "private/Room_create";
     }
 
@@ -160,7 +170,7 @@ public class ManageRoomController {
             @RequestParam Long roomTypeId,
             @RequestParam Long basePrice,
             @RequestParam Long overPrice,
-            @RequestParam String status,
+            @RequestParam RoomStatus status,
             @RequestParam(required = false) String description,
 
             @RequestParam(required = false) List<Long> amenityIds,
@@ -270,7 +280,7 @@ public class ManageRoomController {
             @RequestParam Long roomId,
             @RequestParam BigDecimal basePrice,
             @RequestParam BigDecimal overPrice,
-            @RequestParam String status,
+            @RequestParam RoomStatus status,
             @RequestParam Long roomTypeId,
 
             // ===== ROOM TYPE =====

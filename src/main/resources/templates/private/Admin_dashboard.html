@@ -196,7 +196,11 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
-            <form method="get" th:action="@{/admin/dashboard}" class="flex flex-wrap items-center gap-3">
+            <form
+                    id="dateFilterForm"
+                    method="get"
+                    th:action="@{/admin/dashboard}"
+                    class="flex flex-wrap items-center gap-3">
 
                 <!-- Date Range Picker -->
                 <div id="drp-wrapper">
@@ -262,19 +266,22 @@
 
             <!-- Quick Filters -->
             <div class="flex bg-white rounded-lg p-1 shadow-sm border border-gray-200">
-                <button type="button"
+                <button id="btn-week"
+                        type="button"
                         onclick="filterThisWeek()"
-                        class="px-4 py-1.5 text-sm font-medium rounded-md bg-blue-50 text-blue-600">
+                        class="px-4 py-1.5 text-sm font-medium rounded-md ext-gray-500 hover:bg-gray-50">
                     Tuần này
                 </button>
 
-                <button type="button"
+                <button id="btn-month"
+                        type="button"
                         onclick="filterThisMonth()"
                         class="px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:bg-gray-50">
                     Tháng này
                 </button>
 
-                <button type="button"
+                <button  id="btn-year"
+                        type="button"
                         onclick="filterThisYear()"
                         class="px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:bg-gray-50">
                     Năm nay
@@ -453,6 +460,23 @@
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const dateForm = document.getElementById("dateFilterForm");
+        const btnWeek = document.getElementById("btn-week");
+        const btnMonth = document.getElementById("btn-month");
+        const btnYear = document.getElementById("btn-year");
+
+        function setActive(btn){
+
+            const buttons = [btnWeek, btnMonth, btnYear];
+
+            buttons.forEach(b => {
+                b.classList.remove("bg-blue-50","text-blue-600");
+                b.classList.add("text-gray-500","hover:bg-gray-50");
+            });
+
+            btn.classList.remove("text-gray-500","hover:bg-gray-50");
+            btn.classList.add("bg-blue-50","text-blue-600");
+        }
 
         function toggleSidebar() {
 
@@ -548,11 +572,14 @@ function applyRange() {
         toEl.addEventListener("change", applyRange);
 
 
+
         /* ==============================
            QUICK FILTER BUTTONS
         ============================== */
 
         window.filterThisWeek = function () {
+
+            setActive(btnWeek);
 
             const today = new Date();
 
@@ -565,9 +592,13 @@ function applyRange() {
             toEl.value = lastDay.toISOString().slice(0, 10);
 
             applyRange();
+
+            dateForm.submit();
         }
 
         window.filterThisMonth = function () {
+
+            setActive(btnMonth);
 
             const today = new Date();
 
@@ -578,10 +609,13 @@ function applyRange() {
             toEl.value = lastDay.toISOString().slice(0, 10);
 
             applyRange();
+            dateForm.submit();
         }
 
 
         window.filterThisYear = function () {
+
+            setActive(btnYear);
 
             const today = new Date();
 
@@ -592,6 +626,7 @@ function applyRange() {
             toEl.value = lastDay.toISOString().slice(0, 10);
 
             applyRange();
+            dateForm.submit();
         }
 
         /* ==============================

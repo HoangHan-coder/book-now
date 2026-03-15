@@ -1,6 +1,8 @@
 package vn.edu.fpt.booknow.controllers.model.entities;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
+
 import java.util.List;
 
 @Entity
@@ -22,8 +24,18 @@ public class Room {
     private String roomNumber;
 
     // ===== STATUS =====
-    @Column(name = "status", length = 50, nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'AVAILABLE'")
+    @Column(name = "status", nullable = false, length = 50)
+    private RoomStatus status;
+
+    public RoomStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(RoomStatus status) {
+        this.status = status;
+    }
 
     // ===== SOFT DELETE =====
     @Column(name = "is_deleted", nullable = false)
@@ -65,13 +77,6 @@ public class Room {
         this.roomNumber = roomNumber;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     public Boolean getDeleted() {
         return isDeleted;

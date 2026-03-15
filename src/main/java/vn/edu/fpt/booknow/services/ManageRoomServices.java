@@ -71,22 +71,22 @@ public class ManageRoomServices {
 
     @Transactional
     public Page<Room> filterRooms(
-            String status,
-            String type,
+            RoomStatus status,
+            Long type,
             String roomNumber,
             Pageable pageable
     ) {
 
         Specification<Room> spec = (root, query, cb) -> cb.conjunction();
 
-        if (status != null && !status.isBlank()) {
+        if (status != null) {
             spec = spec.and((root, query, cb) ->
                     cb.equal(root.get("status"), status));
         }
 
-        if (type != null && !type.isBlank()) {
+        if (type != null) {
             spec = spec.and((root, query, cb) ->
-                    cb.equal(root.get("roomType").get("name"), type));
+                    cb.equal(root.get("roomType").get("roomTypeId"), type));
         }
 
         if (roomNumber != null && !roomNumber.isBlank()) {
@@ -107,13 +107,27 @@ public class ManageRoomServices {
     }
 
     @Transactional
+    public List<String> getRoomNumbers(){
+
+        List<Room> rooms = roomRepository.findAll();
+
+        List<String> numbers = new ArrayList<>();
+
+        for(Room r : rooms){
+            numbers.add(r.getRoomNumber());
+        }
+
+        return numbers;
+    }
+
+    @Transactional
     public void softDeleteRoom(Long id) {
 
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room not found"));
 
-        if(room.getStatus().equals("AVAILABLE")){
-            room.setStatus("DELETED");
+        if(room.getStatus().equals(RoomStatus.AVAILABLE)){
+            room.setStatus(RoomStatus.DELETED);
         }
 
         roomRepository.save(room);
@@ -128,7 +142,7 @@ public class ManageRoomServices {
             Long roomId,
             BigDecimal basePrice,
             BigDecimal overPrice,
-            String status,
+            RoomStatus status,
             Long roomTypeId,
             String roomTypeDescription,
             List<Long> amenityIds,
@@ -138,23 +152,59 @@ public class ManageRoomServices {
             String deletedImageIds
     ) {
         /* ===== 1. FIND ROOM ===== */
+        if (roomId == null || roomId <= 0) {
+            throw new IllegalArgumentException("ID phòng không hợp lệ");
+        }
 
         Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new RuntimeException("Room not found"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng"));
+
 
         /* ===== 2. UPDATE ROOM ===== */
+        if (basePrice == null || basePrice.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Giá cơ bản không hợp lệ");
+        }
 
+        if (basePrice.compareTo(new BigDecimal("5000000")) > 0) {
+            throw new IllegalArgumentException("Giá cơ bản quá lớn");
+        }
+
+        if (overPrice == null || overPrice.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Giá phụ thu không hợp lệ");
+        }
+
+        if (overPrice.compareTo(basePrice) < 0) {
+            throw new IllegalArgumentException("Giá phụ thu phải lớn hơn hoặc bằng giá cơ bản");
+        }
         room.getRoomType().setBasePrice(basePrice);
         room.getRoomType().setOverPrice(overPrice);
+
+        if (status == null) {
+            throw new IllegalArgumentException("Trạng thái phòng là bắt buộc");
+        }
+        if (status.equals(RoomStatus.DELETED)) {
+            throw new IllegalArgumentException("Không tùy chỉnh được trạng thái này");
+        }
         room.setStatus(status);
 
         /* ===== 3. UPDATE ROOM TYPE ===== */
 
+        if (roomTypeId == null || roomTypeId <= 0) {
+            throw new IllegalArgumentException("Không tìm thấy loại phòng");
+        }
+
         RoomType roomType = roomTypeRepository.findById(roomTypeId)
-                .orElseThrow(() -> new RuntimeException("RoomType not found"));
+                .orElseThrow(() -> new RuntimeException("Loại phòng không hợp lệ"));
 
         room.setRoomType(roomType);
-        room.getRoomType().setDescription(roomTypeDescription);
+
+        roomTypeDescription = roomTypeDescription.trim();
+
+        if (roomTypeDescription.length() > 500) {
+            throw new IllegalArgumentException("Mô tả loại phòng quá dài");
+        }
+
+        roomType.setDescription(roomTypeDescription);
 
         /* ===== 4. UPDATE AMENITIES ===== */
 
@@ -165,12 +215,11 @@ public class ManageRoomServices {
 
             List<Amenity> amenities = amenityRepository.findAllById(amenityIds);
 
+            if (amenities.size() != amenityIds.size()) {
+                throw new IllegalArgumentException("Một số tiện nghi không tồn tại");
+            }
+
             for (Amenity amenity : amenities) {
-
-                boolean exists = roomAmenityRepository
-                        .existsByRoomAndAmenity(room, amenity);
-
-                if (!exists) {
 
                     RoomAmenity ra = new RoomAmenity();
                     ra.setRoom(room);
@@ -178,8 +227,6 @@ public class ManageRoomServices {
 
                     roomAmenityRepository.save(ra);
                     room.getRoomAmenities().add(ra);
-                }
-
             }
         }
 
@@ -187,9 +234,17 @@ public class ManageRoomServices {
 
         if (newAmenityNames != null && !newAmenityNames.isEmpty()) {
 
+            if (newAmenityNames.size() > 5) {
+                throw new IllegalArgumentException("Không được thêm quá 5 tiện nghi");
+            }
+
             for (int i = 0; i < newAmenityNames.size(); i++) {
 
                 String name = newAmenityNames.get(i).trim();
+
+                if (name.length() > 50) {
+                    throw new IllegalArgumentException("Tên tiện nghi quá dài");
+                }
 
                 if (name.isBlank()) continue;
 
@@ -212,6 +267,16 @@ public class ManageRoomServices {
 
                             try {
 
+                                if (icon.getSize() > 2_000_000) {
+                                    throw new IllegalArgumentException("Icon tiện nghi không được lớn hơn 2MB");
+                                }
+
+                                String contentType = icon.getContentType();
+
+                                if (contentType == null || !contentType.startsWith("image/")) {
+                                    throw new IllegalArgumentException("File icon tiện nghi phải là hình ảnh");
+                                }
+
                                 Map upload = cloudinary.uploader().upload(
                                         icon.getBytes(),
                                         ObjectUtils.asMap("folder", "booknow/amenities")
@@ -223,7 +288,7 @@ public class ManageRoomServices {
 
                             } catch (Exception e) {
 
-                                throw new RuntimeException("Upload amenity icon failed");
+                                throw new RuntimeException("Tải icon tiện nghi thất bại");
 
                             }
                         }
@@ -246,12 +311,23 @@ public class ManageRoomServices {
 
         /* ===== 5. DELETE IMAGE ===== */
 
+
         if (deletedImageIds != null && !deletedImageIds.isBlank()) {
 
-            List<Long> imageIds = Arrays.stream(deletedImageIds.split(","))
-                    .map(String::trim)
-                    .map(Long::parseLong)
-                    .toList();
+            List<Long> imageIds;
+
+            try {
+
+                imageIds = Arrays.stream(deletedImageIds.split(","))
+                        .map(String::trim)
+                        .map(Long::parseLong)
+                        .toList();
+
+            } catch (Exception e) {
+
+                throw new IllegalArgumentException("Danh sách ảnh cần xóa không hợp lệ");
+
+            }
 
             for (Long imageId : imageIds) {
 
@@ -272,7 +348,7 @@ public class ManageRoomServices {
                         }
 
                     } catch (Exception e) {
-                        System.out.println("Cloudinary delete failed: " + e.getMessage());
+                        System.out.println("Xóa ảnh trên Cloudinary thất bại: " + e.getMessage());
                     }
 
                     // xóa DB
@@ -283,12 +359,26 @@ public class ManageRoomServices {
 
         /* ===== 6. UPLOAD IMAGE ===== */
 
+        if (images.length > 5) {
+            throw new IllegalArgumentException("Không được upload quá 5 ảnh");
+        }
+
         if (images != null && images.length > 0) {
 
             for (MultipartFile file : images) {
 
                 if (file == null || file.isEmpty()) {
                     continue;
+                }
+
+                if (file.getSize() > 2_000_000) {
+                    throw new IllegalArgumentException("Ảnh không được lớn hơn 2MB");
+                }
+
+                String contentType = file.getContentType();
+
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    throw new IllegalArgumentException("File upload phải là hình ảnh");
                 }
 
                 uploadImage(file, room, false);
@@ -308,7 +398,7 @@ public class ManageRoomServices {
             Long roomTypeId,
             Long basePrice,
             Long overPrice,
-            String status,
+            RoomStatus status,
             String description,
             List<Long> amenityIds,
             List<String> newAmenityNames,
@@ -334,7 +424,6 @@ public class ManageRoomServices {
         room.getRoomType().setOverPrice(overPrice != null ? BigDecimal.valueOf(overPrice) : BigDecimal.ZERO);
 
         room.getRoomType().setDescription(description);
-
         roomRepository.save(room);
 
         /* ===== ADD AMENITIES ===== */
@@ -371,8 +460,6 @@ public class ManageRoomServices {
                     amenity.setName(name);
 
                     /* ===== UPLOAD ICON ===== */
-                    System.out.println("NEW AMENITIES: " + newAmenityNames);
-                    System.out.println("NEW ICONS: " + newAmenityIcons);
                     if (newAmenityIcons != null && i < newAmenityIcons.size()) {
 
                         MultipartFile icon = newAmenityIcons.get(i);
@@ -486,12 +573,28 @@ public class ManageRoomServices {
         LocalDate start;
         LocalDate end;
 
-        if (startDate == null || endDate == null) {
+        if (startDate == null || endDate == null || startDate.isBlank() || endDate.isBlank()) {
             start = LocalDate.now().withDayOfMonth(1);
             end = LocalDate.now();
         } else {
-            start = LocalDate.parse(startDate);
-            end = LocalDate.parse(endDate);
+            try {
+                String normalizedStart = startDate.length() >= 10 ? startDate.substring(0, 10) : startDate;
+                String normalizedEnd = endDate.length() >= 10 ? endDate.substring(0, 10) : endDate;
+
+                start = LocalDate.parse(normalizedStart);
+                end = LocalDate.parse(normalizedEnd);
+            } catch (Exception ex) {
+                // If parsing fails (bad format), fall back to current month range
+                start = LocalDate.now().withDayOfMonth(1);
+                end = LocalDate.now();
+            }
+        }
+
+        // Ensure the range is valid
+        if (start.isAfter(end)) {
+            LocalDate tmp = start;
+            start = end;
+            end = tmp;
         }
 
         LocalDate today = LocalDate.now();
@@ -533,7 +636,7 @@ public class ManageRoomServices {
        ===================== */
 
         int totalRooms =
-                roomRepository.countByStatusNot("DELETED");
+                roomRepository.countByStatusNot(RoomStatus.DELETED);
 
         int activeRooms =
                 roomRepository.countByStatusIn(

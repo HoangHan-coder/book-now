@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.fpt.booknow.controllers.model.entities.Room;
+import vn.edu.fpt.booknow.controllers.model.entities.RoomStatus;
 import vn.edu.fpt.booknow.services.ManageRoomServices;
 import vn.edu.fpt.booknow.services.UpdateSttService;
 
@@ -21,7 +22,7 @@ public class ManageSttRoomController {
     @GetMapping("/update/{id}")
     public String updateSttRoom(Model model, @PathVariable("id") Long id) {
         Room room = manageRoomServices.findRoomById(id);
-        if ("DELETED".equals(room.getStatus())) {
+        if (room.getStatus().equals(RoomStatus.DELETED)) {
             return "redirect:/admin/list";
         }
         model.addAttribute("room", room);
@@ -31,7 +32,7 @@ public class ManageSttRoomController {
     @PostMapping("/update")
     public String updateSttSubmit (
             @RequestParam Long roomId,
-            @RequestParam(required = false) String status) {
+            @RequestParam(required = false) RoomStatus status) {
         updateSttService.updateRoomStatus(roomId, status);
         return "redirect:/admin/list";
     }

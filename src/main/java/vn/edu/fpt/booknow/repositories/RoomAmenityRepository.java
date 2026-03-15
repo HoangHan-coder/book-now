@@ -10,5 +10,4 @@ import java.util.List;
 public interface RoomAmenityRepository extends JpaRepository<RoomAmenity, Long> {
     List<RoomAmenity> findByRoom(Room room);
     void deleteByRoom(Room room);
-    boolean existsByRoomAndAmenity(Room room, Amenity amenity);
 }
