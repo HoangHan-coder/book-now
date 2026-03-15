@@ -291,6 +291,8 @@ public class BookingService {
             slotDiscountPercent = 0.07;
         } else if (slotCount > 0) {
             slotDiscountPercent = 0.05;
+        } else {
+            return -1;
         }
         double vipDiscountPercent = 0.0;
         if (isVip) {
