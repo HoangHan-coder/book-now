@@ -107,6 +107,20 @@ public class ManageRoomServices {
     }
 
     @Transactional
+    public List<String> getRoomNumbers(){
+
+        List<Room> rooms = roomRepository.findAll();
+
+        List<String> numbers = new ArrayList<>();
+
+        for(Room r : rooms){
+            numbers.add(r.getRoomNumber());
+        }
+
+        return numbers;
+    }
+
+    @Transactional
     public void softDeleteRoom(Long id) {
 
         Room room = roomRepository.findById(id)

@@ -553,8 +553,7 @@
 
     function showError(input, msg) {
 
-        const wrapper = input.closest('.space-y-1');
-        const errorEl = wrapper ? wrapper.parentElement.querySelector('.price-error') : null;
+        const errorEl = input.closest('.space-y-1')?.querySelector('.price-error');
 
         if (!errorEl) return;
 
@@ -585,10 +584,13 @@
 
     moneyInputs.forEach(input => {
 
-        const MIN = Number(input.dataset.min || 0);
-        const MAX = Number(input.dataset.max || 10000000);
+        const MIN = Number(input.dataset.min || 100000);
+        const MAX = Number(input.dataset.max || 5000000);
+
 
         input.addEventListener('input', () => {
+
+            showError(input,null);
 
             let raw = input.value.replace(/[^\d]/g, '');
 
@@ -615,9 +617,39 @@
             input.dataset.lastValid = value;
             input.value = formatVND(value);
 
+            validatePriceRelation();
         });
 
     });
+
+    /* ===============================
+       PRICE RELATION VALIDATE
+    ================================ */
+
+    function validatePriceRelation() {
+
+        const baseInput = document.querySelector('input[name="basePrice"]');
+        const overInput = document.querySelector('input[name="overPrice"]');
+
+        const basePrice = Number(baseInput.value.replace(/[^\d]/g,''));
+        const overPrice = Number(overInput.value.replace(/[^\d]/g,''));
+
+
+        if (basePrice < 100000) {
+            showError(baseInput, "Giá / slot tối thiểu là 100.000₫");
+            return false;
+        }
+
+        if (overPrice < basePrice + 100000) {
+            showError(overInput, "Giá đêm phải cao hơn giá phòng ít nhất 100.000₫");
+            return false;
+        }
+
+        showError(baseInput, null);
+        showError(overInput, null);
+
+        return true;
+    }
 
     /* ===== PRICE +/- BUTTON ===== */
 
@@ -627,8 +659,8 @@
 
             const input = btn.closest('.relative').querySelector('.money-input');
 
-            const MIN = Number(input.dataset.min || 0);
-            const MAX = Number(input.dataset.max || 10000000);
+            const MIN = Number(input.dataset.min || 100000);
+            const MAX = Number(input.dataset.max || 5000000);
             const STEP = Number(input.dataset.step || 1000);
 
             let current = Number(input.dataset.lastValid || 0);
@@ -1072,34 +1104,6 @@
     });
 
 
-    /* ===============================
-       PRICE RELATION VALIDATE
-    ================================ */
-
-    function validatePriceRelation() {
-
-        const baseInput = document.querySelector('input[name="basePrice"]');
-        const overInput = document.querySelector('input[name="overPrice"]');
-
-        const basePrice = Number(baseInput.dataset.lastValid || 0);
-        const overPrice = Number(overInput.dataset.lastValid || 0);
-
-        if (basePrice < 100000) {
-            showError(baseInput, "Giá / slot tối thiểu là 100.000₫");
-            return false;
-        }
-
-        if (overPrice < basePrice + 100000) {
-            showError(overInput, "Giá đêm phải cao hơn giá phòng ít nhất 100.000₫");
-            return false;
-        }
-
-        showError(baseInput, null);
-        showError(overInput, null);
-
-        return true;
-    }
-
 
     /* ===============================
        FORM SUBMIT
@@ -1117,6 +1121,15 @@
     });
 
     form.addEventListener("submit", function (e) {
+
+        // ❗ kiểm tra còn lỗi không
+        const hasError = document.querySelectorAll('.price-error:not(.hidden)').length > 0;
+
+        if (hasError) {
+            alert("Vui lòng sửa lỗi giá trước khi lưu");
+            e.preventDefault();
+            return;
+        }
 
         if (!validatePriceRelation()) {
             e.preventDefault();

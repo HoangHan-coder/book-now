@@ -148,9 +148,10 @@ public class ManageRoomController {
 
     @GetMapping("/create")
     public String createRoom(Model model) {
+
+        model.addAttribute("roomNumber", manageRoomServices.getRoomNumbers());
         model.addAttribute("roomType", roomTypeService.findAll());
         model.addAttribute("allAmenities", amenityService.findAll());
-
         return "private/Room_create";
     }
 
