@@ -424,7 +424,7 @@
 
                     <!-- CHECKED_IN: Check-out -->
                     <a th:if="${booking.bookingStatus.name() == 'CHECKED_IN'}"
-                       th:href="@{/bookings/{id}/checkout(id=${booking.bookingId})}"
+                       th:href="@{/user/check-out/{bookingCode}(bookingCode=${booking.bookingCode})}"
                        class="inline-flex items-center gap-2 px-6 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 shadow-md shadow-green-500/20 transition-colors">
                         <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i> Trả phòng
                     </a>

@@ -87,10 +87,6 @@ public class Booking {
 
     @Column(name = "update_at")
     private LocalDateTime updateAt;
-    @Column(name = "actual_check_in_time")
-    private LocalDateTime actualCheckInTime;
-    @Column(name = "actual_check_out_time")
-    private LocalDateTime actualCheckOutTime;
 
     @Size(max = 255)
     @Column(name = "id_card_font_public_id")
