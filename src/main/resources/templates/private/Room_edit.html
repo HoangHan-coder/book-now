@@ -349,9 +349,9 @@
                         <div class="space-y-2">
                             <label class="block text-sm font-medium text-gray-700">Ảnh hiện tại</label>
                             <div class="grid grid-cols-4 sm:grid-cols-5 gap-3" id="existingImages">
-                                <div th:each="img : ${room.images}"
-                                     class="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group">
-                                    <img th:src="${img.imageUrl}" class="w-full h-full object-cover">
+                                <div  th:each="img : ${room.images}"
+                                        class="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group">
+                                    <img th:if="${img != null}" th:src="${img.imageUrl}" class="w-full h-full object-cover">
                                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                         <button type="button"
                                                 class="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
@@ -1075,6 +1075,7 @@
         checkbox.type = "checkbox";
         checkbox.name = "newAmenityNames";
         checkbox.value = name;
+        checkbox.checked = true;
         checkbox.className = "h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500";
 
 

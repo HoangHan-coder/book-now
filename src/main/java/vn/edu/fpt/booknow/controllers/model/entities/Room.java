@@ -3,7 +3,9 @@ package vn.edu.fpt.booknow.controllers.model.entities;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "room")
@@ -43,11 +45,11 @@ public class Room {
 
     // ===== ROOM IMAGES =====
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
-    private List<Image> images;
+    private Set<Image> images = new HashSet<>();
 
     // ===== ROOM AMENITIES =====
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RoomAmenity> roomAmenities;
+    private Set<RoomAmenity> roomAmenities = new HashSet<>();
 
     public Room() {}
 
@@ -86,19 +88,19 @@ public class Room {
         isDeleted = deleted;
     }
 
-    public List<Image> getImages() {
+    public Set<Image> getImages() {
         return images;
     }
 
-    public void setImages(List<Image> images) {
+    public void setImages(Set<Image> images) {
         this.images = images;
     }
 
-    public List<RoomAmenity> getRoomAmenities() {
+    public Set<RoomAmenity> getRoomAmenities() {
         return roomAmenities;
     }
 
-    public void setRoomAmenities(List<RoomAmenity> roomAmenities) {
+    public void setRoomAmenities(Set<RoomAmenity> roomAmenities) {
         this.roomAmenities = roomAmenities;
     }
 }

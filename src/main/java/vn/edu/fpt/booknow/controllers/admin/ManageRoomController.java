@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Controller
@@ -170,7 +171,6 @@ public class ManageRoomController {
             @RequestParam Long roomTypeId,
             @RequestParam Long basePrice,
             @RequestParam Long overPrice,
-            @RequestParam RoomStatus status,
             @RequestParam(required = false) String description,
 
             @RequestParam(required = false) List<Long> amenityIds,
@@ -188,7 +188,6 @@ public class ManageRoomController {
                     roomTypeId,
                     basePrice,
                     overPrice,
-                    status,
                     description,
                     amenityIds,
                     newAmenityNames,
@@ -254,7 +253,7 @@ public class ManageRoomController {
         }
 
         if (room.getRoomAmenities() == null) {
-            room.setRoomAmenities(new ArrayList<>());
+            room.setRoomAmenities(new HashSet<>());
         }
 
         List<Long> roomAmenityIds = room.getRoomAmenities()
@@ -295,8 +294,7 @@ public class ManageRoomController {
             @RequestParam(value = "images", required = false) MultipartFile[] images,
 
             // ===== IMAGE DELETE =====
-            @RequestParam(value = "deletedImageIds", required = false) String deletedImageIds,
-            @RequestParam( required = false) String deletedAmenityIds
+            @RequestParam(value = "deletedImageIds", required = false) String deletedImageIds
     ) {
         try {
 
@@ -314,10 +312,12 @@ public class ManageRoomController {
                     deletedImageIds
             );
 
-        } catch (Exception e) {
-            throw new InternalServerException("Edit room failed: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw e; // lỗi validate
         }
-
+        catch (Exception e) {
+            throw new InternalServerException("Lỗi hệ thống khi cập nhật phòng");
+        }
         return "redirect:/admin/detail/" + roomId;
     }
 

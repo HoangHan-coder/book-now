@@ -32,7 +32,12 @@ public class ManageSttRoomController {
     @PostMapping("/update")
     public String updateSttSubmit (
             @RequestParam Long roomId,
-            @RequestParam(required = false) RoomStatus status) {
+            @RequestParam RoomStatus status
+    ) {
+        if (status == null) {
+            throw new IllegalArgumentException("Status is required");
+        }
+
         updateSttService.updateRoomStatus(roomId, status);
         return "redirect:/admin/list";
     }

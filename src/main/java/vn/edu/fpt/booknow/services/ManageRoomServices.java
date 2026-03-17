@@ -161,16 +161,16 @@ public class ManageRoomServices {
 
 
         /* ===== 2. UPDATE ROOM ===== */
-        if (basePrice == null || basePrice.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Giá cơ bản không hợp lệ");
+        if (basePrice == null || basePrice.compareTo(new BigDecimal("100000")) < 0) {
+            throw new IllegalArgumentException("Giá / slot tối thiểu là 100.000₫");
         }
 
         if (basePrice.compareTo(new BigDecimal("5000000")) > 0) {
-            throw new IllegalArgumentException("Giá cơ bản quá lớn");
+            throw new IllegalArgumentException("Giá / slot không vượt quá 5.000.000₫");
         }
 
-        if (overPrice == null || overPrice.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Giá phụ thu không hợp lệ");
+        if (overPrice.compareTo(basePrice.add(new BigDecimal("100000"))) < 0) {
+            throw new IllegalArgumentException("Giá / đêm phải cao hơn giá slot ít nhất 100.000₫");
         }
 
         if (overPrice.compareTo(basePrice) < 0) {
@@ -198,13 +198,15 @@ public class ManageRoomServices {
 
         room.setRoomType(roomType);
 
-        roomTypeDescription = roomTypeDescription.trim();
+        if (roomTypeDescription != null) {
+            roomTypeDescription = roomTypeDescription.trim();
 
-        if (roomTypeDescription.length() > 500) {
-            throw new IllegalArgumentException("Mô tả loại phòng quá dài");
+            if (roomTypeDescription.length() > 500) {
+                throw new IllegalArgumentException("Mô tả loại phòng quá dài");
+            }
+
+            roomType.setDescription(roomTypeDescription);
         }
-
-        roomType.setDescription(roomTypeDescription);
 
         /* ===== 4. UPDATE AMENITIES ===== */
 
@@ -234,19 +236,25 @@ public class ManageRoomServices {
 
         if (newAmenityNames != null && !newAmenityNames.isEmpty()) {
 
-            if (newAmenityNames.size() > 5) {
-                throw new IllegalArgumentException("Không được thêm quá 5 tiện nghi");
+            if (newAmenityNames.size() > 10) {
+                throw new IllegalArgumentException("Không được thêm quá 10 tiện nghi");
             }
+
+            Set<String> uniqueNames = new HashSet<>();
 
             for (int i = 0; i < newAmenityNames.size(); i++) {
 
                 String name = newAmenityNames.get(i).trim();
 
-                if (name.length() > 50) {
-                    throw new IllegalArgumentException("Tên tiện nghi quá dài");
+                if (name.length() < 2 || name.length() > 50) {
+                    throw new IllegalArgumentException("Tên tiện nghi phải từ 2 đến 50 ký tự");
                 }
 
-                if (name.isBlank()) continue;
+                String normalized = name.trim().toLowerCase();
+
+                if (!uniqueNames.add(normalized)) {
+                    throw new IllegalArgumentException("Tên tiện nghi bị trùng");
+                }
 
                 Amenity amenity = amenityRepository.findByNameIgnoreCase(name);
 
@@ -257,41 +265,45 @@ public class ManageRoomServices {
                     amenity = new Amenity();
                     amenity.setName(name);
 
+                    /* ===== VALIDATE ICON ===== */
+
+                    if (newAmenityIcons == null || i >= newAmenityIcons.size()) {
+                        throw new IllegalArgumentException("Tiện nghi mới phải có icon");
+                    }
+
+                    MultipartFile icon = newAmenityIcons.get(i);
+
+                    if (icon == null || icon.isEmpty()) {
+                        throw new IllegalArgumentException("Tiện nghi mới phải có icon");
+                    }
+
                     /* ===== UPLOAD ICON ===== */
 
-                    if (newAmenityIcons != null && i < newAmenityIcons.size()) {
+                    try {
 
-                        MultipartFile icon = newAmenityIcons.get(i);
-
-                        if (icon != null && !icon.isEmpty()) {
-
-                            try {
-
-                                if (icon.getSize() > 2_000_000) {
-                                    throw new IllegalArgumentException("Icon tiện nghi không được lớn hơn 2MB");
-                                }
-
-                                String contentType = icon.getContentType();
-
-                                if (contentType == null || !contentType.startsWith("image/")) {
-                                    throw new IllegalArgumentException("File icon tiện nghi phải là hình ảnh");
-                                }
-
-                                Map upload = cloudinary.uploader().upload(
-                                        icon.getBytes(),
-                                        ObjectUtils.asMap("folder", "booknow/amenities")
-                                );
-
-                                String iconUrl = (String) upload.get("secure_url");
-
-                                amenity.setIconUrl(iconUrl);
-
-                            } catch (Exception e) {
-
-                                throw new RuntimeException("Tải icon tiện nghi thất bại");
-
-                            }
+                        if (icon.getSize() > 2_000_000) {
+                            throw new IllegalArgumentException("Icon tiện nghi không được lớn hơn 2MB");
                         }
+
+                        String contentType = icon.getContentType();
+
+                        if (contentType == null || !contentType.startsWith("image/")) {
+                            throw new IllegalArgumentException("File icon tiện nghi phải là hình ảnh");
+                        }
+
+                        Map upload = cloudinary.uploader().upload(
+                                icon.getBytes(),
+                                ObjectUtils.asMap("folder", "booknow/amenities")
+                        );
+
+                        String iconUrl = (String) upload.get("secure_url");
+
+                        amenity.setIconUrl(iconUrl);
+
+                    } catch (Exception e) {
+
+                        throw new RuntimeException("Tải icon tiện nghi thất bại");
+
                     }
 
                     amenityRepository.save(amenity);
@@ -359,7 +371,7 @@ public class ManageRoomServices {
 
         /* ===== 6. UPLOAD IMAGE ===== */
 
-        if (images.length > 5) {
+        if (images != null && images.length > 5) {
             throw new IllegalArgumentException("Không được upload quá 5 ảnh");
         }
 
@@ -398,7 +410,6 @@ public class ManageRoomServices {
             Long roomTypeId,
             Long basePrice,
             Long overPrice,
-            RoomStatus status,
             String description,
             List<Long> amenityIds,
             List<String> newAmenityNames,
@@ -407,18 +418,35 @@ public class ManageRoomServices {
     ) {
 
         if (roomRepository.existsByRoomNumber(roomNumber)) {
-            throw new RuntimeException("Room already exists");
+            throw new RuntimeException("Số phòng đã tồn tại");
         }
 
+        if (!roomNumber.matches("^[A-Z]-[A-Za-z]+-\\d{2}$")) {
+            throw new RuntimeException("Số phòng không đúng định dạng (Ví dụ: G-Cyber-01)");
+        }
+
+
         RoomType roomType = roomTypeRepository.findById(roomTypeId)
-                .orElseThrow(() -> new RuntimeException("RoomType not found"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy loại phòng"));
+
+        if(roomType.getIsDeleted()){
+            throw new RuntimeException("Loại phòng đã bị xóa");
+        }
 
         Room room = new Room();
 
         room.setRoomNumber(roomNumber);
-        room.setStatus(status);
+        room.setStatus(RoomStatus.AVAILABLE);
         room.setRoomType(roomType);
         room.getRoomType().setIsDeleted(false);
+
+        if(basePrice == null || basePrice < 100000){
+            throw new RuntimeException("Giá / slot tối thiểu là 100.000₫");
+        }
+
+        if(overPrice == null || overPrice < basePrice + 100000){
+            throw new RuntimeException("Giá quá giờ phải lớn hơn giá cơ bản ít nhất 100.000₫");
+        }
 
         room.getRoomType().setBasePrice(basePrice != null ? BigDecimal.valueOf(basePrice) : BigDecimal.ZERO);
         room.getRoomType().setOverPrice(overPrice != null ? BigDecimal.valueOf(overPrice) : BigDecimal.ZERO);
@@ -464,9 +492,19 @@ public class ManageRoomServices {
 
                         MultipartFile icon = newAmenityIcons.get(i);
 
+                        String contentType = icon.getContentType();
+
+                        if(!contentType.startsWith("image/")){
+                            throw new RuntimeException("Icon tiện nghi phải là hình ảnh");
+                        }
+
                         if (icon != null && !icon.isEmpty()) {
 
                             try {
+
+                                if(icon.getSize() > 2 * 1024 * 1024){
+                                    throw new RuntimeException("Ảnh phải nhỏ hơn 2MB");
+                                }
 
                                 Map upload = cloudinary.uploader().upload(
                                         icon.getBytes(),
@@ -479,7 +517,7 @@ public class ManageRoomServices {
 
                             } catch (Exception e) {
 
-                                throw new RuntimeException("Upload amenity icon failed");
+                                throw new RuntimeException("Upload icon tiện nghi thất bại");
 
                             }
                         }
@@ -503,6 +541,10 @@ public class ManageRoomServices {
         /* ===== UPLOAD IMAGE ===== */
 
         if (images != null && images.length > 0) {
+
+            if(images != null && images.length > 5){
+                throw new RuntimeException("Không được upload quá 5 ảnh");
+            }
 
             boolean isFirst = true;
 

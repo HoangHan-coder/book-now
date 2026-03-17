@@ -2,6 +2,7 @@ package vn.edu.fpt.booknow.repositories;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -25,7 +26,17 @@ public interface RoomRepository extends JpaRepository<Room, Long>, JpaSpecificat
     int countByStatusNot(RoomStatus status);
 
     @Override
-    @EntityGraph(attributePaths = {"roomType"})
-    Page<Room> findAll(org.springframework.data.jpa.domain.Specification<Room> spec, Pageable pageable);
+    @EntityGraph(attributePaths = {
+            "roomType"
+    })
+    Page<Room> findAll(Specification<Room> spec, Pageable pageable);
+
+    @EntityGraph(attributePaths = {
+            "roomType",
+            "images",
+            "roomAmenities",
+            "roomAmenities.amenity"
+    })
+    Optional<Room> findById(Long id);
 
 }
