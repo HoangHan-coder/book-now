@@ -80,6 +80,26 @@ public class BookingController {
         }
     }
 
+    @PostMapping("/{id}")
+    public String bookingHandleCancel(@PathVariable("id") String id,
+                                      Model model) {
+        try {
+            Long bookingId = Long.parseLong(id);
+            Booking booking = bookingService.getBookingById(bookingId);
+            if (booking == null) {
+                System.out.println("booking is null");
+                return "redirect:/error/404";
+            }
+            bookingService.cancel(booking.getBookingId());
+        } catch (NumberFormatException e) {
+            System.out.println("Booking ID invalid");
+            return "redirect:/error/404";
+        }
+        return "redirect:/bookings/" + id;
+    }
+
+
+
     @GetMapping("/{id}/update-info")
     public String updateBookingInfoView(@PathVariable("id") String id,
                                         Model model) {

@@ -395,7 +395,7 @@
 
                     <!-- PENDING: Cancel Booking -->
                     <form th:if="${booking.bookingStatus.name() == 'PENDING'}"
-                          th:action="@{/bookings/{id}}"
+                          th:action="@{/bookings/{id}(id=${booking.bookingId})}"
                           method="post"
                           onsubmit="return confirm('Bạn có chắc chắn muốn hủy đặt phòng này không?')">
                         <button type="submit"
@@ -406,7 +406,7 @@
 
                     <!-- PENDING_PAYMENT: Cancel + Pay Now -->
                     <form th:if="${booking.bookingStatus.name() == 'PENDING_PAYMENT'}"
-                          th:action="@{/bookings/{id}}"
+                          th:action="@{/bookings/{id}(id=${booking.bookingId})}"
                           method="post"
                           onsubmit="return confirm('Bạn có chắc chắn muốn hủy đặt phòng này không?')">
                         <button type="submit"

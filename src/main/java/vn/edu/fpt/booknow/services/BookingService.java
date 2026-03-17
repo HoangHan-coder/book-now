@@ -46,6 +46,14 @@ public class BookingService {
     }
 
     @Transactional
+    public void cancel(Long bookingId) {
+        Booking booking = getBookingById(bookingId);
+        booking.setNote("Được hủy bởi khách hàng");
+        booking.setBookingStatus(BookingStatus.FAILED);
+    }
+
+
+    @Transactional
     public void updateIdCard(MultipartFile idCardFront, MultipartFile idCardBack, Long bookingId)
             throws Exception{
 
