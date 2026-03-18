@@ -3,6 +3,7 @@ package vn.edu.fpt.booknow.controllers.admin;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -146,6 +146,7 @@ public class ManageRoomController {
         model.addAttribute("totalRoom", roomlist.getTotalElements());
         model.addAttribute("totalPages", roomlist.getTotalPages());
         model.addAttribute("roomType", roomTypeService.findAll());
+        model.addAttribute("hasDeletedRooms", roomlist.getContent().stream().allMatch(r -> r.getStatus() == RoomStatus.DELETED));
         } catch (Exception e) {
             throw new InternalServerException("Cannot load room list");
         }
@@ -154,6 +155,17 @@ public class ManageRoomController {
         model.addAttribute("type", type);
         model.addAttribute("roomNumber", roomNumber);
         return "private/Room_list";
+    }
+
+    @PostMapping("/delete-rooms")
+    @ResponseBody
+    public ResponseEntity<?> deleteRooms(@RequestParam List<Long> roomIds) {
+
+        if (roomIds == null || roomIds.isEmpty()) {
+            return ResponseEntity.badRequest().body("No rooms selected");
+        }
+        manageRoomServices.deleteRooms(roomIds);
+        return ResponseEntity.ok("Deleted successfully");
     }
 
     @GetMapping("/create")
@@ -194,7 +206,6 @@ public class ManageRoomController {
                     newAmenityIcons,
                     images
             );
-            System.out.println("CREATE ROOM TRIGGERED");
             redirectAttributes.addFlashAttribute("successMessage", "Tạo phòng thành công!");
 
         } catch (Exception e) {
@@ -235,6 +246,10 @@ public class ManageRoomController {
 
         if (room == null) {
             throw new ResourceNotFoundException("Room not found with id: " + id);
+        }
+
+        if (room.getStatus() == RoomStatus.DELETED) {
+            throw new IllegalStateException("Room has been deleted and cannot be edited");
         }
 
         if (room.getRoomType() == null) {
@@ -294,7 +309,8 @@ public class ManageRoomController {
             @RequestParam(value = "images", required = false) MultipartFile[] images,
 
             // ===== IMAGE DELETE =====
-            @RequestParam(value = "deletedImageIds", required = false) String deletedImageIds
+            @RequestParam(value = "deletedImageIds", required = false) String deletedImageIds,
+            RedirectAttributes redirectAttributes
     ) {
         try {
 
@@ -311,7 +327,7 @@ public class ManageRoomController {
                     images,
                     deletedImageIds
             );
-
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật thành công!");
         } catch (IllegalArgumentException e) {
             throw e; // lỗi validate
         }

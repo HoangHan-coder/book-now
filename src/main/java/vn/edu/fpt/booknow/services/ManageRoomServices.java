@@ -107,13 +107,13 @@ public class ManageRoomServices {
     }
 
     @Transactional
-    public List<String> getRoomNumbers(){
+    public List<String> getRoomNumbers() {
 
         List<Room> rooms = roomRepository.findAll();
 
         List<String> numbers = new ArrayList<>();
 
-        for(Room r : rooms){
+        for (Room r : rooms) {
             numbers.add(r.getRoomNumber());
         }
 
@@ -126,11 +126,20 @@ public class ManageRoomServices {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room not found"));
 
-        if(room.getStatus().equals(RoomStatus.AVAILABLE)){
+        if (room.getStatus().equals(RoomStatus.AVAILABLE)) {
             room.setStatus(RoomStatus.DELETED);
+            room.setDeleted(true);
         }
 
         roomRepository.save(room);
+    }
+
+    public void deleteRooms(List<Long> ids) {
+        for (Long id : ids) {
+            Room room = roomRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Room not found"));
+            roomRepository.deleteById(id);
+        }
     }
 
     /* ======================================================
@@ -210,25 +219,33 @@ public class ManageRoomServices {
 
         /* ===== 4. UPDATE AMENITIES ===== */
 
-        roomAmenityRepository.deleteByRoom(room);
-        room.getRoomAmenities().clear();
+        roomAmenityRepository.deleteByRoomId(roomId);
+
+        Set<Long> usedAmenityIds = new HashSet<>();
 
         if (amenityIds != null && !amenityIds.isEmpty()) {
 
-            List<Amenity> amenities = amenityRepository.findAllById(amenityIds);
+            Set<Long> uniqueAmenityIds = new HashSet<>(amenityIds);
 
-            if (amenities.size() != amenityIds.size()) {
+            List<Amenity> amenities = amenityRepository.findAllById(uniqueAmenityIds);
+
+            if (amenities.size() != uniqueAmenityIds.size()) {
                 throw new IllegalArgumentException("Một số tiện nghi không tồn tại");
             }
 
             for (Amenity amenity : amenities) {
 
-                    RoomAmenity ra = new RoomAmenity();
-                    ra.setRoom(room);
-                    ra.setAmenity(amenity);
+                if (usedAmenityIds.contains(amenity.getAmenityId())) {
+                    continue;
+                }
 
-                    roomAmenityRepository.save(ra);
-                    room.getRoomAmenities().add(ra);
+                // ✅ đánh dấu đã dùng
+                usedAmenityIds.add(amenity.getAmenityId());
+                RoomAmenity ra = new RoomAmenity();
+                ra.setRoom(room);
+                ra.setAmenity(amenity);
+
+                roomAmenityRepository.save(ra);
             }
         }
 
@@ -310,6 +327,14 @@ public class ManageRoomServices {
                 }
 
                 /* ===== LINK ROOM ===== */
+
+                // ❌ nếu đã tồn tại thì bỏ qua
+                if (usedAmenityIds.contains(amenity.getAmenityId())) {
+                    continue;
+                }
+
+                // ✅ đánh dấu đã dùng
+                usedAmenityIds.add(amenity.getAmenityId());
 
                 RoomAmenity ra = new RoomAmenity();
                 ra.setRoom(room);
@@ -425,11 +450,14 @@ public class ManageRoomServices {
             throw new RuntimeException("Số phòng không đúng định dạng (Ví dụ: G-Cyber-01)");
         }
 
+        if (roomTypeId == null) {
+            throw new RuntimeException("Vui lòng chọn loại phòng");
+        }
 
         RoomType roomType = roomTypeRepository.findById(roomTypeId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy loại phòng"));
 
-        if(roomType.getIsDeleted()){
+        if (roomType.getIsDeleted()) {
             throw new RuntimeException("Loại phòng đã bị xóa");
         }
 
@@ -440,11 +468,11 @@ public class ManageRoomServices {
         room.setRoomType(roomType);
         room.getRoomType().setIsDeleted(false);
 
-        if(basePrice == null || basePrice < 100000){
+        if (basePrice == null || basePrice < 100000) {
             throw new RuntimeException("Giá / slot tối thiểu là 100.000₫");
         }
 
-        if(overPrice == null || overPrice < basePrice + 100000){
+        if (overPrice == null || overPrice < basePrice + 100000) {
             throw new RuntimeException("Giá quá giờ phải lớn hơn giá cơ bản ít nhất 100.000₫");
         }
 
@@ -458,7 +486,13 @@ public class ManageRoomServices {
 
         if (amenityIds != null && !amenityIds.isEmpty()) {
 
+            Set<Long> uniqueAmenityIds = new HashSet<>(amenityIds);
+
             List<Amenity> amenities = amenityRepository.findAllById(amenityIds);
+
+            if (amenities.size() != uniqueAmenityIds.size()) {
+                throw new IllegalArgumentException("Một số tiện nghi không tồn tại");
+            }
 
             for (Amenity amenity : amenities) {
 
@@ -494,7 +528,7 @@ public class ManageRoomServices {
 
                         String contentType = icon.getContentType();
 
-                        if(!contentType.startsWith("image/")){
+                        if (!contentType.startsWith("image/")) {
                             throw new RuntimeException("Icon tiện nghi phải là hình ảnh");
                         }
 
@@ -502,7 +536,7 @@ public class ManageRoomServices {
 
                             try {
 
-                                if(icon.getSize() > 2 * 1024 * 1024){
+                                if (icon.getSize() > 2 * 1024 * 1024) {
                                     throw new RuntimeException("Ảnh phải nhỏ hơn 2MB");
                                 }
 
@@ -542,7 +576,7 @@ public class ManageRoomServices {
 
         if (images != null && images.length > 0) {
 
-            if(images != null && images.length > 5){
+            if (images != null && images.length > 5) {
                 throw new RuntimeException("Không được upload quá 5 ảnh");
             }
 
@@ -663,15 +697,7 @@ public class ManageRoomServices {
        REVENUE
        ===================== */
 
-        List<Booking> bookings =
-                bookingRepository.findByCheckOutTimeBetween(
-                        startTime,
-                        endTime
-                );
-
-        long revenue = bookings.stream()
-                .mapToLong(b -> b.getTotalAmount().longValue())
-                .sum();
+        long revenue = bookingRepository.sumRevenue(startTime, endTime);
 
     /* =====================
        ROOM STATS
@@ -693,7 +719,7 @@ public class ManageRoomServices {
                 java.time.temporal.ChronoUnit.DAYS.between(start, end) + 1;
 
         String compareLabel;
-        String chartTitle="";
+        String chartTitle = "";
 
         if (days == 1) {
             compareLabel = "so với hôm qua";
@@ -745,16 +771,7 @@ public class ManageRoomServices {
     /* =====================
        PREVIOUS REVENUE
        ===================== */
-
-        List<Booking> prevBookingsRevenue =
-                bookingRepository.findByCheckOutTimeBetween(
-                        prevStartTime,
-                        prevEndTime
-                );
-
-        long prevRevenue = prevBookingsRevenue.stream()
-                .mapToLong(b -> b.getTotalAmount().longValue())
-                .sum();
+        long prevRevenue = bookingRepository.sumRevenue(prevStartTime, prevEndTime);
 
         double revenuePercent;
 
@@ -781,9 +798,15 @@ public class ManageRoomServices {
         /* =====================
        Table Status
        ===================== */
-        int paid = bookingRepository.countByBookingStatusAndCreatedAtBetween("PAID", startTime, endTime);
-        int pending = bookingRepository.countByBookingStatusAndCreatedAtBetween("PENDING", startTime, endTime);
-        int failed = bookingRepository.countByBookingStatusAndCreatedAtBetween("FAILED", startTime, endTime);
+        Map<String, Integer> statusMap = new HashMap<>();
+
+        for (Object[] row : bookingRepository.countByStatus(startTime, endTime)) {
+            statusMap.put((String) row[0], ((Long) row[1]).intValue());
+        }
+
+        int paid = statusMap.getOrDefault("PAID", 0);
+        int pending = statusMap.getOrDefault("PENDING", 0);
+        int failed = statusMap.getOrDefault("FAILED", 0);
 
         // Lượng đặt phòng
         List<Integer> chartData = new ArrayList<>();
@@ -802,23 +825,21 @@ public class ManageRoomServices {
             LocalDate current = start;
             int week = start.get(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR);
 
+            Map<LocalDate, Integer> bookingMap = new HashMap<>();
+            Map<LocalDate, Long> revenueMap = new HashMap<>();
+
+            for (Object[] row : bookingRepository.countByDate(startTime, endTime)) {
+                bookingMap.put(((java.sql.Date) row[0]).toLocalDate(), ((Long) row[1]).intValue());
+            }
+
+            for (Object[] row : bookingRepository.revenueByDate(startTime, endTime)) {
+                revenueMap.put(((java.sql.Date) row[0]).toLocalDate(), ((Long) row[1]));
+            }
+
             while (!current.isAfter(end)) {
 
-                LocalDateTime dayStart = current.atStartOfDay();
-                LocalDateTime dayEnd = current.atTime(23,59,59);
-
-                int count = bookingRepository.countByCreatedAtBetween(
-                        current.atStartOfDay(),
-                        current.atTime(23,59,59)
-                );
-
-                List<Booking> dayBookings =
-                        bookingRepository.findByCheckOutTimeBetween(dayStart, dayEnd);
-
-                long dayRevenue = dayBookings.stream()
-                        .mapToLong(b -> b.getTotalAmount().longValue())
-                        .sum();
-
+                int count = bookingMap.getOrDefault(current, 0);
+                long dayRevenue = revenueMap.getOrDefault(current, 0L);
 
                 chartData.add(count);
                 revenueData.add(dayRevenue);
@@ -834,6 +855,17 @@ public class ManageRoomServices {
 
             LocalDate current = start;
 
+            Map<LocalDate, Integer> bookingMap = new HashMap<>();
+            Map<LocalDate, Long> revenueMap = new HashMap<>();
+
+            for (Object[] row : bookingRepository.countByDate(startTime, endTime)) {
+                bookingMap.put(((java.sql.Date) row[0]).toLocalDate(), ((Long) row[1]).intValue());
+            }
+
+            for (Object[] row : bookingRepository.revenueByDate(startTime, endTime)) {
+                revenueMap.put(((java.sql.Date) row[0]).toLocalDate(), ((Long) row[1]));
+            }
+
             while (!current.isAfter(end)) {
 
                 LocalDate weekEnd = current.plusDays(6);
@@ -842,19 +874,16 @@ public class ManageRoomServices {
                     weekEnd = end;
                 }
 
-                int count = bookingRepository.countByCreatedAtBetween(
-                        current.atStartOfDay(),
-                        weekEnd.atTime(23,59,59)
-                );
+                int count = 0;
+                long weekRevenue = 0;
 
-                long weekRevenue = bookingRepository
-                        .findByCheckOutTimeBetween(
-                                current.atStartOfDay(),
-                                weekEnd.atTime(23,59,59)
-                        )
-                        .stream()
-                        .mapToLong(b -> b.getTotalAmount().longValue())
-                        .sum();
+                LocalDate temp = current;
+
+                while (!temp.isAfter(weekEnd)) {
+                    count += bookingMap.getOrDefault(temp, 0);
+                    weekRevenue += revenueMap.getOrDefault(temp, 0L);
+                    temp = temp.plusDays(1);
+                }
 
                 chartData.add(count);
                 revenueData.add(weekRevenue);
@@ -881,10 +910,35 @@ public class ManageRoomServices {
 
             LocalDate current = start.withDayOfMonth(1);
 
-            while (!current.isAfter(end))
+            while (!current.isAfter(end)) {
 
-            chartTitle = "Từ " + start.getDayOfMonth() +  "/" + start.getMonthValue() + "/" + start.getYear() +
-                    " đến " + end.getDayOfMonth()+  "/" + end.getMonthValue() + "/" + end.getYear();
+                LocalDate monthEnd = current.withDayOfMonth(current.lengthOfMonth());
+
+                if (monthEnd.isAfter(end)) {
+                    monthEnd = end;
+                }
+
+                int count = bookingRepository.countByCreatedAtBetween(
+                        current.atStartOfDay(),
+                        monthEnd.atTime(23, 59, 59)
+                );
+
+                long monthRevenue = bookingRepository.sumRevenue(
+                        current.atStartOfDay(),
+                        monthEnd.atTime(23, 59, 59)
+                );
+
+                chartData.add(count);
+                revenueData.add(monthRevenue);
+
+                chartLabels.add("T" + current.getMonthValue() + "/" + current.getYear());
+                revenueLabels.add("T" + current.getMonthValue() + "/" + current.getYear());
+
+                current = current.plusMonths(1); // ⚠️ QUAN TRỌNG (tránh loop vô hạn)
+            }
+
+            chartTitle = "Từ " + start.getDayOfMonth() + "/" + start.getMonthValue() + "/" + start.getYear() +
+                    " đến " + end.getDayOfMonth() + "/" + end.getMonthValue() + "/" + end.getYear();
         }
 
 /* =====================
@@ -900,7 +954,7 @@ public class ManageRoomServices {
                 int quarter = (current.getMonthValue() - 1) / 3 + 1;
 
                 LocalDate quarterStart =
-                        LocalDate.of(current.getYear(), (quarter-1)*3+1, 1);
+                        LocalDate.of(current.getYear(), (quarter - 1) * 3 + 1, 1);
 
                 LocalDate quarterEnd =
                         quarterStart.plusMonths(2)
@@ -910,17 +964,14 @@ public class ManageRoomServices {
 
                 int count = bookingRepository.countByCreatedAtBetween(
                         quarterStart.atStartOfDay(),
-                        quarterEnd.atTime(23,59,59)
+                        quarterEnd.atTime(23, 59, 59)
                 );
 
-                long quarterRevenue = bookingRepository
-                        .findByCheckOutTimeBetween(
+                long quarterRevenue =
+                        bookingRepository.sumRevenue(
                                 quarterStart.atStartOfDay(),
-                                quarterEnd.atTime(23,59,59)
-                        )
-                        .stream()
-                        .mapToLong(b -> b.getTotalAmount().longValue())
-                        .sum();
+                                quarterEnd.atTime(23, 59, 59)
+                        );
 
                 chartData.add(count);
                 chartLabels.add("Q" + quarter + " " + current.getYear());
@@ -1013,7 +1064,7 @@ public class ManageRoomServices {
         try {
 
             LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();
-            LocalDateTime end = LocalDate.parse(endDate).atTime(23,59,59);
+            LocalDateTime end = LocalDate.parse(endDate).atTime(23, 59, 59);
 
             List<Booking> bookings =
                     bookingRepository.findByCheckOutTimeBetween(start, end);
@@ -1094,7 +1145,6 @@ public class ManageRoomServices {
 
                     .getFile()
                     .getAbsolutePath();
-            System.out.println(fontPath);
             PdfFont font = PdfFontFactory.createFont(
                     fontPath,
                     PdfEncodings.IDENTITY_H

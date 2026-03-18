@@ -1,7 +1,6 @@
 package vn.edu.fpt.booknow.controllers.model.dto;
 
 import java.util.List;
-import java.util.Map;
 
 public class DashboardDTO {
     private int bookingCount;

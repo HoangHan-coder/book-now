@@ -37,5 +37,30 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     """)
         List<Object[]> countByStatus(LocalDateTime start, LocalDateTime end);
 
+    @Query("""
+    SELECT COALESCE(SUM(b.totalAmount), 0)
+    FROM Booking b
+    WHERE b.checkOutTime BETWEEN :start AND :end
+""")
+    long sumRevenue(LocalDateTime start, LocalDateTime end);
+
+
+    @Query("""
+    SELECT CAST(b.createdAt AS date), COUNT(b)
+    FROM Booking b
+    WHERE b.createdAt BETWEEN :start AND :end
+    GROUP BY CAST(b.createdAt AS date)
+""")
+    List<Object[]> countByDate(LocalDateTime start, LocalDateTime end);
+
+
+    @Query("""
+    SELECT CAST(b.checkOutTime AS date), SUM(b.totalAmount)
+    FROM Booking b
+    WHERE b.checkOutTime BETWEEN :start AND :end
+    GROUP BY CAST(b.checkOutTime AS date)
+""")
+    List<Object[]> revenueByDate(LocalDateTime start, LocalDateTime end);
+
 }
 

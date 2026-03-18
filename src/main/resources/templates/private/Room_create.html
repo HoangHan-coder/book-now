@@ -195,10 +195,13 @@
                                     <select id="roomTypeSelect"
                                             name="roomTypeId"
                                             class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white mb-2">
-
+                                        <option value="" selected disabled>-- Chọn loại phòng --</option>
                                         <option th:each="type : ${roomType}"
                                                 th:value="${type.roomTypeId}"
                                                 th:data-img="${type.imageUrl}"
+                                                th:data-baseprice="${type.basePrice}"
+                                                th:data-overprice="${type.overPrice}"
+                                                th:data-description="${type.description}"
                                                 th:text="${type.name}">
                                         </option>
 
@@ -738,6 +741,28 @@
                 },150);
             }
 
+            const basePrice = selectedOption.getAttribute('data-baseprice');
+            const overPrice = selectedOption.getAttribute('data-overprice');
+            const description = selectedOption.getAttribute('data-description');
+
+            const baseInput = document.querySelector('input[name="basePrice"]');
+            const overInput = document.querySelector('input[name="overPrice"]');
+
+            if (basePrice) {
+                baseInput.value = Number(basePrice).toLocaleString('vi-VN');
+                baseInput.dataset.lastValid = basePrice;
+            }
+
+            if (overPrice) {
+                overInput.value = Number(overPrice).toLocaleString('vi-VN');
+                overInput.dataset.lastValid = overPrice;
+            }
+
+            const desc = document.querySelector('textarea[name="description"]');
+            if (desc) {
+                desc.value = description || '';
+            }
+
         });
 
 
@@ -829,6 +854,12 @@
         ===================================================== */
 
         document.getElementById('createRoomForm').addEventListener('submit',function(e){
+
+            if (!roomTypeSelect.value) {
+                alert("Vui lòng chọn loại phòng");
+                e.preventDefault();
+                return;
+            }
 
             if(!validatePriceRelation()){
                 e.preventDefault();

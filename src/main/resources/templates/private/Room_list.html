@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh sách phòng - BookNow</title>
@@ -147,17 +149,33 @@
 
     </div>
     <!-- HEADER & ACTIONS -->
+
     <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
         <div>
             <h1 class="text-2xl font-bold text-gray-800">Danh sách phòng</h1>
             <p class="text-sm text-gray-500 mt-1">Quản lý trạng thái và thông tin các phòng</p>
         </div>
-        <a th:href="@{/admin/create}">
-            <button class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg shadow-sm font-medium transition-colors">
-                <i class="fa-solid fa-plus"></i>
-                <span>Thêm phòng mới</span>
-            </button>
-        </a>
+        <div class="flex items-center gap-6"> <!-- gap-6 ~ 24px -->
+
+            <!-- NÚT XÓA -->
+                <button type="button"
+                        id="deleteButton"
+                        th:if="${hasDeletedRooms}"
+                        class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg shadow-sm font-medium transition-colors">
+                    <i class="fa-solid fa-trash"></i>
+                    <span>Xóa phòng</span>
+                </button>
+
+            <!-- NÚT THÊM -->
+            <a th:href="@{/admin/create}">
+                <button
+                        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg shadow-sm font-medium transition-colors">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Thêm phòng mới</span>
+                </button>
+            </a>
+
+        </div>
     </div>
 
     <form th:action="@{/admin/list}" method="get">
@@ -227,6 +245,17 @@
             <table class="w-full text-left border-collapse">
                 <thead class="bg-gray-50 border-b border-gray-100">
                 <tr>
+                    <th th:if="${hasDeletedRooms}"
+                        class="py-4 px-6 text-center">
+
+                        <div class="flex flex-col items-center justify-center gap-1">
+        <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            Chọn tất cả
+        </span>
+                            <input type="checkbox" id="selectAll">
+                        </div>
+
+                    </th>
                     <th class="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Số phòng</th>
                     <th class="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Loại phòng</th>
                     <th class="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Giá / slot</th>
@@ -239,6 +268,12 @@
                 <!-- Available -->
                 <tr th:each="room : ${rooms.content}"
                     class="hover:bg-gray-50 transition-colors group">
+                    <td th:if="${hasDeletedRooms}"
+                        class="py-4 px-6 text-center">
+                        <input type="checkbox"
+                               name="roomIds"
+                               th:value="${room.roomId}">
+                    </td>
                     <td class="py-4 px-6">
                         <span class="font-bold text-gray-900 bg-gray-100 px-3 py-1 rounded-md text-sm"
                               th:text="${room.roomNumber}"></span>
@@ -273,7 +308,8 @@
                 </tr>
                 <!-- don't data -->
                 <tr th:if="${rooms.content.size() == 0}">
-                    <td colspan="6" class="text-center py-10 text-gray-500">
+                    <td th:colspan="${(hasDeletedRooms) ? 7 : 6}"
+                        class="text-center py-10 text-gray-500">
                         <i class="fa-regular fa-face-frown text-2xl mb-2 block"></i>
                         Không tìm thấy phòng phù hợp
                     </td>
@@ -281,6 +317,7 @@
                 </tbody>
             </table>
         </div>
+
 
         <!-- Pagination -->
         <div th:if="${rooms.totalElements > 0}"
@@ -314,7 +351,7 @@
             </div>
         </div>
     </div>
-
+    </form>
 </main>
 
 <!-- SCRIPT -->
@@ -337,6 +374,63 @@
 
     mobileMenuBtn.addEventListener('click', toggleSidebar);
     sidebarOverlay.addEventListener('click', toggleSidebar);
+
+    // Select All functionality
+    const selectAllCheckbox = document.getElementById('selectAll');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('input[name="roomIds"]');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+    }
+
+    // Delete functionality
+    const deleteUrl = "[[@{/admin/delete-rooms}]]";
+    const deleteButton = document.getElementById('deleteButton');
+
+    if (deleteButton) {
+        deleteButton.addEventListener('click', function() {
+
+            const selectedRooms = Array.from(
+                document.querySelectorAll('input[name="roomIds"]:checked')
+            ).map(cb => cb.value);
+
+            if (selectedRooms.length === 0) {
+                alert('Vui lòng chọn ít nhất một phòng để xóa.');
+                return;
+            }
+
+            if (confirm('Bạn có chắc chắn muốn xóa các phòng đã chọn?')) {
+
+                const formData = new FormData();
+                selectedRooms.forEach(id => formData.append('roomIds', id));
+
+                // ✅ LẤY CSRF TỪ META
+                const token = document.querySelector('meta[name="_csrf"]').content;
+                const header = document.querySelector('meta[name="_csrf_header"]').content;
+
+                fetch(deleteUrl, {
+                    method: 'POST',
+                    headers: {
+                        [header]: token
+                    },
+                    body: formData
+                })
+                    .then(res => {
+                        if (!res.ok) throw new Error("Delete failed");
+                        return res.text();
+                    })
+                    .then(msg => {
+                        alert(msg);
+                        window.location.href="/book-now/admin/list";
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('Có lỗi xảy ra khi xóa phòng.');
+                    });
+            }
+        });
+    }
 </script>
 </body>
 </html>

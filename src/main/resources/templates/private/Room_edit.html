@@ -166,6 +166,10 @@
             <input type="hidden" name="roomId" th:value="${room.roomId}">
             <input type="hidden" name="deletedImageIds">
             <input type="hidden" name="deletedAmenityIds">
+            <!-- CSRF token (required when Spring Security CSRF protection is enabled) -->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <!-- Container for new amenity icon file inputs (keeps ordering in sync with newAmenityNames) -->
+            <div id="newAmenityFiles" class="hidden"></div>
 
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
                 <!-- LEFT COLUMN: Basic Info (2/3 width) -->
@@ -230,6 +234,9 @@
                                             th:value="${type.roomTypeId}"
                                             th:selected="${type.roomTypeId == room.roomType.roomTypeId}"
                                             th:data-img="${type.imageUrl}"
+                                            th:data-baseprice="${type.basePrice}"
+                                            th:data-overprice="${type.overPrice}"
+                                            th:data-description="${type.description}"
                                             th:text="${type.name}">
                                     </option>
 
@@ -735,6 +742,30 @@
             }, 150);
         }
 
+        const basePrice = selectedOption.getAttribute('data-baseprice');
+        const overPrice = selectedOption.getAttribute('data-overprice');
+        const description = selectedOption.getAttribute('data-description');
+
+        const baseInput = document.querySelector('input[name="basePrice"]');
+        const overInput = document.querySelector('input[name="overPrice"]');
+
+        if (basePrice) {
+            baseInput.value = Number(basePrice).toLocaleString('vi-VN');
+            baseInput.dataset.lastValid = basePrice;
+        }
+
+        if (overPrice) {
+            overInput.value = Number(overPrice).toLocaleString('vi-VN');
+            overInput.dataset.lastValid = overPrice;
+        }
+
+        const desc = document.querySelector('textarea[name="roomTypeDescription"]');
+        if (desc) {
+            desc.value = description || '';
+        }
+
+        isChanged = true;
+
     });
 
 
@@ -1078,41 +1109,43 @@
         checkbox.checked = true;
         checkbox.className = "h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500";
 
-
-        /* icon image */
-
-        const img = document.createElement("img");
-        img.className = "w-5 h-5 object-cover rounded";
-        img.src = URL.createObjectURL(imageFile);
-
-
-        /* name */
-
-        const span = document.createElement("span");
-        span.className = "text-sm text-gray-700";
-        span.textContent = name;
-
-
-        /* append */
-
-        label.appendChild(checkbox);
-        label.appendChild(img);
-        label.appendChild(span);
-
-        amenitiesList.prepend(label);
-
-        /* hidden input icon */
+        /* hidden input icon (paired with checkbox to keep indexing consistent) */
         const hiddenFileInput = document.createElement("input");
-
         hiddenFileInput.type = "file";
         hiddenFileInput.name = "newAmenityIcons";
         hiddenFileInput.style.display = "none";
+        hiddenFileInput.dataset.pairedAmenity = name;
 
         const dt = new DataTransfer();
         dt.items.add(imageFile);
         hiddenFileInput.files = dt.files;
 
-        document.getElementById("editRoomForm").appendChild(hiddenFileInput);
+        /* When user unchecks the amenity, remove both the checkbox/label and its paired file input */
+        checkbox.addEventListener("change", () => {
+            if (!checkbox.checked) {
+                hiddenFileInput.remove();
+                label.remove();
+            }
+        });
+
+        /* icon image */
+        const img = document.createElement("img");
+        img.className = "w-5 h-5 object-cover rounded";
+        img.src = URL.createObjectURL(imageFile);
+
+        /* name */
+        const span = document.createElement("span");
+        span.className = "text-sm text-gray-700";
+        span.textContent = name;
+
+        /* append */
+        label.appendChild(checkbox);
+        label.appendChild(img);
+        label.appendChild(span);
+
+        // Keep order of newAmenityNames and newAmenityIcons in sync by appending both
+        amenitiesList.appendChild(label);
+        document.getElementById("newAmenityFiles").appendChild(hiddenFileInput);
 
         /* reset modal */
         amenityNameInput.value = "";

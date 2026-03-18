@@ -1,7 +1,6 @@
 package vn.edu.fpt.booknow.controllers.model.entities;
 
 import jakarta.persistence.*;
-import org.apache.logging.log4j.util.Lazy;
 
 @Entity
 public class RoomAmenity {
