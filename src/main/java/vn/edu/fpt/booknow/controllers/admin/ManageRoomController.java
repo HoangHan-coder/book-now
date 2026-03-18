@@ -165,7 +165,32 @@ public class ManageRoomController {
             return ResponseEntity.badRequest().body("No rooms selected");
         }
         manageRoomServices.deleteRooms(roomIds);
-        return ResponseEntity.ok("Deleted successfully");
+        return ResponseEntity.ok("Đã xóa thành công");
+    }
+
+    @PostMapping("/room/delete/{id}")
+    public String softDeleteRoom(@PathVariable Long id,
+                                 RedirectAttributes redirectAttributes) {
+
+        try {
+            manageRoomServices.softDeleteRoom(id);
+            redirectAttributes.addFlashAttribute("success", "Phòng Đã Ngừng sử dụng");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/list";
+    }
+
+    @PostMapping("/room/restore/{id}")
+    public String restoreRoom(@PathVariable Long id,
+                              RedirectAttributes redirectAttributes) {
+        try {
+            manageRoomServices.restoreRoom(id);
+            redirectAttributes.addFlashAttribute("success","Khôi phục phòng thành công");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/list";
     }
 
     @GetMapping("/create")
@@ -225,20 +250,10 @@ public class ManageRoomController {
         }
 
         model.addAttribute("room", room);
+        model.addAttribute("isDeleted", room.getStatus() == RoomStatus.DELETED);
         return "private/Room_Detail";
     }
 
-    @PostMapping("/room/delete/{id}")
-    public String softDeleteRoom(@PathVariable Long id) {
-
-        Room room = manageRoomServices.findRoomById(id);
-
-        if (room == null) {
-            throw new ResourceNotFoundException("Room not found with id: " + id);
-        }
-        manageRoomServices.softDeleteRoom(id);
-        return "redirect:/admin/list";
-    }
 
     @GetMapping("/edit/{id}")
     public String editRoom(Model model, @PathVariable("id") Long id) {
@@ -249,7 +264,7 @@ public class ManageRoomController {
         }
 
         if (room.getStatus() == RoomStatus.DELETED) {
-            throw new IllegalStateException("Room has been deleted and cannot be edited");
+            return "redirect:/admin/detail/" + id + "?error=deleted";
         }
 
         if (room.getRoomType() == null) {

@@ -124,16 +124,32 @@ public class ManageRoomServices {
     public void softDeleteRoom(Long id) {
 
         Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Room not found"));
+                .orElseThrow(() -> new RuntimeException("không tìm thấy phòng"));
 
-        if (room.getStatus().equals(RoomStatus.AVAILABLE)) {
-            room.setStatus(RoomStatus.DELETED);
-            room.setDeleted(true);
+        if (room.getStatus() != RoomStatus.AVAILABLE) {
+            throw new IllegalArgumentException("Chỉ phòng trống mới ngừng hoạt động được");
         }
 
+        room.setStatus(RoomStatus.DELETED);
+        room.setDeleted(true);
         roomRepository.save(room);
     }
 
+    @Transactional
+    public void restoreRoom(Long id) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("không tìm thấy phòng"));
+
+        if (room.getStatus() != RoomStatus.DELETED) {
+            throw new IllegalArgumentException("Chỉ phòng đã xóa mới được khôi phục");
+        }
+
+        room.setStatus(RoomStatus.AVAILABLE);
+        room.setDeleted(false);
+        roomRepository.save(room);
+    }
+
+    @Transactional
     public void deleteRooms(List<Long> ids) {
         for (Long id : ids) {
             Room room = roomRepository.findById(id)
@@ -168,6 +184,9 @@ public class ManageRoomServices {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng"));
 
+        if(RoomStatus.DELETED == room.getStatus()) {
+        throw new IllegalArgumentException("Phòng đã ngừng sử dụng");
+        }
 
         /* ===== 2. UPDATE ROOM ===== */
         if (basePrice == null || basePrice.compareTo(new BigDecimal("100000")) < 0) {

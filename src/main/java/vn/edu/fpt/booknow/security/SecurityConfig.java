@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/assets/**","/admin/create/**","/admin/rooms/create"
                                 , "/admin/detail/**","/admin/list","/admin/edit/**",
                                 "/staff/update/**", "/admin/dashboard", "/admin/dashboard/export/**",
-                                "/admin/room/delete/**", "/admin/delete-rooms").permitAll() // permitAll = cho phép công cộng
+                                "/admin/room/delete/**", "/admin/delete-rooms", "/admin/room/restore/**").permitAll() // permitAll = cho phép công cộng
                         //.requestMatchers("/artist/list").hasRole("ADMIN")
                         .anyRequest().authenticated() // anyReq = tất cả các request còn lại, buộc phải xác thực
                 )

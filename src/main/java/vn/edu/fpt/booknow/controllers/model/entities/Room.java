@@ -102,4 +102,5 @@ public class Room {
     public void setRoomAmenities(Set<RoomAmenity> roomAmenities) {
         this.roomAmenities = roomAmenities;
     }
+
 }
