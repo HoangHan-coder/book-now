@@ -140,7 +140,6 @@ public class RoomController {
             int start = Math.max(0, current - displayRange / 2);
             int end = Math.min(totalPages - 1, start + displayRange - 1);
             if (end - start + 1 < displayRange) start = Math.max(0, end - displayRange + 1);
-            System.out.println(searchDTO.getPage());
             List<Integer> pageNumbers = new ArrayList<>();
             for (int i = start; i <= end; i++) pageNumbers.add(i);
 

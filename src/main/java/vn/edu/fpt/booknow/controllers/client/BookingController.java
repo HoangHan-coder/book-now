@@ -25,7 +25,6 @@ public class BookingController {
 
 
         try {
-            System.out.println(frontImg.getSize());
             long MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
             if (frontImg != null && frontImg.getSize() > MAX_SIZE) {
