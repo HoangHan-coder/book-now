@@ -22,7 +22,7 @@ public class StaBookingDetailController {
 
         Booking booking = bookingDetailService.getBookingDetail(bookingCode);
 
-        // BẮT LỖI Ở CONTROLLER (không throw)
+
         if (booking == null) {
             model.addAttribute("errorMessage", "Không tìm thấy booking");
             return "error/404";

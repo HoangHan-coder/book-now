@@ -137,4 +137,11 @@ public abstract class SeleniumBaseTest {
         new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds))
                 .until(ExpectedConditions.urlContains(urlFragment));
     }
+    protected void slowDown(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
 }

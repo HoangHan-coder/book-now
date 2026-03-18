@@ -66,13 +66,19 @@ class StaffBookingDetailUITest extends SeleniumBaseTest {
                 extractedBookingCode == null || extractedBookingCode.isBlank(),
                 "[SKIP] Database không có booking để test"
         );
+        slowDown(500); // 🔥 thêm ở đây
 
         driver.get(BOOKING_DETAIL_PATH + extractedBookingCode);
+
+        slowDown(1000); // 🔥 thêm ở đây
 
         waitFor(20).until(
                 ExpectedConditions.presenceOfElementLocated(By.tagName("h1"))
         );
+
+        slowDown(500); // 🔥 thêm ở đây
     }
+
 
     // ═════════════════════════════════════════
     // UI-D01 – Click xem chi tiết
@@ -96,7 +102,9 @@ class StaffBookingDetailUITest extends SeleniumBaseTest {
         assertFalse(detailLinks.isEmpty(),
                 "Phải có ít nhất 1 link 'Xem chi tiết'");
 
+
         detailLinks.get(0).click();
+
 
         waitFor(20).until(
                 ExpectedConditions.urlContains("/admin/booking-detail/")
@@ -224,15 +232,16 @@ class StaffBookingDetailUITest extends SeleniumBaseTest {
     @Order(7)
     @DisplayName("UI-D07 – Booking không tồn tại → trang lỗi")
     void accessInvalidBookingCode_shouldShowErrorPage() {
+        driver.get(BOOKING_LIST_URL); // reset trước
+        slowDown(1000);
 
         driver.get(BOOKING_DETAIL_PATH + "BK_KHONG_TON_TAI_9999");
-
+        slowDown(2000);
         waitFor(10).until(
                 ExpectedConditions.presenceOfElementLocated(By.tagName("body"))
         );
 
         String page = driver.getPageSource().toLowerCase();
-
         boolean error =
                 page.contains("không tìm thấy") ||
                         page.contains("404") ||
