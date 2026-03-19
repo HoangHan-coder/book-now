@@ -7,20 +7,34 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
-@AllArgsConstructor
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import vn.edu.fpt.booknow.model.entities.Room;
+import vn.edu.fpt.booknow.model.entities.RoomStatus;
+
 @NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class RoomDTO {
+
     private Long roomId;
-    private BigDecimal basePrice;
-    private Integer maxGuest;
+
+    private RoomTypeDTO roomType;
+
     private String roomNumber;
-    private String roomType;
-    private String description;
-    private String imageUrl;
-    private String utilities;
-    private String iconUrl;
-    private BigDecimal overPrice;
-    List<Amenity> amenityList = new ArrayList<>();
+
+    private RoomStatus status;
+
+    private Boolean isDeleted = false;
+
+    public RoomDTO(Room room) {
+        this.roomId = room.getRoomId();
+        this.roomType = new RoomTypeDTO(room.getRoomType());
+        this.roomNumber = room.getRoomNumber();
+        this.status = room.getStatus();
+        this.isDeleted = room.getIsDeleted();
+    }
 
 }
