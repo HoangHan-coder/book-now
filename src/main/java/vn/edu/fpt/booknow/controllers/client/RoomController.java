@@ -4,15 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.dto.*;
 import vn.edu.fpt.booknow.model.entities.*;
-import vn.edu.fpt.booknow.repositories.CustomerRepository;
-import vn.edu.fpt.booknow.repositories.FeedBackRepository;
-import vn.edu.fpt.booknow.repositories.ImageRepository;
-import vn.edu.fpt.booknow.repositories.RoomRepository;
-import vn.edu.fpt.booknow.services.BookingService;
 import vn.edu.fpt.booknow.services.FeedBackService;
 import vn.edu.fpt.booknow.services.JWTService;
 import vn.edu.fpt.booknow.services.RoomService;
@@ -56,7 +49,7 @@ public class RoomController {
             String email = "";
             Customer customer = new Customer();
             System.out.println(roomId + " detailRoomService");
-            List<RoomDTO> roomDetail = roomService.detailRoomService(roomId);
+            List<DetailRoomDTO> roomDetail = roomService.detailRoomService(roomId);
             if (roomDetail.isEmpty()) {
                 return "redirect:/404";
             }
@@ -147,7 +140,7 @@ public class RoomController {
                              Model model) {
         try {
             // Luôn mặc định về trang 0 khi bấm tìm mới
-            Page<RoomDTO> rooms = roomService.getSearchService(searchDTO, searchDTO.getPage());
+            Page<DetailRoomDTO> rooms = roomService.getSearchService(searchDTO, searchDTO.getPage());
 
             // Tính toán phân trang trực tiếp trong hàm
             int totalPages = rooms.getTotalPages();
@@ -178,7 +171,7 @@ public class RoomController {
                             Model model) {
         try {
             // Sử dụng tham số 'page' từ URL
-            Page<RoomDTO> rooms = roomService.getSearchService(searchDTO, page);
+            Page<DetailRoomDTO> rooms = roomService.getSearchService(searchDTO, page);
 
             // Tính toán phân trang trực tiếp trong hàm (lặp lại logic)
             int totalPages = rooms.getTotalPages();

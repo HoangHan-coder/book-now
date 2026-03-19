@@ -4,17 +4,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import vn.edu.fpt.booknow.model.dto.RoomDTO;
+import vn.edu.fpt.booknow.model.dto.DetailRoomDTO;
 import vn.edu.fpt.booknow.model.dto.SearchDTO;
 import vn.edu.fpt.booknow.model.entities.*;
 import vn.edu.fpt.booknow.services.RoomService;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Controller
 public class HomePageController {
@@ -25,12 +22,12 @@ public class HomePageController {
     @GetMapping("/home")
     public String getHomePage(Model model) {
         SearchDTO searchDTO = new SearchDTO();
-        Page<RoomDTO> list = roomService.getAllRoomService();
+        Page<DetailRoomDTO> list = roomService.getAllRoomService();
         List<Amenity> amenities = roomService.getAllAmenity();
         List<RoomType> roomType = roomService.getAllRoomType();
         List<Booking> booking = roomService.getAllBooking();
         List<Timetable> timetables = roomService.getAllTimeTable();
-        List<RoomDTO> roomAll = roomService.roomAll();
+        List<DetailRoomDTO> roomAll = roomService.roomAll();
         List<LocalDateTime> weekDates = new ArrayList<>();
         LocalDateTime today = LocalDateTime.now();
         List<Scheduler> schedulers = roomService.schedulers(); // Giả sử bạn lấy từ service

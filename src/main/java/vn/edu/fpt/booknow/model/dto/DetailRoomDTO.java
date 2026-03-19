@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoomDTO {
+public class DetailRoomDTO {
     private Long roomId;
     private BigDecimal basePrice;
     private Integer maxGuest;

@@ -5,7 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import vn.edu.fpt.booknow.model.dto.RoomDTO;
+import vn.edu.fpt.booknow.model.dto.DetailRoomDTO;
 import vn.edu.fpt.booknow.model.dto.SearchDTO;
 import vn.edu.fpt.booknow.model.dto.TimeTableDTO;
 import vn.edu.fpt.booknow.model.entities.*;
@@ -42,13 +42,13 @@ public class RoomService {
         this.imageRepository = imageRepository;
     }
 
-    public Page<RoomDTO> getAllRoomService() {
+    public Page<DetailRoomDTO> getAllRoomService() {
         Pageable pageable = PageRequest.of(0, 3);
-        Page<RoomDTO> listRoom = roomRepository.findRoom(pageable);
+        Page<DetailRoomDTO> listRoom = roomRepository.findRoom(pageable);
         return listRoom;
     }
 
-    public Page<RoomDTO> getSearchService(SearchDTO searchDTO, int page) {
+    public Page<DetailRoomDTO> getSearchService(SearchDTO searchDTO, int page) {
         Sort sort;
         String sortType = searchDTO.getSortType();
 
@@ -80,13 +80,13 @@ public class RoomService {
     }
 
 
-    public List<RoomDTO> detailRoomService(Long id) {
-        List<RoomDTO> roomAmenityFlatDTO = roomRepository.findRoomDetail(id);
-        Map<String, RoomDTO> map = new LinkedHashMap<>();
-        for (RoomDTO x : roomAmenityFlatDTO) {
-            RoomDTO roomDTO = map.computeIfAbsent(
+    public List<DetailRoomDTO> detailRoomService(Long id) {
+        List<DetailRoomDTO> roomAmenityFlatDTO = roomRepository.findRoomDetail(id);
+        Map<String, DetailRoomDTO> map = new LinkedHashMap<>();
+        for (DetailRoomDTO x : roomAmenityFlatDTO) {
+            DetailRoomDTO detailRoomDTO = map.computeIfAbsent(
                     x.getRoomId() + "",
-                    idd -> new RoomDTO(
+                    idd -> new DetailRoomDTO(
                             x.getRoomId(),
                             x.getBasePrice(),
                             x.getMaxGuest(),
@@ -100,12 +100,12 @@ public class RoomService {
                             new ArrayList<>()
                     )
             );
-            roomDTO.getAmenityList().add(
+            detailRoomDTO.getAmenityList().add(
                     new Amenity(null, x.getUtilities(), x.getIconUrl(), null, null)
             );
         }
-        List<RoomDTO> roomDTO = new ArrayList<>(map.values());
-        return roomDTO;
+        List<DetailRoomDTO> detailRoomDTO = new ArrayList<>(map.values());
+        return detailRoomDTO;
     }
     public boolean isBetween(LocalDateTime currentData, Long currentSlotId, TimeTableDTO start, TimeTableDTO end) {
         // Chuyển đổi thành một con số duy nhất để so sánh (Năm + Tháng + Ngày + Slot)
@@ -155,8 +155,8 @@ public class RoomService {
         return list;
     }
 
-    public List<RoomDTO> roomAll() {
-        List<RoomDTO> list = roomRepository.findAllRoom();
+    public List<DetailRoomDTO> roomAll() {
+        List<DetailRoomDTO> list = roomRepository.findAllRoom();
         return list;
     }
     public List<Booking> getAllBookingStatus() {
