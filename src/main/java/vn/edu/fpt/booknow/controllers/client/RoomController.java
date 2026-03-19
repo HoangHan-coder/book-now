@@ -4,24 +4,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.dto.*;
 import vn.edu.fpt.booknow.model.entities.*;
-import vn.edu.fpt.booknow.repositories.CustomerRepository;
-import vn.edu.fpt.booknow.repositories.FeedBackRepository;
-import vn.edu.fpt.booknow.repositories.ImageRepository;
-import vn.edu.fpt.booknow.repositories.RoomRepository;
-import vn.edu.fpt.booknow.services.BookingService;
 import vn.edu.fpt.booknow.services.FeedBackService;
 import vn.edu.fpt.booknow.services.JWTService;
 import vn.edu.fpt.booknow.services.RoomService;
 import vn.edu.fpt.booknow.services.customer.CustomerService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Controller
 public class RoomController {
@@ -54,7 +49,7 @@ public class RoomController {
             String email = "";
             Customer customer = new Customer();
             System.out.println(roomId + " detailRoomService");
-            List<RoomDTO> roomDetail = roomService.detailRoomService(roomId);
+            List<DetailRoomDTO> roomDetail = roomService.detailRoomService(roomId);
             if (roomDetail.isEmpty()) {
                 return "redirect:/404";
             }
@@ -108,6 +103,20 @@ public class RoomController {
                 }
             }
             booking.setRoomId(roomId);
+            DateTimeFormatter formatterr = DateTimeFormatter.ofPattern("dd/MM/yyyy"); // Dùng "/" để dễ nhìn
+
+            List<String> monthDateStrings = IntStream.range(0, 365)
+                    .mapToObj(i -> LocalDate.now().plusDays(i+1).format(formatterr))
+                    .collect(Collectors.toList());
+            List<Map<String, Object>> simpleTimetables = timetables.stream().map(t -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("timetableId", t.getTimetableId());
+                map.put("slotName", t.getSlotName());
+                return map;
+            }).collect(Collectors.toList());
+            model.addAttribute("timeTableJS", simpleTimetables);
+            model.addAttribute("monthDates", monthDateStrings);
+
             model.addAttribute("bookedKeys", bookedKeys);
             model.addAttribute("timeTable", timetables);
             model.addAttribute("weekDates", weekDates);
@@ -131,7 +140,7 @@ public class RoomController {
                              Model model) {
         try {
             // Luôn mặc định về trang 0 khi bấm tìm mới
-            Page<RoomDTO> rooms = roomService.getSearchService(searchDTO, searchDTO.getPage());
+            Page<DetailRoomDTO> rooms = roomService.getSearchService(searchDTO, searchDTO.getPage());
 
             // Tính toán phân trang trực tiếp trong hàm
             int totalPages = rooms.getTotalPages();
@@ -140,7 +149,6 @@ public class RoomController {
             int start = Math.max(0, current - displayRange / 2);
             int end = Math.min(totalPages - 1, start + displayRange - 1);
             if (end - start + 1 < displayRange) start = Math.max(0, end - displayRange + 1);
-            System.out.println(searchDTO.getPage());
             List<Integer> pageNumbers = new ArrayList<>();
             for (int i = start; i <= end; i++) pageNumbers.add(i);
 
@@ -163,7 +171,7 @@ public class RoomController {
                             Model model) {
         try {
             // Sử dụng tham số 'page' từ URL
-            Page<RoomDTO> rooms = roomService.getSearchService(searchDTO, page);
+            Page<DetailRoomDTO> rooms = roomService.getSearchService(searchDTO, page);
 
             // Tính toán phân trang trực tiếp trong hàm (lặp lại logic)
             int totalPages = rooms.getTotalPages();

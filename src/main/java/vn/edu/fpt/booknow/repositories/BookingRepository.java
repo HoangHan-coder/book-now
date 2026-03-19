@@ -25,4 +25,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
    boolean isRoomOccupied(@Param("roomId") Long roomId,
          @Param("shiftStart") LocalDateTime shiftStart,
          @Param("shiftEnd") LocalDateTime shiftEnd);
+
+   Booking getByBookingCode(String bookingCode);
 }

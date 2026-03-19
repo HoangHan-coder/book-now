@@ -6,22 +6,22 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import vn.edu.fpt.booknow.model.dto.RoomDTO;
+import vn.edu.fpt.booknow.model.dto.DetailRoomDTO;
 import vn.edu.fpt.booknow.model.entities.Room;
 
 import java.util.List;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
-    @Query("SELECT DISTINCT new vn.edu.fpt.booknow.model.dto.RoomDTO(r.roomId,t.basePrice,t.maxGuests,r.roomNumber,t.name,t.description,i.imageUrl,m.name,m.iconUrl,t.overPrice,null)  FROM Room r \n" +
+    @Query("SELECT DISTINCT new vn.edu.fpt.booknow.model.dto.DetailRoomDTO(r.roomId,t.basePrice,t.maxGuests,r.roomNumber,t.name,t.description,i.imageUrl,m.name,m.iconUrl,t.overPrice,null)  FROM Room r \n" +
             "JOIN RoomAmenity a ON r.roomId = a.roomAmenityId \n" +
             "JOIN RoomType t ON t.roomTypeId = r.roomType.roomTypeId\n" +
             "JOIN Amenity m ON m.amenityId= a.roomAmenityId\n" +
             "JOIN Image i ON i.room.roomId = r.roomId \n" +
             "WHERE r.isDeleted = false AND i.isCover = true")
-    Page<RoomDTO> findRoom(Pageable pageable);
+    Page<DetailRoomDTO> findRoom(Pageable pageable);
     @Query(
             value = """
-    SELECT DISTINCT new vn.edu.fpt.booknow.model.dto.RoomDTO(
+    SELECT DISTINCT new vn.edu.fpt.booknow.model.dto.DetailRoomDTO(
         r.roomId, t.basePrice, t.maxGuests, r.roomNumber, t.name, t.description, 
         i.imageUrl, null, null, t.overPrice, null
     )
@@ -65,7 +65,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
           ) = :amenityCount)
     """
     )
-    Page<RoomDTO> searchRooms(
+    Page<DetailRoomDTO> searchRooms(
             @Param("keyword") String keyword,
             @Param("maxGuest") Integer maxGuest,
             @Param("price") String price,
@@ -74,16 +74,16 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             Pageable pageable
     );
 
-    @Query("SELECT DISTINCT new vn.edu.fpt.booknow.model.dto.RoomDTO(r.roomId,t.basePrice,t.maxGuests,r.roomNumber,t.name,t.description,i.imageUrl,m.name,m.iconUrl,t.overPrice,null)  FROM Room r \n" +
+    @Query("SELECT DISTINCT new vn.edu.fpt.booknow.model.dto.DetailRoomDTO(r.roomId,t.basePrice,t.maxGuests,r.roomNumber,t.name,t.description,i.imageUrl,m.name,m.iconUrl,t.overPrice,null)  FROM Room r \n" +
             "JOIN RoomAmenity a ON r.roomId = a.room.roomId \n" +
             "JOIN RoomType t ON t.roomTypeId = r.roomType.roomTypeId\n" +
             "JOIN Amenity m ON m.amenityId= a.amenity.amenityId\n" +
             "JOIN Image i ON i.room.roomId = r.roomId \n" +
             "WHERE r.isDeleted = false AND i.isCover = true AND r.roomId = :id")
-    List<RoomDTO> findRoomDetail(@Param("id") Long id);
+    List<DetailRoomDTO> findRoomDetail(@Param("id") Long id);
 
     @Query("""
-                SELECT new vn.edu.fpt.booknow.model.dto.RoomDTO(
+                SELECT new vn.edu.fpt.booknow.model.dto.DetailRoomDTO(
                     r.roomId,
                     t.basePrice,
                     t.maxGuests,
@@ -104,15 +104,18 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
                 GROUP BY r.roomId, t.basePrice, t.maxGuests,r.roomNumber, t.name, t.description, i.imageUrl, t.overPrice
             """)
 // Spring sẽ tự động nối ORDER BY dựa vào tham số Sort truyền vào
-    List<RoomDTO> findAllRoomsSorted(Sort sort);
+    List<DetailRoomDTO> findAllRoomsSorted(Sort sort);
 
-    @Query("SELECT DISTINCT new vn.edu.fpt.booknow.model.dto.RoomDTO(r.roomId,t.basePrice,t.maxGuests,r.roomNumber, t.name,t.description,i.imageUrl,m.name,m.iconUrl,t.overPrice,null)  FROM Room r \n" +
+    @Query("SELECT DISTINCT new vn.edu.fpt.booknow.model.dto.DetailRoomDTO(r.roomId,t.basePrice,t.maxGuests,r.roomNumber, t.name,t.description,i.imageUrl,m.name,m.iconUrl,t.overPrice,null)  FROM Room r \n" +
             "JOIN RoomAmenity a ON r.roomId = a.roomAmenityId \n" +
             "JOIN RoomType t ON t.roomTypeId = r.roomType.roomTypeId\n" +
             "JOIN Amenity m ON m.amenityId= a.roomAmenityId\n" +
             "JOIN Image i ON i.room.roomId = r.roomId \n" +
             "WHERE r.isDeleted = false AND i.isCover = true")
-    List<RoomDTO> findAllRoom();
+    List<DetailRoomDTO> findAllRoom();
+
+    @Query("SELECT r FROM Room r JOIN RoomType t ON r.roomType.roomTypeId = t.roomTypeId WHERE r.roomId = :id")
+    Room getPrice(@Param("id") Long id);
 
     Room getByRoomId(Long roomId);
 }
