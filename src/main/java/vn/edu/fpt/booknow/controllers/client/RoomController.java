@@ -18,10 +18,12 @@ import vn.edu.fpt.booknow.services.JWTService;
 import vn.edu.fpt.booknow.services.RoomService;
 import vn.edu.fpt.booknow.services.customer.CustomerService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Controller
 public class RoomController {
@@ -108,6 +110,20 @@ public class RoomController {
                 }
             }
             booking.setRoomId(roomId);
+            DateTimeFormatter formatterr = DateTimeFormatter.ofPattern("dd/MM/yyyy"); // Dùng "/" để dễ nhìn
+
+            List<String> monthDateStrings = IntStream.range(0, 365)
+                    .mapToObj(i -> LocalDate.now().plusDays(i+1).format(formatterr))
+                    .collect(Collectors.toList());
+            List<Map<String, Object>> simpleTimetables = timetables.stream().map(t -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("timetableId", t.getTimetableId());
+                map.put("slotName", t.getSlotName());
+                return map;
+            }).collect(Collectors.toList());
+            model.addAttribute("timeTableJS", simpleTimetables);
+            model.addAttribute("monthDates", monthDateStrings);
+
             model.addAttribute("bookedKeys", bookedKeys);
             model.addAttribute("timeTable", timetables);
             model.addAttribute("weekDates", weekDates);

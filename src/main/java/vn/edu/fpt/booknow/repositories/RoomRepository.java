@@ -114,5 +114,8 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             "WHERE r.isDeleted = false AND i.isCover = true")
     List<RoomDTO> findAllRoom();
 
+    @Query("SELECT r FROM Room r JOIN RoomType t ON r.roomType.roomTypeId = t.roomTypeId WHERE r.roomId = :id")
+    Room getPrice(@Param("id") Long id);
+
     Room getByRoomId(Long roomId);
 }

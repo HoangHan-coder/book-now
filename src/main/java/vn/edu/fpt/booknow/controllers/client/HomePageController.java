@@ -9,9 +9,12 @@ import vn.edu.fpt.booknow.model.dto.SearchDTO;
 import vn.edu.fpt.booknow.model.entities.*;
 import vn.edu.fpt.booknow.services.RoomService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Controller
 public class HomePageController {
@@ -40,6 +43,8 @@ public class HomePageController {
             map.put("endTime", t.getEndTime().toString());
             return map;
         }).collect(Collectors.toList());
+        // Thay vì chỉ lấy 7 ngày, hãy lấy 30 ngày cho vào Model
+
         for (Scheduler s : schedulers) {
             // Format: RoomID_LocalDate_TimetableID
             // Lưu ý: s.getDate() trả về LocalDateTime nên cần lấy toLocalDate()

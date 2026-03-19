@@ -21,9 +21,9 @@ public class BookingDTO {
 
     private Long roomId;
 
-    private LocalDate checkInTime;
+    private String checkInTime;
 
-    private LocalDate checkOutTime;
+    private String checkOutTime;
 
     private String idCardFrontUrl;
 
@@ -37,5 +37,4 @@ public class BookingDTO {
 
     private LocalDate createdAt;
     private String note;
-    private List<String> selectedSlots;
 }

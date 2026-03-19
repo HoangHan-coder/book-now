@@ -10,9 +10,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.dto.BookingDTO;
 import vn.edu.fpt.booknow.services.BookingService;
+
 @Controller
 public class BookingController {
     private BookingService bookingService;
+
     public BookingController(BookingService bookingService) {
         this.bookingService = bookingService;
     }
@@ -20,13 +22,11 @@ public class BookingController {
     @PostMapping("/booking/save")
     public String bookingSave(@ModelAttribute BookingDTO bookingDTO, @RequestParam(value = "cccd_front", required = false) MultipartFile frontImg,
                               @RequestParam(value = "cccd_back", required = false) MultipartFile backImg,
-//                              @CookieValue(name = "Access_token", required = false) String accessToken,
+                              @CookieValue(name = "Access_token", required = false) String accessToken,
                               RedirectAttributes redirectAttributes, Model model) {
-
-
         try {
             long MAX_SIZE = 5 * 1024 * 1024; // 5MB
-
+            System.out.println(backImg + "  27");
             if (frontImg != null && frontImg.getSize() > MAX_SIZE) {
                 redirectAttributes.addFlashAttribute("toastMessage", "Ảnh mặt trước vượt quá 5MB!");
                 redirectAttributes.addFlashAttribute("toastType", "error");
@@ -38,15 +38,18 @@ public class BookingController {
                 redirectAttributes.addFlashAttribute("toastType", "error");
                 return "redirect:/detail/" + bookingDTO.getRoomId();
             }
-//            if (accessToken == null || accessToken.isEmpty()) {
-//                return "redirect:/auth/login";
-//            }
-            String rediect = bookingService.saveBooking(bookingDTO, frontImg, backImg, redirectAttributes, "", model);
+            if (accessToken == null || accessToken.isEmpty()) {
+                return "redirect:/auth/login";
+            }
+            String rediect = bookingService.saveBooking(bookingDTO, frontImg, backImg, redirectAttributes, accessToken);
             return rediect;
 
         } catch (Exception e) {
-            System.out.println("test");
-            System.out.println(e.getMessage());
+            System.out.println(e.getMessage() + " test 46");
+            if (e.getMessage().equalsIgnoreCase("Empty file")) {
+
+                return "redirect:/detail/" + bookingDTO.getRoomId();
+            }
             return "redirect:/auth/login";
         }
     }
