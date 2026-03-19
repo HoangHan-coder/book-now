@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking,Long> {
     List<Booking> getByBookingStatus(String bookingStatus);
+
     @Query("SELECT COUNT(b) > 0 FROM Booking b " +
             "WHERE b.room.roomId = :roomId " +
             "AND b.bookingStatus <> 'CANCELLED' " +
@@ -18,4 +19,7 @@ public interface BookingRepository extends JpaRepository<Booking,Long> {
     boolean isRoomOccupied(@Param("roomId") Long roomId,
                            @Param("shiftStart") LocalDateTime shiftStart,
                            @Param("shiftEnd") LocalDateTime shiftEnd);
+
+    Booking getByBookingCode(String bookingCode);
 }
+

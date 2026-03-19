@@ -73,4 +73,8 @@ public class Booking {
     @OneToMany(mappedBy = "booking")
     private List<Scheduler> schedulers = new ArrayList<>();
     private String note;
+
+    @ColumnDefault("sysdatetime()")
+    @Column(name = "update_at", nullable = false)
+    private LocalDateTime updateAt;
 }

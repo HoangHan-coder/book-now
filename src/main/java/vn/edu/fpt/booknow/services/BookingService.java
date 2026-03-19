@@ -5,6 +5,7 @@ import com.cloudinary.utils.ObjectUtils;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -226,7 +227,7 @@ public class BookingService {
            WorkShift lastShift = allShifts.get(allShifts.size() - 1);
 
            // 1. Tính tổng tiền của TẤT CẢ các ca đã chọn
-           BigDecimal totalAmount = calculateTotalAmount(allShifts, bookingDTO.getRoomId(), redirectAttributes);
+           BigDecimal totalAmount = calculateTotalAmount(allShifts, bookingDTO.getRoomId());
 
            LocalDateTime checkInDate = firstShift.getStartTime();
            LocalDateTime checkOutDate = lastShift.getEndTime();
@@ -247,8 +248,8 @@ public class BookingService {
            newBooking.setCheckInTime(checkInDate);
            newBooking.setCheckOutTime(checkOutDate);
            newBooking.setTotalAmount(totalAmount);
-           newBooking.setBookingStatus("PENDING");
-           newBooking.setBookingCode("BK-" + System.currentTimeMillis());
+           newBooking.setBookingStatus("PENDING_PAYMENT");
+           newBooking.setBookingCode(generateUniqueBookingCode());
            newBooking.setCreatedAt(LocalDateTime.now());
            newBooking.setNote(bookingDTO.getNote());
 
@@ -261,7 +262,7 @@ public class BookingService {
            System.out.println(" - Ca kết thúc: " + lastShift.getShiftType());
            System.out.println(" - CHECK-IN:  " + checkInDate);
            System.out.println(" - CHECK-OUT: " + checkOutDate);
-           System.out.println(" - Tổng tiền: " + calculateTotalAmount(allShifts, bookingDTO.getRoomId(), redirectAttributes));
+           System.out.println(" - Tổng tiền: " + calculateTotalAmount(allShifts, bookingDTO.getRoomId()));
            System.out.println("====================================");
            Booking savedBooking = bookingRepository.save(newBooking);
 
@@ -293,10 +294,7 @@ public class BookingService {
      * Sáng, Chiều, Tối = basePrice
      * Đêm = overnightPrice
      */
-    public BigDecimal calculateTotalAmount(List<WorkShift> group, Long roomId, RedirectAttributes redirectAttributes) {
-        // 1. Lấy thông tin phòng từ DB
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phòng ID: " + roomId));
+    public BigDecimal calculateTotalAmount(List<WorkShift> group, Long roomId) {
 
         // 2. Lấy giá cấu hình của phòng
         Room room1 = roomRepository.getPrice(roomId);
@@ -315,6 +313,23 @@ public class BookingService {
         }
 
         return total;
+    }
+    public String generateUniqueBookingCode() {
+        String newCode;
+        Booking isExisted = new Booking();
+
+        do {
+            // Tạo mã theo format BK + Timestamp hiện tại
+            // Ví dụ: BK-1710912345678
+            newCode = "BK-" + System.currentTimeMillis();
+
+            // Kiểm tra mã này đã tồn tại trong DB chưa
+            isExisted = bookingRepository.getByBookingCode(newCode);
+
+            // Nếu đã tồn tại (isExisted = true), vòng lặp sẽ tiếp tục chạy lại
+        } while (isExisted != null);
+
+        return newCode;
     }
     private boolean isRateLimited(String username) {
         Bucket bucket = cache.computeIfAbsent(username, k -> createNewBucket());
@@ -417,5 +432,68 @@ public class BookingService {
         if (slotName.contains("Tối")) return "Tối";
         return "Đêm";
     }
+    public Booking getFindCode(String code) {
+        Booking booking = bookingRepository.getByBookingCode(code);
+        return booking;
+    }
+    @Transactional
+    public String completeOfflineCheckin(Booking bookingData, MultipartFile frontImg, MultipartFile backImg, RedirectAttributes redirectAttributes) {
+        // 1. Lấy dữ liệu gốc từ DB
+        Booking existingBooking = bookingRepository.findById(bookingData.getBookingId())
+                .orElseThrow(() -> new RuntimeException("Booking không tồn tại"));
 
+        // 2. Cập nhật các trường thông tin cơ bản
+        existingBooking.setNote(bookingData.getNote());
+        existingBooking.setBookingStatus("CHECKED_IN");
+        existingBooking.setUpdateAt(LocalDateTime.now());
+
+        // 3. Xử lý ảnh mặt trước
+        if (frontImg != null && !frontImg.isEmpty()) {
+            try {
+                String frontUrl = uploadToCloudinary(frontImg);
+                // CHỈ set khi upload thành công file mới
+                existingBooking.setIdCardFrontUrl(frontUrl);
+            } catch (IOException e) {
+                return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt trước!", bookingData.getBookingId());
+            }
+        }
+        // Nếu không có frontImg mới, existingBooking.getIdCardFrontUrl() vẫn giữ giá trị cũ từ DB
+
+        // 4. Xử lý ảnh mặt sau
+        if (backImg != null && !backImg.isEmpty()) {
+            try {
+                String backUrl = uploadToCloudinary(backImg);
+                // CHỈ set khi upload thành công file mới
+                existingBooking.setIdCardBackUrl(backUrl);
+            } catch (IOException e) {
+                return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt sau!", bookingData.getBookingId());
+            }
+        }
+
+        // 5. Lưu lại Booking đã cập nhật
+        bookingRepository.save(existingBooking);
+
+        redirectAttributes.addFlashAttribute("toastMessage", "Check-in thành công!");
+        redirectAttributes.addFlashAttribute("toastType", "success");
+
+        return "redirect:/offline-checkin";
+    }
+    @Transactional
+    public void cancelBookingStatus(Long bookingId) {
+        // 1. Tìm booking
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn đặt phòng để hủy"));
+
+        // 2. Kiểm tra điều kiện (Ví dụ: Không được hủy nếu đã Check-in)
+        if ("CHECKED_IN".equals(booking.getBookingStatus())) {
+            throw new RuntimeException("Không thể hủy đơn đã hoàn tất Check-in!");
+        }
+        System.out.println(bookingId + " test 494");
+        // 3. Cập nhật trạng thái
+        booking.setBookingStatus("FAILED");
+        booking.setUpdateAt(LocalDateTime.now());
+
+        // 4. Lưu lại
+        bookingRepository.save(booking);
+    }
 }

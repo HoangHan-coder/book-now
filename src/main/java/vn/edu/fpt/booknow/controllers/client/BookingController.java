@@ -2,16 +2,14 @@ package vn.edu.fpt.booknow.controllers.client;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.dto.BookingDTO;
 import vn.edu.fpt.booknow.services.BookingService;
 
 @Controller
+@RequestMapping
 public class BookingController {
     private BookingService bookingService;
 
@@ -45,11 +43,6 @@ public class BookingController {
             return rediect;
 
         } catch (Exception e) {
-            System.out.println(e.getMessage() + " test 46");
-            if (e.getMessage().equalsIgnoreCase("Empty file")) {
-
-                return "redirect:/detail/" + bookingDTO.getRoomId();
-            }
             return "redirect:/auth/login";
         }
     }
