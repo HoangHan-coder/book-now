@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor     
 public class DetailRoomDTO {
     private Long roomId;
     private BigDecimal basePrice;
