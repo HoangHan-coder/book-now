@@ -8,9 +8,13 @@ import vn.edu.fpt.booknow.model.dto.FeedbackDetailDTO;
 import vn.edu.fpt.booknow.model.entities.Feedback;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface FeedBackRepository extends JpaRepository<Feedback, Long> {
+public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
+
+    Optional<Feedback> findFeedbacksByBooking_BookingId(Long bookingId);
+
     @Query("""
     SELECT new vn.edu.fpt.booknow.model.dto.FeedbackDetailDTO(
         c.fullName, 

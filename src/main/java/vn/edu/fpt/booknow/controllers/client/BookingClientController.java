@@ -10,10 +10,10 @@ import vn.edu.fpt.booknow.services.BookingService;
 
 @Controller
 @RequestMapping
-public class BookingController {
+public class BookingClientController {
     private BookingService bookingService;
 
-    public BookingController(BookingService bookingService) {
+    public BookingClientController(BookingService bookingService) {
         this.bookingService = bookingService;
     }
 
@@ -28,13 +28,13 @@ public class BookingController {
             if (frontImg != null && frontImg.getSize() > MAX_SIZE) {
                 redirectAttributes.addFlashAttribute("toastMessage", "Ảnh mặt trước vượt quá 5MB!");
                 redirectAttributes.addFlashAttribute("toastType", "error");
-                return "redirect:/detail/" + bookingDTO.getRoomId();
+                return "redirect:/detail/" + bookingDTO.getRoom().getRoomId();
             }
 
             if (backImg != null && backImg.getSize() > MAX_SIZE) {
                 redirectAttributes.addFlashAttribute("toastMessage", "Ảnh mặt sau vượt quá 5MB!");
                 redirectAttributes.addFlashAttribute("toastType", "error");
-                return "redirect:/detail/" + bookingDTO.getRoomId();
+                return "redirect:/detail/" + bookingDTO.getRoom().getRoomId();
             }
             if (accessToken == null || accessToken.isEmpty()) {
                 return "redirect:/auth/login";

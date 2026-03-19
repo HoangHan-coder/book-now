@@ -6,10 +6,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.fpt.booknow.model.dto.*;
 import vn.edu.fpt.booknow.model.entities.*;
-import vn.edu.fpt.booknow.services.FeedBackService;
+import vn.edu.fpt.booknow.services.FeedbackService;
 import vn.edu.fpt.booknow.services.JWTService;
 import vn.edu.fpt.booknow.services.RoomService;
-import vn.edu.fpt.booknow.services.customer.CustomerService;
+import vn.edu.fpt.booknow.services.CustomerService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,8 +23,8 @@ public class RoomController {
     private final CustomerService customerService;
     private RoomService roomService;
     private JWTService jwtService;
-    private FeedBackService feedbackService;
-    public RoomController(RoomService roomService, JWTService jwtService, FeedBackService feedBackService, CustomerService customerService) {
+    private FeedbackService feedbackService;
+    public RoomController(RoomService roomService, JWTService jwtService, FeedbackService feedBackService, CustomerService customerService) {
         this.roomService = roomService;
         this.jwtService = jwtService;
         this.feedbackService = feedBackService;
@@ -64,7 +64,7 @@ public class RoomController {
             if (accessToken != null && !accessToken.isEmpty()) {
                 email = jwtService.extractUserName(accessToken);
                 System.out.println(email);
-                customer = customerService.findCustomer(email);
+                customer = customerService.findCusByEmail(email);
                 booking.setCustomer(customer);
             }
             booking.setCustomer(customer);
@@ -102,7 +102,9 @@ public class RoomController {
                     }
                 }
             }
-            booking.setRoomId(roomId);
+
+            Room room1 = roomService.findRoom(roomId);
+            booking.setRoom(room1);
             DateTimeFormatter formatterr = DateTimeFormatter.ofPattern("dd/MM/yyyy"); // Dùng "/" để dễ nhìn
 
             List<String> monthDateStrings = IntStream.range(0, 365)

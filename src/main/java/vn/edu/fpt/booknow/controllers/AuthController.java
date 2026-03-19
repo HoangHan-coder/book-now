@@ -23,7 +23,7 @@ import vn.edu.fpt.booknow.services.CustomerService;
 import vn.edu.fpt.booknow.services.StaffAccountService;
 import vn.edu.fpt.booknow.services.MailService;
 import vn.edu.fpt.booknow.services.RecaptchaService;
-import vn.edu.fpt.booknow.services.customer.CustomerService;
+import vn.edu.fpt.booknow.services.CustomerService;
 
 import java.util.Objects;
 import java.util.regex.Pattern;

@@ -3,7 +3,6 @@ package vn.edu.fpt.booknow.services;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.edu.fpt.booknow.dto.BookingUpdateMessage;
 import vn.edu.fpt.booknow.model.entities.Booking;
 import vn.edu.fpt.booknow.model.entities.BookingStatus;
 import vn.edu.fpt.booknow.repositories.BookingRepository;
@@ -56,24 +55,9 @@ public class BookingUpdateService {
 
         Booking savedBooking = bookingRepository.save(booking);
 
-        notifyBookingUpdate(savedBooking);
+
     }
 
-    private void notifyBookingUpdate(Booking booking) {
-        BookingUpdateMessage message = new BookingUpdateMessage(
-                booking.getBookingCode(),
-                booking.getBookingStatus(),
-                booking.getCustomer().getFullName(),
-                booking.getRoom().getRoomNumber(),
-                booking.getCheckInTime(),
-                booking.getCheckOutTime(),
-                booking.getUpdateAt(),
-                "STATUS_CHANGED"
-        );
-
-        // Send to all staff members listening on /topic/booking-updates
-        messagingTemplate.convertAndSend("/topic/booking-updates", message);
-    }
 
     public Booking getBookingOrThrow(String bookingCode) {
         return bookingRepository.findByBookingCodeWithDetails(bookingCode)
@@ -128,8 +112,6 @@ public class BookingUpdateService {
                 booking.setBookingStatus(BookingStatus.CHECKED_OUT);
 
                 Booking savedBooking = bookingRepository.save(booking);
-
-                notifyBookingUpdate(savedBooking);
             }
         }
     }
