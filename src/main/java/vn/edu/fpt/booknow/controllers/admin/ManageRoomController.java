@@ -87,7 +87,8 @@ public class ManageRoomController {
             return "private/Admin_dashboard";
 
         } catch (Exception e) {
-            throw new InternalServerException("Dashboard loading failed");
+            e.printStackTrace();
+            throw e;
         }
     }
 
@@ -291,8 +292,10 @@ public class ManageRoomController {
                 .map(ra -> ra.getAmenity().getAmenityId())
                 .toList();
 
+        List<RoomStatus> allowedStatuses = manageRoomServices.getAllowedStatusesWithCurrent(room.getStatus());
 
         model.addAttribute("room", room);
+        model.addAttribute("allowedStatuses", allowedStatuses);
         model.addAttribute("roomType",roomTypeService.findAll());
         model.addAttribute("allAmenities", amenityService.findAll());
         model.addAttribute("roomAmenityIds", roomAmenityIds);

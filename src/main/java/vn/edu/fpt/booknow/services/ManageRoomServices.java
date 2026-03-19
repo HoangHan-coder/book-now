@@ -45,6 +45,7 @@ public class ManageRoomServices {
     private AmenityRepository amenityRepository;
     private ImageRepository imageRepository;
     private BookingRepository bookingRepository;
+    private PaymentRepository paymentRepository;
     private Cloudinary cloudinary;
 
     private static final long MAX_FILE_SIZE = 2 * 1024 * 1024;
@@ -55,17 +56,18 @@ public class ManageRoomServices {
             "image/webp"
     );
 
-    public ManageRoomServices(RoomRepository roomRepository, RoomAmenityRepository roomAmenityRepository, RoomTypeRepository roomTypeRepository, AmenityRepository amenityRepository, ImageRepository imageRepository, BookingRepository bookingRepository, Cloudinary cloudinary) {
+    public ManageRoomServices(RoomRepository roomRepository, RoomAmenityRepository roomAmenityRepository, RoomTypeRepository roomTypeRepository, AmenityRepository amenityRepository, ImageRepository imageRepository, BookingRepository bookingRepository, PaymentRepository paymentRepository, Cloudinary cloudinary) {
         this.roomRepository = roomRepository;
         this.roomAmenityRepository = roomAmenityRepository;
         this.roomTypeRepository = roomTypeRepository;
         this.amenityRepository = amenityRepository;
         this.imageRepository = imageRepository;
         this.bookingRepository = bookingRepository;
+        this.paymentRepository = paymentRepository;
         this.cloudinary = cloudinary;
     }
 
-    /* ======================================================
+   /* ======================================================
                        FILTER ROOM
     ====================================================== */
 
@@ -158,6 +160,49 @@ public class ManageRoomServices {
         }
     }
 
+    @Transactional
+    public List<RoomStatus> getAllowedStatusesWithCurrent(RoomStatus currentStatus) {
+        if (currentStatus == null) return List.of();
+
+        // Lấy các trạng thái cho phép chuyển sang
+        List<RoomStatus> allowed;
+        switch (currentStatus) {
+            case AVAILABLE -> allowed = List.of(RoomStatus.BOOKED, RoomStatus.OUT_OF_SERVICE, RoomStatus.MAINTENANCE);
+            case BOOKED -> allowed = List.of(RoomStatus.OCCUPIED);
+            case OCCUPIED -> allowed = List.of(RoomStatus.DIRTY);
+            case DIRTY -> allowed = List.of(RoomStatus.CLEANING);
+            case CLEANING -> allowed = List.of(RoomStatus.AVAILABLE);
+            case MAINTENANCE -> allowed = List.of(RoomStatus.AVAILABLE);
+            case OUT_OF_SERVICE -> allowed = List.of(RoomStatus.AVAILABLE, RoomStatus.MAINTENANCE);
+            case DELETED -> allowed = List.of();
+            default -> allowed = List.of(currentStatus);
+        }
+
+        // Thêm trạng thái hiện tại nếu chưa có
+        if (!allowed.contains(currentStatus)) {
+            List<RoomStatus> result = new ArrayList<>();
+            result.add(currentStatus);
+            result.addAll(allowed);
+            return result;
+        }
+
+        return allowed;
+    }
+
+
+    private boolean isValidTransition(RoomStatus current, RoomStatus next) {
+        return switch (current) {
+            case AVAILABLE -> List.of(RoomStatus.BOOKED, RoomStatus.OUT_OF_SERVICE, RoomStatus.MAINTENANCE).contains(next);
+            case BOOKED -> List.of(RoomStatus.OCCUPIED).contains(next);
+            case OCCUPIED -> List.of(RoomStatus.DIRTY).contains(next);
+            case DIRTY -> List.of(RoomStatus.CLEANING).contains(next);
+            case CLEANING -> List.of(RoomStatus.AVAILABLE).contains(next);
+            case MAINTENANCE -> List.of(RoomStatus.AVAILABLE).contains(next);
+            case OUT_OF_SERVICE -> List.of(RoomStatus.AVAILABLE, RoomStatus.MAINTENANCE).contains(next);
+            default -> false;
+        };
+    }
+
     /* ======================================================
                        EDIT ROOM
     ====================================================== */
@@ -207,12 +252,21 @@ public class ManageRoomServices {
         room.getRoomType().setBasePrice(basePrice);
         room.getRoomType().setOverPrice(overPrice);
 
+        RoomStatus currentStatus = room.getStatus();
+
         if (status == null) {
             throw new IllegalArgumentException("Trạng thái phòng là bắt buộc");
         }
         if (status.equals(RoomStatus.DELETED)) {
             throw new IllegalArgumentException("Không tùy chỉnh được trạng thái này");
         }
+
+        if (!currentStatus.equals(status) && !isValidTransition(currentStatus, status)) {
+            throw new IllegalArgumentException(
+                    "Không thể chuyển từ " + currentStatus + " sang " + status
+            );
+        }
+
         room.setStatus(status);
 
         /* ===== 3. UPDATE ROOM TYPE ===== */
@@ -706,29 +760,25 @@ public class ManageRoomServices {
        ===================== */
 
         int bookingCount =
-                bookingRepository.countByCreatedAtBetweenAndBookingStatusNot(
+                bookingRepository.countByBookingStatusAndCheckOutTimeBetween(
+                        "COMPLETED",
                         startTime,
-                        endTime,
-                        "DELETED"
+                        endTime
                 );
 
     /* =====================
        REVENUE
        ===================== */
 
-        long revenue = bookingRepository.sumRevenue(startTime, endTime);
+        long revenue = bookingRepository.sumRevenueCompleted(startTime, endTime);
 
-    /* =====================
-       ROOM STATS
-       ===================== */
+        //tiền đã thu
+        BigDecimal total = paymentRepository.getTotalRevenue(startTime, endTime);
+        long revenueReceived = (total != null) ? total.longValue() : 0;
 
-        int totalRooms =
-                roomRepository.countByStatusNot(RoomStatus.DELETED);
-
-        int activeRooms =
-                roomRepository.countByStatusIn(
-                        List.of("BOOKED", "OCCUPIED")
-                );
+        //tổng số phòng
+        long totalRooms = roomRepository.count();
+        long activeRooms = bookingRepository.countActiveRooms(startTime, endTime);
 
     /* =====================
        PERIOD COMPARISON
@@ -790,7 +840,7 @@ public class ManageRoomServices {
     /* =====================
        PREVIOUS REVENUE
        ===================== */
-        long prevRevenue = bookingRepository.sumRevenue(prevStartTime, prevEndTime);
+        long prevRevenue = bookingRepository.sumRevenueCompleted(prevStartTime, prevEndTime);
 
         double revenuePercent;
 
@@ -820,12 +870,14 @@ public class ManageRoomServices {
         Map<String, Integer> statusMap = new HashMap<>();
 
         for (Object[] row : bookingRepository.countByStatus(startTime, endTime)) {
-            statusMap.put((String) row[0], ((Long) row[1]).intValue());
+            String status = (String) row[0];
+            Number countNumber = (Number) row[1]; // cast chung cho Number
+            int count = countNumber != null ? countNumber.intValue() : 0;
+            statusMap.put(status, count);
         }
 
-        int paid = statusMap.getOrDefault("PAID", 0);
-        int pending = statusMap.getOrDefault("PENDING", 0);
-        int failed = statusMap.getOrDefault("FAILED", 0);
+        int totalBookings = bookingRepository.countAllByCreatedAt(startTime, endTime);
+
 
         // Lượng đặt phòng
         List<Integer> chartData = new ArrayList<>();
@@ -847,12 +899,18 @@ public class ManageRoomServices {
             Map<LocalDate, Integer> bookingMap = new HashMap<>();
             Map<LocalDate, Long> revenueMap = new HashMap<>();
 
-            for (Object[] row : bookingRepository.countByDate(startTime, endTime)) {
-                bookingMap.put(((java.sql.Date) row[0]).toLocalDate(), ((Long) row[1]).intValue());
+            for (Object[] row : bookingRepository.revenueByDateCompleted(startTime, endTime)) {
+                LocalDate date = ((java.sql.Date) row[0]).toLocalDate();
+                Number countNumber = (Number) row[1];
+                int count = countNumber != null ? countNumber.intValue() : 0;
+                bookingMap.put(date, count);
             }
 
             for (Object[] row : bookingRepository.revenueByDate(startTime, endTime)) {
-                revenueMap.put(((java.sql.Date) row[0]).toLocalDate(), ((Long) row[1]));
+                LocalDate date = ((java.sql.Date) row[0]).toLocalDate();
+                Number revenueNumber = (Number) row[1];
+                long revenueAmount = revenueNumber != null ? revenueNumber.longValue() : 0L;
+                revenueMap.put(date, revenueAmount);
             }
 
             while (!current.isAfter(end)) {
@@ -877,13 +935,20 @@ public class ManageRoomServices {
             Map<LocalDate, Integer> bookingMap = new HashMap<>();
             Map<LocalDate, Long> revenueMap = new HashMap<>();
 
-            for (Object[] row : bookingRepository.countByDate(startTime, endTime)) {
-                bookingMap.put(((java.sql.Date) row[0]).toLocalDate(), ((Long) row[1]).intValue());
+            for (Object[] row : bookingRepository.revenueByDateCompleted(startTime, endTime)) {
+                LocalDate date = ((java.sql.Date) row[0]).toLocalDate();
+                Number countNum = (Number) row[1];
+                int count = countNum != null ? countNum.intValue() : 0;
+                bookingMap.put(date, count);
             }
 
             for (Object[] row : bookingRepository.revenueByDate(startTime, endTime)) {
-                revenueMap.put(((java.sql.Date) row[0]).toLocalDate(), ((Long) row[1]));
+                LocalDate date = ((java.sql.Date) row[0]).toLocalDate();
+                Number revenueNum = (Number) row[1];
+                long revenueAmount = revenueNum != null ? revenueNum.longValue() : 0L;
+                revenueMap.put(date, revenueAmount);
             }
+
 
             while (!current.isAfter(end)) {
 
@@ -942,7 +1007,7 @@ public class ManageRoomServices {
                         monthEnd.atTime(23, 59, 59)
                 );
 
-                long monthRevenue = bookingRepository.sumRevenue(
+                long monthRevenue = bookingRepository.sumRevenueCompleted(
                         current.atStartOfDay(),
                         monthEnd.atTime(23, 59, 59)
                 );
@@ -987,7 +1052,7 @@ public class ManageRoomServices {
                 );
 
                 long quarterRevenue =
-                        bookingRepository.sumRevenue(
+                        bookingRepository.sumRevenueCompleted(
                                 quarterStart.atStartOfDay(),
                                 quarterEnd.atTime(23, 59, 59)
                         );
@@ -1006,7 +1071,11 @@ public class ManageRoomServices {
     /* =====================
        SET DTO
        ===================== */
-        dto.setStatusData(List.of(paid, pending, failed));
+        dto.setRevenueReceived(revenueReceived);
+        dto.setStatusData(new ArrayList<>(statusMap.values()));
+        dto.setStatusLabels(new ArrayList<>(statusMap.keySet()));
+        dto.setTotalBookings(totalBookings);
+
         dto.setQuarterBookings(chartData);
         dto.setQuarterLabels(chartLabels);
         dto.setChartTitle(chartTitle);

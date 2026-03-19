@@ -15,8 +15,6 @@ import java.util.Optional;
 public interface RoomRepository extends JpaRepository<Room, Long>, JpaSpecificationExecutor<Room> {
     boolean existsByRoomNumber(String roomNumber);
 
-    // đếm phòng đang hoạt động
-    int countByStatusIn(List<String> statuses);
 
     // tổng phòng (không tính DELETED)
     int countByStatusNot(RoomStatus status);

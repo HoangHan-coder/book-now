@@ -110,7 +110,16 @@
                     <p class="text-sm text-gray-500 mt-1">Xem thông tin phòng <span th:text="${room.roomNumber}" class="font-bold text-gray-700"></span></p>
                 </div>
             </div>
+        </div>
 
+        <div th:if="${successMessage}"
+             class="bg-green-100 text-green-800 px-4 py-3 rounded mb-4">
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <div th:if="${errorMessage}"
+             class="bg-red-100 text-red-800 px-4 py-3 rounded mb-4">
+            <span th:text="${errorMessage}"></span>
         </div>
 
         <!-- INFO CARD -->

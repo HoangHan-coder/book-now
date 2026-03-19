@@ -195,28 +195,11 @@
                                 <label class="block text-sm font-medium text-gray-700">Trạng thái hiện tại</label>
                                 <select name="status"
                                         class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white">
-
-                                    <option value="AVAILABLE"
-                                            th:selected="${room.status.name() == 'AVAILABLE'}">AVAILABLE</option>
-
-                                    <option value="DIRTY"
-                                            th:selected="${room.status.name() == 'DIRTY'}">DIRTY</option>
-
-                                    <option value="CLEANING"
-                                            th:selected="${room.status.name() == 'CLEANING'}">CLEANING</option>
-
-                                    <option value="BOOKED"
-                                            th:selected="${room.status.name() == 'BOOKED'}">BOOKED</option>
-
-                                    <option value="OCCUPIED"
-                                            th:selected="${room.status.name() == 'OCCUPIED'}">OCCUPIED</option>
-
-                                    <option value="MAINTENANCE"
-                                            th:selected="${room.status.name() == 'MAINTENANCE'}">MAINTENANCE</option>
-
-                                    <option value="OUT_OF_SERVICE"
-                                            th:selected="${room.status.name() == 'OUT_OF_SERVICE'}">OUT_OF_SERVICE</option>
-
+                                    <option th:each="s : ${allowedStatuses}"
+                                            th:value="${s.name()}"
+                                            th:selected="${s.name() == room.status.name()}">
+                                        <span th:text="${s.name()}"></span>
+                                    </option>
                                 </select>
                             </div>
                         </div>

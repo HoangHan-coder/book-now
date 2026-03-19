@@ -7,9 +7,11 @@ public class DashboardDTO {
 
     private long revenue;
 
-    private int totalRooms;
+    private long revenueReceived;
 
-    private int activeRooms;
+    private long totalRooms;
+
+    private long activeRooms;
 
     private int totalCustomers;
 
@@ -29,6 +31,8 @@ public class DashboardDTO {
 
     private List<Integer> statusData;
 
+    private int totalBookings;
+
     private List<Integer> quarterBookings;
 
     private List<String> quarterLabels;
@@ -39,8 +43,12 @@ public class DashboardDTO {
 
     private List<Long> revenueData;
 
-    // getter setter
+    private String dateLabel;
 
+    private List<String> statusLabels;
+
+
+    // getter setter
 
     public int getBookingCount() {
         return bookingCount;
@@ -58,19 +66,27 @@ public class DashboardDTO {
         this.revenue = revenue;
     }
 
-    public int getTotalRooms() {
+    public long getRevenueReceived() {
+        return revenueReceived;
+    }
+
+    public void setRevenueReceived(long revenueReceived) {
+        this.revenueReceived = revenueReceived;
+    }
+
+    public long getTotalRooms() {
         return totalRooms;
     }
 
-    public void setTotalRooms(int totalRooms) {
+    public void setTotalRooms(long totalRooms) {
         this.totalRooms = totalRooms;
     }
 
-    public int getActiveRooms() {
+    public long getActiveRooms() {
         return activeRooms;
     }
 
-    public void setActiveRooms(int activeRooms) {
+    public void setActiveRooms(long activeRooms) {
         this.activeRooms = activeRooms;
     }
 
@@ -146,6 +162,14 @@ public class DashboardDTO {
         this.statusData = statusData;
     }
 
+    public int getTotalBookings() {
+        return totalBookings;
+    }
+
+    public void setTotalBookings(int totalBookings) {
+        this.totalBookings = totalBookings;
+    }
+
     public List<Integer> getQuarterBookings() {
         return quarterBookings;
     }
@@ -185,5 +209,23 @@ public class DashboardDTO {
     public void setRevenueData(List<Long> revenueData) {
         this.revenueData = revenueData;
     }
+
+    public String getDateLabel() {
+        return dateLabel;
+    }
+
+    public void setDateLabel(String dateLabel) {
+        this.dateLabel = dateLabel;
+    }
+
+    public List<String> getStatusLabels() {
+        return statusLabels;
+    }
+
+    public void setStatusLabels(List<String> statusLabels) {
+        this.statusLabels = statusLabels;
+    }
+
+
 }
 
