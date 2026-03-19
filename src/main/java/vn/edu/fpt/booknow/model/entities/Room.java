@@ -47,6 +47,8 @@ public class Room {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 
+
+
     @OneToMany(mappedBy = "room")
     private List<Booking> bookings = new ArrayList<>();
 

@@ -96,4 +96,6 @@ public class Booking {
     @Column(name = "id_card_back_public_id")
     private String idCardBackPublicId;
 
+    @OneToMany(mappedBy = "booking")
+    private List<Scheduler> schedulers = new ArrayList<>();
 }

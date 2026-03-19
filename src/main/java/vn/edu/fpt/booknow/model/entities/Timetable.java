@@ -9,8 +9,9 @@ import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalTime;
 
-@Getter
-@Setter
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "Timetable", schema = "dbo")
 public class Timetable {

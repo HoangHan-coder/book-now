@@ -10,13 +10,9 @@ import vn.edu.fpt.booknow.model.entities.StaffAccount;
 import vn.edu.fpt.booknow.model.map.CustomerDetails;
 import vn.edu.fpt.booknow.model.map.StaffUserDetails;
 import vn.edu.fpt.booknow.repositories.CustomerRepository;
-import vn.edu.fpt.booknow.repositories.StaffAccountRepository;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
-
-    @Autowired
-    private StaffAccountRepository staffAccountRepository;
 
     @Autowired
     private CustomerRepository customerRepository;

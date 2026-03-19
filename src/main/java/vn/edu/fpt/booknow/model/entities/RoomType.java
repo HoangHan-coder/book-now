@@ -17,7 +17,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "RoomType", schema = "dbo", uniqueConstraints = {
-        @UniqueConstraint(name = "UQ_RoomType_Name", columnNames = {"name"})
+                @UniqueConstraint(name = "UQ_RoomType_Name", columnNames = { "name" })
 })
 public class RoomType {
 
@@ -61,5 +61,5 @@ public class RoomType {
         private Boolean isDeleted;
 
         @OneToMany(mappedBy = "roomType")
-    private List<Room> rooms = new ArrayList<>();
+        private List<Room> rooms = new ArrayList<>();
 }

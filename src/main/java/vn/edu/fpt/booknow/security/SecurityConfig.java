@@ -47,8 +47,9 @@ public class SecurityConfig {
                 .securityMatcher("/admin/**")
                 .authenticationProvider(staffAuthProvider())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/login","/auth/logout", "/public/**", "/home","/pay/**",
-                                "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password").permitAll()
+                        .requestMatchers("/admin/login","/auth/login","/auth/logout", "/public/**", "/home","/search","/detail/**","/pay/**",
+                                "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password",
+                                "/404").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -70,13 +71,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login",
                                 "/auth/logout", "/register",
-                                "/public/**", "/home",
-                                "/pay/**",
-                                "/forgot-password",
-                                "/verify-otp",
-                                "/resend-otp",
+                                "/public/**", "/home","/pay/**", 
+                                "/home","/search","/detail/**",
+                                "/forgot-password", 
+                                "/verify-otp", 
+                                "/resend-otp", 
                                 "/reset-password",
-                                "/error/**").permitAll()
+                                "/404").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
