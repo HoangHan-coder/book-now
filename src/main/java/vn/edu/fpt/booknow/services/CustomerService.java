@@ -22,7 +22,6 @@ public class CustomerService {
 
     @Autowired
     private JWTService jwtService;
-
     public boolean verify(Customer users, HttpServletResponse response) {
         System.out.println("Verify customer is running..");
         try {
@@ -45,7 +44,6 @@ public class CustomerService {
         }
         return false;
     }
-
     public Customer findCusByEmail(String email) {
         return customerRepository.findCustomerByEmail(email).orElse(null);
     }
