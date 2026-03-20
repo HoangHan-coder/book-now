@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import vn.edu.fpt.booknow.model.dto.UserDetailDTO;
 import vn.edu.fpt.booknow.model.entities.StaffAccount;
 import vn.edu.fpt.booknow.repositories.StaffAccountRepository;
+import vn.edu.fpt.booknow.services.MailService;
 
 import java.util.Map;
 import java.util.Optional;
@@ -20,12 +21,15 @@ public class EditStaffAccountService {
 
     private final StaffAccountRepository repository;
     private final Cloudinary cloudinary;
+    private final MailService mailService;
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
 
     public EditStaffAccountService(StaffAccountRepository repository,
-                                   Cloudinary cloudinary) {
+                                   Cloudinary cloudinary,
+                                   MailService mailService) {
         this.repository = repository;
         this.cloudinary = cloudinary;
+        this.mailService = mailService;
     }
 
     // UC-17.x: Get Staff Account for Edit
@@ -103,12 +107,17 @@ public class EditStaffAccountService {
         staff.setStatus(status);
 
 // UPDATE PASSWORD
-        updatePassword(staff, newPassword, confirmNewPassword);
+        boolean isPasswordChanged = updatePassword(staff, newPassword, confirmNewPassword);
 
 // upload avatar nếu có
         uploadAvatar(avatar, staff);
 
         repository.save(staff);
+// gửi mail
+        if (isPasswordChanged) {
+            mailService.sendNewPassword(staff.getEmail(), newPassword);
+        }
+
     }
 
     // UC-17.x: Validate input rules
@@ -142,13 +151,13 @@ public class EditStaffAccountService {
         }
     }
 
-    private void updatePassword(StaffAccount staff,
-                                String newPassword,
-                                String confirmPassword) {
 
-        // không đổi password
+    private boolean updatePassword(StaffAccount staff,
+                                   String newPassword,
+                                   String confirmPassword) {
+
         if (newPassword == null || newPassword.isBlank()) {
-            return;
+            return false;
         }
 
         validatePasswordRule(newPassword);
@@ -158,8 +167,9 @@ public class EditStaffAccountService {
         }
 
         String hashedPassword = hashPassword(newPassword);
-
         staff.setPasswordHash(hashedPassword);
+
+        return true;
     }
 
     private void validatePasswordRule(String password) {

@@ -8,6 +8,7 @@ import vn.edu.fpt.booknow.model.entities.StaffAccount;
 import vn.edu.fpt.booknow.repositories.StaffAccountRepository;
 
 import org.springframework.stereotype.Service;
+import vn.edu.fpt.booknow.services.MailService;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -20,12 +21,15 @@ public class CreateStaffAccountService {
 
     private final StaffAccountRepository repository;
     private final Cloudinary cloudinary;
+    private final MailService mailService;
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
 
     public CreateStaffAccountService(StaffAccountRepository repository,
-                                     Cloudinary cloudinary) {
+                                     Cloudinary cloudinary,
+                                     MailService mailService) {
         this.repository = repository;
         this.cloudinary = cloudinary;
+        this.mailService = mailService;
     }
 
     public void createStaffAccount(StaffAccountCreateDTO dto) {
@@ -37,10 +41,16 @@ public class CreateStaffAccountService {
         }
 
         StaffAccount account = buildEntity(dto);
-
         uploadAvatar(dto.getAvatar(), account);
-
         repository.save(account);
+        // gửi mail
+        mailService.sendAccountCreated(
+                account.getEmail(),
+                account.getFullName(),
+                account.getPhone(),
+                account.getEmail(),
+                dto.getPassword() // dùng password gốc
+        );
     }
 
     private void uploadAvatar(MultipartFile avatar, StaffAccount account) {
