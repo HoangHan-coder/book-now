@@ -87,8 +87,8 @@ public class Booking {
     @Column(name = "note")
     private String note;
 
-    @Column(name = "update_at")
-    private LocalDateTime updateAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Size(max = 255)
     @Column(name = "id_card_font_public_id")

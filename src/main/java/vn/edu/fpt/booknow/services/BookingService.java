@@ -565,7 +565,7 @@ public class BookingService {
         // 2. Cập nhật các trường thông tin cơ bản
         existingBooking.setNote(bookingData.getNote());
         existingBooking.setBookingStatus(BookingStatus.CHECKED_IN);
-        existingBooking.setUpdateAt(LocalDateTime.now());
+        existingBooking.setUpdatedAt(LocalDateTime.now());
 
         // 3. Xử lý ảnh mặt trước
         if (frontImg != null && !frontImg.isEmpty()) {
@@ -611,7 +611,7 @@ public class BookingService {
         System.out.println(bookingId + " test 494");
         // 3. Cập nhật trạng thái
         booking.setBookingStatus(BookingStatus.FAILED);
-        booking.setUpdateAt(LocalDateTime.now());
+        booking.setUpdatedAt(LocalDateTime.now());
 
         // 4. Lưu lại
         bookingRepository.save(booking);
