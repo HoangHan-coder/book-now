@@ -71,7 +71,7 @@ public class Booking {
     private String note;
 
     // ===== UPDATED AT =====
-    @Column(name = "update_at")
+    @Column(name = "updated_at")
     private LocalDateTime updateAt;
 
     // ===== CONSTRUCTOR =====
