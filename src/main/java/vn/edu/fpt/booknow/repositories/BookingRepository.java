@@ -13,7 +13,7 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     // Count all bookings except a specific status
-    int countByCreatedAtBetweenAndBookingStatusNot(
+    int countByCheckOutTimeBetweenAndBookingStatusNot(
             LocalDateTime start,
             LocalDateTime end,
             String bookingStatus
@@ -26,7 +26,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             LocalDateTime end
     );
 
-    int countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    int countByCheckOutTimeBetween(LocalDateTime start, LocalDateTime end);
 
     List<Booking> findByCheckOutTimeBetween(
             LocalDateTime start,
@@ -37,7 +37,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("""
                 SELECT b.bookingStatus, COUNT(b)
                 FROM Booking b
-                WHERE b.createdAt BETWEEN :start AND :end
+                WHERE b.checkOutTime BETWEEN :start AND :end
                 GROUP BY b.bookingStatus
             """)
     List<Object[]> countByStatus(LocalDateTime start, LocalDateTime end);
@@ -45,15 +45,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     // ===============================
     // Doanh thu
     // ===============================
-
-    @Query("""
-                SELECT CAST(b.checkOutTime AS date), COUNT(b)
-                FROM Booking b
-                WHERE b.checkOutTime BETWEEN :start AND :end
-                  AND b.bookingStatus = 'COMPLETED'
-                GROUP BY CAST(b.checkOutTime AS date)
-            """)
-    List<Object[]> bookingCountByDateCompleted(LocalDateTime start, LocalDateTime end);
 
     // Tổng doanh thu chỉ cho booking trạng thái COMPLETED
     @Query("""
@@ -65,14 +56,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     long sumRevenueCompleted(LocalDateTime start, LocalDateTime end);
 
 
-    // Doanh thu theo ngày
-    @Query("""
-                SELECT CAST(b.checkOutTime AS date), SUM(b.totalAmount)
-                FROM Booking b
-                WHERE b.checkOutTime BETWEEN :start AND :end
-                GROUP BY CAST(b.checkOutTime AS date)
-            """)
-    List<Object[]> revenueByDate(LocalDateTime start, LocalDateTime end);
 
     // Doanh thu theo ngày chỉ cho COMPLETED
     @Query("""
@@ -87,9 +70,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("""
                 SELECT COUNT(b)
                 FROM Booking b
-                WHERE b.createdAt BETWEEN :start AND :end
+                WHERE b.checkOutTime BETWEEN :start AND :end
             """)
-    int countAllByCreatedAt(LocalDateTime start, LocalDateTime end);
+    int countAllByCheckOutTime(LocalDateTime start, LocalDateTime end);
 
     @Query("""
     SELECT COUNT(DISTINCT b.room.roomId)

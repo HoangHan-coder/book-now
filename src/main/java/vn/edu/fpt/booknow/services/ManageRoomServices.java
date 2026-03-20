@@ -29,6 +29,7 @@ import vn.edu.fpt.booknow.controllers.model.dto.DashboardDTO;
 import vn.edu.fpt.booknow.controllers.model.entities.*;
 import vn.edu.fpt.booknow.repositories.*;
 
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -815,7 +816,7 @@ public class ManageRoomServices {
        ===================== */
 
         int prevBookings =
-                bookingRepository.countByCreatedAtBetweenAndBookingStatusNot(
+                bookingRepository.countByCheckOutTimeBetweenAndBookingStatusNot(
                         prevStartTime,
                         prevEndTime,
                         "DELETED"
@@ -876,7 +877,7 @@ public class ManageRoomServices {
             statusMap.put(status, count);
         }
 
-        int totalBookings = bookingRepository.countAllByCreatedAt(startTime, endTime);
+        int totalBookings = bookingRepository.countAllByCheckOutTime(startTime, endTime);
 
 
         // Lượng đặt phòng
@@ -906,7 +907,7 @@ public class ManageRoomServices {
                 bookingMap.put(date, count);
             }
 
-            for (Object[] row : bookingRepository.revenueByDate(startTime, endTime)) {
+            for (Object[] row : bookingRepository.revenueByDateCompleted(startTime, endTime)) {
                 LocalDate date = ((java.sql.Date) row[0]).toLocalDate();
                 Number revenueNumber = (Number) row[1];
                 long revenueAmount = revenueNumber != null ? revenueNumber.longValue() : 0L;
@@ -942,7 +943,7 @@ public class ManageRoomServices {
                 bookingMap.put(date, count);
             }
 
-            for (Object[] row : bookingRepository.revenueByDate(startTime, endTime)) {
+            for (Object[] row : bookingRepository.revenueByDateCompleted(startTime, endTime)) {
                 LocalDate date = ((java.sql.Date) row[0]).toLocalDate();
                 Number revenueNum = (Number) row[1];
                 long revenueAmount = revenueNum != null ? revenueNum.longValue() : 0L;
@@ -1002,7 +1003,7 @@ public class ManageRoomServices {
                     monthEnd = end;
                 }
 
-                int count = bookingRepository.countByCreatedAtBetween(
+                int count = bookingRepository.countByCheckOutTimeBetween(
                         current.atStartOfDay(),
                         monthEnd.atTime(23, 59, 59)
                 );
@@ -1046,7 +1047,7 @@ public class ManageRoomServices {
                                         quarterStart.plusMonths(2).lengthOfMonth()
                                 );
 
-                int count = bookingRepository.countByCreatedAtBetween(
+                int count = bookingRepository.countByCheckOutTimeBetween(
                         quarterStart.atStartOfDay(),
                         quarterEnd.atTime(23, 59, 59)
                 );
@@ -1100,6 +1101,8 @@ public class ManageRoomServices {
     @Transactional
     public void exportCSV(String startDate, String endDate, HttpServletResponse response) throws Exception {
 
+        DashboardDTO dashboard = getDashboard(startDate, endDate);
+
         LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();
         LocalDateTime end = LocalDate.parse(endDate).atTime(23, 59, 59);
 
@@ -1117,28 +1120,87 @@ public class ManageRoomServices {
         // FIX lỗi tiếng Việt Excel
         writer.write("\uFEFF");
 
+    /* =====================
+       SUMMARY SECTION
+       ===================== */
+
+        writer.println("===== DASHBOARD SUMMARY =====");
+        writer.println("Date Range," + startDate + " - " + endDate);
+        writer.println("Total Bookings," + dashboard.getBookingCount());
+        writer.println("Total Revenue," + dashboard.getRevenue());
+        writer.println("Revenue Received," + dashboard.getRevenueReceived());
+        writer.println("Total Rooms," + dashboard.getTotalRooms());
+        writer.println("Active Rooms," + dashboard.getActiveRooms());
+        writer.println("Booking Growth (%)," + dashboard.getBookingPercent());
+        writer.println("Revenue Growth (%)," + dashboard.getRevenuePercent());
+        writer.println();
+
+    /* =====================
+       STATUS BREAKDOWN
+       ===================== */
+
+        writer.println("===== STATUS BREAKDOWN =====");
+
+        List<String> statusLabels = dashboard.getStatusLabels();
+        List<Integer> statusData = dashboard.getStatusData();
+
+        for (int i = 0; i < statusLabels.size(); i++) {
+            writer.println(statusLabels.get(i) + "," + statusData.get(i));
+        }
+
+        writer.println();
+
+    /* =====================
+       CHART DATA (BOOKING)
+       ===================== */
+
+        writer.println("===== BOOKING CHART =====");
+        writer.println("Label,Bookings");
+
+        for (int i = 0; i < dashboard.getQuarterLabels().size(); i++) {
+            writer.println(
+                    dashboard.getQuarterLabels().get(i) + "," +
+                            dashboard.getQuarterBookings().get(i)
+            );
+        }
+
+        writer.println();
+
+    /* =====================
+       CHART DATA (REVENUE)
+       ===================== */
+
+        writer.println("===== REVENUE CHART =====");
+        writer.println("Label,Revenue");
+
+        for (int i = 0; i < dashboard.getRevenueLabels().size(); i++) {
+            writer.println(
+                    dashboard.getRevenueLabels().get(i) + "," +
+                            dashboard.getRevenueData().get(i)
+            );
+        }
+
+        writer.println();
+
+    /* =====================
+       DETAIL BOOKING LIST
+       ===================== */
+
+        writer.println("===== BOOKING DETAIL =====");
         writer.println("Booking Code,Customer,Room,Check-in,Check-out,Status,Total");
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         for (Booking b : bookings) {
 
-            String bookingCode = b.getBookingCode();
-            String customer = b.getCustomer().getFullName();
-            String room = b.getRoom().getRoomNumber();
-            String checkIn = b.getCheckInTime().format(formatter);
-            String checkOut = b.getCheckOutTime().format(formatter);
-            String status = b.getBookingStatus();
-            BigDecimal total = b.getTotalAmount();
-
             writer.println(
-                    bookingCode + "," +
-                            customer + "," +
-                            room + "," +
-                            checkIn + "," +
-                            checkOut + "," +
-                            status + "," +
-                            total
+                    b.getBookingCode() + "," +
+                            b.getCustomer().getFullName() + "," +
+                            b.getRoom().getRoomNumber() + "," +
+                            b.getCheckInTime().format(formatter) + "," +
+                            b.getCheckOutTime().format(formatter) + "," +
+                            b.getBookingStatus() + "," +
+                            b.getTotalAmount()
             );
         }
 
@@ -1154,6 +1216,7 @@ public class ManageRoomServices {
             LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();
             LocalDateTime end = LocalDate.parse(endDate).atTime(23, 59, 59);
 
+            // ✅ Lấy TẤT CẢ booking giống CSV
             List<Booking> bookings =
                     bookingRepository.findByCheckOutTimeBetween(start, end);
 
@@ -1179,13 +1242,48 @@ public class ManageRoomServices {
 
                 Row row = sheet.createRow(rowNum++);
 
-                row.createCell(0).setCellValue(b.getBookingCode());
-                row.createCell(1).setCellValue(b.getCustomer().getFullName());
-                row.createCell(2).setCellValue(b.getRoom().getRoomNumber());
-                row.createCell(3).setCellValue(b.getCheckInTime().format(formatter));
-                row.createCell(4).setCellValue(b.getCheckOutTime().format(formatter));
-                row.createCell(5).setCellValue(b.getBookingStatus());
-                row.createCell(6).setCellValue(b.getTotalAmount().doubleValue());
+                String bookingCode = b.getBookingCode() != null ? b.getBookingCode() : "";
+
+                String customer =
+                        b.getCustomer() != null && b.getCustomer().getFullName() != null
+                                ? b.getCustomer().getFullName()
+                                : "";
+
+                String room =
+                        b.getRoom() != null && b.getRoom().getRoomNumber() != null
+                                ? b.getRoom().getRoomNumber()
+                                : "";
+
+                String checkIn =
+                        b.getCheckInTime() != null
+                                ? b.getCheckInTime().format(formatter)
+                                : "";
+
+                String checkOut =
+                        b.getCheckOutTime() != null
+                                ? b.getCheckOutTime().format(formatter)
+                                : "";
+
+                String status =
+                        b.getBookingStatus() != null ? b.getBookingStatus() : "";
+
+                double total =
+                        b.getTotalAmount() != null
+                                ? b.getTotalAmount().doubleValue()
+                                : 0;
+
+                row.createCell(0).setCellValue(bookingCode);
+                row.createCell(1).setCellValue(customer);
+                row.createCell(2).setCellValue(room);
+                row.createCell(3).setCellValue(checkIn);
+                row.createCell(4).setCellValue(checkOut);
+                row.createCell(5).setCellValue(status);
+                row.createCell(6).setCellValue(total);
+            }
+
+            // ✅ Auto size cho đẹp (khuyên dùng)
+            for (int i = 0; i <= 6; i++) {
+                sheet.autoSizeColumn(i);
             }
 
             response.setContentType(
@@ -1214,6 +1312,7 @@ public class ManageRoomServices {
             LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();
             LocalDateTime end = LocalDate.parse(endDate).atTime(23, 59, 59);
 
+            // ✅ giống CSV / Excel → lấy ALL booking
             List<Booking> bookings =
                     bookingRepository.findByCheckOutTimeBetween(start, end);
 
@@ -1227,14 +1326,14 @@ public class ManageRoomServices {
             PdfWriter writer = new PdfWriter(response.getOutputStream());
             PdfDocument pdf = new PdfDocument(writer);
 
-            /* ===== LOAD FONT (SUPPORT VIETNAMESE) ===== */
+            /* ===== FONT (FIX CHUẨN KHÔNG LỖI JAR) ===== */
+            InputStream fontStream =
+                    new ClassPathResource("fonts/NotoSans-Regular.ttf").getInputStream();
 
-            String fontPath = new ClassPathResource("fonts/NotoSans-Regular.ttf")
+            byte[] fontBytes = fontStream.readAllBytes();
 
-                    .getFile()
-                    .getAbsolutePath();
             PdfFont font = PdfFontFactory.createFont(
-                    fontPath,
+                    fontBytes,
                     PdfEncodings.IDENTITY_H
             );
 
@@ -1242,12 +1341,12 @@ public class ManageRoomServices {
             document.setFont(font);
 
             /* ===== TITLE ===== */
-            Paragraph title = new Paragraph("BOOKING REPORT")
-                    .setBold()
-                    .setFontSize(20)
-                    .setTextAlignment(TextAlignment.CENTER);
-
-            document.add(title);
+            document.add(
+                    new Paragraph("BOOKING REPORT")
+                            .setBold()
+                            .setFontSize(20)
+                            .setTextAlignment(TextAlignment.CENTER)
+            );
 
             document.add(
                     new Paragraph("From " + startDate + " to " + endDate)
@@ -1260,17 +1359,17 @@ public class ManageRoomServices {
             Table table = new Table(
                     UnitValue.createPercentArray(new float[]{10, 25, 8, 12, 12, 13, 20})
             );
-
             table.setWidth(UnitValue.createPercentValue(100));
 
             /* ===== HEADER ===== */
-            table.addHeaderCell(new Cell().add(new Paragraph("Booking Code").setBold()));
-            table.addHeaderCell(new Cell().add(new Paragraph("Customer").setBold()));
-            table.addHeaderCell(new Cell().add(new Paragraph("Room").setBold()));
-            table.addHeaderCell(new Cell().add(new Paragraph("Check-in").setBold()));
-            table.addHeaderCell(new Cell().add(new Paragraph("Check-out").setBold()));
-            table.addHeaderCell(new Cell().add(new Paragraph("Status").setBold()));
-            table.addHeaderCell(new Cell().add(new Paragraph("Total").setBold()));
+            String[] headers = {
+                    "Booking Code", "Customer", "Room",
+                    "Check-in", "Check-out", "Status", "Total"
+            };
+
+            for (String h : headers) {
+                table.addHeaderCell(new Cell().add(new Paragraph(h).setBold()));
+            }
 
             DateTimeFormatter formatter =
                     DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -1280,65 +1379,67 @@ public class ManageRoomServices {
             /* ===== DATA ===== */
             for (Booking b : bookings) {
 
+                String bookingCode =
+                        b.getBookingCode() != null ? b.getBookingCode() : "";
+
                 String customer =
-                        b.getCustomer() != null
+                        b.getCustomer() != null && b.getCustomer().getFullName() != null
                                 ? b.getCustomer().getFullName()
-                                : "N/A";
+                                : "";
 
                 String room =
-                        b.getRoom() != null
+                        b.getRoom() != null && b.getRoom().getRoomNumber() != null
                                 ? b.getRoom().getRoomNumber()
-                                : "N/A";
+                                : "";
 
                 String checkIn =
                         b.getCheckInTime() != null
                                 ? b.getCheckInTime().format(formatter)
-                                : "N/A";
+                                : "";
 
                 String checkOut =
                         b.getCheckOutTime() != null
                                 ? b.getCheckOutTime().format(formatter)
-                                : "N/A";
+                                : "";
 
-                table.addCell(new Cell().add(new Paragraph(b.getBookingCode())));
+                String status =
+                        b.getBookingStatus() != null ? b.getBookingStatus() : "";
+
+                long amount =
+                        b.getTotalAmount() != null
+                                ? b.getTotalAmount().longValue()
+                                : 0;
+
+                totalRevenue += amount;
+
+                String money = String.format("%,d VND", amount);
+
+                table.addCell(new Cell().add(new Paragraph(bookingCode)));
 
                 table.addCell(new Cell().add(new Paragraph(customer)));
 
                 table.addCell(
-                        new Cell()
-                                .add(new Paragraph(room))
+                        new Cell().add(new Paragraph(room))
                                 .setTextAlignment(TextAlignment.CENTER)
                 );
 
                 table.addCell(
-                        new Cell()
-                                .add(new Paragraph(checkIn))
+                        new Cell().add(new Paragraph(checkIn))
                                 .setTextAlignment(TextAlignment.CENTER)
                 );
 
                 table.addCell(
-                        new Cell()
-                                .add(new Paragraph(checkOut))
+                        new Cell().add(new Paragraph(checkOut))
                                 .setTextAlignment(TextAlignment.CENTER)
                 );
 
                 table.addCell(
-                        new Cell()
-                                .add(new Paragraph(b.getBookingStatus()))
+                        new Cell().add(new Paragraph(status))
                                 .setTextAlignment(TextAlignment.CENTER)
                 );
 
-                long amount = b.getTotalAmount() != null
-                        ? b.getTotalAmount().longValue()
-                        : 0;
-
-                totalRevenue += amount;
-
-                String money = String.format("%,d", amount) + " VND";
-
                 table.addCell(
-                        new Cell()
-                                .add(new Paragraph(money))
+                        new Cell().add(new Paragraph(money))
                                 .setTextAlignment(TextAlignment.RIGHT)
                 );
             }
@@ -1349,14 +1450,12 @@ public class ManageRoomServices {
 
             /* ===== SUMMARY ===== */
             document.add(
-                    new Paragraph("Total Bookings: " + bookings.size())
-                            .setBold()
+                    new Paragraph("Total Bookings: " + bookings.size()).setBold()
             );
 
             document.add(
                     new Paragraph("Total Revenue: " +
-                            String.format("%,d VND", totalRevenue))
-                            .setBold()
+                            String.format("%,d VND", totalRevenue)).setBold()
             );
 
             document.close();
