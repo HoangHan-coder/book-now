@@ -16,7 +16,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
    Optional<Booking> findByBookingCode(String bookingCode);
 
-   List<Booking> getByBookingStatus(String bookingStatus);
+   List<Booking> getByBookingStatus(BookingStatus bookingStatus);
 
    @Query("SELECT COUNT(b) > 0 FROM Booking b " +
          "WHERE b.room.roomId = :roomId " +
