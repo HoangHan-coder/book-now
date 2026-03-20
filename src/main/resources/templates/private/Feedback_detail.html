@@ -128,7 +128,17 @@
           </div>
 
           <div class="p-6">
+            <!-- HIỂN THỊ REPLY -->
+            <div th:if="${feedback.contentReply != null}"
+                 class="mb-4 p-4 bg-green-50 border rounded-xl">
 
+              <p class="text-sm text-gray-600 mb-1">Phản hồi của admin:</p>
+
+              <p class="text-gray-800 font-medium"
+                 th:text="${feedback.contentReply}">
+              </p>
+
+            </div>
             <!-- UC-14.4 Reply Form -->
             <form th:action="@{/admin/feedback/reply}" method="post">
 
@@ -138,18 +148,27 @@
                      th:value="${feedback.feedbackId}"/>
 
               <!-- reply content -->
-              <textarea
-                      name="replyContent"
-                      class="w-full p-4 border border-gray-300 rounded-xl outline-none min-h-[120px] text-sm"
-                      placeholder="Nhập phản hồi từ Homestay..."
-                      th:text="${feedback.contentReply}">
-      </textarea>
+              <textarea name="replyContent"
+                        th:text="${feedback.contentReply}"
+                        class="w-full p-4 border border-gray-300 rounded-xl outline-none min-h-[120px] text-sm"
+                        placeholder="Nhập phản hồi từ Homestay...">
+              </textarea>
 
+                    <!-- nút reply -->
               <div class="flex justify-end mt-4">
-                <button type="submit"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium shadow-sm transition-colors">
+
+                <!-- Chưa reply -->
+                <button th:if="${feedback.contentReply == null}"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg">
                   Gửi
                 </button>
+
+                <!-- Đã reply -->
+                <button th:if="${feedback.contentReply != null}"
+                        class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2.5 rounded-lg">
+                  Cập nhật
+                </button>
+
               </div>
 
             </form>
