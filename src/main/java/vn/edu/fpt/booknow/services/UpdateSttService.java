@@ -1,8 +1,8 @@
 package vn.edu.fpt.booknow.services;
 
 import org.springframework.stereotype.Service;
-import vn.edu.fpt.booknow.controllers.model.entities.Room;
-import vn.edu.fpt.booknow.controllers.model.entities.RoomStatus;
+import vn.edu.fpt.booknow.model.entities.Room;
+import vn.edu.fpt.booknow.model.entities.RoomStatus;
 import vn.edu.fpt.booknow.repositories.RoomRepository;
 
 import java.util.List;

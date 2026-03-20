@@ -189,7 +189,7 @@
                 <div class="relative">
                     <select name="status" class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white cursor-pointer">
                         <option value="">Tất cả trạng thái</option>
-                        <option th:each="s : ${T(vn.edu.fpt.booknow.controllers.model.entities.RoomStatus).values()}"
+                        <option th:each="s : ${T(vn.edu.fpt.booknow.model.entities.RoomStatus).values()}"
                                 th:value="${s}"
                                 th:text="${s}"
                                 th:selected="${s == status}">

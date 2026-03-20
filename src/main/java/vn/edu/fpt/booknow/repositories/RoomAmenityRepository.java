@@ -3,8 +3,8 @@ package vn.edu.fpt.booknow.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import vn.edu.fpt.booknow.controllers.model.entities.Room;
-import vn.edu.fpt.booknow.controllers.model.entities.RoomAmenity;
+import vn.edu.fpt.booknow.model.entities.Room;
+import vn.edu.fpt.booknow.model.entities.RoomAmenity;
 
 import java.util.List;
 

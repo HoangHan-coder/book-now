@@ -9,10 +9,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import vn.edu.fpt.booknow.controllers.model.dto.DashboardDTO;
-import vn.edu.fpt.booknow.controllers.model.entities.Room;
-import vn.edu.fpt.booknow.controllers.model.entities.RoomStatus;
-import vn.edu.fpt.booknow.controllers.model.entities.RoomType;
+import vn.edu.fpt.booknow.model.dto.DashboardDTO;
+import vn.edu.fpt.booknow.model.entities.Room;
+import vn.edu.fpt.booknow.model.entities.RoomStatus;
+import vn.edu.fpt.booknow.model.entities.RoomType;
 import vn.edu.fpt.booknow.exceptions.InternalServerException;
 import vn.edu.fpt.booknow.exceptions.ResourceNotFoundException;
 import vn.edu.fpt.booknow.services.AmenityService;
@@ -107,11 +107,6 @@ public class ManageRoomController {
             case "excel":
                 manageRoomServices.exportExcel(startDate, endDate, response);
                 break;
-
-            case "pdf":
-                manageRoomServices.exportPDF(startDate, endDate, response);
-                break;
-
             default:
                 throw new ResourceNotFoundException("Invalid export type: " + type);
         }

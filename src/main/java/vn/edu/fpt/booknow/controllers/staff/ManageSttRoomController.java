@@ -3,8 +3,8 @@ package vn.edu.fpt.booknow.controllers.staff;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import vn.edu.fpt.booknow.controllers.model.entities.Room;
-import vn.edu.fpt.booknow.controllers.model.entities.RoomStatus;
+import vn.edu.fpt.booknow.model.entities.Room;
+import vn.edu.fpt.booknow.model.entities.RoomStatus;
 import vn.edu.fpt.booknow.services.ManageRoomServices;
 import vn.edu.fpt.booknow.services.UpdateSttService;
 

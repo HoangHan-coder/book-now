@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.controllers.model.dto;
+package vn.edu.fpt.booknow.model.dto;
 
 import java.util.List;
 
