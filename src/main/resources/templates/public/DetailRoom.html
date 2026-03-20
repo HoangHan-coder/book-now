@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết phòng - BookNow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {sans: ['Inter', 'sans-serif']},
+                    colors: {brand: {DEFAULT: '#2563eb'}}
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+<div style="position: fixed; top: 25px; left: 25px; z-index: 100;"
+     class="bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow-sm border border-white/50 transition-all hover:shadow-md">
+    <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='/homepage'">
+        <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100">
+            <i class="fa-solid fa-house-chimney text-xl text-blue-600"></i>
+        </div>
+        <div class="flex flex-col justify-center">
+            <span class="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-blue-700 leading-none">BookNow</span>
+        </div>
+    </div>
+</div>
+
+<div style="position: fixed; top: 25px; right: 25px; z-index: 100;" class="flex items-center gap-3">
+    <button class="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white/90 backdrop-blur rounded-xl shadow-sm border border-white/50 hover:text-blue-600 hover:bg-white transition-all">
+        Đăng nhập
+    </button>
+    <button class="px-4 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-xl shadow-lg shadow-blue-500/30 hover:bg-blue-700 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+        Đăng ký
+    </button>
+</div>
+
+<div th:each="room : ${roomDetail}" class="max-w-7xl mx-auto px-4 md:px-8 pt-32 pb-12">
+
+    <nav class="flex mb-6 text-sm text-gray-500 pl-2">
+        <a href="/" class="hover:text-blue-600">Trang chủ</a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-800 font-medium">Chi tiết phòng</span>
+    </nav>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 space-y-8">
+            <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                <div class="relative w-full group">
+                    <div class="swiper mySwiper w-full"
+                         style="aspect-ratio: 1921 / 2560; max-height: 750px; margin: auto;">
+                        <div class="swiper-wrapper">
+                            <div th:each="img : ${image}"
+                                 class="swiper-slide bg-[#121212] flex items-center justify-center">
+                                <img th:src="${img.imageUrl}"
+                                     alt="Room Detail"
+                                     class="w-full h-full object-contain">
+                            </div>
+
+                            <div th:if="${#lists.isEmpty(image)}"
+                                 class="swiper-slide bg-black flex items-center justify-center">
+                                <img th:src="${room.getImageUrl()}" class="w-full h-full object-contain">
+                            </div>
+                        </div>
+                        <div class="swiper-button-next !text-white bg-black/20 hover:bg-black/40 w-10 h-10 rounded-full after:!text-lg opacity-0 group-hover:opacity-100 transition-all"></div>
+                        <div class="swiper-button-prev !text-white bg-black/20 hover:bg-black/40 w-10 h-10 rounded-full after:!text-lg opacity-0 group-hover:opacity-100 transition-all"></div>
+
+                        <div class="swiper-pagination"></div>
+                    </div>
+
+                    <div class="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg text-sm font-bold text-gray-800 shadow-sm flex items-center gap-1">
+                        <i class="fa-solid fa-star text-yellow-400"></i> 4.8 (120 đánh giá)
+                    </div>
+                </div>
+                <div class="p-6 md:p-8">
+                    <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-semibold text-blue-600 uppercase tracking-wider">Phòng</span>
+                            <div class="flex items-center">
+                                <i class="fa-solid fa-door-open text-gray-400 mr-2"></i>
+                                <span class="text-2xl font-extrabold text-gray-800"
+                                      th:text="${room.roomNumber}">101</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="bg-blue-50 px-4 py-2 rounded-lg border border-blue-100 inline-block">
+                                <span class="block text-xs text-gray-500">Số người tối đa</span>
+                                <span class="text-lg font-bold text-blue-700">
+                                    <i class="fa-solid fa-user-group mr-1"></i>
+                                    <span th:text="${room.getMaxGuest() + ' Người'}"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 mb-6 border-b border-gray-100 pb-6">
+                        <div class="flex-1 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                            <span class="block text-xs text-gray-500 mb-1">Giá theo Slot (3h)</span>
+                            <span id="rawBasePrice" class="hidden" th:text="${room.basePrice}"></span>
+                            <span class="text-xl font-bold text-gray-800"
+                                  th:text="${#numbers.formatDecimal(room.getBasePrice(),0,'POINT',0,'COMMA') + ' đ'}"></span>
+                        </div>
+                        <div class="flex-1 bg-blue-50 p-3 rounded-xl border border-blue-100">
+                            <span class="block text-xs text-blue-600 mb-1">Giá qua đêm</span>
+                            <span id="rawOverPrice" class="hidden" th:text="${room.overPrice}"></span>
+                            <span class="text-xl font-bold text-blue-700"
+                                  th:text="${#numbers.formatDecimal(room.getOverPrice(),0, 'POINT',0,'COMMA') + ' đ'} "></span>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-3">Mô tả phòng</h3>
+                        <p class="text-gray-600 leading-relaxed mb-4" th:text="${room.getDescription()}"></p>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                            <div th:each="icon : ${room.amenityList}"
+                                 class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 shadow-sm hover:border-blue-400 transition">
+                                <img th:src="${icon.iconUrl}" alt="" class="w-5 h-5 object-contain"/>
+                                <span th:text="${icon.name}" class="truncate"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+                <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
+                    <i class="fa-regular fa-calendar-check text-blue-600"></i> Lịch trống phòng tuần này
+                </h3>
+                <div class="overflow-x-auto pb-2">
+                    <div class="min-w-[600px]">
+                        <div class="grid grid-cols-8 gap-1 text-center">
+                            <div class="p-2 text-xs font-bold text-gray-400 uppercase">Slot</div>
+                            <div th:each="date : ${weekDates}"
+                                 th:classappend="${date.isEqual(today)} ? 'bg-blue-100 text-blue-800 ring-2 ring-blue-400' : 'bg-gray-100 text-gray-700'"
+                                 class="p-2 rounded text-sm font-semibold">
+                                <span th:if="${date.isEqual(today)}">Hôm nay</span>
+                                <span th:if="${!date.isEqual(today)}"
+                                      th:text="${date.getDayOfWeek().getValue() == 7 ? 'Chủ Nhật' : 'Thứ ' + (date.getDayOfWeek().getValue() + 1)}"></span>
+                                <br>
+                                <span class="text-xs font-normal"
+                                      th:classappend="${date.getDayOfWeek().getValue() == 7} ? 'text-red-500'"
+                                      th:text="${#temporals.format(date, 'dd/MM')}"></span>
+                            </div>
+                        </div>
+                        <div th:each="tItem : ${timeTable}" class="grid grid-cols-8 gap-1 items-center mt-1">
+                            <div class="text-[0.7rem] font-bold text-gray-500 text-center">
+                                <span th:utext="${tItem.slotName != null ? tItem.slotName.replaceFirst(' ', '<br/>') : ''}"></span>
+                            </div>
+                            <th:block th:each="date : ${weekDates}">
+                                <div class="w-full">
+                                    <th:block
+                                            th:with="currentKey=${#temporals.format(date, 'ddMM')} + '-' + ${tItem.timetableId}">
+                                        <div class="w-full py-1"
+                                             th:with="isNightSlot=${tItem.slotName.contains('Đêm') or tItem.timetableId > 4},
+                  currentPrice=${isNightSlot ? room.overPrice : room.basePrice}">
+
+                                            <button th:if="${!bookedKeys.contains(currentKey)}"
+                                                    type="button"
+                                                    th:id="'btn-' + ${currentKey}"
+                                                    th:data-index="${(dateStat.index * 4) + tItemStat.index}"
+                                                    th:data-slot-info="|${#temporals.format(date, 'dd/MM')} ${tItem.slotName}|"
+                                                    th:data-price="${currentPrice}"
+                                                    onclick="toggleSlot(this, this.getAttribute('data-slot-info'), this.getAttribute('data-price'))"
+                                                    th:classappend="${date.isEqual(today)} ? 'ring-1 ring-green-400 bg-green-100' : 'bg-[#e8fdf1]'"
+                                                    class="slot-button w-full relative hover:bg-[#d1fae5] text-green-700 border border-[#c2f5d8] text-sm py-3 rounded-lg font-medium transition-all duration-200 shadow-sm active:scale-95 overflow-hidden group">
+                                                <span class="slot-label transition-all duration-200">Trống</span>
+                                                <div class="check-mark absolute inset-0 bg-blue-600 text-white flex items-center justify-center opacity-0 translate-y-full transition-all duration-200">
+                                                    <i class="fa-solid fa-check"></i>
+                                                </div>
+                                            </button>
+
+                                            <button th:if="${bookedKeys.contains(currentKey)}"
+                                                    type="button"
+                                                    disabled
+                                                    class="w-full bg-gray-200 text-gray-400 border border-gray-300 text-sm py-3 rounded-lg font-medium cursor-not-allowed opacity-70">
+                                                <span th:text="${bookedKeys.contains(currentKey)} ? 'Đã đặt' : 'Không khả dụng'"></span>
+                                            </button>
+                                        </div>
+                                    </th:block>
+                                </div>
+                            </th:block>
+                        </div>
+                        <div class="mt-8 pt-6 border-t border-gray-200">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                                <div class="space-y-3 bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
+                                    <h4 class="text-xs font-bold text-blue-600 uppercase tracking-widest flex items-center gap-2">
+                                        <i class="fa-solid fa-calendar-check"></i> Thời gian Check-in
+                                    </h4>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Ngày
+                                                đến</label>
+                                            <select id="select-date-in" onchange="checkContinuousSelection()"
+                                                    class="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                                                <option value="">Chọn ngày</option>
+                                                <option th:each="dateStr : ${monthDates}"
+                                                        th:value="${dateStr}"
+                                                        th:text="${dateStr}"></option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Giờ
+                                                (Ca)</label>
+                                            <select id="select-slot-in" onchange="checkContinuousSelection()"
+                                                    class="slot-select w-full p-2.5 bg-white border border-gray-200 rounded-lg text-xs">
+                                                <option value="">Chọn ca</option>
+                                                <option th:each="tItem : ${timeTable}"
+                                                        th:value="${tItem.timetableId}"
+                                                        th:text="${tItem.slotName}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-3 bg-gray-50 p-4 rounded-2xl border border-gray-200">
+                                    <h4 class="text-xs font-bold text-gray-600 uppercase tracking-widest flex items-center gap-2">
+                                        <i class="fa-solid fa-calendar-xmark"></i> Thời gian Check-out
+                                    </h4>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Ngày
+                                                đi</label>
+                                            <select id="select-date-out" onchange="checkContinuousSelection()"
+                                                    class="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                                                <option value="">Chọn ngày</option>
+                                                <option th:each="dateStr : ${monthDates}"
+                                                        th:value="${dateStr}"
+                                                        th:text="${dateStr}"></option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Giờ
+                                                (Ca)</label>
+                                            <select id="select-slot-out" onchange="checkContinuousSelection()" class="slot-select w-full p-2.5 bg-white border border-gray-200 rounded-lg text-xs">
+                                                <option value="">Chọn ca</option>
+                                                <option th:each="tItem : ${timeTable}"
+                                                        th:value="${tItem.timetableId}"
+                                                        th:text="${tItem.slotName}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="booking-status-badge"
+                                 class="mt-4 w-full p-3 bg-gray-100 border border-gray-200 rounded-xl text-xs text-center font-bold text-gray-500 uppercase tracking-widest transition-all">
+                                Vui lòng chọn đầy đủ thông tin Check-in và Check-out
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 mt-8"
+                             th:if="${feedbackStats != null}">
+                            <h3 class="text-lg font-bold text-gray-800 mb-8 flex items-center gap-2">
+                                <i class="fa-regular fa-comment-dots text-blue-600"></i> Đánh giá từ khách hàng
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+                                <div class="flex flex-col items-center justify-center border-r border-gray-100">
+                                    <div class="flex items-baseline gap-1">
+                                        <span class="text-6xl font-extrabold text-gray-800"
+                                              th:text="${#numbers.formatDecimal(feedbackStats.averageRating, 1, 1)}">4.8</span>
+                                        <span class="text-xl text-gray-400 font-medium">/5</span>
+                                    </div>
+                                    <div class="flex text-yellow-400 my-3 text-lg">
+                                        <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                                            <i th:class="${i <= feedbackStats.averageRating ? 'fa-solid fa-star' : (i - feedbackStats.averageRating < 1 ? 'fa-solid fa-star-half-stroke' : 'fa-regular fa-star')}"></i>
+                                        </th:block>
+                                    </div>
+                                    <p class="text-sm text-gray-500 font-medium">
+                                        Dựa trên <span class="text-gray-800"
+                                                       th:text="${feedbackStats.totalReviews + ' đánh giá'}">120 đánh giá</span>
+                                    </p>
+                                </div>
+
+                                <div class="md:col-span-2 space-y-3">
+                                    <div th:each="star : ${#numbers.sequence(5, 1, -1)}"
+                                         class="flex items-center gap-4">
+                                        <span class="text-sm font-medium text-gray-600 w-12" th:text="${star + ' sao'}">5 sao</span>
+                                        <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                            <div class="h-full bg-yellow-400 rounded-full"
+                                                 th:style="'width: ' + (${feedbackStats.totalReviews > 0 ? (feedbackStats.ratingCounts.get(star) * 100.0 / feedbackStats.totalReviews) : 0}) + '%'">
+                                            </div>
+                                        </div>
+                                        <span class="text-sm text-gray-400 w-8 text-right"
+                                              th:text="${feedbackStats.ratingCounts.get(star)}">0</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-8">
+                                <div th:each="item : ${feedbackList}"
+                                     class="pb-8 border-b border-gray-50 last:border-0">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div class="flex items-center gap-3">
+                                            <img th:if="${item.avatarUrl != null}" th:src="${item.avatarUrl}"
+                                                 class="w-12 h-12 rounded-full object-cover">
+                                            <div th:unless="${item.avatarUrl != null}"
+                                                 class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg"
+                                                 th:text="${#strings.substring(item.customerName, 0, 1)}">N
+                                            </div>
+                                            <div>
+                                                <h4 class="font-bold text-gray-800" th:text="${item.customerName}">Tên
+                                                    khách hàng</h4>
+                                                <p class="text-[10px] text-blue-600 font-bold uppercase tracking-wider"
+                                                   th:text="${'Đã đặt ' + item.bookingCount + ' lần'}">Đã đặt 0 lần</p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="flex text-yellow-400 text-xs mb-1">
+                                                <i th:each="i : ${#numbers.sequence(1, 5)}"
+                                                   th:class="${i <= item.rating ? 'fa-solid fa-star' : 'fa-regular fa-star'}"></i>
+                                            </div>
+                                            <span class="text-[11px] text-gray-400"
+                                                  th:text="${#temporals.format(item.createdAt, 'dd/MM/yyyy')}">Ngày</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-600 leading-relaxed text-sm mb-4" th:text="${item.content}">Nội
+                                        dung...</p>
+
+                                    <div th:if="${item.replyContent != null}"
+                                         class="bg-blue-50/50 border-l-4 border-blue-200 p-4 rounded-r-xl ml-4">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <i class="fa-solid fa-reply text-blue-400 text-sm scale-x-[-1]"></i>
+                                            <span class="text-xs font-bold text-blue-700"
+                                                  th:text="${'Quản lý ' + (item.managerName ?: 'Homestay')}">Quản lý</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 italic" th:text="${item.replyContent}">Lời cảm
+                                            ơn...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button th:if="${feedbackStats.totalReviews > 5}"
+                                    class="w-full mt-6 py-3 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+                                Xem thêm đánh giá khác
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="lg:col-span-1">
+            <div class="bg-white p-6 rounded-2xl shadow-lg border border-blue-100 sticky top-32">
+                <h2 class="text-xl font-bold text-gray-800 mb-6 border-b border-gray-100 pb-3">Thông tin đặt phòng</h2>
+
+                <form class="space-y-5" onsubmit="return validateBooking(event)" th:action="@{/booking/save}"
+                      method="post" th:object="${informBooking}" enctype="multipart/form-data">
+                    <input type="hidden" th:field="*{roomId}">
+                    <input type="hidden" name="roomId">
+                    <input type="hidden" th:field="*{customer.fullName}">
+                    <input type="hidden" th:field="*{customer.phone}">
+                    <input type="hidden" th:field="*{customer.email}">
+                    <input type="hidden" id="hidden-checkin-time" th:field="*{checkInTime}">
+                    <input type="hidden" id="hidden-checkout-time" th:field="*{checkOutTime}">
+                    <input type="hidden" id="totalAmountHidden" th:field="*{totalAmount}">
+                    <div id="price-summary-card"
+                         class="mb-6 p-4 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-lg shadow-blue-200 text-white">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] uppercase font-bold opacity-80 tracking-widest">Tổng chi phí dự kiến</span>
+                            <i class="fa-solid fa-wallet opacity-80"></i>
+                        </div>
+
+                        <div class="flex items-baseline gap-1 mb-3">
+                            <span id="display-total-price" class="text-3xl font-black">0</span>
+                            <span class="text-sm font-bold">VNĐ</span>
+                        </div>
+
+                        <div class="pt-3 border-t border-white/20 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] opacity-80 font-medium uppercase">Check-in:</span>
+                                <span id="summary-checkin" class="text-[11px] font-bold">--/-- (Trống)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] opacity-80 font-medium uppercase">Check-out:</span>
+                                <span id="summary-checkout" class="text-[11px] font-bold">--/-- (Trống)</span>
+                            </div>
+                        </div>
+
+                        <p class="text-[10px] mt-3 opacity-70 italic">* Giá đã bao gồm phí dịch vụ và VAT</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                            <i class="fa-regular fa-user text-blue-500 w-5"></i>
+                            <div>
+                                <p class="text-[10px] uppercase text-gray-400 font-bold">Họ và tên</p>
+                                <p class="text-sm font-semibold text-gray-700"
+                                   th:text="*{customer.fullName} ?: 'Chưa cập nhật'"></p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                            <i class="fa-solid fa-phone text-blue-500 w-5"></i>
+                            <div>
+                                <p class="text-[10px] uppercase text-gray-400 font-bold">Số điện thoại</p>
+                                <p class="text-sm font-semibold text-gray-700"
+                                   th:text="*{customer.phone} ?: 'Chưa cập nhật'"></p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                            <i class="fa-regular fa-envelope text-blue-500 w-5"></i>
+                            <div>
+                                <p class="text-[10px] uppercase text-gray-400 font-bold">Email</p>
+                                <p class="text-sm font-semibold text-gray-700"
+                                   th:text="*{customer.email} ?: 'Chưa cập nhật'"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 mt-4">
+                        <div onclick="document.getElementById('cccd_front').click()"
+                             class="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center cursor-pointer hover:border-blue-500 group relative min-h-[120px] flex items-center justify-center overflow-hidden">
+                            <input type="file" id="cccd_front" name="cccd_front" class="hidden" accept="image/*"
+                                   onchange="previewImage(this, 'preview_front_content')">
+                            <div id="preview_front_content" class="flex flex-col items-center">
+                                <i class="fa-solid fa-id-card text-2xl text-gray-400 group-hover:text-blue-500"></i>
+                                <p class="text-[10px] text-gray-500 mt-1">Mặt trước CCCD</p>
+                            </div>
+                        </div>
+
+                        <div onclick="document.getElementById('cccd_back').click()"
+                             class="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center cursor-pointer hover:border-blue-500 group relative min-h-[120px] flex items-center justify-center overflow-hidden">
+                            <input type="file" id="cccd_back" name="cccd_back" class="hidden" accept="image/*"
+                                   onchange="previewImage(this, 'preview_back_content')">
+                            <div id="preview_back_content" class="flex flex-col items-center">
+                                <i class="fa-solid fa-id-card text-2xl text-gray-400 group-hover:text-blue-500"></i>
+                                <p class="text-[10px] text-gray-500 mt-1">Mặt sau CCCD</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Ghi chú</label>
+                        <textarea th:field="*{note}" rows="2" placeholder="Yêu cầu đặc biệt..."
+                                  class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm"></textarea>
+                    </div>
+
+                    <div class="flex items-start gap-3 mt-2">
+                        <input type="checkbox" id="terms" required
+                               class="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                        <label for="terms" class="text-xs text-gray-500 cursor-pointer">
+                            Tôi đồng ý với <a href="#" class="text-blue-600 hover:underline">điều khoản sử dụng</a>.
+                        </label>
+                    </div>
+
+                    <button id="submit-booking" type="submit"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 mt-4">
+                        Xác nhận Đặt phòng
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script th:inline="javascript">
+    // Thêm hàm copy nhanh (Tùy chọn)
+
+    const selectedSlotsMap = new Map();
+    let selectedSlots = new Set();
+    function toggleSlot(btn, slotName, price) {
+        clearDropdowns();
+        const currentIndex = parseInt(btn.getAttribute('data-index'));
+
+        if (selectedSlotsMap.has(slotName)) {
+            // --- ĐOẠN SỬA LỖI TẠI ĐÂY ---
+
+            // Lấy danh sách các index đang được chọn hiện tại
+            const selectedIndices = Array.from(selectedSlotsMap.keys()).map(key => {
+                const b = document.querySelector(`button[data-slot-info="${key}"]`);
+                return b ? parseInt(b.getAttribute('data-index')) : null;
+            }).filter(idx => idx !== null).sort((a, b) => a - b);
+
+            const minIdx = selectedIndices[0];
+            const maxIdx = selectedIndices[selectedIndices.length - 1];
+
+            // Nếu click vào ô ở GIỮA dải (không phải đầu cũng không phải cuối)
+            // thì ta xóa toàn bộ để tránh bị hổng ở giữa
+            if (currentIndex > minIdx && currentIndex < maxIdx) {
+                const allButtons = Array.from(document.querySelectorAll('.slot-button'));
+                allButtons.forEach(b => {
+                    const idx = parseInt(b.getAttribute('data-index'));
+                    if (selectedSlotsMap.has(b.getAttribute('data-slot-info'))) {
+                        deselectSlot(b, b.getAttribute('data-slot-info'));
+                    }
+                });
+            } else {
+                // Nếu click vào ô ở đầu hoặc cuối dải, chỉ xóa đúng ô đó
+                deselectSlot(btn, slotName);
+            }
+            // ------------------------------
+        } else {
+            // Giữ nguyên logic chọn mới (fillGaps)
+            if (selectedSlotsMap.size > 0) {
+                fillGaps(currentIndex);
+            } else {
+                selectSlot(btn, slotName, price);
+            }
+        }
+
+        updateFinalUI();
+    }
+
+    // Hàm này giúp đồng bộ tiền, nhãn hiển thị và input ẩn
+    function updateFinalUI() {
+        // 1. Tính lại tiền dựa trên Map
+        calculateTablePrice();
+
+        // 2. Lấy danh sách các ô đang chọn, sắp xếp theo thứ tự thời gian (index)
+        const selectedButtons = Array.from(document.querySelectorAll('.slot-button'))
+            .filter(b => selectedSlotsMap.has(b.getAttribute('data-slot-info')))
+            .sort((a, b) => parseInt(a.getAttribute('data-index')) - parseInt(b.getAttribute('data-index')));
+
+        if (selectedButtons.length > 0) {
+            const firstInfo = selectedButtons[0].getAttribute('data-slot-info');
+            const lastInfo = selectedButtons[selectedButtons.length - 1].getAttribute('data-slot-info');
+
+            // Cập nhật nhãn Check-in / Check-out ở khung bên phải
+            updatePriceSummaryLabels(firstInfo, lastInfo);
+        } else {
+            // Nếu không còn ô nào được chọn
+            updatePriceSummaryLabels(null, null);
+            if(document.getElementById('display-total-price')) document.getElementById('display-total-price').innerText = "0";
+            if(document.getElementById('totalAmountHidden')) document.getElementById('totalAmountHidden').value = 0;
+        }
+    }
+    function calculateTotalPrice() {
+        // Nếu có dữ liệu trong Map (đang chọn bằng bảng)
+        if (selectedSlotsMap && selectedSlotsMap.size > 0) {
+            calculateTablePrice();
+        }
+        // Nếu không có trong Map thì tính theo các ô Select
+        else {
+            calculateSelectPrice();
+        }
+    }
+    function syncDropdownToSummary() {
+        const dInStr = document.getElementById('select-date-in').value;
+        const sInEl = document.getElementById('select-slot-in');
+        const dOutStr = document.getElementById('select-date-out').value;
+        const sOutEl = document.getElementById('select-slot-out');
+
+        if (!dInStr || !sInEl.value || !dOutStr || !sOutEl.value) return;
+
+        const parseDate = (str) => {
+            const [d, m, y] = str.split('/');
+            return new Date(y, m - 1, d);
+        };
+
+        const dateIn = parseDate(dInStr);
+        const dateOut = parseDate(dOutStr);
+        const startIdx = sInEl.selectedIndex;
+        const endIdx = sOutEl.selectedIndex;
+
+        // NẾU NGƯỢC: Reset nhãn về rỗng và dừng lại luôn
+        if (dateIn > dateOut || (dateIn.getTime() === dateOut.getTime() && startIdx >= endIdx)) {
+            updatePriceSummaryLabels(null, null);
+            return;
+        }
+
+        const checkinDisplay = `${dInStr} ${sInEl.options[sInEl.selectedIndex].text}`;
+        const checkoutDisplay = `${dOutStr} ${sOutEl.options[sOutEl.selectedIndex].text}`;
+        updatePriceSummaryLabels(checkinDisplay, checkoutDisplay);
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdownIds = ['select-date-in', 'select-slot-in', 'select-date-out', 'select-slot-out'];
+
+        dropdownIds.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', function() {
+                    // 1. Xóa lựa chọn trên bảng (vì bạn yêu cầu không được chọn cả hai)
+                    if (this.value !== "") {
+                        clearTableSelection();
+                    }
+
+                    // 2. Cập nhật dữ liệu sang khung bên phải
+                    syncDropdownToSummary();
+
+                    // 3. Tính lại tiền (nếu bạn có hàm tính tiền riêng cho dropdown)
+                    if (typeof calculateTotalPrice === 'function') {
+                        calculateTotalPrice();
+                    }
+                });
+            }
+        });
+    });
+    function updatePriceSummaryLabels(inStr, outStr) {
+        const inEl = document.getElementById('summary-checkin');
+        const outEl = document.getElementById('summary-checkout');
+
+        const formatInfo = (str, isCheckOut = false) => {
+            if (!str) return "--/--/---- (Trống)";
+
+            // Regex tìm khoảng thời gian trong ngoặc (HH:mm - HH:mm)
+            const timeMatch = str.match(/\((.*?)\)/);
+            if (timeMatch && timeMatch[1].includes('-')) {
+                const times = timeMatch[1].split('-').map(t => t.trim());
+
+                // Lấy phần ngày và tên ca (trước dấu ngoặc đơn)
+                // Ví dụ: "25/03/2026 Ca 1 "
+                const prefix = str.split('(')[0].trim();
+
+                // Check-in lấy giờ đầu (times[0]), Check-out lấy giờ cuối (times[1])
+                const timeToDisplay = isCheckOut ? times[1] : times[0];
+                return `${prefix} (${timeToDisplay})`;
+            }
+            return str;
+        };
+
+        if (inEl) inEl.innerText = formatInfo(inStr, false);
+        if (outEl) outEl.innerText = formatInfo(outStr, true);
+    }
+    // Hàm xóa trắng các dropdown
+    function clearDropdowns() {
+        const ids = ['select-date-in', 'select-slot-in', 'select-date-out', 'select-slot-out'];
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.value = "";
+                // Kích hoạt sự kiện change thủ công để Badge tự reset
+                el.dispatchEvent(new Event('change'));
+            }
+        });
+
+        if(document.getElementById('time-in-display')) document.getElementById('time-in-display').innerText = "--:--";
+        if(document.getElementById('time-out-display')) document.getElementById('time-out-display').innerText = "--:--";
+    }
+
+    // Hàm xóa tất cả các ô đã chọn trên bảng (Timetable)
+    function clearTableSelection() {
+        const allButtons = document.querySelectorAll('.slot-button:not([disabled])');
+        allButtons.forEach(b => {
+            // Gọi hàm deselectSlot có sẵn trong code của bạn để đảm bảo tính nhất quán
+            if (typeof deselectSlot === 'function') {
+                deselectSlot(b, b.getAttribute('data-slot-info'));
+            }
+        });
+        // Xóa Map/Set lưu trữ của bạn (tùy theo biến bạn đang dùng là selectedSlots hay selectedSlotsMap)
+        if (typeof selectedSlots !== 'undefined') selectedSlots.clear();
+        if (typeof selectedSlotsMap !== 'undefined') selectedSlotsMap.clear();
+    }
+
+    // Lắng nghe sự kiện: Nếu người dùng động vào Dropdown thì xóa bảng
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdownIds = ['select-date-in', 'select-slot-in', 'select-date-out', 'select-slot-out'];
+
+        dropdownIds.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', function() {
+                    if (this.value !== "") {
+                        clearTableSelection();
+                        // Gọi lại hàm tính tiền sau khi xóa bảng
+                        if (typeof calculateTotalPrice === 'function') {
+                            calculateTotalPrice();
+                        }
+                    }
+                });
+            }
+        });
+    });
+    function fillGaps(newIndex) {
+        let minIdx = newIndex;
+        let maxIdx = newIndex;
+
+        // Tìm dải index hiện tại đang được chọn để xác định biên mới
+        selectedSlotsMap.forEach((val, key) => {
+            const btn = document.querySelector(`button[data-slot-info="${key}"]`);
+            if (btn) {
+                const idx = parseInt(btn.getAttribute('data-index'));
+                minIdx = Math.min(minIdx, idx);
+                maxIdx = Math.max(maxIdx, idx);
+            }
+        });
+
+        const start = Math.min(minIdx, newIndex);
+        const end = Math.max(maxIdx, newIndex);
+
+        // Kiểm tra chặn (disabled)
+        for (let i = start; i <= end; i++) {
+            const btn = document.querySelector(`button[data-index="${i}"]`);
+            if (!btn || btn.disabled) {
+                showToast("Không thể chọn vì có ca đã đặt ở giữa!", "error");
+                return false; // Trả về false để hàm toggle biết mà dừng
+            }
+        }
+
+        // Chọn toàn bộ dải
+        const allButtons = Array.from(document.querySelectorAll('.slot-button:not([disabled])'));
+        allButtons.forEach(btn => {
+            const idx = parseInt(btn.getAttribute('data-index'));
+            if (idx >= start && idx <= end) {
+                selectSlot(btn, btn.getAttribute('data-slot-info'), btn.getAttribute('data-price'));
+            }
+        });
+        return true;
+    }
+
+    function selectSlot(btn, slotName, price) {
+        const selectedStyles = ['bg-blue-600', 'text-white', 'hover:bg-blue-700', 'outline', 'outline-2', 'outline-blue-300', 'scale-105', 'shadow-md', 'border-blue-600'];
+        const availableStyles = ['bg-[#e8fdf1]', 'bg-green-100', 'text-green-700', 'hover:bg-[#d1fae5]', 'border', 'border-[#c2f5d8]'];
+
+        btn.classList.remove(...availableStyles);
+        btn.classList.add(...selectedStyles);
+        btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+        selectedSlotsMap.set(slotName, price);
+    }
+
+    function deselectSlot(btn, slotName) {
+        const selectedStyles = ['bg-blue-600', 'text-white', 'hover:bg-blue-700', 'outline', 'outline-2', 'outline-blue-300', 'scale-105', 'shadow-md', 'border-blue-600'];
+        const availableStyles = ['bg-[#e8fdf1]', 'bg-green-100', 'text-green-700', 'hover:bg-[#d1fae5]', 'border', 'border-[#c2f5d8]'];
+
+        btn.classList.remove(...selectedStyles);
+        btn.classList.add(...availableStyles);
+        btn.innerHTML = 'Trống';
+        selectedSlotsMap.delete(slotName);
+    }
+
+
+    function previewImage(input, previewId) {
+        const previewContainer = document.getElementById(previewId);
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                // Thay thế toàn bộ nội dung bên trong div bằng thẻ img
+                previewContainer.innerHTML = `
+                <img src="${e.target.result}"
+                     class="absolute inset-0 w-full h-full object-cover p-1 rounded-lg"
+                     alt="CCCD Preview">
+                <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span class="text-white text-xs font-bold bg-blue-600/80 px-2 py-1 rounded">Thay đổi</span>
+                </div>
+            `;
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    window.onload = function () {
+        /* Thymeleaf thay thế giá trị vào đây */
+        const message = /*[[${toastMessage}]]*/ null;
+        const type = /*[[${toastType}]]*/ "error";
+
+        if (message) {
+            showToast(message, type);
+        }
+    };
+
+    function showToast(message, type = 'error') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        const bgColor = type === 'error' ? 'bg-red-600' : 'bg-green-600';
+
+        // Style cho toast
+        toast.className = `${bgColor} text-white px-6 py-3 rounded-xl shadow-2xl transform transition-all duration-500 translate-x-full opacity-0 flex items-center gap-3 min-w-[300px]`;
+        toast.innerHTML = `
+            <i class="fa-solid ${type === 'error' ? 'fa-circle-exclamation' : 'fa-check-circle'}"></i>
+            <span class="font-medium">${message}</span>
+        `;
+
+        container.prepend(toast);
+
+        // Hiệu ứng trượt vào
+        setTimeout(() => {
+            toast.classList.remove('translate-x-full', 'opacity-0');
+        }, 100);
+
+        // Tự động biến mất sau 4 giây
+        setTimeout(() => {
+            toast.classList.add('translate-x-full', 'opacity-0');
+            setTimeout(() => toast.remove(), 500);
+        }, 4000);
+    }
+
+    function validateBooking(event) {
+        // 1. Lấy giá trị từ các ô Select (Dropdown)
+        const dIn = document.getElementById('select-date-in')?.value;
+        const sIn = document.getElementById('select-slot-in')?.value;
+        const dOut = document.getElementById('select-date-out')?.value;
+        const sOut = document.getElementById('select-slot-out')?.value;
+
+        // Biến kiểm tra xem Dropdown đã được điền đầy đủ chưa
+        const isDropdownFilled = dIn && sIn && dOut && sOut;
+
+        // Biến kiểm tra xem có lỗi va chạm (Badge màu đỏ/cam) không
+        const statusBadge = document.getElementById('booking-status-badge');
+        const hasBookingError = statusBadge && (
+            statusBadge.classList.contains('bg-red-100') ||
+            statusBadge.classList.contains('bg-orange-100')
+        );
+
+        // 2. Logic kiểm tra tổng hợp:
+        // Hợp lệ khi: (Có chọn trên bảng) HOẶC (Chọn đầy đủ Dropdown VÀ không có lỗi)
+        if (selectedSlotsMap.size === 0 && (!isDropdownFilled || hasBookingError)) {
+            event.preventDefault(); // Ngăn gửi form
+
+            if (hasBookingError) {
+                showToast("Khoảng thời gian chọn từ danh sách không hợp lệ hoặc đã được đặt!", "error");
+            } else {
+                showToast("Vui lòng chọn thời gian trên bảng hoặc chọn đầy đủ từ danh sách!", "error");
+            }
+            return false;
+        }
+
+        // 3. Kiểm tra ảnh CCCD (Nếu bạn muốn mở lại thì bỏ comment)
+        const front = document.getElementById('cccd_front').files.length;
+        const back = document.getElementById('cccd_back').files.length;
+        if (front === 0 || back === 0) {
+            event.preventDefault();
+            showToast("Vui lòng tải lên cả hai mặt CCCD!", "error");
+            return false;
+        }
+
+        return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Lấy tham số từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const preDate = urlParams.get('preDate'); // Ví dụ: 2026-03-01
+        const preSlotId = urlParams.get('preSlotId');
+
+        if (preDate && preSlotId) {
+            // 2. Chuyển định dạng date từ YYYY-MM-DD sang ddMM để khớp với currentKey
+            const dateParts = preDate.split('-');
+            if (dateParts.length === 3) {
+                const formattedDateKey = dateParts[2] + dateParts[1]; // ddMM
+                const targetKey = `btn-${formattedDateKey}-${preSlotId}`;
+
+                // 3. Tìm button và thực hiện click giả lập
+                const targetBtn = document.getElementById(targetKey);
+                if (targetBtn) {
+                    // Cuộn màn hình đến vị trí bảng lịch để người dùng thấy
+                    targetBtn.scrollIntoView({behavior: 'smooth', block: 'center'});
+
+                    // Gọi hàm chọn slot
+                    targetBtn.click();
+
+                    // Xóa tham số trên URL để nếu user F5 sẽ không bị chọn lại
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof Swiper === 'undefined') return;
+
+        const swiperContainer = document.querySelector(".mySwiper");
+        if (!swiperContainer) return;
+
+        // Đếm số lượng slide thực tế
+        const slideCount = swiperContainer.querySelectorAll('.swiper-slide').length;
+
+        if (slideCount > 0) {
+            const swiper = new Swiper(".mySwiper", {
+                // CHỈ BẬT LOOP KHI CÓ TỪ 3 ẢNH TRỞ LÊN (hoặc tùy vào cấu hình của bạn)
+                loop: slideCount > 1,
+
+                spaceBetween: 0,
+                centeredSlides: true,
+                autoplay: slideCount > 1 ? {
+                    delay: 3500,
+                    disableOnInteraction: false,
+                } : false, // Tắt autoplay nếu chỉ có 1 ảnh
+
+                pagination: {
+                    el: ".swiper-pagination",
+                    clickable: true,
+                    dynamicBullets: true,
+                },
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                },
+                effect: 'slide',
+                speed: 800,
+
+                // Tự động ẩn các nút điều hướng nếu chỉ có 1 slide
+                watchOverflow: true
+            });
+
+            // Nếu chỉ có 1 slide, ẩn luôn các nút điều hướng cho đẹp
+            if (slideCount === 1) {
+                const nextBtn = swiperContainer.querySelector('.swiper-button-next');
+                const prevBtn = swiperContainer.querySelector('.swiper-button-prev');
+                const pagination = swiperContainer.querySelector('.swiper-pagination');
+
+                if (nextBtn) nextBtn.style.display = 'none';
+                if (prevBtn) prevBtn.style.display = 'none';
+                if (pagination) pagination.style.display = 'none';
+            }
+        } else {
+            // Trường hợp không có ảnh nào: Ẩn luôn khung Swiper
+            swiperContainer.style.display = 'none';
+        }
+    });
+    function calculateSelectPrice() {
+        const displayMoney = document.getElementById('display-total-price');
+        const hiddenTotal = document.getElementById('totalAmountHidden');
+        const statusBadge = document.getElementById('booking-status-badge');
+
+        const dIn = document.getElementById('select-date-in').value;
+        const sInElem = document.getElementById('select-slot-in');
+        const dOut = document.getElementById('select-date-out').value;
+        const sOutElem = document.getElementById('select-slot-out');
+
+        // 1. Kiểm tra đầu vào
+        if (!dIn || sInElem.selectedIndex <= 0 || !dOut || sOutElem.selectedIndex <= 0) {
+            if(displayMoney) displayMoney.innerText = "0";
+            return;
+        }
+
+        // 2. Kiểm tra lỗi Badge (Nếu đang đỏ/cam thì không tính tiền)
+        const isError = statusBadge && (
+            statusBadge.classList.contains('bg-red-100') ||
+            statusBadge.classList.contains('bg-orange-100')
+        );
+        if (isError) {
+            displayMoney.innerText = "0";
+            if (hiddenTotal) hiddenTotal.value = 0;
+            return;
+        }
+
+        // 3. Gán nhãn và input ẩn
+        const sInText = sInElem.options[sInElem.selectedIndex].text;
+        const sOutText = sOutElem.options[sOutElem.selectedIndex].text;
+        const fullIn = `${dIn} ${sInText}`;
+        const fullOut = `${dOut} ${sOutText}`;
+
+        document.getElementById('hidden-checkin-time').value = fullIn;
+        document.getElementById('hidden-checkout-time').value = fullOut;
+        updatePriceSummaryLabels(fullIn, fullOut);
+
+        // 4. LẤY GIÁ TIỀN (Sửa lỗi biến tại đây)
+        const basePrice = parseInt(document.getElementById('rawBasePrice')?.innerText) || 0;
+        const overPrice = parseInt(document.getElementById('rawOverPrice')?.innerText) || 0;
+
+        // Lấy danh sách tất cả các ca hợp lệ
+        const allSlots = Array.from(sInElem.options)
+            .filter(opt => opt.value !== "")
+            .map(opt => ({ id: opt.value, name: opt.text }));
+
+        // Lấy Index của ca bắt đầu và ca kết thúc
+        const startIndex = allSlots.findIndex(s => s.id === sInElem.value);
+        const endIndex = allSlots.findIndex(s => s.id === sOutElem.value);
+
+        const parseDate = (str) => {
+            const [d, m, y] = str.split('/');
+            return new Date(y, m - 1, d);
+        };
+
+        const dateIn = parseDate(dIn);
+        const dateOut = parseDate(dOut);
+        const diffDays = Math.round((dateOut - dateIn) / (1000 * 60 * 60 * 24));
+
+        // 5. VÒNG LẶP TÍNH TIỀN
+        if (diffDays >= 0) {
+            let total = 0;
+            for (let d = 0; d <= diffDays; d++) {
+                let startLoop = (d === 0) ? startIndex : 0;
+                let endLoop = (d === diffDays) ? endIndex : allSlots.length - 1;
+
+                for (let i = startLoop; i <= endLoop; i++) {
+                    // Kiểm tra nếu tên ca có chữ "Đêm" thì dùng giá overPrice
+                    total += allSlots[i].name.includes("Đêm") ? overPrice : basePrice;
+                }
+            }
+
+            if(displayMoney) displayMoney.innerText = total.toLocaleString('vi-VN');
+            if (hiddenTotal) hiddenTotal.value = total;
+        }
+    }
+
+    function calculateTablePrice() {
+        const displayMoney = document.getElementById('display-total-price');
+        const hiddenTotal = document.getElementById('totalAmountHidden');
+
+        if (selectedSlotsMap && selectedSlotsMap.size > 0) {
+            let totalTable = 0;
+            selectedSlotsMap.forEach((price) => {
+                totalTable += parseInt(price);
+            });
+
+            displayMoney.innerText = totalTable.toLocaleString('vi-VN');
+            if (hiddenTotal) hiddenTotal.value = totalTable;
+
+            // --- ĐOẠN SỬA QUAN TRỌNG: Lấy đúng nút đầu và cuối theo index ---
+            const selectedButtons = Array.from(document.querySelectorAll('.slot-button'))
+                .filter(b => selectedSlotsMap.has(b.getAttribute('data-slot-info')))
+                .sort((a, b) => parseInt(a.getAttribute('data-index')) - parseInt(b.getAttribute('data-index')));
+
+            if (selectedButtons.length > 0) {
+                // Lấy full chuỗi bao gồm cả ngày/tháng/năm từ data-slot-info
+                const firstInfo = selectedButtons[0].getAttribute('data-slot-info');
+                const lastInfo = selectedButtons[selectedButtons.length - 1].getAttribute('data-slot-info');
+
+                // Gán vào hidden input để gửi về Controller (Server nhận được dd/MM/yyyy)
+                if (document.getElementById('hidden-checkin-time'))
+                    document.getElementById('hidden-checkin-time').value = firstInfo;
+                if (document.getElementById('hidden-checkout-time'))
+                    document.getElementById('hidden-checkout-time').value = lastInfo;
+
+                // Cập nhật giao diện xem trước
+                updatePriceSummaryLabels(firstInfo, lastInfo);
+            }
+        } else {
+            displayMoney.innerText = "0";
+            if (hiddenTotal) hiddenTotal.value = 0;
+            updatePriceSummaryLabels(null, null);
+        }
+    }
+    // Lắng nghe sự kiện thay đổi của tất cả các ô Select
+    document.querySelectorAll('select').forEach(select => {
+        select.addEventListener('change', calculateTotalPrice);
+    });
+
+    // 1. Lấy bookedKeys (Mảng String, an toàn)
+    const bookedKeys = /*[[${bookedKeys}]]*/ [];
+
+    // 2. Lấy danh sách ca đã được "làm sạch" (Không còn quan hệ lồng nhau)
+    const slots = /*[[${timeTableJS}]]*/ [];
+    function checkContinuousSelection() {
+        const dateInStr = document.getElementById('select-date-in').value;
+        const slotInSelect = document.getElementById('select-slot-in');
+        const dateOutStr = document.getElementById('select-date-out').value;
+        const slotOutSelect = document.getElementById('select-slot-out');
+        const statusBadge = document.getElementById('booking-status-badge');
+
+        if (!dateInStr || !slotInSelect.value || !dateOutStr || !slotOutSelect.value) {
+            statusBadge.innerText = "VUI LÒNG CHỌN ĐẦY ĐỦ THÔNG TIN";
+            statusBadge.className = "mt-4 w-full p-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs text-center uppercase";
+            return;
+        }
+        const allOptions = Array.from(slotInSelect.options).filter(opt => opt.value !== "");
+        const allSlotIds = allOptions.map(opt => opt.value);
+        const startIndex = slotInSelect.selectedIndex - 1; // Trừ 1 nếu option đầu là "Chọn ca"
+        const endIndex = slotOutSelect.selectedIndex - 1;
+        const parseDate = (str) => {
+            const [d, m, y] = str.split('/');
+            return new Date(y, m - 1, d);
+        };
+
+        const dateIn = parseDate(dateInStr);
+        const dateOut = parseDate(dateOutStr);
+
+        // Dùng value (ID của Slot) để so sánh nếu ID được thiết kế tăng dần theo thời gian (Sáng < Chiều < Đêm)
+        // Nếu không, hãy dùng selectedIndex như bạn đã làm nhưng phải cẩn thận
+        const startIdx = slotInSelect.selectedIndex;
+        const endIdx = slotOutSelect.selectedIndex;
+
+        // KIỂM TRA NGƯỢC THỜI GIAN
+        if (dateIn > dateOut || (dateIn.getTime() === dateOut.getTime() && startIdx >= endIdx)) {
+            statusBadge.innerText = "THỜI GIAN ĐI PHẢI SAU THỜI GIAN ĐẾN!";
+            statusBadge.className = "mt-4 w-full p-3 bg-red-100 border-red-200 rounded-xl text-red-600 font-bold text-xs text-center";
+
+            // Reset hiển thị tiền và nhãn
+            document.getElementById('display-total-price').innerText = "0";
+            updatePriceSummaryLabels(null, null);
+            return;
+        }
+
+        // 4. Vòng lặp kiểm tra va chạm
+        let isBooked = false;
+        let conflictKey = "";
+        let tempDate = new Date(dateIn);
+
+        while (tempDate <= dateOut) {
+            let sIdx = (tempDate.getTime() === dateIn.getTime()) ? startIndex : 0;
+            let eIdx = (tempDate.getTime() === dateOut.getTime()) ? endIndex : allSlotIds.length - 1;
+
+            for (let i = sIdx; i <= eIdx; i++) {
+                const day = String(tempDate.getDate()).padStart(2, '0');
+                const month = String(tempDate.getMonth() + 1).padStart(2, '0');
+                const checkKey = `${day}${month}-${allSlotIds[i]}`;
+
+                console.log("Đang check key:", checkKey);
+
+                if (bookedKeys.includes(checkKey)) {
+                    isBooked = true;
+                    conflictKey = checkKey;
+                    break;
+                }
+            }
+            if (isBooked) break;
+            tempDate.setDate(tempDate.getDate() + 1);
+        }
+
+        // 5. Hiển thị kết quả lên UI
+        if (isBooked) {
+            statusBadge.innerText = "KHOẢNG THỜI GIAN NÀY ĐÃ CÓ NGƯỜI ĐẶT!";
+            statusBadge.className = "mt-4 w-full p-3 bg-orange-100 border-orange-200 rounded-xl text-orange-600 font-bold text-xs text-center";
+        } else {
+            statusBadge.innerText = "THỜI GIAN HỢP LỆ - CÓ THỂ ĐẶT PHÒNG";
+            statusBadge.className = "mt-4 w-full p-3 bg-green-100 border-green-200 rounded-xl text-green-600 font-bold text-xs text-center";
+            calculateSelectPrice(); // Chỉ tính tiền khi mọi thứ đã hợp lệ
+        }
+        calculateTotalPrice();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdownIds = ['select-date-in', 'select-slot-in', 'select-date-out', 'select-slot-out'];
+
+        dropdownIds.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', function() {
+                    if (this.value !== "") {
+                        clearTableSelection();
+                    }
+
+                    // CHỈ CẦN 2 HÀM NÀY:
+                    checkContinuousSelection(); // Bước 1: Kiểm tra va chạm và hiện Badge status
+                    calculateSelectPrice();      // Bước 2: Nếu không lỗi thì hiện nhãn thời gian và tiền
+                });
+            }
+        });
+    });
+</script>
+<div id="toast-container" class="fixed top-5 right-5 z-[200] flex flex-col gap-2"></div>
+</body>
+</html>

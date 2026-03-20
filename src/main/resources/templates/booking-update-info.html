@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${'Cập nhật thông tin - ' + booking.bookingCode + ' - BookNow'}">Cập nhật thông tin - BookNow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } }
+        }
+    </script>
+    <style>
+        .upload-zone {
+            transition: all 0.2s ease;
+        }
+        .upload-zone:hover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .upload-zone.dragover {
+            border-color: #3b82f6;
+            background-color: #dbeafe;
+            transform: scale(1.01);
+        }
+        .upload-zone.has-file {
+            border-color: #22c55e;
+            background-color: #f0fdf4;
+        }
+        .preview-img {
+            max-height: 220px;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 min-h-screen">
+
+    <!-- ===== LOGO ===== -->
+    <div class="fixed top-5 left-5 z-50 bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow border border-gray-100">
+        <a th:href="@{/home}" class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100">
+                <i class="fa-solid fa-house-chimney text-blue-600 text-base"></i>
+            </div>
+            <span class="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-blue-700">BookNow</span>
+        </a>
+    </div>
+
+    <!-- ===== MAIN LAYOUT ===== -->
+    <div class="max-w-3xl mx-auto px-4 md:px-8 pt-24 pb-14">
+
+        <!-- ===== MAIN CARD ===== -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+            <!-- Header -->
+            <div class="px-6 sm:px-8 py-6 border-b border-gray-100">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
+                        <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">Cập nhật thông tin đặt phòng</h1>
+                        <p class="text-sm text-gray-500">Mã đặt phòng:
+                            <span class="font-mono font-semibold text-gray-700" th:text="${booking.bookingCode}">BK20260312001</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reject Reason -->
+            <div th:if="${booking.note != null and !#strings.isEmpty(booking.note)}"
+                 class="mx-6 sm:mx-8 mt-6 bg-red-50 rounded-xl border border-red-100 px-5 py-4">
+                <p class="text-xs text-red-500 font-semibold mb-1">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Lý do từ chối
+                </p>
+                <p class="text-sm text-red-700 font-medium" th:text="${booking.note}">
+                    Ảnh căn cước công dân bị mờ, không đọc được thông tin.
+                </p>
+            </div>
+
+            <!-- Current ID Card Images -->
+            <div class="px-6 sm:px-8 pt-6">
+                <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">
+                    <i class="fa-regular fa-image mr-2"></i>Ảnh CCCD hiện tại
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="rounded-xl border border-gray-200 overflow-hidden bg-gray-50">
+                        <p class="text-xs text-gray-400 font-semibold px-4 pt-3 pb-2">Mặt trước</p>
+                        <div class="px-4 pb-4">
+                            <img th:src="${booking.idCardFrontUrl}"
+                                 alt="CCCD mặt trước"
+                                 class="w-full h-40 object-contain rounded-lg bg-white border border-gray-100">
+                        </div>
+                    </div>
+                    <div class="rounded-xl border border-gray-200 overflow-hidden bg-gray-50">
+                        <p class="text-xs text-gray-400 font-semibold px-4 pt-3 pb-2">Mặt sau</p>
+                        <div class="px-4 pb-4">
+                            <img th:src="${booking.idCardBackUrl}"
+                                 alt="CCCD mặt sau"
+                                 class="w-full h-40 object-contain rounded-lg bg-white border border-gray-100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Form -->
+            <form id="updateForm"
+                  th:action="@{/bookings/{id}/update-info(id=${booking.bookingId})}"
+                  method="post"
+                  enctype="multipart/form-data"
+                  class="px-6 sm:px-8 py-6 space-y-6">
+
+                <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest">
+                    <i class="fa-solid fa-cloud-arrow-up mr-2"></i>Tải lên ảnh CCCD mới
+                </h2>
+
+                <!-- Error message -->
+                <div th:if="${error != null}"
+                     class="bg-red-50 rounded-xl border border-red-100 px-5 py-4">
+                    <p class="text-sm text-red-600 font-medium">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i>
+                        <span th:text="${error}">Đã xảy ra lỗi</span>
+                    </p>
+                </div>
+
+<!--                &lt;!&ndash; Success message &ndash;&gt;-->
+<!--                <div th:if="${success != null}"-->
+<!--                     class="bg-green-50 rounded-xl border border-green-100 px-5 py-4">-->
+<!--                    <p class="text-sm text-green-600 font-medium">-->
+<!--                        <i class="fa-solid fa-circle-check mr-1"></i>-->
+<!--                        <span th:text="${success}">Cập nhật thành công</span>-->
+<!--                    </p>-->
+<!--                </div>-->
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+                    <!-- Front ID Card Upload -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Mặt trước CCCD <span class="text-red-500">*</span>
+                        </label>
+                        <div id="dropzoneFront" class="upload-zone relative border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer">
+                            <input type="file" id="idCardFront" name="idCardFront"
+                                   accept="image/jpeg,image/png,image/webp"
+                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                   onchange="handleFileSelect(this, 'front')" required>
+
+                            <!-- Upload placeholder -->
+                            <div id="placeholderFront">
+                                <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-blue-50 flex items-center justify-center">
+                                    <i class="fa-solid fa-cloud-arrow-up text-blue-500 text-xl"></i>
+                                </div>
+                                <p class="text-sm font-medium text-gray-600">Kéo thả hoặc nhấn để chọn ảnh</p>
+                                <p class="text-xs text-gray-400 mt-1">JPEG, PNG, WebP (tối đa 2MB)</p>
+                            </div>
+
+                            <!-- Preview -->
+                            <div id="previewFront" class="hidden">
+                                <img id="previewImgFront" src="" alt="Preview" class="preview-img mx-auto rounded-lg">
+                                <p id="fileNameFront" class="text-xs text-green-600 font-medium mt-2"></p>
+                                <button type="button" onclick="clearFile('front')"
+                                        class="mt-2 text-xs text-red-500 hover:text-red-700 font-medium">
+                                    <i class="fa-solid fa-xmark mr-1"></i>Xóa
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Back ID Card Upload -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Mặt sau CCCD <span class="text-red-500">*</span>
+                        </label>
+                        <div id="dropzoneBack" class="upload-zone relative border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer">
+                            <input type="file" id="idCardBack" name="idCardBack"
+                                   accept="image/jpeg,image/png,image/webp"
+                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                   onchange="handleFileSelect(this, 'back')" required>
+
+                            <!-- Upload placeholder -->
+                            <div id="placeholderBack">
+                                <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-blue-50 flex items-center justify-center">
+                                    <i class="fa-solid fa-cloud-arrow-up text-blue-500 text-xl"></i>
+                                </div>
+                                <p class="text-sm font-medium text-gray-600">Kéo thả hoặc nhấn để chọn ảnh</p>
+                                <p class="text-xs text-gray-400 mt-1">JPEG, PNG, WebP (tối đa 2MB)</p>
+                            </div>
+
+                            <!-- Preview -->
+                            <div id="previewBack" class="hidden">
+                                <img id="previewImgBack" src="" alt="Preview" class="preview-img mx-auto rounded-lg">
+                                <p id="fileNameBack" class="text-xs text-green-600 font-medium mt-2"></p>
+                                <button type="button" onclick="clearFile('back')"
+                                        class="mt-2 text-xs text-red-500 hover:text-red-700 font-medium">
+                                    <i class="fa-solid fa-xmark mr-1"></i>Xóa
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Guidelines -->
+                <div class="bg-blue-50 rounded-xl border border-blue-100 px-5 py-4">
+                    <p class="text-xs font-semibold text-blue-600 mb-2">
+                        <i class="fa-solid fa-lightbulb mr-1"></i> Hướng dẫn chụp ảnh CCCD
+                    </p>
+                    <ul class="text-xs text-blue-700 space-y-1">
+                        <li><i class="fa-solid fa-check mr-1.5 text-blue-400"></i>Chụp rõ nét, đủ sáng, không bị mờ</li>
+                        <li><i class="fa-solid fa-check mr-1.5 text-blue-400"></i>Chụp đầy đủ 4 góc, không bị cắt xén</li>
+                        <li><i class="fa-solid fa-check mr-1.5 text-blue-400"></i>Không chụp qua màn hình điện thoại/máy tính</li>
+                        <li><i class="fa-solid fa-check mr-1.5 text-blue-400"></i>Định dạng: JPEG, PNG hoặc WebP, tối đa 2MB</li>
+                    </ul>
+                </div>
+
+            </form>
+
+            <!-- Action Buttons -->
+            <div class="px-6 sm:px-8 py-5 bg-gray-50 border-t border-gray-100">
+                <div class="flex flex-wrap gap-3 justify-end">
+                    <a th:href="@{/bookings/{id}(id=${booking.bookingId})}"
+                       class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors">
+                        <i class="fa-solid fa-arrow-left text-xs"></i> Quay lại
+                    </a>
+                    <button type="submit" form="updateForm" id="submitBtn" disabled
+                            class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-paper-plane text-xs"></i> Gửi lại để kiểm duyệt
+                    </button>
+                </div>
+            </div>
+
+            <!-- Support Footer -->
+            <div class="px-6 py-3 bg-gray-100/60 text-center text-xs text-gray-400 border-t border-gray-100">
+                Cần trợ giúp? Liên hệ
+                <a href="#" class="text-blue-500 hover:underline">support@booknow.vn</a>
+                hoặc gọi
+                <a href="tel:19001234" class="text-blue-500 hover:underline">1900 1234</a>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+        const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+        let selectedFiles = { front: false, back: false };
+
+        function handleFileSelect(input, side) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Validate file type
+            if (!ALLOWED_TYPES.includes(file.type)) {
+                alert('Chỉ chấp nhận ảnh định dạng JPEG, PNG hoặc WebP.');
+                input.value = '';
+                return;
+            }
+
+            // Validate file size
+            if (file.size > MAX_FILE_SIZE) {
+                alert('Kích thước ảnh không được vượt quá 2MB.');
+                input.value = '';
+                return;
+            }
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const capSide = side.charAt(0).toUpperCase() + side.slice(1);
+                document.getElementById('placeholder' + capSide).classList.add('hidden');
+                document.getElementById('preview' + capSide).classList.remove('hidden');
+                document.getElementById('previewImg' + capSide).src = e.target.result;
+                document.getElementById('fileName' + capSide).textContent = file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
+                document.getElementById('dropzone' + capSide).classList.add('has-file');
+
+                selectedFiles[side] = true;
+                updateSubmitButton();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearFile(side) {
+            const capSide = side.charAt(0).toUpperCase() + side.slice(1);
+            const input = document.getElementById(side === 'front' ? 'idCardFront' : 'idCardBack');
+            input.value = '';
+
+            document.getElementById('placeholder' + capSide).classList.remove('hidden');
+            document.getElementById('preview' + capSide).classList.add('hidden');
+            document.getElementById('previewImg' + capSide).src = '';
+            document.getElementById('dropzone' + capSide).classList.remove('has-file');
+
+            selectedFiles[side] = false;
+            updateSubmitButton();
+        }
+
+        function updateSubmitButton() {
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = !(selectedFiles.front && selectedFiles.back);
+        }
+
+        // Drag & drop
+        ['Front', 'Back'].forEach(function(side) {
+            const zone = document.getElementById('dropzone' + side);
+            ['dragenter', 'dragover'].forEach(function(evt) {
+                zone.addEventListener(evt, function(e) {
+                    e.preventDefault();
+                    zone.classList.add('dragover');
+                });
+            });
+            ['dragleave', 'drop'].forEach(function(evt) {
+                zone.addEventListener(evt, function(e) {
+                    e.preventDefault();
+                    zone.classList.remove('dragover');
+                });
+            });
+        });
+
+        // Form submit validation
+        document.getElementById('updateForm').addEventListener('submit', function(e) {
+            const frontFile = document.getElementById('idCardFront').files[0];
+            const backFile = document.getElementById('idCardBack').files[0];
+
+            if (!frontFile || !backFile) {
+                e.preventDefault();
+                alert('Vui lòng chọn cả ảnh mặt trước và mặt sau CCCD.');
+                return;
+            }
+
+            // Disable button to prevent double submit
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').innerHTML =
+                '<i class="fa-solid fa-spinner fa-spin text-xs"></i> Đang gửi...';
+        });
+    </script>
+
+</body>
+</html>

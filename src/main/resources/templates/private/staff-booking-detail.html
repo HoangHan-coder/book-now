@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Chi tiết đặt phòng</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-gray-50 font-sans text-gray-800">
+
+<!-- LOGO -->
+<div class="fixed top-6 left-6 z-50 flex items-center gap-3 select-none">
+  <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
+    <i class="fa-solid fa-house-chimney text-blue-600 text-xl"></i>
+  </div>
+  <div class="flex flex-col leading-none">
+    <span class="text-2xl font-extrabold tracking-tight text-blue-600">BookNow</span>
+    <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider">Homestay System</span>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-40 flex flex-col pt-28">
+
+  <nav class="px-4 space-y-2 flex-1">
+
+    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+      <i class="fa-solid fa-chart-line w-5"></i>
+      Bảng điều khiển
+    </a>
+
+    <a href="#" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium shadow-sm ring-1 ring-black/5">
+      <i class="fa-regular fa-calendar-check w-5"></i>
+      Đơn đặt phòng
+    </a>
+
+    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+      <i class="fa-solid fa-door-open w-5"></i>
+      Phòng
+    </a>
+
+    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+      <i class="fa-solid fa-users-gear w-5"></i>
+      Khách hàng
+    </a>
+
+  </nav>
+
+  <div class="p-4 border-t border-gray-100">
+    <a href="#" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
+      <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
+      Đăng xuất
+    </a>
+  </div>
+
+</aside>
+
+<!-- MAIN -->
+<main class="lg:ml-64 max-w-7xl mx-auto py-12 px-8">
+
+  <!-- HEADER -->
+  <div class="flex justify-between items-start mb-10">
+
+    <div>
+      <h1 class="text-2xl font-bold flex items-center gap-3">
+        Chi tiết đơn #
+        <span th:text="${booking.bookingCode}"></span>
+
+        <span class="px-3 py-1 rounded-full text-sm font-medium"
+              th:classappend="${booking.bookingStatus.cssClass}"
+              th:text="${booking.bookingStatus.displayName}">
+        </span>
+      </h1>
+
+      <p class="text-gray-500 text-sm mt-2">
+        Tạo ngày
+        <span th:text="${#temporals.format(booking.createdAt,'dd/MM/yyyy HH:mm')}"></span>
+      </p>
+    </div>
+
+    <a th:href="@{/admin/bookings}"
+       class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 text-sm transition">
+      ← Quay lại
+    </a>
+
+  </div>
+
+  <!-- GRID -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+
+    <!-- LEFT SIDE -->
+    <div class="lg:col-span-2 space-y-8">
+
+      <!-- BOOKING INFO -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-6">
+
+        <h3 class="font-semibold text-lg">Thông tin đặt phòng</h3>
+
+        <div class="grid grid-cols-2 gap-8">
+
+          <div>
+            <p class="text-sm text-gray-500">Check-in</p>
+            <p class="font-semibold"
+               th:text="${#temporals.format(booking.checkInTime,'dd/MM/yyyy HH:mm')}"></p>
+          </div>
+
+          <div>
+            <p class="text-sm text-gray-500">Check-out</p>
+            <p class="font-semibold"
+               th:text="${#temporals.format(booking.checkOutTime,'dd/MM/yyyy HH:mm')}"></p>
+          </div>
+
+          <div>
+            <p class="text-sm text-gray-500">Số khách</p>
+            <p th:text="${booking.room.roomType.maxGuests}"></p>
+          </div>
+
+          <div>
+            <p class="text-sm text-gray-500">Thời gian lưu trú</p>
+            <p id="durationText"
+               class="font-semibold text-blue-600"
+               th:text="${duration}">
+            </p>
+          </div>
+
+        </div>
+
+        <div>
+          <p class="text-sm text-gray-500">Ghi chú</p>
+          <p class="italic text-gray-700"
+             th:text="${booking.note} ?: 'Không có ghi chú'"></p>
+        </div>
+
+      </div>
+
+      <!-- ROOM INFO -->
+
+      <!-- ROOM INFO -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+
+        <h3 class="font-semibold text-lg mb-6">Thông tin phòng</h3>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+
+          <!-- LEFT: TEXT INFO -->
+          <div class="space-y-6">
+
+            <div>
+              <p class="text-sm text-gray-500">Số phòng</p>
+              <p class="font-semibold text-lg"
+                 th:text="${booking.room.roomNumber}"></p>
+            </div>
+
+            <div>
+              <p class="text-sm text-gray-500">Loại phòng</p>
+              <p th:text="${booking.room.roomType.name}"></p>
+            </div>
+
+            <div>
+              <p class="text-sm text-gray-500">Giá</p>
+              <p class="font-semibold"
+                 th:text="${#numbers.formatDecimal(booking.room.roomType.basePrice,0,'COMMA',0,'POINT')} + 'đ'">
+              </p>
+            </div>
+
+          </div>
+
+          <!-- RIGHT: ROOM IMAGE -->
+          <div>
+            <img th:src="${booking.room.roomType.imageUrl}"
+                 class="w-full h-64 object-cover rounded-xl border border-gray-100 shadow-sm hover:scale-[1.02] transition duration-300">
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="space-y-8">
+
+      <!-- CUSTOMER -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
+
+        <div class="w-16 h-16 mx-auto rounded-full bg-blue-100 flex items-center justify-center text-xl font-bold text-blue-600"
+             th:text="${#strings.substring(booking.customer.fullName,0,1)}">
+        </div>
+
+        <h4 class="mt-4 font-semibold"
+            th:text="${booking.customer.fullName}"></h4>
+
+        <p class="text-sm text-gray-500 mb-6">Khách hàng</p>
+
+        <div class="text-sm space-y-2 text-left">
+
+          <div>
+            <span class="text-gray-500">SĐT:</span>
+            <span th:text="${booking.customer.phone}"></span>
+          </div>
+
+          <div>
+            <span class="text-gray-500">Email:</span>
+            <span th:text="${booking.customer.email}"></span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PAYMENT -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-4">
+
+        <h3 class="font-semibold text-lg">Thanh toán</h3>
+
+        <div class="flex justify-between text-base">
+          <span>Tổng tiền</span>
+          <span class="font-semibold text-blue-600"
+                th:text="${#numbers.formatDecimal(booking.totalAmount,0,'COMMA',0,'POINT')} + 'đ'">
+          </span>
+        </div>
+
+      </div>
+
+      <!-- ACTION BUTTONS -->
+      <div class="flex gap-2">
+
+        <!-- Nút hủy -->
+        <form th:action="@{/admin/bookings/cancel/{bookingCode}(bookingCode=${booking.bookingCode})}"
+              method="post"
+              onsubmit="return confirm('Bạn có chắc chắn muốn hủy đặt phòng này không?')">
+
+          <input type="hidden" name="status" value="FAILED">
+
+          <!-- lý do hủy -->
+          <textarea name="reason"
+                    placeholder="Nhập lý do hủy booking..."
+                    required
+                    class="w-full border border-gray-300 rounded-lg p-2 text-sm mb-3"></textarea>
+
+          <button type="submit"
+                  class="flex items-center gap-2 bg-white border border-red-200 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg font-medium transition">
+            <i class="fa-solid fa-ban"></i>
+            Hủy đặt phòng
+          </button>
+
+        </form>
+
+        <!-- Nút cập nhật -->
+        <a th:href="@{/admin/bookings/update/{bookingCode}(bookingCode=${booking.bookingCode})}"
+           class="flex items-center gap-2 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg font-medium transition">
+          <i class="fa-solid fa-pen"></i>
+          Cập nhật trạng thái
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
+
+</body>
+</html>

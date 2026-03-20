@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang chủ - BookNow</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=more_horiz"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            light: '#60a5fa', // blue-400
+                            DEFAULT: '#3b82f6', // blue-500
+                            dark: '#2563eb', // blue-600
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Định nghĩa độ rộng cố định cho mỗi cột phòng */
+        .room-column {
+            min-width: 200px; /* Đảm bảo mỗi phòng đủ rộng để hiện 4 slot */
+            width: 200px;
+        }
+
+        /* Ép bảng không được co lại mà phải tràn ra ngoài để cuộn */
+        table {
+            table-layout: fixed;
+            width: max-content;
+            min-width: 100%;
+        }
+
+        /* Hiện thanh cuộn ngang (Xóa class no-scrollbar nếu muốn thấy thanh cuộn) */
+        .scroll-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        /* Specific Logo Positioning Rule */
+        .logo-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin-top: 25px;
+            margin-left: 25px;
+            z-index: 60; /* Higher than navbar */
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Hero Background */
+        .hero-bg {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 550px;
+        }
+
+        /* Dropdown Animation */
+        .dropdown-menu {
+            transform-origin: top right;
+            transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+        }
+
+        .dropdown-hidden {
+            transform: scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .dropdown-visible {
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Horizontal Scroll Hide */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+
+        /* Slot Button Selection */
+        .slot-btn.selected {
+            background-color: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 pb-24">
+
+<a th:href="@{/home}">
+    <!-- LOGO (Fixed Position) -->
+    <div class="logo-fixed flex items-center gap-3 select-none cursor-pointer" >
+        <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
+            <i class="fa-solid fa-house-chimney gradient-icon text-xl text-blue-600"></i>
+        </div>
+        <div class="flex flex-col justify-center">
+            <span class="text-2xl font-extrabold tracking-tight text-white leading-none drop-shadow-md">BookNow</span>
+            <span class="text-[10px] text-gray-100 font-medium uppercase tracking-wider pl-0.5 drop-shadow-sm">Homestay System</span>
+        </div>
+    </div>
+</a>
+
+<!-- NAVBAR (Transparent Full Width) -->
+<nav class="fixed top-0 left-0 w-full flex justify-end items-center px-8 py-6 z-50 bg-gradient-to-b from-black/50 to-transparent transition-all duration-300"
+     id="mainNavbar">
+    <div class="flex items-center gap-8">
+        <a href="#" class="text-sm font-medium text-white hover:text-blue-200 transition-colors drop-shadow-sm">Về chúng
+            tôi</a>
+        <a href="#" class="text-sm font-medium text-white hover:text-blue-200 transition-colors drop-shadow-sm">Liên
+            hệ</a>
+
+        <div class="w-px h-6 bg-white/30"></div>
+
+        <!-- Profile Dropdown Container -->
+        <div class="relative">
+            <button id="profileBtn" class="flex items-center gap-3 focus:outline-none group">
+                <div class="text-right hidden sm:block">
+                    <p class="text-xs font-bold text-white group-hover:text-blue-100 transition-colors drop-shadow-sm">
+                        Nguyễn Văn A</p>
+                    <p class="text-[10px] text-gray-200 group-hover:text-white transition-colors">Khách hàng</p>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/50 shadow-sm group-hover:bg-white group-hover:text-blue-600 transition-all">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div id="profileDropdown"
+                 class="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 dropdown-menu dropdown-hidden z-50">
+                <div class="px-4 py-3 border-b border-gray-100">
+                    <p class="text-sm font-medium text-gray-900">Tài khoản của tôi</p>
+                    <p class="text-xs text-gray-500 truncate">nguyenvana@gmail.com</p>
+                </div>
+                <ul class="py-1">
+                    <li>
+                        <a href="register_profile.html"
+                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
+                            <i class="fa-regular fa-id-card mr-2 w-4"></i> Hồ sơ của tôi
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
+                            <i class="fa-solid fa-clock-rotate-left mr-2 w-4"></i> Lịch sử đặt phòng
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
+                            <i class="fa-regular fa-heart mr-2 w-4"></i> Phòng yêu thích
+                        </a>
+                    </li>
+                </ul>
+                <div class="border-t border-gray-100 mt-1 pt-1">
+                    <a href="customer_login.html" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                        <i class="fa-solid fa-arrow-right-from-bracket mr-2 w-4"></i> Đăng xuất
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO SECTION -->
+<header class="hero-bg flex items-center justify-center relative">
+    <div class="text-center text-white z-10 px-4 mt-10">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">Tìm không gian nghỉ dưỡng lý tưởng</h1>
+        <p class="text-lg md:text-xl opacity-90 drop-shadow-md">Trải nghiệm homestay tiện nghi, linh hoạt theo khung giờ
+            của bạn</p>
+    </div>
+</header>
+
+<!-- SEARCH & FILTER BAR -->
+<div class="max-w-6xl mx-auto px-4 -mt-24 relative z-20">
+    <div class="bg-white rounded-3xl shadow-2xl border border-gray-100 p-6"
+         th:object="${search}">
+
+        <form th:action="@{/search}" method="post"
+              class="grid grid-cols-1 md:grid-cols-12 gap-5">
+
+            <!-- Search -->
+            <div class="md:col-span-6">
+                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
+                    Tìm kiếm
+                </label>
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input th:field="*{keyword}"
+                           type="text"
+                           placeholder="Tên phòng"
+                           class="w-full h-11 pl-11 pr-4 text-sm
+                                  border border-gray-200 rounded-xl
+                                  focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                  transition outline-none"/>
+                </div>
+            </div>
+
+            <!-- Guests -->
+            <div class="md:col-span-2">
+                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
+                    Số khách
+                </label>
+                <div class="relative">
+                    <select th:field="*{maxGuest}"
+                            class="w-full h-11 px-4 text-sm
+                                   border border-gray-200 rounded-xl
+                                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                   appearance-none bg-white cursor-pointer">
+                        <option value="1">1 Người</option>
+                        <option value="2">2 Người</option>
+                        <option value="4">4 Người</option>
+                    </select>
+                    <i class="fa-solid fa-user-group absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400"></i>
+                </div>
+            </div>
+
+            <!-- Price -->
+            <div class="md:col-span-2">
+                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">
+                    Mức giá
+                </label>
+                <div class="relative">
+                    <select th:field="*{price}"
+                            class="w-full h-11 px-4 text-sm
+                                   border border-gray-200 rounded-xl
+                                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                   appearance-none bg-white cursor-pointer">
+                        <option value="">Tất cả</option>
+                        <option value="low">&lt; 300k</option>
+                        <option value="mid">300k – 800k</option>
+                        <option value="high">&gt; 800k</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400"></i>
+                </div>
+            </div>
+
+            <!-- Button -->
+            <div class="md:col-span-2 flex items-end">
+                <button type="submit"
+                        class="w-full h-11
+                               bg-blue-600 hover:bg-blue-700
+                               text-white text-sm font-semibold
+                               rounded-xl shadow-md
+                               flex items-center justify-center gap-2
+                               transition active:scale-[0.98]">
+                    <i class="fa-solid fa-filter"></i>
+                    Tìm phòng
+                </button>
+            </div>
+
+            <!-- Amenities -->
+            <div class="md:col-span-12 pt-4 border-t border-gray-100
+                        flex flex-wrap items-center gap-2">
+
+                <span class="text-xs font-semibold text-gray-500 mr-2">
+                    Tiện nghi:
+                </span>
+
+                <label th:each="a,start : ${amenities}"
+                       th:classappend="${start.index >= 3} ? 'hidden amenity-extra' : ''"
+                       class="amenityIds-item flex items-center gap-2
+                              px-3 py-1.5 rounded-full
+                              border border-gray-200 bg-gray-50
+                              text-xs cursor-pointer
+                              hover:border-blue-400 hover:bg-blue-50
+                              transition">
+
+                    <input type="checkbox"
+                           name="amenity"
+                           th:value="${a.name}"
+                           class="text-blue-600 rounded focus:ring-blue-500"/>
+
+                    <span th:text="${a.name}"></span>
+                </label>
+
+                <span id="toggleAmenity"
+                      class="material-symbols-outlined text-gray-400
+                             cursor-pointer hover:text-blue-500 transition">
+                    more_horiz
+                </span>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+
+<!-- MAIN CONTENT CONTAINER -->
+<div class="max-w-7xl mx-auto px-4 py-12 space-y-16">
+
+    <!-- TIME TABLE SECTION (Weekly Table) -->
+    <section>
+        <div class="flex flex-col md:flex-row justify-between items-end mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Lịch phòng trống tuần này</h2>
+                <p class="text-gray-500 mt-2">Chọn khung giờ bạn muốn đặt trực tiếp trên bảng</p>
+            </div>
+            <!-- Legend -->
+            <div class="flex gap-4 mt-4 md:mt-0 text-sm">
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-white border border-gray-300"></div>
+                    Trống
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-blue-600"></div>
+                    Đang chọn
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-gray-200"></div>
+                    Đã đặt
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLE CONTAINER -->
+        <div class="overflow-x-auto bg-white rounded-2xl shadow-sm border border-gray-100 scroll-container">
+            <table class="border-collapse text-sm">
+                <thead class="bg-gray-50">
+                <tr>
+                    <th class="p-4 text-left font-semibold text-gray-500 w-40 border-b border-gray-100 sticky left-0 bg-gray-50 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                        Ngày / Phòng
+                    </th>
+
+                    <th th:each="room : ${roomAll}"
+                        class="p-4 text-center font-semibold text-gray-800 border-b border-gray-100 room-column">
+                        <div class="flex flex-col items-center">
+                            <span th:text="${room.getRoomNumber()}"></span>
+                        </div>
+                    </th>
+                </tr>
+                </thead>
+                <tbody id="scheduleTableBody" class="divide-y divide-gray-100">
+
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- FEATURED ROOMS -->
+    <section>
+        <div class="flex justify-between items-end mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Phòng nổi bật</h2>
+                <p class="text-gray-500 mt-1">Các phòng được yêu thích nhất tuần qua</p>
+            </div>
+            <a th:href="@{/search}" class="text-blue-600 font-medium hover:text-blue-700 hover:underline text-sm flex items-center">
+                Xem tất cả <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Room Card -->
+            <div th:each="room : ${rooms}">
+                <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 group">
+                    <div class="relative h-56 overflow-hidden">
+                        <img th:src="${room.getImageUrl()}"
+                             alt="Room"
+                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div th:text="${room.getRoomType()}"
+                             class="absolute top-3 left-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-xs font-bold text-gray-800 shadow-sm">
+
+                        </div>
+                        <div class="absolute bottom-3 right-3 bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">
+                            4.8 <i class="fa-solid fa-star text-yellow-300 ml-1"></i></div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1 group-hover:text-blue-600 transition-colors"
+                            th:text="${room.getRoomNumber()}"></h3>
+                        <p class="text-sm text-gray-500 mb-4 line-clamp-2" th:text="${room.getDescription()}">.</p>
+                        <div class="flex items-center gap-3 text-xs text-gray-500 mb-4">
+                            <span class="flex items-center"><i class="fa-solid fa-user-group mr-1.5"></i> <span
+                                    th:text="${room.getMaxGuest()}"></span> Khách</span>
+                            <span class="flex items-center"><i class="fa-solid fa-wifi mr-1.5"></i> <span
+                                    th:text="${room.getUtilities()}"></span></span>
+                        </div>
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                            <div>
+                                <p class="text-xs text-gray-400">Giá từ</p>
+                                <p class="text-lg font-bold text-blue-600"><span
+                                        th:text="${#numbers.formatDecimal(room.getBasePrice(),0,'POINT',0,'COMMA') + ' đ'}"></span><span
+                                        class="text-xs font-normal text-gray-500">/ slot</span></p>
+                            </div>
+                            <a th:href="@{/detail/{id}(id=${room.getRoomId()})}">
+                                <button class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">
+                                    Chi tiết
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<!-- BOOKING BAR (Sticky Bottom) -->
+<div id="bookingBar"
+     class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] transform translate-y-full transition-transform duration-300 z-50 flex flex-col md:flex-row justify-between items-center gap-4">
+    <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 text-xl">
+            <i class="fa-solid fa-cart-flatbed-suitcase"></i>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 uppercase font-semibold">Đang chọn:</p>
+            <p class="font-bold text-gray-800" id="bookingBarText"></p>
+        </div>
+    </div>
+    <div class="flex gap-3 w-full md:w-auto">
+        <button id="cancelBookingBtn"
+                class="px-6 py-3 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors w-1/2 md:w-auto">
+            Hủy
+        </button>
+        <button onclick="submitBooking()"
+                class="px-8 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all w-1/2 md:w-auto flex items-center justify-center gap-2">
+            Đặt ngay <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </div>
+</div>
+<form id="bookingSubmitForm" method="GET" style="display: none;">
+    <input type="hidden" name="preDate" id="formDate">
+    <input type="hidden" name="preSlotId" id="formTimetableId">
+</form>
+<!-- FOOTER -->
+<footer class="bg-gray-900 text-white pt-12 pb-6">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <!-- Brand Info -->
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fa-solid fa-house-chimney text-blue-400 text-2xl"></i>
+                    <span class="text-2xl font-bold">BookNow</span>
+                </div>
+                <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                    Hệ thống đặt phòng homestay thông minh, tiện lợi và linh hoạt nhất cho kỳ nghỉ của bạn.
+                </p>
+                <div class="flex gap-4">
+                    <a href="#"
+                       class="w-8 h-8 rounded bg-gray-800 flex items-center justify-center hover:bg-blue-600 transition-colors"><i
+                            class="fa-brands fa-facebook-f text-sm"></i></a>
+                    <a href="#"
+                       class="w-8 h-8 rounded bg-gray-800 flex items-center justify-center hover:bg-pink-600 transition-colors"><i
+                            class="fa-brands fa-instagram text-sm"></i></a>
+                    <a href="#"
+                       class="w-8 h-8 rounded bg-gray-800 flex items-center justify-center hover:bg-blue-400 transition-colors"><i
+                            class="fa-brands fa-twitter text-sm"></i></a>
+                </div>
+            </div>
+            <!-- Contact Info -->
+            <div>
+                <h3 class="text-lg font-bold mb-4">Liên hệ</h3>
+                <ul class="space-y-3 text-sm text-gray-400">
+                    <li class="flex items-start gap-3">
+                        <i class="fa-solid fa-location-dot mt-1 text-blue-500"></i>
+                        <span>123 Đường Ninh Kiều, Cần Thơ, Việt Nam</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fa-solid fa-phone text-blue-500"></i>
+                        <span>Hotline: 1900 1234</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fa-solid fa-envelope text-blue-500"></i>
+                        <span>support@booknow.vn</span>
+                    </li>
+                </ul>
+            </div>
+            <!-- Quick Links -->
+            <div>
+                <h3 class="text-lg font-bold mb-4">Thông tin</h3>
+                <ul class="space-y-2 text-sm text-gray-400">
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Về chúng tôi</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Điều khoản dịch vụ</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Chính sách bảo mật</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Quy chế hoạt động</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 pt-6 text-center text-xs text-gray-500">
+            &copy; 2026 BookNow Homestay System. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- SCRIPT -->
+<script th:inline="javascript">
+    // --- 1. DỮ LIỆU TỪ BACKEND ---
+    const rawRooms = /*[[${roomAll}]]*/ [];
+    const rawSlots = /*[[${timeTable}]]*/ [];
+    const rawWeekDates = /*[[${weekDates}]]*/ [];
+    const rawBookedKeys = /*[[${bookedKeys}]]*/ []; // Set<String> từ Java: "RoomID_YYYY-MM-DD_TimetableID"
+
+    const roomsData = Array.isArray(rawRooms) ? rawRooms : [];
+    const slotsData = Array.isArray(rawSlots) ? rawSlots : [];
+    const bookedKeys = new Set(Array.isArray(rawBookedKeys) ? rawBookedKeys : []);
+
+
+    let selectedSlot = null;
+
+    // Format giờ hiển thị (HH:mm)
+    function formatTime(timeStr) {
+        if (!timeStr) return "";
+        const timePart = timeStr.includes('T') ? timeStr.split('T')[1] : timeStr;
+        return timePart.substring(0, 5);
+    }
+
+    // Map thông tin phòng (Dùng đúng roomId từ Entity)
+    const roomInfo = roomsData.map((r, index) => ({
+        id: r.roomId || r.id || `temp-${index}`,
+        name: r.roomNumber || 'N/A'
+    }));
+
+    // Map khung giờ (Dùng đúng timetableId từ Entity Timetable)
+    const formattedSlots = slotsData.map(s => ({
+        id: s.timetableId,
+        name: s.slotName,
+        time: formatTime(s.startTime) + ' - ' + formatTime(s.endTime)
+    }));
+
+    // Map ngày tháng và chuẩn hóa Key YYYY-MM-DD để khớp với Java
+    const formattedWeekDates = (rawWeekDates || []).map((date, index) => {
+        const dateObj = new Date(date);
+        const yyyy = dateObj.getFullYear();
+        const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const dd = String(dateObj.getDate()).padStart(2, '0');
+        const isoDate = `${yyyy}-${mm}-${dd}`; // Kết quả: 2026-02-28
+
+        const dayNames = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+        return {
+            fullDate: isoDate,
+            dayName: dayNames[dateObj.getDay()],
+            dateStr: dateObj.getDate() + '/' + (dateObj.getMonth() + 1)
+        };
+    });
+
+    // --- 2. HÀM RENDER BẢNG ---
+    function renderTable() {
+        const tableBody = document.getElementById('scheduleTableBody');
+        if (!tableBody) return;
+        tableBody.innerHTML = '';
+
+        formattedWeekDates.forEach((date) => {
+            const tr = document.createElement('tr');
+            tr.className = 'group hover:bg-blue-50/30 transition-colors';
+
+            // Cột Ngày
+            const dateCell = document.createElement('td');
+            dateCell.className = 'p-4 border-b border-gray-100 sticky left-0 bg-white group-hover:bg-blue-50/30 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]';
+            dateCell.innerHTML = `
+                <div class="font-bold text-gray-800">${date.dayName}</div>
+                <div class="text-xs text-gray-500">${date.dateStr}</div>
+            `;
+            tr.appendChild(dateCell);
+
+            // Cột Phòng
+            roomInfo.forEach((room) => {
+                const td = document.createElement('td');
+                td.className = 'p-3 border-b border-gray-100 text-center room-column';
+                const slotGrid = document.createElement('div');
+                slotGrid.className = 'grid grid-cols-2 gap-1.5 justify-center';
+
+                formattedSlots.forEach(slot => {
+                    // Tạo Key để kiểm tra trạng thái khóa
+                    const statusKey = `${room.id}_${date.fullDate}_${slot.id}`;
+                    const isBooked = bookedKeys.has(statusKey);
+
+                    // Kiểm tra trạng thái đang chọn
+                    const isSelected = selectedSlot &&
+                        String(selectedSlot.roomId) === String(room.id) &&
+                        selectedSlot.date === date.fullDate &&
+                        String(selectedSlot.slotId) === String(slot.id);
+
+                    const btn = document.createElement('button');
+
+                    // Style Button dựa trên trạng thái (Booked > Selected > Default)
+                    if (isBooked) {
+                        btn.className = 'h-8 w-full rounded-md text-[10px] font-medium bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed';
+                        btn.innerHTML = `<i class="fa-solid fa-lock text-[8px]"></i>`;
+                        btn.disabled = true;
+                    } else {
+                        btn.className = `h-8 w-full rounded-md text-[10px] font-medium transition-all border ${
+                            isSelected ? 'bg-blue-600 text-white border-blue-600 shadow-sm scale-105' :
+                                'bg-white text-gray-600 border-gray-200 hover:border-blue-400 hover:text-blue-600'
+                        }`;
+                        btn.innerHTML = `<span>${slot.name.split('(')[0].trim()}</span>`;
+                        btn.onclick = () => handleSlotClick(room, date, slot);
+                    }
+                    slotGrid.appendChild(btn);
+                });
+                td.appendChild(slotGrid);
+                tr.appendChild(td);
+            });
+            tableBody.appendChild(tr);
+        });
+    }
+    function submitBooking() {
+        // 1. Kiểm tra xem người dùng đã chọn slot chưa
+        if (!selectedSlot) {
+            alert("Vui lòng chọn một khung giờ trước khi đặt!");
+            return;
+        }
+
+        const form = document.getElementById('bookingSubmitForm');
+
+        // 2. Gán giá trị từ đối tượng selectedSlot vào các input ẩn của form
+        document.getElementById('formDate').value = selectedSlot.date;
+        document.getElementById('formTimetableId').value = selectedSlot.slotId;
+
+        // 3. Cập nhật action URL: /book-now/detail/{roomId}
+        form.action = '/book-now/detail/' + selectedSlot.roomId;
+
+        // 4. Gửi form
+        form.submit();
+    }
+    function handleSlotClick(room, date, slot) {
+        const bookingBar = document.getElementById('bookingBar');
+        const bookingBarText = document.getElementById('bookingBarText');
+
+        const isSame = selectedSlot &&
+            String(selectedSlot.roomId) === String(room.id) &&
+            selectedSlot.date === date.fullDate &&
+            String(selectedSlot.slotId) === String(slot.id);
+
+        if (isSame) {
+            selectedSlot = null;
+            bookingBar.classList.add('translate-y-full');
+        } else {
+            selectedSlot = {
+                roomId: room.id,
+                date: date.fullDate,
+                slotId: slot.id,
+                roomName: room.name,
+                slotName: slot.name
+            };
+            bookingBarText.textContent = `${room.name} • ${date.dayName}, ${date.dateStr} • ${slot.name}`;
+            bookingBar.classList.remove('translate-y-full');
+        }
+        renderTable();
+    }
+    // 3. Toggle Tiện nghi
+    const toggleBtn = document.getElementById("toggleAmenity");
+    const extraAmenities = document.querySelectorAll(".amenity-extra");
+    let isExpanded = false;
+
+    toggleBtn.addEventListener("click", () => {
+        isExpanded = !isExpanded;
+        extraAmenities.forEach(el => el.classList.toggle("hidden", !isExpanded));
+        toggleBtn.innerText = isExpanded ? "expand_less" : "more_horiz";
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+        const cancelBtn = document.getElementById('cancelBookingBtn');
+        if(cancelBtn) {
+            cancelBtn.onclick = () => {
+                selectedSlot = null;
+                document.getElementById('bookingBar').classList.add('translate-y-full');
+                renderTable();
+            };
+        }
+        renderTable();
+    });
+</script>
+</body>
+</html>
