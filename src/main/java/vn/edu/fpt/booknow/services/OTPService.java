@@ -140,7 +140,7 @@ public class OTPService {
     public void sendOtp(String email) {
         // Check if email exists (but don't reveal this to user for security)
         Optional<Customer> customerOpt = customerRepository.findCustomerByEmail(email);
-        System.out.println(customerOpt);
+//        System.out.println(customerOpt);
         // Always show success message even if email doesn't exist (security best practice)
         if (customerOpt.isPresent()) {
             // Generate and save OTP
@@ -167,7 +167,6 @@ public class OTPService {
 
     public boolean resendEmail(String email) {
         Optional<Customer> customerOpt = customerRepository.findCustomerByEmail(email);
-        System.out.println(customerOpt);
         if (customerOpt.isPresent()) {
             // Generate and save OTP
             System.out.println("Email has exist " + this.hasOtp(email));

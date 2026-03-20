@@ -35,8 +35,8 @@ public class JWTFilter extends OncePerRequestFilter {
         // Skip JWT validation for public endpoints
         if (requestPath.contains("/auth/login") || requestPath.contains("/admin/login") || 
             requestPath.contains("/register") || requestPath.contains("/public") ||
-            requestPath.contains("/auth/logout") || requestPath.contains("/pay") ||
-                requestPath.contains("/momo-*") || requestPath.contains("/forgot-password") ||requestPath.contains("/booking/save") ) {
+            requestPath.contains("/auth/logout") ||
+                requestPath.contains("/pay") || requestPath.contains("/forgot-password")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -56,6 +56,7 @@ public class JWTFilter extends OncePerRequestFilter {
         // get token and username from header
         if (authHeader != null){
             token = authHeader;
+            System.out.println("JWT TOKEN: " + token);
             username = jwtService.extractUserName(token);
         }
 
@@ -86,5 +87,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // add authentication token into security context holder
         SecurityContextHolder.getContext().setAuthentication(authToken);
+        System.out.println("PATH: " + request.getRequestURI());
+        System.out.println("AUTH BEFORE: " + SecurityContextHolder.getContext().getAuthentication());
     }
 }

@@ -4,15 +4,29 @@ package vn.edu.fpt.booknow.controllers;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.fpt.booknow.model.dto.MomoResponseDTO;
+import vn.edu.fpt.booknow.model.entities.Booking;
+import vn.edu.fpt.booknow.model.entities.BookingStatus;
+import vn.edu.fpt.booknow.model.entities.Payment;
+import vn.edu.fpt.booknow.services.BookingService;
 import vn.edu.fpt.booknow.services.MomoPaymentService;
+import vn.edu.fpt.booknow.services.PaymentService;
+
+import java.math.BigDecimal;
 
 @Controller
 @RequestMapping("/pay")
 public class PaymentController {
+
+    @Autowired
+    private BookingService bookingService;
+
+    @Autowired
+    private PaymentService paymentService;
 
     private static final Logger log = LoggerFactory.getLogger(PaymentController.class);
 
@@ -29,17 +43,19 @@ public class PaymentController {
 
     @PostMapping("/create-payment")
     public String createPayment(
-            @RequestParam("amount") long amount,
-            @RequestParam("orderInfo") String orderInfo,
+            @RequestParam("bookingCode") String bookingCode,
+            @RequestParam("totalAmount") String totalAmount,
             Model model) {
-
-        log.info("Nhận yêu cầu tạo thanh toán: amount={}, orderInfo={}", amount, orderInfo);
         try {
+            long amount = Long.parseLong(totalAmount);
+            log.info("Nhận yêu cầu tạo thanh toán: amount={}, orderInfo={}", amount, bookingCode);
+            System.out.println("Nhận yêu cầu tạo thanh toán: amount="+amount+", orderInfo="+bookingCode);
+
             if (amount <= 0) {
                 model.addAttribute("error", "Số tiền phải lớn hơn 0");
                 return "payment";
             }
-            MomoResponseDTO response = momoPaymentService.createPayment(amount, orderInfo);
+            MomoResponseDTO response = momoPaymentService.createPayment(amount, bookingCode);
             if (response.isSuccess() && response.getPayUrl() != null) {
                 log.info("Tạo thanh toán thành công, redirect đến: {}", response.getPayUrl());
                 return "redirect:" + response.getPayUrl();
@@ -57,29 +73,29 @@ public class PaymentController {
 
     @GetMapping("/momo-return")
     public String handleReturn(
-            @RequestParam(value = "partnerCode",  required = false) String partnerCode,
-            @RequestParam(value = "requestId",    required = false) String requestId,
-            @RequestParam(value = "orderId",      required = false) String orderId,
-            @RequestParam(value = "amount",       required = false) String amount,
-            @RequestParam(value = "orderInfo",    required = false) String orderInfo,
-            @RequestParam(value = "orderType",    required = false) String orderType,
-            @RequestParam(value = "transId",      required = false) String transId,
-            @RequestParam(value = "message",      required = false) String message,
+            @RequestParam(value = "partnerCode", required = false) String partnerCode,
+            @RequestParam(value = "requestId", required = false) String requestId,
+            @RequestParam(value = "orderId", required = false) String orderId,
+            @RequestParam(value = "amount", required = false) String amount,
+            @RequestParam(value = "orderInfo", required = false) String orderInfo,
+            @RequestParam(value = "orderType", required = false) String orderType,
+            @RequestParam(value = "transId", required = false) String transId,
+            @RequestParam(value = "message", required = false) String message,
             @RequestParam(value = "localMessage", required = false) String localMessage,
             @RequestParam(value = "responseTime", required = false) String responseTime,
-            @RequestParam(value = "resultCode",    required = false) String resultCode,
-            @RequestParam(value = "payType",      required = false) String payType,
-            @RequestParam(value = "extraData",    required = false, defaultValue = "") String extraData,
-            @RequestParam(value = "signature",    required = false) String signature,
+            @RequestParam(value = "resultCode", required = false) String resultCode,
+            @RequestParam(value = "payType", required = false) String payType,
+            @RequestParam(value = "extraData", required = false, defaultValue = "") String extraData,
+            @RequestParam(value = "signature", required = false) String signature,
             Model model) {
 
         log.info("=== Nhận callback returnUrl ===");
         log.info("OrderId: {}, resultCode: {}, TransId: {}", orderId, resultCode, transId);
 
         boolean isValid = momoPaymentService.verifyReturnSignature(
-            partnerCode, requestId, orderId, amount, orderInfo, orderType,
-            transId, message, responseTime, resultCode,
-            payType, extraData, signature
+                partnerCode, requestId, orderId, amount, orderInfo, orderType,
+                transId, message, responseTime, resultCode,
+                payType, extraData, signature
         );
 
         if (!isValid) {
@@ -90,17 +106,27 @@ public class PaymentController {
         }
 
         boolean isSuccess = "0".equals(resultCode);
-        model.addAttribute("success",      isSuccess);
-        model.addAttribute("orderId",      orderId);
-        model.addAttribute("amount",       amount);
-        model.addAttribute("transId",      transId);
-        model.addAttribute("orderInfo",    orderInfo);
+        model.addAttribute("success", isSuccess);
+        model.addAttribute("orderId", orderId);
+        model.addAttribute("amount", amount);
+        model.addAttribute("transId", transId);
+        model.addAttribute("orderInfo", orderInfo);
         model.addAttribute("responseTime", responseTime);
-        model.addAttribute("resultCode",    resultCode);
-        model.addAttribute("message",      isSuccess ? "Thanh toán thành công!" : "Thanh toán thất bại: " + message);
-
+        model.addAttribute("resultCode", resultCode);
+        model.addAttribute("message", isSuccess ? "Thanh toán thành công!" : "Thanh toán thất bại: " + message);
+        Booking booking = bookingService.getBookingDetail(orderInfo);
+        if (isSuccess) {
+            BigDecimal total = BigDecimal.valueOf(Double.parseDouble(amount));
+            bookingService.updateStatus(BookingStatus.PAID, orderInfo);
+            paymentService.creatPayment(new Payment(
+                    booking,
+                    total,
+                    "MOMO Payment",
+                    "SUCCESS"
+            ));
+        }
         log.info("Kết quả thanh toán: success={}, transId={}", isSuccess, transId);
-        return "result";
+        return "redirect:/bookings/" + booking.getBookingId();
     }
 
     @PostMapping("/momo-notify")
@@ -124,36 +150,36 @@ public class PaymentController {
                 // JSON body
                 com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
                 com.fasterxml.jackson.databind.JsonNode node = mapper.readTree(rawBody);
-                partnerCode  = getText(node, "partnerCode");
-                requestId    = getText(node, "requestId");
-                orderId      = getText(node, "orderId");
-                amount       = getText(node, "amount");
-                orderInfo    = getText(node, "orderInfo");
-                orderType    = getText(node, "orderType");
-                transId      = getText(node, "transId");
-                message      = getText(node, "message");
+                partnerCode = getText(node, "partnerCode");
+                requestId = getText(node, "requestId");
+                orderId = getText(node, "orderId");
+                amount = getText(node, "amount");
+                orderInfo = getText(node, "orderInfo");
+                orderType = getText(node, "orderType");
+                transId = getText(node, "transId");
+                message = getText(node, "message");
                 localMessage = getText(node, "localMessage");
                 responseTime = getText(node, "responseTime");
-                resultCode   = getText(node, "resultCode");
-                payType      = getText(node, "payType");
-                extraData    = node.has("extraData") ? node.get("extraData").asText("") : "";
-                signature    = getText(node, "signature");
+                resultCode = getText(node, "resultCode");
+                payType = getText(node, "payType");
+                extraData = node.has("extraData") ? node.get("extraData").asText("") : "";
+                signature = getText(node, "signature");
             } else {
                 // Form params fallback
-                partnerCode  = request.getParameter("partnerCode");
-                requestId    = request.getParameter("requestId");
-                orderId      = request.getParameter("orderId");
-                amount       = request.getParameter("amount");
-                orderInfo    = request.getParameter("orderInfo");
-                orderType    = request.getParameter("orderType");
-                transId      = request.getParameter("transId");
-                message      = request.getParameter("message");
+                partnerCode = request.getParameter("partnerCode");
+                requestId = request.getParameter("requestId");
+                orderId = request.getParameter("orderId");
+                amount = request.getParameter("amount");
+                orderInfo = request.getParameter("orderInfo");
+                orderType = request.getParameter("orderType");
+                transId = request.getParameter("transId");
+                message = request.getParameter("message");
                 localMessage = request.getParameter("localMessage");
                 responseTime = request.getParameter("responseTime");
-                resultCode   = request.getParameter("resultCode");
-                payType      = request.getParameter("payType");
-                extraData    = request.getParameter("extraData") != null ? request.getParameter("extraData") : "";
-                signature    = request.getParameter("signature");
+                resultCode = request.getParameter("resultCode");
+                payType = request.getParameter("payType");
+                extraData = request.getParameter("extraData") != null ? request.getParameter("extraData") : "";
+                signature = request.getParameter("signature");
             }
 
             log.info("OrderId: {}, ResultCode: {}, TransId: {}, Amount: {}",

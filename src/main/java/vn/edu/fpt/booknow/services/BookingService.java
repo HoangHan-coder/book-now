@@ -28,14 +28,31 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class BookingService {
+
     private RoomRepository roomRepository;
+
     private BookingRepository bookingRepository;
+
     private TimeTableRepository timeTableRepository;
+
     private ScheduleRepository scheduleRepository;
+
     private Cloudinary cloudinary;
+
     private CustomerRepository customerRepository;
+
     private JWTService jwtService;
+
+    private static final long MAX_FILE_SIZE = 2 * 1024 * 1024;
+
+    private static final Set<String> ALLOWED_TYPES = Set.of(
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+    );
+    
     private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
+
     public BookingService(BookingRepository bookingRepository,
                           TimeTableRepository timeTableRepository,
                           RoomRepository roomRepository,
@@ -50,6 +67,91 @@ public class BookingService {
         this.customerRepository = customerRepository;
         this.jwtService = jwtService;
     }
+
+    // ========================Hoang Han=============================
+
+
+    public List<Booking> getBookingByEmail(String email) {
+        return bookingRepository.getBookingByCustomer_Email(email).orElse(null);
+    }
+
+    public Booking getBookingDetail(String code) {
+        return bookingRepository.findByBookingCode(code).orElse(null);
+    }
+
+    @Transactional
+    public void updateStatus(BookingStatus bookingStatus, String bookingCode) {
+        Booking booking = getBookingDetail(bookingCode);
+        booking.setBookingStatus(bookingStatus);
+    }
+
+    @Transactional
+    public void cancel(Long bookingId) {
+        Booking booking = getBookingById(bookingId);
+        booking.setNote("Được hủy bởi khách hàng");
+        booking.setBookingStatus(BookingStatus.FAILED);
+    }
+
+
+    @Transactional
+    public void updateIdCard(MultipartFile idCardFront, MultipartFile idCardBack, Long bookingId)
+            throws Exception{
+
+        if (idCardFront.getSize() > MAX_FILE_SIZE || idCardBack.getSize() > MAX_FILE_SIZE) {
+            throw new Exception("Ảnh phải nhỏ hơn hoặc bằng 2mb");
+        }
+
+        if (!ALLOWED_TYPES.contains(idCardFront.getContentType()) || !ALLOWED_TYPES.contains(idCardBack.getContentType())) {
+            throw new Exception("Hệ thống chỉ hỗ trợ ảnh có đuôi .png hoặc .jpg");
+        }
+        Booking booking = bookingRepository.getReferenceById(bookingId);
+
+        try {
+
+            @SuppressWarnings("unchecked")
+            Map<String, Object> uploadidCardFrontResult = cloudinary.uploader().upload(
+                    idCardFront.getBytes(),
+                    ObjectUtils.asMap(
+                            "folder", "book-now/card-id"
+                    ));
+
+            @SuppressWarnings("unchecked")
+            Map<String, Object> uploadIdCardBackResult = cloudinary.uploader().upload(
+                    idCardBack.getBytes(),
+                    ObjectUtils.asMap(
+                            "folder", "book-now/card-id"
+                    ));
+
+            String idCardFrontUrl = (String) uploadidCardFrontResult.get("secure_url");
+            String publicIdCardFrontUrl = (String) uploadidCardFrontResult.get("public_id");
+
+            String idCardBackUrl = (String) uploadIdCardBackResult.get("secure_url");
+            String publicIdCardBackUrl = (String) uploadIdCardBackResult.get("public_id");
+
+            booking.setIdCardFrontUrl(idCardFrontUrl);
+            booking.setIdCardFontPublicId(publicIdCardFrontUrl);
+
+            booking.setIdCardBackUrl(idCardBackUrl);
+            booking.setIdCardBackPublicId(publicIdCardBackUrl);
+
+            updateStatus(BookingStatus.PENDING, booking.getBookingCode());
+
+        } catch (Exception e) {
+            throw new Exception("Lỗi upload ảnh lên cloud");
+        }
+    }
+
+
+    @SuppressWarnings("null")
+    public Booking getBookingById(Long bookingId) {
+        return bookingRepository.findById(bookingId).orElse(null);
+    }
+
+    // ========================Hoang Han=============================
+
+
+
+
 
     private Bucket createNewBucket() {
         return Bucket.builder()
@@ -69,34 +171,34 @@ public class BookingService {
 
         try {
             if (isRateLimited(username)) {
-                return setErrorMessage(redirectAttributes, "Thao tác quá nhanh! Vui lòng đợi 1 phút.", bookingDTO.getRoomId());
+                return setErrorMessage(redirectAttributes, "Thao tác quá nhanh! Vui lòng đợi 1 phút.", bookingDTO.getRoom().getRoomId());
             }
             if (frontImg.getSize() == 0) {
-                return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt trước!", bookingDTO.getRoomId());
+                return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt trước!", bookingDTO.getRoom().getRoomId());
 
             }
             if (backImg.getSize() == 0) {
-                return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt sau!", bookingDTO.getRoomId());
+                return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt sau!", bookingDTO.getRoom().getRoomId());
 
             }
             // 1. Parse và tự động gán năm cho Check-in/Check-out (Xử lý loại 1 & 2)
             WorkShift firstShift = parseToWorkShift(bookingDTO.getCheckInTime());
             WorkShift lastShift = parseToWorkShift(bookingDTO.getCheckOutTime());
             if (lastShift.getStartTime().isBefore(firstShift.getStartTime())) {
-                return setErrorMessage(redirectAttributes, "Ngày trả phòng không thể trước ngày nhận phòng!", bookingDTO.getRoomId());
+                return setErrorMessage(redirectAttributes, "Ngày trả phòng không thể trước ngày nhận phòng!", bookingDTO.getRoom().getRoomId());
             }
             // 2. Kiểm tra khung giờ so với DB (Yêu cầu 3)
-            String result = validateShiftWithDatabase(bookingDTO.getRoomId(), firstShift, lastShift);
+            String result = validateShiftWithDatabase(bookingDTO.getRoom().getRoomId(), firstShift, lastShift);
             if (!result.isEmpty()) {
-                return setErrorMessage(redirectAttributes, result, bookingDTO.getRoomId());
+                return setErrorMessage(redirectAttributes, result, bookingDTO.getRoom().getRoomId());
             }
             // 3. Lấp đầy các ca ở giữa để kiểm tra tính liên tiếp (Yêu cầu 4)
-            List<WorkShift> allShifts = fillMissingShifts(Arrays.asList(firstShift, lastShift), bookingDTO.getRoomId());
+            List<WorkShift> allShifts = fillMissingShifts(Arrays.asList(firstShift, lastShift), bookingDTO.getRoom().getRoomId());
 
             // 4. Kiểm tra trùng lặp trong DB
-            String resultCheck = checkDuplicateShifts(allShifts, bookingDTO.getRoomId());
+            String resultCheck = checkDuplicateShifts(allShifts, bookingDTO.getRoom().getRoomId());
             if (!resultCheck.isEmpty()) {
-                return setErrorMessage(redirectAttributes, resultCheck, bookingDTO.getRoomId());
+                return setErrorMessage(redirectAttributes, resultCheck, bookingDTO.getRoom().getRoomId());
             }
             // 5. Upload ảnh (Giữ lại logic cũ)
             String frontUrl = "";
@@ -104,7 +206,7 @@ public class BookingService {
                 try {
                     frontUrl = uploadToCloudinary(frontImg);
                 } catch (IOException e) {
-                    return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt trước!", bookingDTO.getRoomId());
+                    return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt trước!", bookingDTO.getRoom().getRoomId());
                 }
             }
             String backUrl = "";
@@ -112,7 +214,7 @@ public class BookingService {
                 try {
                     backUrl = uploadToCloudinary(backImg);
                 } catch (IOException e) {
-                    return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt sau!", bookingDTO.getRoomId());
+                    return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt sau!", bookingDTO.getRoom().getRoomId());
                 }
             }
             // 6. Lưu vào Database
@@ -123,7 +225,7 @@ public class BookingService {
             return "redirect:/payment";
 
         } catch (IllegalArgumentException e) {
-            return setErrorMessage(redirectAttributes, e.getMessage(), bookingDTO.getRoomId());
+            return setErrorMessage(redirectAttributes, e.getMessage(), bookingDTO.getRoom().getRoomId());
         }
     }
 
@@ -227,7 +329,7 @@ public class BookingService {
            WorkShift lastShift = allShifts.get(allShifts.size() - 1);
 
            // 1. Tính tổng tiền của TẤT CẢ các ca đã chọn
-           BigDecimal totalAmount = calculateTotalAmount(allShifts, bookingDTO.getRoomId());
+           BigDecimal totalAmount = calculateTotalAmount(allShifts, bookingDTO.getRoom().getRoomId());
 
            LocalDateTime checkInDate = firstShift.getStartTime();
            LocalDateTime checkOutDate = lastShift.getEndTime();
@@ -242,13 +344,13 @@ public class BookingService {
            Booking newBooking = new Booking();
            newBooking.setCustomer(customer);
            Room room = new Room();
-           room.setRoomId(bookingDTO.getRoomId());
+           room.setRoomId(bookingDTO.getRoom().getRoomId());
            newBooking.setRoom(room);
 
            newBooking.setCheckInTime(checkInDate);
            newBooking.setCheckOutTime(checkOutDate);
            newBooking.setTotalAmount(totalAmount);
-           newBooking.setBookingStatus("PENDING_PAYMENT");
+           newBooking.setBookingStatus(BookingStatus.PENDING_PAYMENT);
            newBooking.setBookingCode(generateUniqueBookingCode());
            newBooking.setCreatedAt(LocalDateTime.now());
            newBooking.setNote(bookingDTO.getNote());
@@ -262,7 +364,7 @@ public class BookingService {
            System.out.println(" - Ca kết thúc: " + lastShift.getShiftType());
            System.out.println(" - CHECK-IN:  " + checkInDate);
            System.out.println(" - CHECK-OUT: " + checkOutDate);
-           System.out.println(" - Tổng tiền: " + calculateTotalAmount(allShifts, bookingDTO.getRoomId()));
+           System.out.println(" - Tổng tiền: " + calculateTotalAmount(allShifts, bookingDTO.getRoom().getRoomId()));
            System.out.println("====================================");
            Booking savedBooking = bookingRepository.save(newBooking);
 
@@ -444,7 +546,7 @@ public class BookingService {
 
         // 2. Cập nhật các trường thông tin cơ bản
         existingBooking.setNote(bookingData.getNote());
-        existingBooking.setBookingStatus("CHECKED_IN");
+        existingBooking.setBookingStatus(BookingStatus.CHECKED_IN);
         existingBooking.setUpdateAt(LocalDateTime.now());
 
         // 3. Xử lý ảnh mặt trước
@@ -490,7 +592,7 @@ public class BookingService {
         }
         System.out.println(bookingId + " test 494");
         // 3. Cập nhật trạng thái
-        booking.setBookingStatus("FAILED");
+        booking.setBookingStatus(BookingStatus.FAILED);
         booking.setUpdateAt(LocalDateTime.now());
 
         // 4. Lưu lại

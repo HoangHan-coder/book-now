@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách đặt phòng - BookNow</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            light: '#60a5fa', // blue-400
+                            DEFAULT: '#3b82f6', // blue-500
+                            dark: '#2563eb', // blue-600
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Specific Logo Positioning Rule */
+        .logo-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin-top: 25px;
+            margin-left: 25px;
+            z-index: 60; /* Higher than sidebar */
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-icon {
+            color: #3b82f6;
+        }
+
+        /* Sidebar transitions */
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Hide scrollbar for sidebar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Status Badge Colors */
+        .status-pending { @apply bg-yellow-50 text-yellow-700 ring-1 ring-yellow-600/20; }
+        .status-confirmed { @apply bg-blue-50 text-blue-700 ring-1 ring-blue-600/20; }
+        .status-completed { @apply bg-green-50 text-green-700 ring-1 ring-green-600/20; }
+        .status-cancelled { @apply bg-red-50 text-red-700 ring-1 ring-red-600/20; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+<!-- Header -->
+<header class="bg-blue-600 text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold">Housekeeping Dashboard</h1>
+        <div class="flex items-center gap-4">
+            <span class="text-sm">Welcome, <span th:text="${#authentication.name}">User</span></span>
+            <a href="/logout" class="text-sm bg-blue-700 px-3 py-1 rounded hover:bg-blue-800">Logout</a>
+        </div>
+    </div>
+</header>
+
+<!-- Navigation -->
+
+
+<!-- Main Content -->
+<main class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Back Link -->
+    <a href="/admin/manage-housekeeping"
+       class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium
+          text-blue-700 bg-blue-100 rounded-md
+          hover:bg-blue-200 transition mb-4">
+        ← Back to Tasks
+    </a>
+    <!-- Page Header -->
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Task to Staff</h2>
+        <p class="text-sm text-gray-500">cleaning task to a housekeeping staff member</p>
+    </div>
+
+    <form method="POST" th:action="@{'/admin/manage-housekeeping/task-detail/' + ${housekeepingTask.id}}" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Form -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow p-6">
+
+                    <div class="mb-6 pb-6 border-b">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Task Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Task ID</label>
+                                <input type="text" th:value="'#' + ${housekeepingTask.id}" readonly class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100 text-gray-700 font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Room Number</label>
+                                <input type="text" th:value="${housekeepingTask.room.roomNumber}" readonly class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100 text-gray-700 font-bold text-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Room Type</label>
+                                <input type="text" th:value="${housekeepingTask.room.roomType.name}" readonly class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100 text-gray-700">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                                <select name="priority" class="w-full border border-gray-300 rounded px-3 py-2">
+                                    <option value="LOW" th:selected="${housekeepingTask.priority.name() == 'LOW'}">Thấp (Low)</option>
+                                    <option value="NORMAL" th:selected="${housekeepingTask.priority.name() == 'NORMAL'}">Bình thường (Normal)</option>
+                                    <option value="HIGH" th:selected="${housekeepingTask.priority.name() == 'HIGH'}">Cao (High)</option>
+                                    <option value="URGENT" th:selected="${housekeepingTask.priority.name() == 'URGENT'}">Khẩn cấp (Urgent)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Task Type</label>
+                                <input type="text" th:value="${housekeepingTask.taskType}" readonly class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100 text-gray-700">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Current Status</label>
+                                <input type="text"
+                                       th:value="${housekeepingTask.status.displayName}"
+                                       readonly
+                                       class="w-full border border-gray-300 rounded px-3 py-2 font-medium"
+                                       th:classappend="${housekeepingTask.status.cssEnumClass}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Assigned Staff Section -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Assign Staff Member</h3>
+
+                        <div class="p-4 border border-gray-200 rounded bg-gray-50">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Staff</label>
+                            <select name="assignedStaffId" class="w-full border border-gray-300 rounded px-3 py-2">
+                                <option value="">-- Unassigned --</option>
+                                <option th:each="staff : ${availableStaff}" 
+                                        th:value="${staff.staffAccountId}"
+                                        th:text="${staff.fullName}"
+                                        th:selected="${housekeepingTask.assignedTo != null and housekeepingTask.assignedTo.staffAccountId == staff.staffAccountId}">
+                                    Staff Name
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                        <textarea name="notes" class="w-full border border-gray-300 rounded px-3 py-2 h-24" th:text="${housekeepingTask.notes}"></textarea>
+                    </div>
+
+                    <!-- Save Button -->
+                    <div class="flex gap-3">
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-medium">
+                            💾 Save Changes
+                        </button>
+                        <a href="/admin/manage-housekeeping" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 font-medium">
+                            Cancel
+                        </a>
+                    </div>
+            </div>
+        </div>
+        <!-- Sidebar - Task Overview & Details -->
+        <div class="space-y-4">
+            <!-- Task Quick Info -->
+            <!-- Priority Card -->
+            <div class="bg-white rounded-lg shadow-md p-5 border-l-4" th:classappend="${'border-' + housekeepingTask.priority.name().toLowerCase() + '-400'}">
+                <h4 class="font-semibold text-gray-800 mb-3 text-sm">⚡ Mức Độ Ưu Tiên</h4>
+                <div class="mb-3">
+                    <span class="px-4 py-2 rounded-full text-sm font-bold inline-block"
+                          th:classappend="${housekeepingTask.priority.getCssEnumClass()}"
+                          th:text="${housekeepingTask.priority.getDisplayName()}">
+                    </span>
+                </div>
+                <p class="text-xs text-gray-500 border-t pt-3">
+                    <span th:switch="${housekeepingTask.priority.name()}">
+                        <span th:case="'LOW'">Có thể hoàn thành trong thời gian thường</span>
+                        <span th:case="'NORMAL'">Ưu tiên tiêu chuẩn</span>
+                        <span th:case="'HIGH'">Yêu cầu hoàn thành sớm</span>
+                        <span th:case="'URGENT'">Cần hoàn thành ngay lập tức</span>
+                    </span>
+                </p>
+            </div>
+
+            <!-- Status Card -->
+            <div class="bg-white rounded-lg shadow-md p-5 border-l-4 border-green-400">
+                <h4 class="font-semibold text-gray-800 mb-3 text-sm">✓ Trạng Thái Task</h4>
+                <div class="mb-3">
+                    <span class="px-4 py-2 rounded-full text-sm font-bold inline-block"
+                          th:classappend="${housekeepingTask.status.getCssEnumClass()}"
+                          th:text="${housekeepingTask.status.getDisplayName()}">
+                    </span>
+                </div>
+                <p class="text-xs text-gray-500 border-t pt-3">
+                    <span th:if="${housekeepingTask.createdAt}">
+                        📅 Tạo lúc: <span th:text="${#temporals.format(housekeepingTask.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                    </span>
+                </p>
+            </div>
+
+            <!-- Assigned Staff Card -->
+            <div class="bg-white rounded-lg shadow-md p-5 border-l-4 border-purple-400" th:classappend="${housekeepingTask.assignedTo != null ? '' : 'bg-gray-50'}">
+                <h4 class="font-semibold text-gray-800 mb-3 text-sm">👤 Nhân Viên Được Gán</h4>
+                <div th:if="${housekeepingTask.assignedTo}" class="space-y-2">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            <span th:text="${housekeepingTask.assignedTo.fullName.charAt(0)}">S</span>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900 text-sm" th:text="${housekeepingTask.assignedTo.fullName}">Staff Name</p>
+                            <p class="text-xs text-gray-500" th:text="'ID: ' + ${housekeepingTask.assignedTo.staffAccountId}">ID</p>
+                        </div>
+                    </div>
+                    <div class="bg-green-50 border border-green-200 rounded px-3 py-2">
+                        <p class="text-xs text-green-700 font-semibold">✓ Đã Phân Công</p>
+                    </div>
+                </div>
+                <div th:if="!${housekeepingTask.assignedTo}" class="text-center py-6">
+                    <p class="text-sm text-gray-500 mb-3">📭 Chưa gán nhân viên</p>
+                    <p class="text-xs text-gray-400">Chọn nhân viên ở form trên để gán task này</p>
+                </div>
+            </div>
+
+            <!-- Tips Card -->
+            <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg shadow-md p-5 border-l-4 border-amber-400 border-t-4">
+                <h4 class="font-semibold text-amber-900 mb-3 text-sm">💡 Gợi Ý</h4>
+                <div class="space-y-2 text-xs text-amber-800">
+                    <p>✓ Cập nhật ghi chú chi tiết cho nhân viên</p>
+                    <p>✓ Chọn mức độ ưu tiên phù hợp</p>
+                    <p>✓ Gán cán bộ phù hợp để hoàn thành task</p>
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
+</body>
+</html>

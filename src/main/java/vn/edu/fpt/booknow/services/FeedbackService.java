@@ -1,9 +1,13 @@
 package vn.edu.fpt.booknow.services;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.edu.fpt.booknow.model.dto.FeedbackDetailDTO;
 import vn.edu.fpt.booknow.model.dto.FeedbackStatisticsDTO;
-import vn.edu.fpt.booknow.repositories.FeedBackRepository;
+import vn.edu.fpt.booknow.model.entities.Booking;
+import vn.edu.fpt.booknow.model.entities.Feedback;
+import vn.edu.fpt.booknow.repositories.BookingRepository;
+import vn.edu.fpt.booknow.repositories.FeedbackRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,10 +16,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class FeedBackService {
-    private FeedBackRepository feedbackRepository;
-    public  FeedBackService(FeedBackRepository feedBackRepository) {
+public class FeedbackService {
+    private FeedbackRepository feedbackRepository;
+
+    private BookingRepository bookingRepository;
+    public FeedbackService(FeedbackRepository feedBackRepository, BookingRepository bookingRepository) {
         this.feedbackRepository = feedBackRepository;
+        this.bookingRepository = bookingRepository;
     }
     public Map<String, Object> getRoomFeedbackData(Long roomId) {
         // 1. Lấy danh sách chi tiết
@@ -63,5 +70,15 @@ public class FeedBackService {
         Map<Integer, Long> map = new HashMap<>();
         for (int i = 1; i <= 5; i++) map.put(i, 0L);
         return map;
+    }
+
+    public boolean hasFeedback(Long bookingId) {
+        return feedbackRepository.findFeedbacksByBooking_BookingId(bookingId).isPresent();
+    }
+
+    @Transactional
+    public Feedback createFeedback(Long bookingId, Integer rating, String content) {
+        Booking booking = bookingRepository.getReferenceById(bookingId);
+        return feedbackRepository.save(new Feedback(booking, content, rating));
     }
 }
