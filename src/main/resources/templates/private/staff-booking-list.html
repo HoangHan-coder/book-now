@@ -192,7 +192,7 @@
                         focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white">
 
                         <option value="">Tất cả</option>
-                        <option value="PENDING">Chờ kiểm duyệt</option>
+                        <option value="PENDING">Đã kiểm duyệt</option>
                         <option value="PENDING_PAYMENT">Chờ thanh toán</option>
                         <option value="PAID">Đã thanh toán</option>
                         <option value="CHECKED_IN">Đã nhận phòng</option>
@@ -315,7 +315,69 @@
             </table>
         </div>
 
-        <!-- Pagination -->
+        <!-- Pagination Controls -->
+        <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-white rounded-lg border border-gray-100">
+            
+            <!-- Previous Button -->
+            <a th:if="${currentPage > 1}"
+               th:href="@{/admin/bookings(
+                   page=${currentPage > 1 ? currentPage - 1 : totalPages},
+                   checkIn=${param.checkIn},
+                   checkOut=${param.checkOut},
+                   status=${param.status},
+                   keyword=${param.keyword}
+               )}"
+               class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <i class="fa-solid fa-chevron-left"></i>
+                <span>Trang trước</span>
+            </a>
+            
+            <a th:if="${currentPage == 1}"
+               th:href="@{/admin/bookings(
+                   page=${totalPages},
+                   checkIn=${param.checkIn},
+                   checkOut=${param.checkOut},
+                   status=${param.status},
+                   keyword=${param.keyword}
+               )}"
+               class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <i class="fa-solid fa-chevron-left"></i>
+                <span>Trang trước</span>
+            </a>
+
+            <!-- Page Info -->
+            <div class="text-center text-sm font-medium text-gray-700">
+                <span th:text="'Trang ' + ${currentPage} + ' / ' + ${totalPages}">Trang 1 / 5</span>
+                <span class="text-gray-500 text-xs ml-2" th:text="'(Tổng ' + ${totalItems} + ' bản ghi)'"> (Tổng 45 bản ghi)</span>
+            </div>
+
+            <!-- Next Button -->
+            <a th:if="${currentPage < totalPages}"
+               th:href="@{/admin/bookings(
+                   page=${currentPage + 1},
+                   checkIn=${param.checkIn},
+                   checkOut=${param.checkOut},
+                   status=${param.status},
+                   keyword=${param.keyword}
+               )}"
+               class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <span>Trang sau</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            
+            <a th:if="${currentPage == totalPages}"
+               th:href="@{/admin/bookings(
+                   page=1,
+                   checkIn=${param.checkIn},
+                   checkOut=${param.checkOut},
+                   status=${param.status},
+                   keyword=${param.keyword}
+               )}"
+               class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <span>Trang sau</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
 
     </div>
 

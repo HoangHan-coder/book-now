@@ -3,8 +3,11 @@ package vn.edu.fpt.booknow.controllers.staff;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import vn.edu.fpt.booknow.model.dto.PaginatedResponse;
 import vn.edu.fpt.booknow.model.entities.HousekeepingTask;
 import vn.edu.fpt.booknow.model.entities.RoomStatus;
+import vn.edu.fpt.booknow.model.entities.TaskStatus;
+import vn.edu.fpt.booknow.model.entities.PriorityStatus;
 import vn.edu.fpt.booknow.repositories.StaffAccountRepository;
 import vn.edu.fpt.booknow.services.staff.ManageHouseKeepingService;
 
@@ -25,11 +28,51 @@ public class StaManageHouseKeepingController {
     @GetMapping("/manage-housekeeping")
     public String showManageHouseKeepingPage(
             @RequestParam(name = "roomStatus", required = false) String roomStatusStr,
+            @RequestParam(name = "taskStatus", required = false) String taskStatusStr,
+            @RequestParam(name = "priority", required = false) String priorityStr,
+            @RequestParam(name = "page", defaultValue = "1") int page,
             Model model) {
 
-        List<HousekeepingTask> allTasks = manageHouseKeepingService.getAllHousekeepingTask();
+        // Parse filter parameters
+        TaskStatus taskStatus = null;
+        PriorityStatus priority = null;
+
+        if (taskStatusStr != null && !taskStatusStr.isBlank()) {
+            try {
+                taskStatus = TaskStatus.valueOf(taskStatusStr);
+            } catch (IllegalArgumentException e) {
+                // Invalid enum value, ignore filter
+            }
+        }
+
+        if (priorityStr != null && !priorityStr.isBlank()) {
+            try {
+                priority = PriorityStatus.valueOf(priorityStr);
+            } catch (IllegalArgumentException e) {
+                // Invalid enum value, ignore filter
+            }
+        }
+
+        // Get filtered and paginated tasks
+        PaginatedResponse<HousekeepingTask> paginatedTasks = 
+                manageHouseKeepingService.getAllHousekeepingTaskWithPaginationAndFilters(page, taskStatus, priority);
         
-        model.addAttribute("housekeepingTaskLists", allTasks);
+        model.addAttribute("housekeepingTaskLists", paginatedTasks.getData());
+        model.addAttribute("currentPage", paginatedTasks.getCurrentPage());
+        model.addAttribute("totalPages", paginatedTasks.getTotalPages());
+        model.addAttribute("totalItems", paginatedTasks.getTotalItems());
+        model.addAttribute("hasNext", paginatedTasks.isHasNext());
+        model.addAttribute("hasPrevious", paginatedTasks.isHasPrevious());
+        
+        // Pass filter values back to template
+        model.addAttribute("selectedTaskStatus", taskStatus);
+        model.addAttribute("selectedPriority", priority);
+        
+
+        // Add enums to model for template
+        model.addAttribute("taskStatuses", TaskStatus.values());
+        model.addAttribute("priorities", PriorityStatus.values());
+        
         return "private/staff-manage-house-keeping";
     }
 

@@ -223,28 +223,33 @@
       </div>
 
       <!-- ACTION BUTTONS -->
-      <div class="flex gap-2">
+      <div class="flex flex-col gap-3">
 
-        <!-- Nút hủy -->
-        <form th:action="@{/admin/bookings/cancel/{bookingCode}(bookingCode=${booking.bookingCode})}"
-              method="post"
-              onsubmit="return confirm('Bạn có chắc chắn muốn hủy đặt phòng này không?')">
+          <form th:action="@{/admin/bookings/cancel/{bookingCode}(bookingCode=${booking.bookingCode})}"
+                method="post"
+                onsubmit="return confirm('Bạn có chắc chắn muốn hủy đặt phòng này không?')">
 
-          <input type="hidden" name="status" value="FAILED">
+            <input type="hidden" name="status" value="FAILED">
 
-          <!-- lý do hủy -->
-          <textarea name="reason"
-                    placeholder="Nhập lý do hủy booking..."
-                    required
-                    class="w-full border border-gray-300 rounded-lg p-2 text-sm mb-3"></textarea>
+            <!-- lý do hủy -->
+            <textarea name="reason"
+                      placeholder="Nhập lý do hủy booking..."
+                      required
+                      class="w-full border border-gray-300 rounded-lg p-2 text-sm mb-3"></textarea>
 
-          <button type="submit"
-                  class="flex items-center gap-2 bg-white border border-red-200 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg font-medium transition">
-            <i class="fa-solid fa-ban"></i>
-            Hủy đặt phòng
-          </button>
+            <button type="submit"
+                    class="flex items-center gap-2 bg-white border border-red-200 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg font-medium transition">
+              <i class="fa-solid fa-ban"></i>
+              Hủy đặt phòng
+            </button>
 
-        </form>
+          </form>
+
+
+        <!-- Cancel Disabled Notice -->
+
+
+        <div class="flex gap-2">
 
         <!-- Nút cập nhật -->
         <a th:href="@{/admin/bookings/update/{bookingCode}(bookingCode=${booking.bookingCode})}"

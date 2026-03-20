@@ -15,7 +15,7 @@ public enum BookingStatus {
     public String getCssClass() {
         return switch (this) {
             case PENDING_PAYMENT -> "bg-yellow-50 text-yellow-700 ring-1 ring-yellow-600/20";
-            case PENDING -> "bg-gray-50 text-gray-700 ring-1 ring-gray-600/20";
+            case PENDING -> "bg-gray-50 text-blue-700 ring-1 ring-gray-600/20";
             case PAID -> "bg-blue-50 text-blue-700 ring-1 ring-blue-600/20";
             case CHECKED_IN -> "bg-purple-50 text-purple-700 ring-1 ring-purple-600/20";
             case CHECKED_OUT -> "bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600/20";
@@ -27,7 +27,7 @@ public enum BookingStatus {
 
     public String getDisplayName() {
         return switch (this) {
-            case PENDING -> "Chờ kiểm duyệt";
+            case PENDING -> "Đã kiểm duyệt";
             case PENDING_PAYMENT -> "Chờ thanh toán";
             case PAID -> "Đã thanh toán";
             case CHECKED_IN -> "Đã nhận phòng";
