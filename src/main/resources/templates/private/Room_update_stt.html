@@ -351,28 +351,18 @@
         // Strict Transition Rules
         const TRANSITIONS = {
 
-            'AVAILABLE': ['BOOKED', 'OUT_OF_SERVICE', 'MAINTENANCE'],
+            'AVAILABLE': ['OUT_OF_SERVICE', 'MAINTENANCE'],
 
-            'DIRTY': ['CLEANING', 'OUT_OF_SERVICE', 'MAINTENANCE'],
+            'DIRTY': ['CLEANING'],
 
-            'CLEANING': ['AVAILABLE', 'OUT_OF_SERVICE', 'MAINTENANCE'],
+            'CLEANING': ['AVAILABLE'],
 
-            'BOOKED': ['OCCUPIED', 'OUT_OF_SERVICE', 'MAINTENANCE'],
+            'OUT_OF_SERVICE': ['MAINTENANCE', 'CLEANING'],
 
-            'OCCUPIED': ['DIRTY', 'OUT_OF_SERVICE', 'MAINTENANCE'],
-
-            'OUT_OF_SERVICE': ['AVAILABLE', 'MAINTENANCE'],
-
-            'MAINTENANCE': ['AVAILABLE']
+            'MAINTENANCE': ['DIRTY']
 
         };
 /* ========= CURRENT STATUS FROM THYMELEAF ========= */
-let currentStatusKey = /*[[${room.status}]]*/ "AVAILABLE";
-            if (currentStatusKey === "DELETED") {
-            newStatusSelect.disabled = true;
-            updateBtn.disabled = true;
-            transitionHint.innerHTML = "Phòng đã bị xóa nên không thể cập nhật trạng thái.";
-        }
 
         // DOM Elements
         const currentStatusDisplay = document.getElementById('currentStatusDisplay');
@@ -382,6 +372,20 @@ let currentStatusKey = /*[[${room.status}]]*/ "AVAILABLE";
         const updateBtn = document.getElementById('updateBtn');
         const updateStatusForm = document.getElementById('updateStatusForm');
         const resetBtn = document.getElementById('resetBtn');
+
+        let currentStatusKey = /*[[${room.status}]]*/ "AVAILABLE";
+        const LOCKED_STATUS = ["DELETED", "BOOKED", "OCCUPIED"];
+
+        if (LOCKED_STATUS.includes(currentStatusKey)) {
+            newStatusSelect.disabled = true;
+            updateBtn.disabled = true;
+
+            if (currentStatusKey === "DELETED") {
+                transitionHint.innerHTML = "Phòng đã bị xóa nên không thể cập nhật trạng thái.";
+            } else {
+                transitionHint.innerHTML = "Phòng đang có khách hoặc đã được đặt. Không thể cập nhật thủ công.";
+            }
+        }
 
         // --- FUNCTIONS ---
 
@@ -400,7 +404,7 @@ let currentStatusKey = /*[[${room.status}]]*/ "AVAILABLE";
         function populateDropdown() {
             newStatusSelect.innerHTML = '<option value="" disabled selected>-- Chọn trạng thái --</option>';
             
-            const allowedNext = TRANSITIONS[currentStatusKey];
+            const allowedNext = TRANSITIONS[currentStatusKey] || [];
 
             if (allowedNext && allowedNext.length > 0) {
                 allowedNext.forEach(statusKey => {
@@ -409,7 +413,9 @@ let currentStatusKey = /*[[${room.status}]]*/ "AVAILABLE";
                     option.textContent = STATUS_CONFIG[statusKey].label;
                     newStatusSelect.appendChild(option);
                 });
-                newStatusSelect.disabled = false;
+                if (!LOCKED_STATUS.includes(currentStatusKey)) {
+                    newStatusSelect.disabled = false;
+                }
                 
                 // Update Hint Text
                 const readableTransitions = allowedNext.map(k => `"${STATUS_CONFIG[k].label.split(' (')[0]}"`).join(' hoặc ');

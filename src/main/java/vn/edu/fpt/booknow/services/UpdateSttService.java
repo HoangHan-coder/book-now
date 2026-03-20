@@ -17,42 +17,70 @@ public class UpdateSttService {
         this.roomRepository = roomRepository;
     }
 
-    public void updateRoomStatus(Long roomId, RoomStatus status) {
+    // TRANSITION RULES (CONSTANT - KHÔNG TẠO LẠI NHIỀU LẦN)
+    private static final Map<RoomStatus, List<RoomStatus>> TRANSITIONS = Map.of(
 
-        // 1. Check null
-        if (status == null) {
-            throw new RuntimeException("Status không hợp lệ");
+            RoomStatus.AVAILABLE, List.of(
+                    RoomStatus.OUT_OF_SERVICE,
+                    RoomStatus.MAINTENANCE
+            ),
+
+            RoomStatus.DIRTY, List.of(
+                    RoomStatus.CLEANING
+            ),
+
+            RoomStatus.CLEANING, List.of(
+                    RoomStatus.AVAILABLE
+            ),
+
+            RoomStatus.OUT_OF_SERVICE, List.of(
+                    RoomStatus.MAINTENANCE,
+                    RoomStatus.CLEANING
+            ),
+
+            RoomStatus.MAINTENANCE, List.of(
+                    RoomStatus.DIRTY
+            )
+    );
+
+    public void updateRoomStatus(Long roomId, RoomStatus newStatus) {
+
+        // 1. Validate input
+        if (newStatus == null) {
+            throw new RuntimeException("Trạng thái không hợp lệ");
         }
 
-        // 2. Lấy room
+        // 2. Lấy phòng
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng"));
 
-        // 3. Không cho update nếu đã DELETED
-        if (room.getStatus() == RoomStatus.DELETED) {
-            throw new RuntimeException("Phòng đã bị xóa");
+        RoomStatus currentStatus = room.getStatus();
+
+        // 3. BLOCK trạng thái không được phép chỉnh tay
+        if (currentStatus == RoomStatus.DELETED) {
+            throw new RuntimeException("Phòng đã bị xóa, không thể cập nhật");
         }
 
-        // 4. Rule transition (giống JS)
-        Map<RoomStatus, List<RoomStatus>> transitions = Map.of(
-                RoomStatus.AVAILABLE, List.of(RoomStatus.BOOKED, RoomStatus.OUT_OF_SERVICE, RoomStatus.MAINTENANCE),
-                RoomStatus.DIRTY, List.of(RoomStatus.CLEANING, RoomStatus.OUT_OF_SERVICE, RoomStatus.MAINTENANCE),
-                RoomStatus.CLEANING, List.of(RoomStatus.AVAILABLE, RoomStatus.OUT_OF_SERVICE, RoomStatus.MAINTENANCE),
-                RoomStatus.BOOKED, List.of(RoomStatus.OCCUPIED, RoomStatus.OUT_OF_SERVICE, RoomStatus.MAINTENANCE),
-                RoomStatus.OCCUPIED, List.of(RoomStatus.DIRTY, RoomStatus.OUT_OF_SERVICE, RoomStatus.MAINTENANCE),
-                RoomStatus.OUT_OF_SERVICE, List.of(RoomStatus.AVAILABLE, RoomStatus.MAINTENANCE),
-                RoomStatus.MAINTENANCE, List.of(RoomStatus.AVAILABLE)
-        );
-
-        RoomStatus current = room.getStatus();
-        List<RoomStatus> allowed = transitions.get(current);
-
-        if (allowed == null || !allowed.contains(status)) {
-            throw new RuntimeException("Không thể chuyển trạng thái này");
+        if (currentStatus == RoomStatus.BOOKED || currentStatus == RoomStatus.OCCUPIED) {
+            throw new RuntimeException("Phòng đang có khách hoặc đã được đặt, không thể cập nhật thủ công");
         }
+
+        // 4. Validate transition
+        validateTransition(currentStatus, newStatus);
 
         // 5. Update
-        room.setStatus(status);
+        room.setStatus(newStatus);
         roomRepository.save(room);
+    }
+
+    private void validateTransition(RoomStatus current, RoomStatus next) {
+
+        List<RoomStatus> allowed = TRANSITIONS.get(current);
+
+        if (allowed == null || !allowed.contains(next)) {
+            throw new RuntimeException(
+                    "Không thể chuyển trạng thái từ " + current + " sang " + next
+            );
+        }
     }
 }
