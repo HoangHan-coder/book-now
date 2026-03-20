@@ -21,9 +21,10 @@ public class CustomerService {
     private AuthenticationManager authManager;
 
     @Autowired
-    private JWTService jwtService;
-     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private JWTService jwtService;
     public boolean verify(Customer users, HttpServletResponse response) {
         System.out.println("Verify is running..");
         Authentication authentication = authManager.authenticate(
@@ -42,5 +43,12 @@ public class CustomerService {
     public Customer findCustomer(String email) {
         Customer customer = customerRepository.getCustomerByEmail(email);
         return customer;
+    }
+    public Customer findCusByEmail(String email) {
+        return customerRepository.findCustomerByEmail(email).orElse(null);
+    }
+
+    public void save(Customer customer) {
+        customerRepository.save(customer);
     }
 }

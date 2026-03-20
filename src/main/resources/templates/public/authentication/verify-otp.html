@@ -4,206 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xác Thực OTP - BookNow</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 400px;
-        }
-        h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: 500;
-        }
-        input[type="text"],
-        input[type="email"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-            text-align: center;
-            letter-spacing: 5px;
-        }
-        input[type="text"]:focus,
-        input[type="email"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        input[type="email"] {
-            letter-spacing: normal;
-            text-align: left;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        button:hover {
-            transform: translateY(-2px);
-        }
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .btn-secondary {
-            background: #6c757d;
-            margin-top: 10px;
-        }
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-        .btn-secondary:disabled {
-            background: #ccc;
-        }
-        .alert {
-            padding: 12px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .alert-info {
-            background-color: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-        .back-link {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .back-link a {
-            color: #667eea;
-            text-decoration: none;
-        }
-        .back-link a:hover {
-            text-decoration: underline;
-        }
-        .info-text {
-            text-align: center;
-            color: #666;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        .otp-input {
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .attempts-info {
-            text-align: center;
-            color: #dc3545;
-            font-size: 13px;
-            margin-top: 10px;
-        }
-        .cooldown-info {
-            text-align: center;
-            color: #6c757d;
-            font-size: 13px;
-            margin-top: 5px;
-        }
-        .button-group {
-            display: flex;
-            gap: 10px;
-        }
-        .button-group button {
-            flex: 1;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="container">
-        <h2>🔢 Xác Thực OTP</h2>
-        
-        <p class="info-text">
-            Mã OTP đã được gửi đến email của bạn.<br>
-            Vui lòng kiểm tra và nhập mã bên dưới.
-        </p>
+<body class="font-['Segoe_UI',Tahoma,Geneva,Verdana,sans-serif] bg-gradient-to-br from-[#667eea] to-[#764ba2] min-h-screen flex justify-center items-center m-0 p-0">
+<div class="bg-white p-[40px] rounded-[10px] shadow-[0_15px_35px_rgba(0,0,0,0.2)] w-full max-w-[400px]">
+    <h2 class="text-center text-[#333] mb-[30px] text-2xl font-bold">
+        <i class="fa-solid fa-shield-halved text-2xl text-blue-600 me-[10px]"></i>Xác Thực OTP</h2>
 
-        <!-- Error Message -->
-        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <p class="text-center text-[#666] mb-[20px] text-[14px]">
+        Mã OTP đã được gửi đến email của bạn.<br>
+        Vui lòng kiểm tra và nhập mã bên dưới.
+    </p>
 
-        <!-- Success Message -->
-        <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+    <!-- Error Message -->
+    <div th:if="${error}" class="p-[12px] rounded-[5px] mb-[20px] bg-[#f8d7da] text-[#721c24] border border-[#f5c6cb]" th:text="${error}"></div>
 
-        <!-- Email Info -->
-        <div class="alert alert-info" th:if="${verifyOtpRequest != null}">
-            Email: <strong th:text="${verifyOtpRequest.email}"></strong>
-        </div>
+    <!-- Success Message -->
+    <div th:if="${message}" class="p-[12px] rounded-[5px] mb-[20px] bg-[#d4edda] text-[#155724] border border-[#c3e6cb]" th:text="${message}"></div>
 
-        <form th:action="@{/verify-otp}" th:object="${verifyOtpRequest}" method="post">
-            <!-- Hidden email field -->
-            <input type="hidden" th:field="*{email}">
-
-            <div class="form-group">
-                <label for="otp">Mã OTP (6 chữ số)</label>
-                <input type="text" 
-                       id="otp" 
-                       th:field="*{otp}" 
-                       class="otp-input"
-                       placeholder="000000"
-                       maxlength="6"
-                       pattern="[0-9]{6}"
-                       required>
-            </div>
-
-            <button type="submit">Xác Nhận</button>
-        </form>
-
-        <!-- Resend OTP Form -->
-        <form th:action="@{/resend-otp}" method="post" style="margin-top: 10px;">
-            <input type="hidden" name="email" th:value="${verifyOtpRequest != null ? verifyOtpRequest.email : ''}">
-            <button type="submit" 
-                    class="btn-secondary"
-                    th:disabled="${resendOnCooldown}"
-                    th:text="${resendOnCooldown} ? 'Gửi lại sau ' + ${resendCooldownSeconds} + 's' : 'Gửi lại OTP'">
-                Gửi lại OTP
-            </button>
-        </form>
-
-        <div class="back-link">
-            <a th:href="@{/forgot-password}">← Quay lại</a>
-        </div>
+    <!-- Email Info -->
+    <div class="p-[12px] rounded-[5px] mb-[20px] bg-[#d1ecf1] text-[#0c5460] border border-[#bee5eb]" th:if="${verifyOtpRequest != null}">
+        Email: <strong th:text="${verifyOtpRequest.email}"></strong>
     </div>
+
+    <form th:action="@{/verify-otp}" th:object="${verifyOtpRequest}" method="post">
+        <!-- Hidden email field -->
+        <input type="hidden" th:field="*{email}">
+
+        <div class="mb-[20px]">
+            <label for="otp" class="block mb-[5px] text-[#555] font-medium">Mã OTP (6 chữ số)</label>
+            <input type="text"
+                   id="otp"
+                   th:field="*{otp}"
+                   class="w-full p-[12px] border-2 border-[#ddd] rounded-[5px] text-[24px] font-bold transition-colors duration-300 text-center tracking-[5px] focus:outline-none focus:border-[#667eea]"
+                   placeholder="000000"
+                   maxlength="6"
+                   pattern="[0-9]{6}"
+                   required>
+        </div>
+
+        <button type="submit" class="w-full p-[12px] bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white border-none rounded-[5px] text-[16px] cursor-pointer transition-transform duration-200 hover:-translate-y-[2px] disabled:bg-none disabled:bg-[#ccc] disabled:cursor-not-allowed disabled:transform-none disabled:hover:translate-y-0">Xác Nhận</button>
+    </form>
+
+    <!-- Resend OTP Form -->
+    <form th:action="@{/resend-otp}" method="post" style="margin-top: 10px;" id="resendForm">
+        <input type="hidden" name="email" th:value="${verifyOtpRequest != null ? verifyOtpRequest.email : ''}">
+        <button type="submit" id="resendBtn" disabled
+                class="w-full p-[12px] bg-[#6c757d] text-white border-none rounded-[5px] text-[16px] cursor-pointer transition-transform duration-200 hover:bg-[#5a6268] hover:-translate-y-[2px]">
+            <span id="countdown">Gửi lại sau 60 s</span>
+            <span id="resendOtp">Gửi lại OTP</span>
+        </button>
+    </form>
+
+    <div class="text-center mt-[20px]">
+        <a th:href="@{/forgot-password}" class="text-[#667eea] no-underline hover:underline">← Quay lại</a>
+    </div>
+</div>
+
+<script>
+    const countdown = document.getElementById('countdown');
+    const resendOtp = document.getElementById('resendOtp');
+    const resendBtn = document.getElementById('resendBtn');
+    let countdownTime = 60;
+    let interval = setInterval(() => {
+        if (countdownTime <= 0) {
+            countdown.style.display = 'none';
+            resendOtp.style.display = 'inline';
+            resendBtn.removeAttribute('disabled');
+            clearInterval(interval);
+        }
+        countdownTime--;
+        countdown.innerText = 'Gửi lại sau ' + countdownTime + 's';
+    }, 1000);
+
+
+</script>
 </body>
 </html>

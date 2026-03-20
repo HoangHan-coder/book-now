@@ -22,9 +22,10 @@ public class RedisService {
     }
 
     // OTP Operations
-    public void saveOtp(String email, String otp, long ttlMinutes) {
+    public boolean saveOtp(String email, String otp, long ttlMinutes) {
         String key = OTP_PREFIX + email;
-        redisTemplate.opsForValue().set(key, otp, ttlMinutes, TimeUnit.MINUTES);
+        Boolean success = redisTemplate.opsForValue().setIfAbsent(key, otp, ttlMinutes, TimeUnit.MINUTES);
+        return Boolean.TRUE.equals(success);
     }
 
     public String getOtp(String email) {
@@ -85,9 +86,11 @@ public class RedisService {
     }
 
     // OTP Resend Cooldown
-    public void setResendCooldown(String email, long ttlSeconds) {
+    public Boolean setResendCooldown(String email, long ttlSeconds) {
         String key = OTP_RESEND_PREFIX + email;
-        redisTemplate.opsForValue().set(key, "1", ttlSeconds, TimeUnit.SECONDS);
+        Boolean setResendCooldown = redisTemplate.opsForValue()
+                .setIfAbsent(key, "1", ttlSeconds, TimeUnit.SECONDS);
+        return Boolean.TRUE.equals(setResendCooldown);
     }
 
     public boolean isResendOnCooldown(String email) {

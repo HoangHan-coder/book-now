@@ -1,9 +1,13 @@
 package vn.edu.fpt.booknow.services;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import vn.edu.fpt.booknow.model.entities.Customer;
+import vn.edu.fpt.booknow.repositories.CustomerRepository;
 
 import java.security.SecureRandom;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -17,20 +21,34 @@ public class OTPService {
 
     private final RedisService redisService;
     private final SecureRandom secureRandom;
+    private final CustomerRepository customerRepository;
+    private final MailService mailService;
+
 
     @Autowired
-    public OTPService(RedisService redisService) {
+    public OTPService(RedisService redisService, CustomerRepository customerRepository, MailService mailService) {
         this.redisService = redisService;
+        this.customerRepository = customerRepository;
+        this.mailService = mailService;
         this.secureRandom = new SecureRandom();
     }
 
     /**
      * Generate a 6-digit OTP and store in Redis
      */
-    public String generateAndSaveOtp(String email) {
+    public String saveOtp(String email) {
         String otp = generateOtp();
-        redisService.saveOtp(email, otp, OTP_TTL_MINUTES);
-        return otp;
+        boolean saved =  redisService.saveOtp(email, otp, OTP_TTL_MINUTES);;
+        return saved ? otp : null;
+    }
+
+    public String saveOtp(String email , String otp) {
+        boolean saved =  redisService.saveOtp(email, otp, OTP_TTL_MINUTES);;
+        return saved ? otp : null;
+    }
+
+    public String getOtp(String email) {
+        return redisService.getOtp(email);
     }
 
     /**
@@ -88,8 +106,7 @@ public class OTPService {
      * Validate reset token
      */
     public String validateResetToken(String token) {
-        String email = redisService.getEmailByResetToken(token);
-        return email;
+        return redisService.getEmailByResetToken(token);
     }
 
     /**
@@ -116,8 +133,66 @@ public class OTPService {
     /**
      * Set resend cooldown
      */
-    public void setResendCooldown(String email) {
-        redisService.setResendCooldown(email, RESEND_COOLDOWN_SECONDS);
+    public boolean setResendCooldown(String email) {
+        return redisService.setResendCooldown(email, RESEND_COOLDOWN_SECONDS);
+    }
+
+    public void sendOtp(String email) {
+        // Check if email exists (but don't reveal this to user for security)
+        Optional<Customer> customerOpt = customerRepository.findCustomerByEmail(email);
+        System.out.println(customerOpt);
+        // Always show success message even if email doesn't exist (security best practice)
+        if (customerOpt.isPresent()) {
+            // Generate and save OTP
+            System.out.println("Email has exist " + this.hasOtp(email));
+            String otp = this.saveOtp(email);
+            System.out.println("Generate opt "+ otp + " with Email " + email);
+
+            // Send OTP via email
+            try {
+                if (otp != null) {
+                    mailService.send(email, otp);
+                    System.out.println("sent otp to" + otp);
+                }
+            } catch (Exception e) {
+                // Log error but still show generic message
+                System.err.println("Failed to send OTP email: " + e.getMessage());
+            }
+
+            // Set resend cooldown
+            this.setResendCooldown(email);
+        }
+
+    }
+
+    public boolean resendEmail(String email) {
+        Optional<Customer> customerOpt = customerRepository.findCustomerByEmail(email);
+        System.out.println(customerOpt);
+        if (customerOpt.isPresent()) {
+            // Generate and save OTP
+            System.out.println("Email has exist " + this.hasOtp(email));
+            String otp =  this.getOtp(email);
+            boolean cooldown = this.setResendCooldown(email);
+            System.out.println("Resent otp is cooldown : " + cooldown);
+            System.out.println("Generate for resent opt "+ otp + " with Email " + email);
+
+            // Send OTP via email
+            try {
+                if (otp != null && cooldown) {
+                    mailService.send(email, otp);
+                    System.out.println("Resented otp to" + otp);
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to resend OTP: " + e.getMessage());
+                return false;
+            }
+
+            // Set cooldown
+            this.setResendCooldown(email);
+        }
+        return true;
     }
 
     /**
@@ -128,6 +203,7 @@ public class OTPService {
     }
 
     // Inner class for validation result
+    @Getter
     public static class OtpValidationResult {
         private final boolean valid;
         private final String message;
@@ -158,16 +234,5 @@ public class OTPService {
                 "Bạn đã nhập sai quá nhiều lần. Vui lòng yêu cầu mã OTP mới.", 0);
         }
 
-        public boolean isValid() {
-            return valid;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public int getRemainingAttempts() {
-            return remainingAttempts;
-        }
     }
 }
