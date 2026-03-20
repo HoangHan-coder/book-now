@@ -35,7 +35,7 @@ public class RoomTypeDTO {
     private Boolean isDeleted = false;
 
     public RoomTypeDTO(RoomType roomType) {
-        this.id = roomType.getId();
+        this.id = roomType.getRoomTypeId();
         this.name = roomType.getName();
         this.description = roomType.getDescription();
         this.basePrice = roomType.getBasePrice();

@@ -9,7 +9,7 @@ import vn.edu.fpt.booknow.model.entities.Timetable;
 import java.util.List;
 
 public interface TimeTableRepository extends JpaRepository<Timetable, Long> {
-    @Query("SELECT new vn.edu.fpt.booknow.model.dto.TimeTableDTO(" +
+    @Query("SELECT  new vn.edu.fpt.booknow.model.dto.TimeTableDTO(" +
             "    b.bookingId, " +
             "    r.roomId," +
             "    b.bookingStatus, " +

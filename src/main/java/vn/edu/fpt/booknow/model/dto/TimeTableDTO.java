@@ -3,6 +3,7 @@ package vn.edu.fpt.booknow.model.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import vn.edu.fpt.booknow.model.entities.BookingStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 public class TimeTableDTO {
     private Long bookingId;
     private Long roomId;
-    private String bookingStatus;
+    private BookingStatus bookingStatus;
     private BigDecimal totalAmount;
     private Long timetableId;
     private LocalDateTime date;

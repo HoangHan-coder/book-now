@@ -48,7 +48,8 @@ public class SecurityConfig {
                 .authenticationProvider(staffAuthProvider())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/login","/auth/login","/auth/logout", "/public/**", "/home","/search","/detail/**","/pay/**",
-
+                                "/booking/save",
+                                "/error",
                                 "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password",
                                 "/404").permitAll()
                         .anyRequest().authenticated()
@@ -77,6 +78,8 @@ public class SecurityConfig {
                                 "/verify-otp", 
                                 "/resend-otp", 
                                 "/reset-password",
+                                "/error",
+                                "/booking/save",
                                 "/404").permitAll()
                         .anyRequest().authenticated()
                 )

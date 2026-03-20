@@ -374,7 +374,7 @@
 
                 <form class="space-y-5" onsubmit="return validateBooking(event)" th:action="@{/booking/save}"
                       method="post" th:object="${informBooking}" enctype="multipart/form-data">
-                    <input type="hidden" th:field="*{roomId}">
+                    <input type="hidden" th:field="*{room.roomId}">
                     <input type="hidden" name="roomId">
                     <input type="hidden" th:field="*{customer.fullName}">
                     <input type="hidden" th:field="*{customer.phone}">

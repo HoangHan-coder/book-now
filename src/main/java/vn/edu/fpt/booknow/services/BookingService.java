@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import vn.edu.fpt.booknow.model.dto.BookingCustomerDTO;
 import vn.edu.fpt.booknow.model.dto.BookingDTO;
 import vn.edu.fpt.booknow.model.dto.WorkShift;
 import vn.edu.fpt.booknow.model.entities.*;
@@ -159,7 +160,7 @@ public class BookingService {
                 .build();
     }
 
-    public String saveBooking(BookingDTO bookingDTO,
+    public String saveBooking(BookingCustomerDTO bookingDTO,
                               MultipartFile frontImg,
                               MultipartFile backImg,
                               RedirectAttributes redirectAttributes,
@@ -202,23 +203,29 @@ public class BookingService {
             }
             // 5. Upload ảnh (Giữ lại logic cũ)
             String frontUrl = "";
+            String frontId = "";
             if (frontImg != null && !frontImg.isEmpty()) {
                 try {
-                    frontUrl = uploadToCloudinary(frontImg);
+                    Map<String, String> imageData = uploadToCloudinary(frontImg);
+                    frontUrl = imageData.get("url");
+                    frontId = imageData.get("public_id");
                 } catch (IOException e) {
                     return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt trước!", bookingDTO.getRoom().getRoomId());
                 }
             }
             String backUrl = "";
+            String backId = "";
             if (backImg != null && !backImg.isEmpty()) {
                 try {
-                    backUrl = uploadToCloudinary(backImg);
+                    Map<String, String> imageData = uploadToCloudinary(frontImg);
+                    backUrl = imageData.get("url");
+                    backId = imageData.get("public_id");
                 } catch (IOException e) {
                     return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt sau!", bookingDTO.getRoom().getRoomId());
                 }
             }
             // 6. Lưu vào Database
-            saveSingleBookingToDatabase(allShifts, bookingDTO, username, redirectAttributes, frontUrl, backUrl);
+            saveSingleBookingToDatabase(allShifts, bookingDTO, username, redirectAttributes, frontUrl, backUrl, frontId,backId);
 
             redirectAttributes.addFlashAttribute("toastMessage", "Đặt phòng thành công!");
             redirectAttributes.addFlashAttribute("toastType", "success");
@@ -304,6 +311,7 @@ public class BookingService {
         List<Timetable> timetableList = timeTableRepository.findAll();
 
         for (WorkShift s : shifts) {
+            System.out.println(s.getShiftType() + " 314");
             boolean isValid = timetableList.stream().anyMatch(t ->
                     t.getSlotName().contains(s.getShiftType()) &&
                             t.getStartTime().equals(s.getStartTime().toLocalTime())
@@ -313,11 +321,13 @@ public class BookingService {
         return ""; // Không có lỗi
     }
     private void saveSingleBookingToDatabase(List<WorkShift> allShifts,
-                                             BookingDTO bookingDTO,
+                                             BookingCustomerDTO bookingDTO,
                                              String email,
                                              RedirectAttributes redirectAttributes,
                                              String frontImg,
-                                             String backImg) {
+                                             String backImg,
+                                             String frontId,
+                                             String backId) {
 
            if (allShifts.isEmpty()) return;
 
@@ -358,6 +368,8 @@ public class BookingService {
            // Hardcode URL hoặc gọi uploadToCloudinary
            newBooking.setIdCardFrontUrl(frontImg);
            newBooking.setIdCardBackUrl(backImg);
+           newBooking.setIdCardFontPublicId(frontId);
+           newBooking.setIdCardBackPublicId(backId);
            System.out.println("====================================");
            System.out.println("LOG ĐẶT PHÒNG:");
            System.out.println(" - Ca bắt đầu: " + firstShift.getShiftType());
@@ -451,10 +463,16 @@ public class BookingService {
      * @return Tổng số tiền dưới dạng String (VD: "250000")
      * @throws IllegalArgumentException nếu có ca không hợp lệ
      */
-    private String uploadToCloudinary(MultipartFile file) throws IOException {
-        // Không try-catch ở đây, để nó tự văng lỗi lên trên
+    private Map<String, String> uploadToCloudinary(MultipartFile file) throws IOException {
+        // Thực hiện upload
         Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
-        return uploadResult.get("url").toString();
+
+        // Tạo một Map mới để chứa 2 thông tin quan trọng nhất
+        Map<String, String> result = new HashMap<>();
+        result.put("url", uploadResult.get("url").toString());
+        result.put("public_id", uploadResult.get("public_id").toString());
+
+        return result;
     }
     private String checkDuplicateShifts(List<WorkShift> allShifts, Long roomId) {
         if (allShifts == null || allShifts.isEmpty()) return "";
@@ -552,9 +570,9 @@ public class BookingService {
         // 3. Xử lý ảnh mặt trước
         if (frontImg != null && !frontImg.isEmpty()) {
             try {
-                String frontUrl = uploadToCloudinary(frontImg);
-                // CHỈ set khi upload thành công file mới
-                existingBooking.setIdCardFrontUrl(frontUrl);
+                Map<String, String> imageData = uploadToCloudinary(frontImg);
+                existingBooking.setIdCardFrontUrl(imageData.get("url"));
+                existingBooking.setIdCardFontPublicId(imageData.get("public_id"));
             } catch (IOException e) {
                 return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt trước!", bookingData.getBookingId());
             }
@@ -564,9 +582,9 @@ public class BookingService {
         // 4. Xử lý ảnh mặt sau
         if (backImg != null && !backImg.isEmpty()) {
             try {
-                String backUrl = uploadToCloudinary(backImg);
-                // CHỈ set khi upload thành công file mới
-                existingBooking.setIdCardBackUrl(backUrl);
+                Map<String, String> imageData = uploadToCloudinary(backImg);
+                existingBooking.setIdCardBackUrl(imageData.get("url"));
+                existingBooking.setIdCardBackPublicId(imageData.get("public_id"));
             } catch (IOException e) {
                 return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt sau!", bookingData.getBookingId());
             }
