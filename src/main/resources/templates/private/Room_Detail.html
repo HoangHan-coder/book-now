@@ -110,7 +110,16 @@
                     <p class="text-sm text-gray-500 mt-1">Xem thông tin phòng <span th:text="${room.roomNumber}" class="font-bold text-gray-700"></span></p>
                 </div>
             </div>
+        </div>
 
+        <div th:if="${successMessage}"
+             class="bg-green-100 text-green-800 px-4 py-3 rounded mb-4">
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <div th:if="${errorMessage}"
+             class="bg-red-100 text-red-800 px-4 py-3 rounded mb-4">
+            <span th:text="${errorMessage}"></span>
         </div>
 
         <!-- INFO CARD -->
@@ -140,7 +149,7 @@
                                     <label class="block text-sm font-medium text-gray-500">Trạng thái hiện tại</label>
                                     <div class="block w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg sm:text-sm flex items-center gap-2">
                                         <div>
-                                            <span th:text="${room.status}" class="text-green-600 font-medium"><i class="fa-solid fa-circle text-[10px] mr-1"></i></span>
+                                            <span th:text="${room.status.displayRoomName}" th:class="${room.status.getCssEnumClass()} + ' font-medium'" class="text-green-600 font-medium"><i class="fa-solid fa-circle text-[10px] mr-1"></i></span>
                                         </div>
                                     </div>
                                 </div>
@@ -259,22 +268,40 @@
                 <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-end gap-3 sticky bottom-0 bg-white py-4 z-10">
                     <form th:action="@{/admin/room/delete/{id}(id=${room.roomId})}"
                           method="post"
-                          th:if="${room.status == 'AVAILABLE'}">
+                          th:if="${room.status.name() == 'AVAILABLE'}">
 
                         <button type="submit"
-                                onclick="return confirm('Bạn có chắc muốn xóa phòng này?')"
+                                onclick="return confirm('Bạn có chắc muốn chuyển ngừng sử dụng phòng này?')"
                                 class="px-6 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium shadow-sm transition-colors flex items-center gap-2">
 
                             <i class="fa-solid fa-trash"></i>
-                            Xóa phòng
+                            Ngừng Sử Dụng
                         </button>
 
                     </form>
-                    
-                    <a th:href="@{/admin/edit/{id}(id=${room.roomId})}"  class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition-colors flex items-center gap-2">
+
+                    <!-- Nếu KHÔNG phải DELETED -->
+                    <a th:if="${!isDeleted}"
+                       th:href="@{/admin/edit/{id}(id=${room.roomId})}"
+                       class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm flex items-center gap-2">
+
                         <i class="fa-regular fa-pen-to-square"></i>
                         Chỉnh sửa thông tin
                     </a>
+
+                    <!-- Nếu là DELETED -->
+                    <form th:if="${isDeleted}"
+                          th:action="@{/admin/room/restore/{id}(id=${room.roomId})}"
+                          method="post">
+
+                        <button type="submit"
+                                onclick="return confirm('bạn có chất muốn Khôi phục phòng này?')"
+                                class="px-6 py-2.5 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium shadow-sm flex items-center gap-2">
+
+                            <i class="fa-solid fa-rotate-left"></i>
+                            Khôi phục phòng
+                        </button>
+                    </form>
                 </div>
 
             </div>

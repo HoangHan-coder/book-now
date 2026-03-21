@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" conterfnt="width=device-width, initial-scale=1.0">
     <title>Chỉnh sửa phòng - BookNow</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -166,6 +166,8 @@
             <input type="hidden" name="roomId" th:value="${room.roomId}">
             <input type="hidden" name="deletedImageIds">
             <input type="hidden" name="deletedAmenityIds">
+            <!-- Container for new amenity icon file inputs (keeps ordering in sync with newAmenityNames) -->
+            <div id="newAmenityFiles" class="hidden"></div>
 
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
                 <!-- LEFT COLUMN: Basic Info (2/3 width) -->
@@ -191,22 +193,11 @@
                                 <label class="block text-sm font-medium text-gray-700">Trạng thái hiện tại</label>
                                 <select name="status"
                                         class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white">
-                                    <option value="" disabled>Tất cả trạng thái</option>
-                                    <option value="AVAILABLE"
-                                            th:selected="${room.status == 'AVAILABLE'}"
-                                    >AVAILABLE</option>
-                                    <option value="BOOKED"
-                                            th:selected="${room.status == 'BOOKED'}"
-                                    >BOOKED</option>
-                                    <option value="MAINTENANCE"
-                                            th:selected="${room.status == 'MAINTENANCE'}"
-                                    >MAINTENANCE</option>
-                                    <option value="OCCUPIED"
-                                            th:selected="${room.status == 'OCCUPIED'}"
-                                    >OCCUPIED</option>
-                                    <option value="CLEANING"
-                                            th:selected="${room.status == 'CLEANING'}"
-                                    >CLEANING</option>
+                                    <option th:each="s : ${allowedStatuses}"
+                                            th:value="${s.name()}"
+                                            th:selected="${s.name() == room.status.name()}">
+                                        <span th:text="${s.name()}"></span>
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -224,6 +215,9 @@
                                             th:value="${type.roomTypeId}"
                                             th:selected="${type.roomTypeId == room.roomType.roomTypeId}"
                                             th:data-img="${type.imageUrl}"
+                                            th:data-baseprice="${type.basePrice}"
+                                            th:data-overprice="${type.overPrice}"
+                                            th:data-description="${type.description}"
                                             th:text="${type.name}">
                                     </option>
 
@@ -343,9 +337,9 @@
                         <div class="space-y-2">
                             <label class="block text-sm font-medium text-gray-700">Ảnh hiện tại</label>
                             <div class="grid grid-cols-4 sm:grid-cols-5 gap-3" id="existingImages">
-                                <div th:each="img : ${room.images}"
-                                     class="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group">
-                                    <img th:src="${img.imageUrl}" class="w-full h-full object-cover">
+                                <div  th:each="img : ${room.images}"
+                                        class="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group">
+                                    <img th:if="${img != null}" th:src="${img.imageUrl}" class="w-full h-full object-cover">
                                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                         <button type="button"
                                                 class="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
@@ -434,6 +428,11 @@
                                     <input type="text"
                                            id="amenityNameInput"
                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
+
+                                    <p id="amenityNameError"
+                                       class="text-xs text-red-500 mt-1 hidden">
+                                        Tên tiện nghi không được vượt quá 50 ký tự
+                                    </p>
                                 </div>
 
                                 <!-- Image -->
@@ -675,6 +674,8 @@
 
             showError(input, null);
 
+            validatePriceRelation();
+
             isChanged = true;
         });
 
@@ -721,6 +722,30 @@
 
             }, 150);
         }
+
+        const basePrice = selectedOption.getAttribute('data-baseprice');
+        const overPrice = selectedOption.getAttribute('data-overprice');
+        const description = selectedOption.getAttribute('data-description');
+
+        const baseInput = document.querySelector('input[name="basePrice"]');
+        const overInput = document.querySelector('input[name="overPrice"]');
+
+        if (basePrice) {
+            baseInput.value = Number(basePrice).toLocaleString('vi-VN');
+            baseInput.dataset.lastValid = basePrice;
+        }
+
+        if (overPrice) {
+            overInput.value = Number(overPrice).toLocaleString('vi-VN');
+            overInput.dataset.lastValid = overPrice;
+        }
+
+        const desc = document.querySelector('textarea[name="roomTypeDescription"]');
+        if (desc) {
+            desc.value = description || '';
+        }
+
+        isChanged = true;
 
     });
 
@@ -1022,8 +1047,15 @@
         const name = amenityNameInput.value.trim();
         const imageFile = amenityFile;
 
+        const regex = /^.{2,50}$/;
+
         if (!name || !imageFile) {
             alert("Phải nhập tên và chọn ảnh tiện nghi");
+            return;
+        }
+
+        if(!regex.test(name)) {
+            alert("Tên phải lớn hơn 2 ký tự và nhỏ hơn 50 ký tự");
             return;
         }
 
@@ -1046,63 +1078,77 @@
 
         /* ----- create new amenity ----- */
 
-        const label = document.createElement('label');
+        const label = document.createElement("label");
 
         label.className =
-            'flex items-center p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors gap-2';
+            "flex items-center gap-2 p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors";
 
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.name = "newAmenityNames";
+        checkbox.value = name;
+        checkbox.checked = true;
+        checkbox.className = "h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500";
 
-        let imgHTML = "";
-
-        if (imageFile) {
-
-            const url = URL.createObjectURL(imageFile);
-
-            imgHTML = `<img src="${url}" class="w-5 h-5 object-cover rounded">`;
-
-        }
-
-
-        label.innerHTML = `
-        <input type="checkbox"
-               name="newAmenityNames"
-               value="${name}"
-               class="h-4 w-4 text-blue-600 rounded border-gray-300"
-               checked>
-
-        ${imgHTML}
-
-        <span class="text-sm text-gray-700">${name}</span>
-    `;
-
-        // tạo input file mới cho form
+        /* hidden input icon (paired with checkbox to keep indexing consistent) */
         const hiddenFileInput = document.createElement("input");
-
         hiddenFileInput.type = "file";
         hiddenFileInput.name = "newAmenityIcons";
         hiddenFileInput.style.display = "none";
+        hiddenFileInput.dataset.pairedAmenity = name;
 
         const dt = new DataTransfer();
         dt.items.add(imageFile);
-
         hiddenFileInput.files = dt.files;
 
-        document.getElementById("editRoomForm").appendChild(hiddenFileInput);
+        /* When user unchecks the amenity, remove both the checkbox/label and its paired file input */
+        checkbox.addEventListener("change", () => {
+            if (!checkbox.checked) {
+                hiddenFileInput.remove();
+                label.remove();
+            }
+        });
 
-        amenitiesList.prepend(label);
+        /* icon image */
+        const img = document.createElement("img");
+        img.className = "w-5 h-5 object-cover rounded";
+        img.src = URL.createObjectURL(imageFile);
 
+        /* name */
+        const span = document.createElement("span");
+        span.className = "text-sm text-gray-700";
+        span.textContent = name;
 
-        /* ----- reset form ----- */
+        /* append */
+        label.appendChild(checkbox);
+        label.appendChild(img);
+        label.appendChild(span);
 
+        // Keep order of newAmenityNames and newAmenityIcons in sync by appending both
+        amenitiesList.appendChild(label);
+        document.getElementById("newAmenityFiles").appendChild(hiddenFileInput);
+
+        /* reset modal */
         amenityNameInput.value = "";
-
         removeAmenityImage();
 
-
+        /* close modal */
         amenityModal.classList.add("hidden");
-
     });
 
+    amenityNameInput.addEventListener("input", function () {
+
+        const value = this.value.trim();
+        const regex = /^.{2,50}$/;
+
+        if (!regex.test(value)) {
+            amenityNameError.textContent = "Tên tiện nghi phải từ 2 đến 50 ký tự";
+            amenityNameError.classList.remove("hidden");
+        } else {
+            amenityNameError.classList.add("hidden");
+        }
+
+    });
 
 
     /* ===============================

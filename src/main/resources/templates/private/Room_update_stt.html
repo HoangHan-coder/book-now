@@ -214,9 +214,11 @@
                             <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2">Trạng thái hiện tại</h2>
                             <div class="flex items-center gap-3" id="currentStatusDisplay">
                                 <!-- Initial State: Available -->
-                                <span class="inline-flex items-center px-4 py-2 rounded-full text-base font-bold bg-green-100 text-green-700 border border-green-200 shadow-sm transition-all duration-300 status-badge">
+                                <span th:classappend="${room.status.getCssEnumClass()}"
+                                        class="inline-flex items-center px-4 py-2 rounded-full text-base font-bold bg-green-100 text-green-700 border border-green-200 shadow-sm transition-all duration-300 status-badge">
                                     <span class="w-2.5 h-2.5 rounded-full bg-green-500 mr-2 animate-pulse"></span>
-                                    <span th:text="${room.status}"></span>
+                                    <span th:text="${room.status.getDisplayRoomName()}"></span>
+
                                 </span>
                             </div>
                             <p  id="currentStatusDesc" class="text-sm text-gray-500 mt-3 max-w-lg transition-all duration-300">
@@ -290,6 +292,22 @@
         icon: 'fa-check'
     },
 
+    'DIRTY': {
+        label: 'Bẩn (Dirty)',
+        desc: 'Phòng cần dọn dẹp sau khi khách trả phòng.',
+        colorClass: 'bg-orange-100 text-orange-700 border-orange-200',
+        dotColor: 'bg-orange-500',
+        icon: 'fa-trash'
+    },
+
+    'CLEANING': {
+        label: 'Đang dọn dẹp (Cleaning)',
+        desc: 'Phòng đang được dọn dẹp vệ sinh sau khi khách trả phòng.',
+        colorClass: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+        dotColor: 'bg-yellow-500',
+        icon: 'fa-broom'
+    },
+
     'BOOKED': {
     label: 'Đã đặt phòng (Booked)',
     desc: 'Phòng đã được khách đặt trước và đang chờ check-in.',
@@ -306,16 +324,23 @@
         icon: 'fa-user-lock'
     },
 
-    'CLEANING': {
-        label: 'Đang dọn dẹp (Cleaning)',
-        desc: 'Phòng đang được dọn dẹp vệ sinh sau khi khách trả phòng.',
-        colorClass: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-        dotColor: 'bg-yellow-500',
-        icon: 'fa-broom'
+    'DELETED': {
+        label: 'Đã xóa (Deleted)',
+        desc: 'Phòng đã bị xóa khỏi hệ thống.',
+        colorClass: 'bg-gray-100 text-gray-700 border-gray-200',
+        dotColor: 'bg-gray-500',
+        icon: 'fa-trash-alt'
     },
+            'MAINTENANCE': {
+                label: 'Đang bảo trì (Maintenance)',
+                desc: 'Phòng đang được sửa chữa hoặc bảo trì kỹ thuật. Không thể đặt hoặc sử dụng.',
+                colorClass: 'bg-purple-100 text-purple-700 border-purple-200',
+                dotColor: 'bg-purple-500',
+                icon: 'fa-screwdriver-wrench'
+            },
 
-    'MAINTENANCE': {
-        label: 'Bảo trì (Maintenance)',
+    'OUT_OF_SERVICE': {
+        label: 'Bảo trì (Out of Service)',
         desc: 'Phòng đang gặp sự cố hoặc bảo dưỡng định kỳ. Tạm ngừng phục vụ.',
         colorClass: 'bg-gray-100 text-gray-700 border-gray-200',
         dotColor: 'bg-gray-500',
@@ -325,17 +350,19 @@
 
         // Strict Transition Rules
         const TRANSITIONS = {
-    'AVAILABLE': ['BOOKED', 'MAINTENANCE'],
-    'BOOKED': ['OCCUPIED', 'MAINTENANCE'],
-    'OCCUPIED': ['CLEANING', 'MAINTENANCE'],
-    'CLEANING': ['AVAILABLE', 'MAINTENANCE'],
-    'MAINTENANCE': ['AVAILABLE']
-};
+
+            'AVAILABLE': ['OUT_OF_SERVICE', 'MAINTENANCE'],
+
+            'DIRTY': ['CLEANING'],
+
+            'CLEANING': ['AVAILABLE'],
+
+            'OUT_OF_SERVICE': ['MAINTENANCE', 'CLEANING'],
+
+            'MAINTENANCE': ['DIRTY']
+
+        };
 /* ========= CURRENT STATUS FROM THYMELEAF ========= */
-let currentStatusKey = /*[[${room.status}]]*/ "AVAILABLE";
-            if (currentStatusKey === "DELETED") {
-             window.location.href = "/admin/list";
-                      }
 
         // DOM Elements
         const currentStatusDisplay = document.getElementById('currentStatusDisplay');
@@ -345,6 +372,20 @@ let currentStatusKey = /*[[${room.status}]]*/ "AVAILABLE";
         const updateBtn = document.getElementById('updateBtn');
         const updateStatusForm = document.getElementById('updateStatusForm');
         const resetBtn = document.getElementById('resetBtn');
+
+        let currentStatusKey = /*[[${room.status}]]*/ "AVAILABLE";
+        const LOCKED_STATUS = ["DELETED", "BOOKED", "OCCUPIED"];
+
+        if (LOCKED_STATUS.includes(currentStatusKey)) {
+            newStatusSelect.disabled = true;
+            updateBtn.disabled = true;
+
+            if (currentStatusKey === "DELETED") {
+                transitionHint.innerHTML = "Phòng đã bị xóa nên không thể cập nhật trạng thái.";
+            } else {
+                transitionHint.innerHTML = "Phòng đang có khách hoặc đã được đặt. Không thể cập nhật thủ công.";
+            }
+        }
 
         // --- FUNCTIONS ---
 
@@ -363,7 +404,7 @@ let currentStatusKey = /*[[${room.status}]]*/ "AVAILABLE";
         function populateDropdown() {
             newStatusSelect.innerHTML = '<option value="" disabled selected>-- Chọn trạng thái --</option>';
             
-            const allowedNext = TRANSITIONS[currentStatusKey];
+            const allowedNext = TRANSITIONS[currentStatusKey] || [];
 
             if (allowedNext && allowedNext.length > 0) {
                 allowedNext.forEach(statusKey => {
@@ -372,7 +413,9 @@ let currentStatusKey = /*[[${room.status}]]*/ "AVAILABLE";
                     option.textContent = STATUS_CONFIG[statusKey].label;
                     newStatusSelect.appendChild(option);
                 });
-                newStatusSelect.disabled = false;
+                if (!LOCKED_STATUS.includes(currentStatusKey)) {
+                    newStatusSelect.disabled = false;
+                }
                 
                 // Update Hint Text
                 const readableTransitions = allowedNext.map(k => `"${STATUS_CONFIG[k].label.split(' (')[0]}"`).join(' hoặc ');
@@ -388,11 +431,8 @@ let currentStatusKey = /*[[${room.status}]]*/ "AVAILABLE";
 resetBtn.addEventListener('click', () => {
     newStatusSelect.value = "";
     updateBtn.disabled = true;
-});
 
-resetBtn.addEventListener('click', () => {
-    newStatusSelect.value = "";
-    updateBtn.disabled = true;
+    renderCurrentStatus();
 });
 
 newStatusSelect.addEventListener('change', () => {

@@ -196,7 +196,11 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
-            <form method="get" th:action="@{/admin/dashboard}" class="flex flex-wrap items-center gap-3">
+            <form
+                    id="dateFilterForm"
+                    method="get"
+                    th:action="@{/admin/dashboard}"
+                    class="flex flex-wrap items-center gap-3">
 
                 <!-- Date Range Picker -->
                 <div id="drp-wrapper">
@@ -262,19 +266,22 @@
 
             <!-- Quick Filters -->
             <div class="flex bg-white rounded-lg p-1 shadow-sm border border-gray-200">
-                <button type="button"
+                <button id="btn-week"
+                        type="button"
                         onclick="filterThisWeek()"
-                        class="px-4 py-1.5 text-sm font-medium rounded-md bg-blue-50 text-blue-600">
+                        class="px-4 py-1.5 text-sm font-medium rounded-md ext-gray-500 hover:bg-gray-50">
                     Tuần này
                 </button>
 
-                <button type="button"
+                <button id="btn-month"
+                        type="button"
                         onclick="filterThisMonth()"
                         class="px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:bg-gray-50">
                     Tháng này
                 </button>
 
-                <button type="button"
+                <button  id="btn-year"
+                        type="button"
                         onclick="filterThisYear()"
                         class="px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:bg-gray-50">
                     Năm nay
@@ -284,7 +291,7 @@
     </div>
 
     <!-- STATS WIDGETS -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Widget 1: Bookings -->
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative">
             <!-- Time Scope Badge -->
@@ -348,12 +355,38 @@
             </div>
         </div>
 
+        <!-- Widget NEW: Collected Revenue -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative">
+
+            <!-- Badge -->
+            <span class="absolute top-4 right-4 bg-green-50 text-green-600 text-[10px] font-bold px-2 py-1 rounded"
+                  th:text="'Tháng ' + ${dashboard.currentMonth}">
+    </span>
+
+            <div class="flex justify-between items-start mt-2">
+                <div>
+                    <p class="text-xs text-gray-500 font-semibold uppercase">
+                        Tiền đã thu
+                    </p>
+
+                    <h3 class="text-2xl font-bold text-gray-800 mt-1"
+                        th:text="${#numbers.formatInteger(dashboard.revenueReceived, 0, 'COMMA')} + ' ₫'">
+                    </h3>
+                </div>
+            </div>
+
+            <div class="mt-4 flex items-center text-xs">
+        <span class="text-gray-500 font-medium">
+            Từ các đơn đã thanh toán
+        </span>
+            </div>
+        </div>
+
         <!-- Widget 3: Active Rooms -->
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative">
             <!-- Time Scope Badge -->
-            <span class="absolute top-4 right-4 bg-purple-50 text-purple-600 text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1">
-                <i class="fa-solid fa-circle text-[6px] text-purple-500">
-                </i> Hôm nay</span>
+            <span class="absolute top-4 right-4 bg-green-50 text-green-600 text-[10px] font-bold px-2 py-1 rounded"
+                  th:text="'Tháng ' + ${dashboard.currentMonth}"></span>
             <div class="flex justify-between items-start mt-2">
                 <div>
                     <p class="text-xs text-gray-500 font-semibold uppercase">Phòng hoạt động</p>
@@ -397,12 +430,6 @@
                                 class="block w-full text-left px-4 py-2 hover:bg-gray-50 text-sm">
                             📊 Excel
                         </button>
-
-                        <button onclick="exportFile('pdf')"
-                                class="block w-full text-left px-4 py-2 hover:bg-gray-50 text-sm">
-                            📄 PDF
-                        </button>
-
                     </div>
                 </div>
             </div>
@@ -430,7 +457,7 @@
                 <div class="mb-4">
                     <h3 class="font-bold text-gray-800"  th:text="|Trạng thái đơn (Tháng ${dashboard.currentMonth})|"></h3>
                     <p class="text-xs text-gray-500 mt-0.5"
-                       th:text="|Dựa trên ${dashboard.bookingCount} đơn đặt|"></p>
+                       th:text="|Dựa trên ${dashboard.totalBookings} đơn đặt|"></p>
                 </div>
                 <div class="relative h-48 w-full flex items-center justify-center">
                     <canvas id="occupancyChart"></canvas>
@@ -453,6 +480,23 @@
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const dateForm = document.getElementById("dateFilterForm");
+        const btnWeek = document.getElementById("btn-week");
+        const btnMonth = document.getElementById("btn-month");
+        const btnYear = document.getElementById("btn-year");
+
+        function setActive(btn){
+
+            const buttons = [btnWeek, btnMonth, btnYear];
+
+            buttons.forEach(b => {
+                b.classList.remove("bg-blue-50","text-blue-600");
+                b.classList.add("text-gray-500","hover:bg-gray-50");
+            });
+
+            btn.classList.remove("text-gray-500","hover:bg-gray-50");
+            btn.classList.add("bg-blue-50","text-blue-600");
+        }
 
         function toggleSidebar() {
 
@@ -548,11 +592,14 @@ function applyRange() {
         toEl.addEventListener("change", applyRange);
 
 
+
         /* ==============================
            QUICK FILTER BUTTONS
         ============================== */
 
         window.filterThisWeek = function () {
+
+            setActive(btnWeek);
 
             const today = new Date();
 
@@ -565,9 +612,13 @@ function applyRange() {
             toEl.value = lastDay.toISOString().slice(0, 10);
 
             applyRange();
+
+            dateForm.submit();
         }
 
         window.filterThisMonth = function () {
+
+            setActive(btnMonth);
 
             const today = new Date();
 
@@ -578,10 +629,13 @@ function applyRange() {
             toEl.value = lastDay.toISOString().slice(0, 10);
 
             applyRange();
+            dateForm.submit();
         }
 
 
         window.filterThisYear = function () {
+
+            setActive(btnYear);
 
             const today = new Date();
 
@@ -592,6 +646,7 @@ function applyRange() {
             toEl.value = lastDay.toISOString().slice(0, 10);
 
             applyRange();
+            dateForm.submit();
         }
 
         /* ==============================
@@ -722,6 +777,7 @@ function applyRange() {
 
         /* -------- Booking Status Chart -------- */
         const statusData = /*[[${dashboard.statusData}]]*/ [];
+        const statusLabels = /*[[${dashboard.statusLabels}]]*/ [];
         const statusCanvas = document.getElementById("occupancyChart");
 
         if (statusCanvas) {
@@ -731,14 +787,22 @@ function applyRange() {
             new Chart(ctxStatus, {
                 type: "doughnut",
                 data: {
-                    labels: ["PAID", "PENDING", "FAILED"],
+                    labels: statusLabels,
                     datasets: [{
                         data: statusData,
-                        backgroundColor: [
-                            "#10b981",
-                            "#f59e0b",
-                            "#ef4444"
-                        ],
+                        backgroundColor: statusLabels.map(label => {
+                            switch (label) {
+                                case "PAID": return "#10b981";           // xanh lá
+                                case "PENDING": return "#f59e0b";        // vàng cam
+                                case "FAILED": return "#ef4444";         // đỏ
+                                case "CHECKED_IN": return "#3b82f6";     // xanh dương
+                                case "CHECKED_OUT": return "#8b5cf6";    // tím
+                                case "COMPLETED": return "#14b8a6";      // teal
+                                case "PENDING_PAYMENT": return "#facc15";// vàng sáng
+                                case "REJECTED": return "#f43f5e";       // hồng đỏ
+                                default: return "#6b7280";
+                            }
+                        }),
                         borderWidth: 0
                     }]
                 },

@@ -181,11 +181,10 @@
                                 <!-- Initial Status -->
                                 <div class="space-y-1">
                                     <label class="block text-sm font-medium text-gray-700">Trạng thái ban đầu</label>
-                                    <input type="text"
-                                           value="AVAILABLE"
-                                           disabled
-                                           class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-gray-100 text-gray-500 cursor-not-allowed sm:text-sm">
-                                    <input type="hidden" name="status" value="AVAILABLE">
+                                    <div class="flex items-center gap-2 px-3 py-2.5 border border-green-200 rounded-lg bg-green-50 text-green-700 text-sm font-medium">
+                                        <i class="fa-solid fa-circle text-[8px]"></i>
+                                        AVAILABLE
+                                    </div>
                                 </div>
                             </div>
 
@@ -196,10 +195,13 @@
                                     <select id="roomTypeSelect"
                                             name="roomTypeId"
                                             class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white mb-2">
-
+                                        <option value="" selected disabled>-- Chọn loại phòng --</option>
                                         <option th:each="type : ${roomType}"
                                                 th:value="${type.roomTypeId}"
                                                 th:data-img="${type.imageUrl}"
+                                                th:data-baseprice="${type.basePrice}"
+                                                th:data-overprice="${type.overPrice}"
+                                                th:data-description="${type.description}"
                                                 th:text="${type.name}">
                                         </option>
 
@@ -392,6 +394,12 @@
                                         <input type="text"
                                                id="amenityNameInput"
                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
+
+                                        <!-- error message -->
+                                        <p id="amenityNameError"
+                                           class="text-red-500 text-xs mt-1 hidden">
+                                            Tên tiện nghi không được vượt quá 50 ký tự
+                                        </p>
                                     </div>
 
                                     <!-- Image -->
@@ -633,6 +641,7 @@
                 input.value = formatVND(current);
 
                 showError(input,null);
+                validatePriceRelation();
 
             });
 
@@ -732,6 +741,28 @@
                 },150);
             }
 
+            const basePrice = selectedOption.getAttribute('data-baseprice');
+            const overPrice = selectedOption.getAttribute('data-overprice');
+            const description = selectedOption.getAttribute('data-description');
+
+            const baseInput = document.querySelector('input[name="basePrice"]');
+            const overInput = document.querySelector('input[name="overPrice"]');
+
+            if (basePrice) {
+                baseInput.value = Number(basePrice).toLocaleString('vi-VN');
+                baseInput.dataset.lastValid = basePrice;
+            }
+
+            if (overPrice) {
+                overInput.value = Number(overPrice).toLocaleString('vi-VN');
+                overInput.dataset.lastValid = overPrice;
+            }
+
+            const desc = document.querySelector('textarea[name="description"]');
+            if (desc) {
+                desc.value = description || '';
+            }
+
         });
 
 
@@ -824,6 +855,12 @@
 
         document.getElementById('createRoomForm').addEventListener('submit',function(e){
 
+            if (!roomTypeSelect.value) {
+                alert("Vui lòng chọn loại phòng");
+                e.preventDefault();
+                return;
+            }
+
             if(!validatePriceRelation()){
                 e.preventDefault();
                 return;
@@ -853,6 +890,299 @@
 
         });
 
+        /* =====================================================
+       AMENITY MODAL OPEN / CLOSE
+    ===================================================== */
+
+        const openAmenityModal = document.getElementById("openAmenityModal");
+        const amenityModal = document.getElementById("amenityModal");
+        const closeAmenityModal = document.getElementById("closeAmenityModal");
+
+        openAmenityModal?.addEventListener("click", () => {
+            amenityModal.classList.remove("hidden");
+        });
+
+        closeAmenityModal?.addEventListener("click", () => {
+            amenityModal.classList.add("hidden");
+        });
+
+
+
+        /* =====================================================
+           AMENITY IMAGE UPLOAD (DRAG & DROP)
+        ===================================================== */
+
+        const amenityDropZone = document.getElementById("amenityDropZone");
+        const amenityInput = document.getElementById("amenityImageInput");
+        const amenityPreview = document.getElementById("amenityPreview");
+        const amenityUploadText = document.getElementById("amenityUploadText");
+
+        let amenityFile = null;
+
+
+        /* -------- render preview -------- */
+
+        function renderAmenityPreview(file){
+
+            const reader = new FileReader();
+
+            reader.onload = function(e){
+
+                amenityPreview.innerHTML = `
+            <div class="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200">
+
+                <img src="${e.target.result}"
+                     class="w-full h-full object-cover">
+
+                <button type="button"
+                        onclick="removeAmenityImage()"
+                        class="absolute top-1 right-1 bg-red-500 text-white
+                               w-5 h-5 rounded-full text-xs
+                               flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+            </div>
+        `;
+
+                amenityPreview.classList.remove("hidden");
+                amenityUploadText.classList.add("hidden");
+
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+
+        /* -------- remove image -------- */
+
+        function removeAmenityImage(){
+
+            amenityFile = null;
+
+            if(amenityInput){
+                amenityInput.value = "";
+            }
+
+            amenityPreview.classList.add("hidden");
+            amenityPreview.innerHTML = "";
+
+            amenityUploadText.classList.remove("hidden");
+        }
+
+
+        /* -------- input select image -------- */
+
+        amenityInput?.addEventListener("change", function(e){
+
+            const file = e.target.files[0];
+
+            if(!file) return;
+
+            /* chỉ cho 1 ảnh */
+            if(amenityFile){
+                alert("Chỉ được upload 1 ảnh cho tiện nghi");
+                amenityInput.value = "";
+                return;
+            }
+
+            if(!file.type.startsWith("image/")){
+                alert("Chỉ được upload ảnh");
+                amenityInput.value = "";
+                return;
+            }
+
+            if(file.size > 2 * 1024 * 1024){
+                alert("Ảnh phải nhỏ hơn 2MB");
+                amenityInput.value = "";
+                return;
+            }
+
+            amenityFile = file;
+
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            amenityInput.files = dt.files;
+
+            renderAmenityPreview(file);
+
+        });
+
+
+        /* -------- drag over -------- */
+
+        amenityDropZone?.addEventListener("dragover", (e)=>{
+            e.preventDefault();
+            amenityDropZone.classList.add("border-blue-400");
+        });
+
+
+        /* -------- drag leave -------- */
+
+        amenityDropZone?.addEventListener("dragleave", ()=>{
+            amenityDropZone.classList.remove("border-blue-400");
+        });
+
+
+        /* -------- drop image -------- */
+
+        amenityDropZone?.addEventListener("drop", (e)=>{
+
+            e.preventDefault();
+
+            amenityDropZone.classList.remove("border-blue-400");
+
+            const file = e.dataTransfer.files[0];   // ✅ LẤY FILE
+
+            if(!file) return;
+
+            if(e.dataTransfer.files.length > 1){
+                alert("Chỉ được upload 1 ảnh!");
+                return;
+            }
+
+            if(amenityFile){
+                alert("Chỉ được upload 1 ảnh cho tiện nghi");
+                return;
+            }
+
+            if(!file.type.startsWith("image/")){
+                alert("Chỉ được upload ảnh");
+                return;
+            }
+
+            if(file.size > 2 * 1024 * 1024){
+                alert("Ảnh phải nhỏ hơn 2MB");
+                return;
+            }
+
+            amenityFile = file;
+
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            amenityInput.files = dt.files;
+
+            renderAmenityPreview(file);
+
+        });
+
+
+        /* =====================================================
+           ADD NEW AMENITY
+        ===================================================== */
+
+        const saveAmenityBtn = document.getElementById("saveAmenityBtn");
+        const amenityNameInput = document.getElementById("amenityNameInput");
+        const amenitiesList = document.getElementById("amenitiesList");
+
+
+        saveAmenityBtn?.addEventListener("click", function () {
+
+
+
+            const name = amenityNameInput.value.trim();
+            const imageFile = amenityFile;
+
+            const regex = /^.{2,50}$/;
+
+            if (!name || !imageFile) {
+                alert("Phải nhập tên và chọn ảnh tiện nghi");
+                return;
+            }
+
+            if(!regex.test(name)) {
+                alert("Tên phải lớn hơn 2 ký tự và nhỏ hơn 50 ký tự");
+                return;
+            }
+
+
+
+            /* ----- check duplicate ----- */
+
+            const existingAmenities = document.querySelectorAll('#amenitiesList span');
+
+            for (let el of existingAmenities) {
+
+                if (el.textContent.trim().toLowerCase() === name.toLowerCase()) {
+
+                    alert("Tiện nghi này đã tồn tại!");
+                    return;
+
+                }
+            }
+
+
+            /* ----- create new amenity ----- */
+
+            const label = document.createElement("label");
+
+            label.className =
+                "flex items-center gap-2 p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors";
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.name = "newAmenityNames";
+            checkbox.value = name;
+            checkbox.checked = true;
+            checkbox.className = "h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500";
+
+
+            /* icon image */
+
+            const img = document.createElement("img");
+            img.className = "w-5 h-5 object-cover rounded";
+            img.src = URL.createObjectURL(imageFile);
+
+
+            /* name */
+
+            const span = document.createElement("span");
+            span.className = "text-sm text-gray-700";
+            span.textContent = name;
+
+
+            /* append */
+
+            label.appendChild(checkbox);
+            label.appendChild(img);
+            label.appendChild(span);
+
+            amenitiesList.prepend(label);
+
+            /* hidden input icon */
+            const hiddenFileInput = document.createElement("input");
+
+            hiddenFileInput.type = "file";
+            hiddenFileInput.name = "newAmenityIcons";
+            hiddenFileInput.style.display = "none";
+
+            const dt = new DataTransfer();
+            dt.items.add(imageFile);
+            hiddenFileInput.files = dt.files;
+
+            document.getElementById("createRoomForm").appendChild(hiddenFileInput);
+
+            /* reset modal */
+            amenityNameInput.value = "";
+            removeAmenityImage();
+
+            /* close modal */
+            amenityModal.classList.add("hidden");
+        });
+
+        amenityNameInput.addEventListener("input", function () {
+
+            const value = this.value.trim();
+            const regex = /^.{2,50}$/;
+
+            if (!regex.test(value)) {
+                amenityNameError.textContent = "Tên tiện nghi phải từ 2 đến 50 ký tự";
+                amenityNameError.classList.remove("hidden");
+            } else {
+                amenityNameError.classList.add("hidden");
+            }
+
+        });
     </script>
 </body>
 </html>
