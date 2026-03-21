@@ -6,13 +6,11 @@ import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.dto.BookingCustomerDTO;
-import vn.edu.fpt.booknow.model.dto.BookingDTO;
 import vn.edu.fpt.booknow.model.dto.WorkShift;
 import vn.edu.fpt.booknow.model.entities.*;
 import vn.edu.fpt.booknow.repositories.*;
@@ -135,7 +133,7 @@ public class BookingService {
             booking.setIdCardBackUrl(idCardBackUrl);
             booking.setIdCardBackPublicId(publicIdCardBackUrl);
 
-            updateStatus(BookingStatus.PENDING, booking.getBookingCode());
+            updateStatus(BookingStatus.APPROVED, booking.getBookingCode());
 
         } catch (Exception e) {
             throw new Exception("Lỗi upload ảnh lên cloud");
@@ -158,6 +156,10 @@ public class BookingService {
         return Bucket.builder()
                 .addLimit(Bandwidth.classic(1, Refill.intervally(1, Duration.ofMinutes(1))))
                 .build();
+    }
+
+    public Booking save(Booking booking) {
+        return bookingRepository.save(booking);
     }
 
     public String saveBooking(BookingCustomerDTO bookingDTO,
@@ -601,5 +603,24 @@ public class BookingService {
 
         // 4. Lưu lại
         bookingRepository.save(booking);
+    }
+
+    @Transactional
+    @Scheduled(fixedRate = 60000)
+    public void cancelExpiredPendingPayments() {
+        LocalDateTime timeLimit = LocalDateTime.now().minusMinutes(15);
+        List<Booking> bookings = bookingRepository.findExpiredPendingBookings(timeLimit);
+        for (Booking b : bookings) {
+            try {
+                b.setBookingStatus(BookingStatus.FAILED);
+                b.setNote("Hệ thống tự động hủy do quá hạn thanh toán 15 phút.");
+                b.setUpdateAt(LocalDateTime.now());
+
+                bookingRepository.save(b);
+                System.out.println("Đã tự động hủy đơn hàng quá hạn: " + b.getBookingId());
+            } catch (Exception e) {
+                System.err.println("Lỗi khi hủy booking " + b.getBookingId());
+            }
+        }
     }
 }

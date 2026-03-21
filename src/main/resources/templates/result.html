@@ -167,8 +167,8 @@
         <!--
             th:href="@{/payment}": Thymeleaf tự thêm context path.
         -->
-        <a th:href="@{/payment}" class="btn btn-primary">🔄 Thanh toán mới</a>
-        <a href="/"              class="btn btn-secondary">🏠 Trang chủ</a>
+        <a th:href="@{/bookings/{id}(id=${bookingId})}" class="btn btn-primary">🔄 Chi tiết booking</a>
+        <a th:href="@{/home}"              class="btn btn-secondary">🏠 Trang chủ</a>
     </div>
 
 </div>

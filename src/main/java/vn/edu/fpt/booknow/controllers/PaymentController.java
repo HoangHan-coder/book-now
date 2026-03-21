@@ -143,12 +143,36 @@ public class PaymentController {
 
         if (!isValid) {
             log.warn("Signature không hợp lệ từ returnUrl!");
-            model.addAttribute("success", false);
             model.addAttribute("message", "Lỗi xác thực chữ ký. Giao dịch không hợp lệ.");
             return "result";
         }
 
         boolean isSuccess = "0".equals(resultCode);
+
+        Booking booking = bookingService.getBookingDetail(orderInfo);
+
+        if (booking == null) {
+            log.warn("Signature không hợp lệ từ returnUrl!");
+            model.addAttribute("message", "Lỗi booking không tồn tại!");
+            return "result";
+        }
+
+        if (booking.getBookingStatus() == BookingStatus.FAILED && isSuccess) {
+            model.addAttribute("message", "Thanh toán thành công trên MoMo, nhưng ĐƠN HÀNG ĐÃ HẾT HẠN (quá 15 phút) trên hệ thống. Vui lòng liên hệ Hotline để được hỗ trợ hoàn tiền.");
+            isSuccess = false; // Đổi cờ để nó hiện giao diện màu đỏ cảnh báo thay vì xanh
+            log.error("CẢNH BÁO (Return): Khách toán đơn {} quá hạn, số tiền: {}", orderInfo, amount);
+        } else if (booking.getBookingStatus() != BookingStatus.PAID) {
+
+            BigDecimal total = BigDecimal.valueOf(Double.parseDouble(amount));
+            if (isSuccess) {
+                bookingService.updateStatus(BookingStatus.PAID, orderInfo);
+                paymentService.creatPayment(new Payment(booking, total, "MOMO Payment", "SUCCESS"));
+            } else {
+                bookingService.updateStatus(BookingStatus.PENDING_PAYMENT, orderInfo);
+                paymentService.creatPayment(new Payment(booking, total, "MOMO Payment", "FAILED"));
+            }
+        }
+        model.addAttribute("bookingId", booking.getBookingId());
         model.addAttribute("success", isSuccess);
         model.addAttribute("orderId", orderId);
         model.addAttribute("amount", amount);
@@ -157,28 +181,8 @@ public class PaymentController {
         model.addAttribute("responseTime", responseTime);
         model.addAttribute("resultCode", resultCode);
         model.addAttribute("message", isSuccess ? "Thanh toán thành công!" : "Thanh toán thất bại: " + message);
-        Booking booking = bookingService.getBookingDetail(orderInfo);
-        if (isSuccess) {
-            BigDecimal total = BigDecimal.valueOf(Double.parseDouble(amount));
-            bookingService.updateStatus(BookingStatus.PAID, orderInfo);
-            paymentService.creatPayment(new Payment(
-                    booking,
-                    total,
-                    "MOMO Payment",
-                    "SUCCESS"
-            ));
-        } else {
-            BigDecimal total = BigDecimal.valueOf(Double.parseDouble(amount));
-            bookingService.updateStatus(BookingStatus.FAILED, orderInfo);
-            paymentService.creatPayment(new Payment(
-                    booking,
-                    total,
-                    "MOMO Payment",
-                    "FAILED"
-            ));
-        }
         log.info("Kết quả thanh toán: success={}, transId={}", isSuccess, transId);
-        return "redirect:/bookings/" + booking.getBookingId();
+        return "result";
     }
 
     @PostMapping("/momo-notify")
@@ -253,10 +257,40 @@ public class PaymentController {
                 return "INVALID_SIGNATURE";
             }
 
+            Booking booking = bookingService.getBookingDetail(orderInfo);
+            if (booking == null) {
+                return "INVALID_ORDER_INFO";
+            }
+
             if ("0".equals(resultCode)) {
                 log.info("Thanh toán thành công: orderId={}, transId={}, amount={}", orderId, transId, amount);
+                if (booking.getBookingStatus() == BookingStatus.FAILED) {
+                    log.error("KHẨN CẤP: Giao dịch thành công nhưng đơn hàng đã quá hạn. Cần liên hệ hỗ trợ hoàn tiền! Amount: {}", amount);
+                    booking.setNote("KHẨN CẤP: Giao dịch thành công nhưng đơn hàng đã quá hạn. Cần liên hệ hỗ trợ hoàn tiền! Amount: " + amount);
+                    bookingService.save(booking);
+                } else if (booking.getBookingStatus() == BookingStatus.PAID) {
+                    log.info("Đơn hàng đã được đánh dấu PAID trước đó, bỏ qua.");
+                } else {
+                    assert amount != null;
+                    BigDecimal total = BigDecimal.valueOf(Double.parseDouble(amount));
+                    bookingService.updateStatus(BookingStatus.PAID, orderInfo);
+                    paymentService.creatPayment(new Payment(
+                            booking,
+                            total,
+                            "MOMO Payment",
+                            "SUCCESS"
+                    ));
+                }
             } else {
                 log.warn("Thanh toán thất bại: orderId={}, resultCode={}", orderId, resultCode);
+                BigDecimal total = BigDecimal.valueOf(Double.parseDouble(amount));
+                bookingService.updateStatus(BookingStatus.FAILED, orderInfo);
+                paymentService.creatPayment(new Payment(
+                        booking,
+                        total,
+                        "MOMO Payment",
+                        "FAILED"
+                ));
             }
             return "0";
 

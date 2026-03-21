@@ -78,10 +78,10 @@ public class BookingUpdateService {
                      next == BookingStatus.FAILED;
 
             case PAID ->
-                    next == BookingStatus.PENDING ||
+                    next == BookingStatus.APPROVED ||
             next == BookingStatus.REJECTED;
 
-            case PENDING ->
+            case APPROVED ->
                     next == BookingStatus.CHECKED_IN ||
                             next == BookingStatus.REJECTED ||
                next == BookingStatus.FAILED;

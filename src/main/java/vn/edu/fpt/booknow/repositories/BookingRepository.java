@@ -122,4 +122,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
     );
+
+    @Query("SELECT b FROM Booking b WHERE b.bookingStatus = 'PENDING_PAYMENT' AND b.createdAt < :timeLimit")
+    List<Booking> findExpiredPendingBookings(@Param("timeLimit") LocalDateTime timeLimit);
 }

@@ -325,7 +325,7 @@
             <form th:action="@{/admin/bookings/update-status}" method="post">
 
               <input type="hidden" name="bookingCode" th:value="${booking.bookingCode}">
-              <input type="hidden" name="status" value="PENDING">
+              <input type="hidden" name="status" value="APPROVED">
 
               <button type="submit"
                       class="px-6 py-2.5 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white font-medium shadow-sm transition-colors sm:w-auto w-full sm:ml-auto">
@@ -518,7 +518,7 @@
   const panelCheckin = document.getElementById('panel_checkin');
   const panelFailure = document.getElementById('panel_failure');
   const panelSuccess = document.getElementById('panel_success');
-  let bookingStatus = document.getElementById('booking-status')?.value || "PENDING";
+  let bookingStatus = document.getElementById('booking-status')?.value || "APPROVED";
 
   const badge = document.getElementById('headerStatusBadge');
 
@@ -623,7 +623,7 @@
         badge.textContent = "Chờ duyệt CCCD";
         updateTimeline(2,"yellow");
         break;
-      case "PENDING":
+      case "APPROVED":
         panelCheckin?.classList.remove('hidden');
         badge?.classList.add('bg-purple-100', 'text-purple-800');
         if (badge) badge.textContent = "Chờ xác thực check-in";
