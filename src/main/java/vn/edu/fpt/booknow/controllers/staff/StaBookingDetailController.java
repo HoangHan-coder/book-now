@@ -1,5 +1,6 @@
 package vn.edu.fpt.booknow.controllers.staff;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class StaBookingDetailController {
 
         Booking booking = bookingDetailService.getBookingDetail(bookingCode);
 
-        // BẮT LỖI Ở CONTROLLER (không throw)
+
         if (booking == null) {
             model.addAttribute("errorMessage", "Không tìm thấy booking");
             return "error/404";
@@ -32,6 +33,7 @@ public class StaBookingDetailController {
 
         model.addAttribute("booking", booking);
         model.addAttribute("duration", durationText);
+
 
         return "private/staff-booking-detail";
     }

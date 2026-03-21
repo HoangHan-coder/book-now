@@ -100,6 +100,59 @@
 
   <div id="housekeeping-lower-content">
 
+  <!-- Filter Section -->
+  <div class="bg-white rounded-lg shadow mb-8 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-800">Bộ lọc</h2>
+    </div>
+    <div class="p-6">
+      <form method="get" action="/admin/manage-housekeeping" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        
+        <!-- Task Status Filter -->
+        <div class="flex flex-col">
+          <label for="taskStatus" class="text-sm font-medium text-gray-700 mb-2">Trạng thái công việc</label>
+          <select id="taskStatus" name="taskStatus" 
+                  class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">-- Tất cả --</option>
+            <option th:each="status : ${taskStatuses}" 
+                    th:value="${status.name()}" 
+                    th:text="${status.displayName}"
+                    th:selected="${selectedTaskStatus == status}">
+              Status
+            </option>
+          </select>
+        </div>
+
+        <!-- Priority Filter -->
+        <div class="flex flex-col">
+          <label for="priority" class="text-sm font-medium text-gray-700 mb-2">Độ ưu tiên</label>
+          <select id="priority" name="priority" 
+                  class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">-- Tất cả --</option>
+            <option th:each="prio : ${priorities}" 
+                    th:value="${prio.name()}" 
+                    th:text="${prio.displayName}"
+                    th:selected="${selectedPriority == prio}">
+              Priority
+            </option>
+          </select>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex items-end gap-2 col-span-1 md:col-span-3 lg:col-span-1">
+          <button type="submit" class="flex-1 lg:flex-initial px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2">
+            <i class="fa-solid fa-filter"></i>
+            <span>Lọc</span>
+          </button>
+          <a href="/admin/manage-housekeeping" class="flex-1 lg:flex-initial px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-colors font-medium flex items-center justify-center gap-2">
+            <i class="fa-solid fa-xmark"></i>
+            <span>Xóa</span>
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Quick Actions -->
   <div class="bg-white rounded-lg shadow mb-8 overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-200">
@@ -187,6 +240,61 @@
       </table>
     </div>
   </div>
+    <!-- Pagination Controls -->
+    <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-white rounded-lg border border-gray-100">
+
+      <!-- Previous Button -->
+      <a th:if="${currentPage > 1}"
+         th:href="@{/admin/manage-housekeeping(
+                   page=${currentPage > 1 ? currentPage - 1 : totalPages},
+                   taskStatus=${param.taskStatus},
+                   priority=${param.priority}
+               )}"
+         class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+        <i class="fa-solid fa-chevron-left"></i>
+        <span>Trang trước</span>
+      </a>
+
+      <a th:if="${currentPage == 1}"
+         th:href="@{/admin/manage-housekeeping(
+                   page=${totalPages},
+                   taskStatus=${param.taskStatus},
+                   priority=${param.priority}
+               )}"
+         class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+        <i class="fa-solid fa-chevron-left"></i>
+        <span>Trang trước</span>
+      </a>
+
+      <!-- Page Info -->
+      <div class="text-center text-sm font-medium text-gray-700">
+        <span th:text="'Trang ' + ${currentPage} + ' / ' + ${totalPages}">Trang 1 / 5</span>
+        <span class="text-gray-500 text-xs ml-2" th:text="'(Tổng ' + ${totalItems} + ' bản ghi)'"> (Tổng 45 bản ghi)</span>
+      </div>
+
+      <!-- Next Button -->
+      <a th:if="${currentPage < totalPages}"
+         th:href="@{/admin/manage-housekeeping(
+                   page=${currentPage + 1},
+                   taskStatus=${param.taskStatus},
+                   priority=${param.priority}
+               )}"
+         class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+        <span>Trang sau</span>
+        <i class="fa-solid fa-chevron-right"></i>
+      </a>
+
+      <a th:if="${currentPage == totalPages}"
+         th:href="@{/admin/manage-housekeeping(
+                   page=1,
+                   taskStatus=${param.taskStatus},
+                   priority=${param.priority}
+               )}"
+         class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+        <span>Trang sau</span>
+        <i class="fa-solid fa-chevron-right"></i>
+      </a>
+    </div>
 
 
 

@@ -1,6 +1,7 @@
 package vn.edu.fpt.booknow.services;
 
 import org.springframework.stereotype.Service;
+import vn.edu.fpt.booknow.model.dto.PaginatedResponse;
 import vn.edu.fpt.booknow.model.entities.Booking;
 import vn.edu.fpt.booknow.model.entities.BookingStatus;
 import vn.edu.fpt.booknow.repositories.BookingRepository;
@@ -81,5 +82,50 @@ public class BookingListService {
                     return true;
                 })
                 .toList();
+    }
+
+    /**
+     * Filter and paginate bookings
+     * @param fromDate Check-in date (optional)
+     * @param toDate Check-out date (optional)
+     * @param status Booking status (optional)
+     * @param keyword Search keyword (optional)
+     * @param page Page number (1-indexed, auto-adjusted if invalid)
+     * @return PaginatedResponse containing page data and pagination info
+     */
+    public PaginatedResponse<Booking> filterWithPagination(
+            String fromDate,
+            String toDate,
+            BookingStatus status,
+            String keyword,
+            int page
+    ) {
+        final int PAGE_SIZE = 10;
+
+        // 1️⃣ Get all filtered data
+        List<Booking> allFilteredBookings = filter(fromDate, toDate, status, keyword);
+
+        // 2️⃣ Calculate pagination metrics
+        long totalItems = allFilteredBookings.size();
+        int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
+
+        // 3️⃣ Validate page number
+        if (totalPages == 0) {
+            totalPages = 1;
+        }
+        if (page < 1) {
+            page = 1;
+        }
+        if (page > totalPages) {
+            page = totalPages;
+        }
+
+        // 4️⃣ Slice data for current page
+        int startIndex = (page - 1) * PAGE_SIZE;
+        int endIndex = Math.min(startIndex + PAGE_SIZE, (int) totalItems);
+        List<Booking> pageData = allFilteredBookings.subList(startIndex, endIndex);
+
+        // 5️⃣ Return paginated response
+        return new PaginatedResponse<>(pageData, page, totalPages, totalItems, PAGE_SIZE);
     }
 }

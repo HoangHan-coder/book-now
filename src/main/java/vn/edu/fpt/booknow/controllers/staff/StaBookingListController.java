@@ -6,12 +6,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import vn.edu.fpt.booknow.model.dto.PaginatedResponse;
 import vn.edu.fpt.booknow.model.entities.Booking;
 import vn.edu.fpt.booknow.model.entities.BookingStatus;
 import vn.edu.fpt.booknow.services.BookingListService;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
@@ -37,17 +37,26 @@ public class StaBookingListController {
             @RequestParam(name = "keyword", required = false)
             String keyword,
 
+            @RequestParam(name = "page", defaultValue = "1")
+            int page,
+
             Model model
     ) {
 
-        List<Booking> bookings = bookingListService.filter(
+        PaginatedResponse<Booking> paginatedBookings = bookingListService.filterWithPagination(
                 checkIn != null ? checkIn.toString() : null,
                 checkOut != null ? checkOut.toString() : null,
                 status,
-                keyword
+                keyword,
+                page
         );
 
-        model.addAttribute("bookings", bookings);
+        model.addAttribute("bookings", paginatedBookings.getData());
+        model.addAttribute("currentPage", paginatedBookings.getCurrentPage());
+        model.addAttribute("totalPages", paginatedBookings.getTotalPages());
+        model.addAttribute("totalItems", paginatedBookings.getTotalItems());
+        model.addAttribute("hasNext", paginatedBookings.isHasNext());
+        model.addAttribute("hasPrevious", paginatedBookings.isHasPrevious());
 
         return "private/staff-booking-list";
     }

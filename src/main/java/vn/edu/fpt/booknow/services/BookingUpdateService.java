@@ -1,26 +1,23 @@
 package vn.edu.fpt.booknow.services;
 
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+//import vn.edu.fpt.booknow.dto.BookingUpdateMessage;
 import vn.edu.fpt.booknow.model.entities.Booking;
 import vn.edu.fpt.booknow.model.entities.BookingStatus;
 import vn.edu.fpt.booknow.repositories.BookingRepository;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class BookingUpdateService {
 
     private final BookingRepository bookingRepository;
-    private final SimpMessagingTemplate messagingTemplate;
+//    private final SimpMessagingTemplate messagingTemplate;
     private final MailService emailService;
     public BookingUpdateService(BookingRepository bookingRepository,
-                                SimpMessagingTemplate messagingTemplate,
+//                                SimpMessagingTemplate messagingTemplate,
                                 MailService emailService) {
         this.bookingRepository = bookingRepository;
-        this.messagingTemplate = messagingTemplate;
+//        this.messagingTemplate = messagingTemplate;
         this.emailService = emailService;
     }
 
@@ -53,7 +50,7 @@ public class BookingUpdateService {
             );
         }
 
-        Booking savedBooking = bookingRepository.save(booking);
+        bookingRepository.save(booking);
 
 
     }
@@ -76,18 +73,19 @@ public class BookingUpdateService {
     private boolean isValidTransition(BookingStatus current, BookingStatus next) {
 
         return switch (current) {
-
-            case PENDING ->
-                    next == BookingStatus.PENDING_PAYMENT ||
-                    next == BookingStatus.REJECTED ||
-                            next == BookingStatus.FAILED;
-
             case PENDING_PAYMENT ->
                     next == BookingStatus.PAID ||
-                            next == BookingStatus.FAILED;
+                     next == BookingStatus.FAILED;
 
             case PAID ->
-                    next == BookingStatus.CHECKED_IN;
+                    next == BookingStatus.PENDING ||
+            next == BookingStatus.REJECTED;
+
+            case PENDING ->
+                    next == BookingStatus.CHECKED_IN ||
+                            next == BookingStatus.REJECTED ||
+               next == BookingStatus.FAILED;
+
             case CHECKED_IN ->
                     next == BookingStatus.CHECKED_OUT ||
                     next == BookingStatus.REJECTED;
@@ -97,22 +95,24 @@ public class BookingUpdateService {
             default -> false;
         };
     }
-    @Transactional
-    public void autoCheckOutExpiredBookings() {
-
-        List<Booking> checkedInBookings = bookingRepository.findByBookingStatus(BookingStatus.CHECKED_IN);
-
-        LocalDateTime now = LocalDateTime.now();
-
-        for (Booking booking : checkedInBookings) {
-
-            if (booking.getCheckOutTime() != null &&
-                    booking.getCheckOutTime().isBefore(now)) {
-
-                booking.setBookingStatus(BookingStatus.CHECKED_OUT);
-
-                Booking savedBooking = bookingRepository.save(booking);
-            }
-        }
-    }
+//    @Transactional
+//    public void autoCheckOutExpiredBookings() {
+//
+//        List<Booking> checkedInBookings = bookingRepository.findByBookingStatus(BookingStatus.CHECKED_IN);
+//
+//        LocalDateTime now = LocalDateTime.now();
+//
+//        for (Booking booking : checkedInBookings) {
+//
+//            if (booking.getCheckOutTime() != null &&
+//                    booking.getCheckOutTime().isBefore(now)) {
+//
+//                booking.setBookingStatus(BookingStatus.CHECKED_OUT);
+//
+//                Booking savedBooking = bookingRepository.save(booking);
+//
+//                notifyBookingUpdate(savedBooking);
+//            }
+//        }
+//    }
 }
