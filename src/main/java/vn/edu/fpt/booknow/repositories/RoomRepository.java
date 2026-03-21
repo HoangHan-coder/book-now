@@ -118,4 +118,25 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     Room getPrice(@Param("id") Long id);
 
     Room getByRoomId(Long roomId);
+
+    boolean existsByRoomNumber(String roomNumber);
+
+
+    // tổng phòng (không tính DELETED)
+    int countByStatusNot(RoomStatus status);
+
+    @Override
+    @EntityGraph(attributePaths = {
+            "roomType"
+    })
+    Page<Room> findAll(Specification<Room> spec, Pageable pageable);
+
+    @EntityGraph(attributePaths = {
+            "roomType",
+            "images",
+            "roomAmenities",
+            "roomAmenities.amenity"
+    })
+    Optional<Room> findById(Long id);
+
 }

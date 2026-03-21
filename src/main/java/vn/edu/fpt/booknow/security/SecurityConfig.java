@@ -51,7 +51,7 @@ public class SecurityConfig {
                                 "/auth/logout", "/public/**",
                                 "/home","/search",
                                 "/detail/**","/pay/**",
-                                "/booking/save",
+                                "/booking/save", "/assets/**",
                                 "/forgot-password", "/verify-otp",
                                 "/resend-otp", "/reset-password",
                                 "/404", "/error").permitAll()
@@ -79,7 +79,7 @@ public class SecurityConfig {
                                 "/public/**", "/home","/pay/**",
                                 "/home","/search","/detail/**",
                                 "/forgot-password",
-                                "/booking/save",
+                                "/booking/save", "/assets/**",
                                 "/verify-otp", 
                                 "/resend-otp", 
                                 "/reset-password",
