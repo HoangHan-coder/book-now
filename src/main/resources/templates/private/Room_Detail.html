@@ -268,7 +268,7 @@
                 <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-end gap-3 sticky bottom-0 bg-white py-4 z-10">
                     <form th:action="@{/admin/room/delete/{id}(id=${room.roomId})}"
                           method="post"
-                          th:if="${room.status == T(vn.edu.fpt.booknow.model.entities.RoomStatus).AVAILABLE}">
+                          th:if="${room.status.name() == 'AVAILABLE'}">
 
                         <button type="submit"
                                 onclick="return confirm('Bạn có chắc muốn chuyển ngừng sử dụng phòng này?')"

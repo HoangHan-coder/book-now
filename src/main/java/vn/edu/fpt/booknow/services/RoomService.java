@@ -101,7 +101,7 @@ public class RoomService {
                     )
             );
             detailRoomDTO.getAmenityList().add(
-                    new Amenity(null, x.getUtilities(), x.getIconUrl(), null, null)
+                    new Amenity(x.getUtilities(), x.getIconUrl())
             );
         }
         List<DetailRoomDTO> detailRoomDTO = new ArrayList<>(map.values());

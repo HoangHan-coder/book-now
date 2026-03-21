@@ -36,7 +36,7 @@ public class Image {
 
     @Size(max = 255)
     @Nationalized
-    @Column(name = "public_id")
+    @Column(name = "image_public_id")
     private String publicId;
 
 }

@@ -29,7 +29,7 @@ public class ManageSttRoomController {
         try {
             Room room = manageRoomServices.findRoomById(id);
 
-            if (room.getStatus() == RoomStatus.DELETED) {
+            if (room.getStatus() == RoomStatus.INACTIVE) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Phòng đã bị xóa");
                 return "redirect:/admin/list";
             }

@@ -57,7 +57,7 @@ public class UpdateSttService {
         RoomStatus currentStatus = room.getStatus();
 
         // 3. BLOCK trạng thái không được phép chỉnh tay
-        if (currentStatus == RoomStatus.DELETED) {
+        if (currentStatus == RoomStatus.INACTIVE) {
             throw new RuntimeException("Phòng đã bị xóa, không thể cập nhật");
         }
 

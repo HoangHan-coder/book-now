@@ -1,5 +1,7 @@
 package vn.edu.fpt.booknow.model.dto;
 
+import vn.edu.fpt.booknow.model.entities.BookingStatus;
+
 import java.util.List;
 
 public class DashboardDTO {
@@ -45,7 +47,7 @@ public class DashboardDTO {
 
     private String dateLabel;
 
-    private List<String> statusLabels;
+    private List<BookingStatus> statusLabels;
 
 
     // getter setter
@@ -218,11 +220,11 @@ public class DashboardDTO {
         this.dateLabel = dateLabel;
     }
 
-    public List<String> getStatusLabels() {
+    public List<BookingStatus> getStatusLabels() {
         return statusLabels;
     }
 
-    public void setStatusLabels(List<String> statusLabels) {
+    public void setStatusLabels(List<BookingStatus> statusLabels) {
         this.statusLabels = statusLabels;
     }
 

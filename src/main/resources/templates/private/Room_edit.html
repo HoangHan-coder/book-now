@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" conterfnt="width=device-width, initial-scale=1.0">
     <title>Chỉnh sửa phòng - BookNow</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -166,8 +166,6 @@
             <input type="hidden" name="roomId" th:value="${room.roomId}">
             <input type="hidden" name="deletedImageIds">
             <input type="hidden" name="deletedAmenityIds">
-            <!-- CSRF token (required when Spring Security CSRF protection is enabled) -->
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <!-- Container for new amenity icon file inputs (keeps ordering in sync with newAmenityNames) -->
             <div id="newAmenityFiles" class="hidden"></div>
 

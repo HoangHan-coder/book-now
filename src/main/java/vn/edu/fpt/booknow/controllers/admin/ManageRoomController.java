@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -142,7 +143,7 @@ public class ManageRoomController {
         model.addAttribute("totalRoom", roomlist.getTotalElements());
         model.addAttribute("totalPages", roomlist.getTotalPages());
         model.addAttribute("roomType", roomTypeService.findAll());
-        model.addAttribute("hasDeletedRooms", roomlist.getContent().stream().allMatch(r -> r.getStatus() == RoomStatus.DELETED));
+        model.addAttribute("hasDeletedRooms", roomlist.getContent().stream().allMatch(r -> r.getStatus() == RoomStatus.INACTIVE));
         } catch (Exception e) {
             throw new InternalServerException("Cannot load room list");
         }
@@ -246,7 +247,7 @@ public class ManageRoomController {
         }
 
         model.addAttribute("room", room);
-        model.addAttribute("isDeleted", room.getStatus() == RoomStatus.DELETED);
+        model.addAttribute("isDeleted", room.getStatus() == RoomStatus.INACTIVE);
         return "private/Room_Detail";
     }
 
@@ -259,7 +260,7 @@ public class ManageRoomController {
             throw new ResourceNotFoundException("Room not found with id: " + id);
         }
 
-        if (room.getStatus() == RoomStatus.DELETED) {
+        if (room.getStatus() == RoomStatus.INACTIVE) {
             return "redirect:/admin/detail/" + id + "?error=deleted";
         }
 
@@ -279,7 +280,7 @@ public class ManageRoomController {
         }
 
         if (room.getRoomAmenities() == null) {
-            room.setRoomAmenities(new HashSet<>());
+            room.setRoomAmenities(new ArrayList<>());
         }
 
         List<Long> roomAmenityIds = room.getRoomAmenities()

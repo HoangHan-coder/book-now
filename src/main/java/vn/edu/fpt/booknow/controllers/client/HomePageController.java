@@ -66,6 +66,6 @@ public class HomePageController {
         model.addAttribute("today", today);
         model.addAttribute("weekDates", weekDates);
         model.addAttribute("roomAll",roomAll);
-        return "public/HomePage";
+        return "public/home";
     }
 }

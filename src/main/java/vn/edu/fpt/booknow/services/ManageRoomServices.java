@@ -120,8 +120,8 @@ public class ManageRoomServices {
             throw new IllegalArgumentException("Chỉ phòng trống mới ngừng hoạt động được");
         }
 
-        room.setStatus(RoomStatus.DELETED);
-        room.setDeleted(true);
+        room.setStatus(RoomStatus.INACTIVE);
+        room.setIsDeleted(true);
         roomRepository.save(room);
     }
 
@@ -130,12 +130,12 @@ public class ManageRoomServices {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("không tìm thấy phòng"));
 
-        if (room.getStatus() != RoomStatus.DELETED) {
+        if (room.getStatus() != RoomStatus.INACTIVE) {
             throw new IllegalArgumentException("Chỉ phòng đã xóa mới được khôi phục");
         }
 
         room.setStatus(RoomStatus.AVAILABLE);
-        room.setDeleted(false);
+        room.setIsDeleted(false);
         roomRepository.save(room);
     }
 
@@ -162,7 +162,7 @@ public class ManageRoomServices {
             case CLEANING -> allowed = List.of(RoomStatus.AVAILABLE);
             case MAINTENANCE -> allowed = List.of(RoomStatus.AVAILABLE);
             case OUT_OF_SERVICE -> allowed = List.of(RoomStatus.AVAILABLE, RoomStatus.MAINTENANCE);
-            case DELETED -> allowed = List.of();
+            case INACTIVE -> allowed = List.of();
             default -> allowed = List.of(currentStatus);
         }
 
@@ -217,7 +217,7 @@ public class ManageRoomServices {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng"));
 
-        if(RoomStatus.DELETED == room.getStatus()) {
+        if(RoomStatus.INACTIVE == room.getStatus()) {
         throw new IllegalArgumentException("Phòng đã ngừng sử dụng");
         }
 
@@ -245,7 +245,7 @@ public class ManageRoomServices {
         if (status == null) {
             throw new IllegalArgumentException("Trạng thái phòng là bắt buộc");
         }
-        if (status.equals(RoomStatus.DELETED)) {
+        if (status.equals(RoomStatus.INACTIVE)) {
             throw new IllegalArgumentException("Không tùy chỉnh được trạng thái này");
         }
 
@@ -375,7 +375,9 @@ public class ManageRoomServices {
                         );
 
                         String iconUrl = (String) upload.get("secure_url");
+                        String iconPublicId = (String) upload.get("public_id");
 
+                        amenity.setIconPublicId(iconPublicId);
                         amenity.setIconUrl(iconUrl);
 
                     } catch (Exception e) {
@@ -607,8 +609,9 @@ public class ManageRoomServices {
                                 );
 
                                 String iconUrl = (String) upload.get("secure_url");
-
+                                String iconPublicId = (String) upload.get("public_id");
                                 amenity.setIconUrl(iconUrl);
+                                amenity.setIconPublicId(iconPublicId);
 
                             } catch (Exception e) {
 
@@ -749,7 +752,7 @@ public class ManageRoomServices {
 
         int bookingCount =
                 bookingRepository.countByBookingStatusAndCheckOutTimeBetween(
-                        "COMPLETED",
+                        BookingStatus.COMPLETED,
                         startTime,
                         endTime
                 );
@@ -798,32 +801,6 @@ public class ManageRoomServices {
         LocalDateTime prevStartTime = prevStart.atStartOfDay();
         LocalDateTime prevEndTime = prevEnd.atTime(23, 59, 59);
 
-    /* =====================
-       PREVIOUS BOOKINGS
-       ===================== */
-
-        int prevBookings =
-                bookingRepository.countByCheckOutTimeBetweenAndBookingStatusNot(
-                        prevStartTime,
-                        prevEndTime,
-                        "DELETED"
-                );
-
-        double bookingPercent;
-
-        if (prevBookings == 0) {
-
-            if (bookingCount == 0) {
-                bookingPercent = 0;
-            } else {
-                bookingPercent = 100;
-            }
-
-        } else {
-
-            bookingPercent =
-                    ((double) (bookingCount - prevBookings) / prevBookings) * 100;
-        }
 
     /* =====================
        PREVIOUS REVENUE
@@ -855,10 +832,10 @@ public class ManageRoomServices {
         /* =====================
        Table Status
        ===================== */
-        Map<String, Integer> statusMap = new HashMap<>();
+        Map<BookingStatus, Integer> statusMap = new HashMap<>();
 
         for (Object[] row : bookingRepository.countByStatus(startTime, endTime)) {
-            String status = (String) row[0];
+            BookingStatus status = (BookingStatus) row[0];
             Number countNumber = (Number) row[1]; // cast chung cho Number
             int count = countNumber != null ? countNumber.intValue() : 0;
             statusMap.put(status, count);
@@ -1079,7 +1056,6 @@ public class ManageRoomServices {
         dto.setTotalRooms(totalRooms);
         dto.setActiveRooms(activeRooms);
 
-        dto.setBookingPercent(bookingPercent);
         dto.setRevenuePercent(revenuePercent);
 
         return dto;
@@ -1128,7 +1104,7 @@ public class ManageRoomServices {
 
         writer.println("===== STATUS BREAKDOWN =====");
 
-        List<String> statusLabels = dashboard.getStatusLabels();
+        List<BookingStatus> statusLabels = dashboard.getStatusLabels();
         List<Integer> statusData = dashboard.getStatusData();
 
         for (int i = 0; i < statusLabels.size(); i++) {
@@ -1255,12 +1231,12 @@ public class ManageRoomServices {
             statusHeader.createCell(0).setCellValue("Status");
             statusHeader.createCell(1).setCellValue("Count");
 
-            List<String> statusLabels = dashboard.getStatusLabels();
+            List<BookingStatus> statusLabels = dashboard.getStatusLabels();
             List<Integer> statusData = dashboard.getStatusData();
 
             for (int i = 0; i < statusLabels.size(); i++) {
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(statusLabels.get(i));
+                row.createCell(0).setCellValue(statusLabels.get(i).name());
                 row.createCell(1).setCellValue(statusData.get(i));
             }
 
@@ -1360,7 +1336,7 @@ public class ManageRoomServices {
                 );
 
                 row.createCell(5).setCellValue(
-                        b.getBookingStatus() != null ? b.getBookingStatus() : ""
+                        b.getBookingStatus() != null ? b.getBookingStatus().name() : ""
                 );
 
                 row.createCell(6).setCellValue(

@@ -53,12 +53,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     int countByCheckOutTimeBetweenAndBookingStatusNot(
             LocalDateTime start,
             LocalDateTime end,
-            String bookingStatus
+            BookingStatus bookingStatus
     );
 
     // Count bookings by specific status
     int countByBookingStatusAndCheckOutTimeBetween(
-            String bookingStatus,
+            BookingStatus bookingStatus,
             LocalDateTime start,
             LocalDateTime end
     );
