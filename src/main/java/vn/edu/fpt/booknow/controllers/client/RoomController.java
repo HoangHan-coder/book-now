@@ -55,7 +55,6 @@ public class RoomController {
             List<Timetable> timetables = roomService.getAllTimeTable();
             List<TimeTableDTO> getSlot = roomService.getSlot(roomId);
             BookingCustomerDTO booking = new BookingCustomerDTO();
-            List<LocalDateTime> weekDates = new ArrayList<>();
             LocalDateTime today = LocalDateTime.now();
             Room room = roomService.findRoom(roomId);
             List<Image> image = roomService.getImgRoom(room);
@@ -66,63 +65,14 @@ public class RoomController {
                 customer = customerService.findCusByEmail(email);
                 booking.setCustomer(customer);
             }
-            booking.setCustomer(customer);
-            for (int i = 0; i < 7; i++) {
-                weekDates.add(today.plusDays(i + 1));
-            }
-            Set<String> bookedKeys = new HashSet<>();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMM");
-
-            if (!getSlot.isEmpty()) {
-                // 1. Nhóm các slot theo BookingId
-                Map<Long, List<TimeTableDTO>> bookingsGrouped = getSlot.stream()
-                        .filter(s -> s.getBookingId() != null)
-                        .collect(Collectors.groupingBy(TimeTableDTO::getBookingId));
-
-                for (List<TimeTableDTO> slotsInBooking : bookingsGrouped.values()) {
-                    // Lấy slot đầu tiên để kiểm tra trạng thái của cả đơn đặt này
-                    TimeTableDTO representative = slotsInBooking.get(0);
-                    BookingStatus status = representative.getBookingStatus(); // Giả sử DTO của bạn có field status
-
-                    // 2. CHỈ xử lý nếu trạng thái KHÔNG PHẢI là Cancel hoặc Failed
-                    // Nếu là Cancel/Failed, chúng ta bỏ qua (không add vào bookedKeys), mặc định nó sẽ hiện là "Trống"
-                    if (status != BookingStatus.CANCELLED && status != BookingStatus.FAILED) {
-
-                        TimeTableDTO first = slotsInBooking.stream()
-                                .min(Comparator.comparing(TimeTableDTO::getDate)
-                                        .thenComparing(TimeTableDTO::getTimetableId)).get();
-
-                        TimeTableDTO last = slotsInBooking.stream()
-                                .max(Comparator.comparing(TimeTableDTO::getDate)
-                                        .thenComparing(TimeTableDTO::getTimetableId)).get();
-
-                        for (LocalDateTime d : weekDates) {
-                            for (Timetable t : timetables) {
-                                if (roomService.isBetween(d, t.getTimetableId(), first, last)) {
-                                    bookedKeys.add(d.format(formatter) + "-" + t.getTimetableId());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
+            List<LocalDateTime> weekDates = roomService.getWeekDates(7);
+            Set<String> bookedKeys = roomService.getBookedKeys(getSlot, weekDates, timetables);
             Room room1 = roomService.findRoom(roomId);
             booking.setRoom(room1);
-            DateTimeFormatter formatterr = DateTimeFormatter.ofPattern("dd/MM/yyyy"); // Dùng "/" để dễ nhìn
-
-            List<String> monthDateStrings = IntStream.range(0, 365)
-                    .mapToObj(i -> LocalDate.now().plusDays(i+1).format(formatterr))
-                    .collect(Collectors.toList());
-            List<Map<String, Object>> simpleTimetables = timetables.stream().map(t -> {
-                Map<String, Object> map = new HashMap<>();
-                map.put("timetableId", t.getTimetableId());
-                map.put("slotName", t.getSlotName());
-                return map;
-            }).collect(Collectors.toList());
+            List<String> monthDateStrings = roomService.getNext365Days();
+            List<Map<String, Object>> simpleTimetables = roomService.getSimpleTimetables(timetables);
             model.addAttribute("timeTableJS", simpleTimetables);
             model.addAttribute("monthDates", monthDateStrings);
-
             model.addAttribute("bookedKeys", bookedKeys);
             model.addAttribute("timeTable", timetables);
             model.addAttribute("weekDates", weekDates);
@@ -147,17 +97,7 @@ public class RoomController {
         try {
             // Luôn mặc định về trang 0 khi bấm tìm mới
             Page<DetailRoomDTO> rooms = roomService.getSearchService(searchDTO, searchDTO.getPage());
-
-            // Tính toán phân trang trực tiếp trong hàm
-            int totalPages = rooms.getTotalPages();
-            int current = rooms.getNumber();
-            int displayRange = 5;
-            int start = Math.max(0, current - displayRange / 2);
-            int end = Math.min(totalPages - 1, start + displayRange - 1);
-            if (end - start + 1 < displayRange) start = Math.max(0, end - displayRange + 1);
-            List<Integer> pageNumbers = new ArrayList<>();
-            for (int i = start; i <= end; i++) pageNumbers.add(i);
-
+            List<Integer> pageNumbers = roomService.getPageNumbers(rooms, 5);
             model.addAttribute("rooms", rooms);
             model.addAttribute("search", searchDTO);
             model.addAttribute("pageNumbers", pageNumbers);
@@ -179,16 +119,7 @@ public class RoomController {
             // Sử dụng tham số 'page' từ URL
             Page<DetailRoomDTO> rooms = roomService.getSearchService(searchDTO, page);
 
-            // Tính toán phân trang trực tiếp trong hàm (lặp lại logic)
-            int totalPages = rooms.getTotalPages();
-            int current = rooms.getNumber();
-            int displayRange = 5;
-            int start = Math.max(0, current - displayRange / 2);
-            int end = Math.min(totalPages - 1, start + displayRange - 1);
-            if (end - start + 1 < displayRange) start = Math.max(0, end - displayRange + 1);
-
-            List<Integer> pageNumbers = new ArrayList<>();
-            for (int i = start; i <= end; i++) pageNumbers.add(i);
+            List<Integer> pageNumbers = roomService.getPageNumbers(rooms, 5);
 
             model.addAttribute("rooms", rooms);
             model.addAttribute("search", searchDTO);

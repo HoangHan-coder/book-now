@@ -28,41 +28,11 @@ public class HomePageController {
         List<Booking> booking = roomService.getAllBooking();
         List<Timetable> timetables = roomService.getAllTimeTable();
         List<DetailRoomDTO> roomAll = roomService.roomAll();
-        List<LocalDateTime> weekDates = new ArrayList<>();
         LocalDateTime today = LocalDateTime.now();
-        List<Scheduler> schedulers = booking.stream()
-                .flatMap(b -> b.getSchedulers().stream()) // 'getSchedulers()' là hàm lấy list scheduler trong entity Booking
-                .collect(Collectors.toList());
-        List<Map<String, Object>> simpleTimetables = timetables.stream().map(t -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("timetableId", t.getTimetableId());
-            map.put("slotName", t.getSlotName()); // Đảm bảo getter đúng tên
-            map.put("startTime", t.getStartTime().toString());
-            map.put("endTime", t.getEndTime().toString());
-            return map;
-        }).collect(Collectors.toList());
-        // Thay vì chỉ lấy 7 ngày, hãy lấy 30 ngày cho vào Model
-
-        Map<String, String> bookedKeys = new HashMap<>();
-
-        for (Scheduler s : schedulers) {
-            // Lấy trạng thái từ đơn đặt phòng (Booking) của Scheduler đó
-            // Đảm bảo s.getBooking().getBookingStatus() trả về Enum hoặc String (CANCELLED, SUCCESS,...)
-            String status = s.getBooking().getBookingStatus().toString();
-
-            // Format Key: RoomID_LocalDate_TimetableID
-            String key = s.getBooking().getRoom().getRoomId() + "_" +
-                    s.getDate().toLocalDate().toString() + "_" +
-                    s.getTimetable().getTimetableId();
-
-            // Lưu vào Map: Key là vị trí slot, Value là trạng thái
-            bookedKeys.put(key, status);
-        }
-        System.out.println(list.getTotalPages());
-
-        for (int i = 0; i < 7; i++) {
-            weekDates.add(today.plusDays(i+1));
-        }
+        List<Scheduler> schedulers = roomService.extractSchedulersFromBookings(booking);
+        List<Map<String, Object>> simpleTimetables = roomService.getSimpleTimetables(timetables);
+        Map<String, String> bookedKeys = roomService.getBookedStatusMap(schedulers);
+        List<LocalDateTime> weekDates = roomService.getWeekDates(7);
         model.addAttribute("bookedKeys", bookedKeys);
         model.addAttribute("rooms",list);
         model.addAttribute("search",searchDTO);

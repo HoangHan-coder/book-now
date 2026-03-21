@@ -153,7 +153,7 @@ public class BookingService {
 
 
 
-
+    // ========================Tan Loc=============================
     private Bucket createNewBucket() {
         return Bucket.builder()
                 .addLimit(Bandwidth.classic(1, Refill.intervally(1, Duration.ofMinutes(1))))
@@ -167,9 +167,6 @@ public class BookingService {
                               String accessToken) {
         String username = jwtService.extractUserName(accessToken);
 
-//        String username = "minhanh.nguyen@gmail.com";
-
-
         try {
             if (isRateLimited(username)) {
                 return setErrorMessage(redirectAttributes, "Thao tác quá nhanh! Vui lòng đợi 1 phút.", bookingDTO.getRoom().getRoomId());
@@ -182,26 +179,21 @@ public class BookingService {
                 return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt sau!", bookingDTO.getRoom().getRoomId());
 
             }
-            // 1. Parse và tự động gán năm cho Check-in/Check-out (Xử lý loại 1 & 2)
             WorkShift firstShift = parseToWorkShift(bookingDTO.getCheckInTime());
             WorkShift lastShift = parseToWorkShift(bookingDTO.getCheckOutTime());
             if (lastShift.getStartTime().isBefore(firstShift.getStartTime())) {
                 return setErrorMessage(redirectAttributes, "Ngày trả phòng không thể trước ngày nhận phòng!", bookingDTO.getRoom().getRoomId());
             }
-            // 2. Kiểm tra khung giờ so với DB (Yêu cầu 3)
             String result = validateShiftWithDatabase(bookingDTO.getRoom().getRoomId(), firstShift, lastShift);
             if (!result.isEmpty()) {
                 return setErrorMessage(redirectAttributes, result, bookingDTO.getRoom().getRoomId());
             }
-            // 3. Lấp đầy các ca ở giữa để kiểm tra tính liên tiếp (Yêu cầu 4)
             List<WorkShift> allShifts = fillMissingShifts(Arrays.asList(firstShift, lastShift), bookingDTO.getRoom().getRoomId());
 
-            // 4. Kiểm tra trùng lặp trong DB
             String resultCheck = checkDuplicateShifts(allShifts, bookingDTO.getRoom().getRoomId());
             if (!resultCheck.isEmpty()) {
                 return setErrorMessage(redirectAttributes, resultCheck, bookingDTO.getRoom().getRoomId());
             }
-            // 5. Upload ảnh (Giữ lại logic cũ)
             String frontUrl = "";
             String frontId = "";
             if (frontImg != null && !frontImg.isEmpty()) {
@@ -224,7 +216,6 @@ public class BookingService {
                     return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt sau!", bookingDTO.getRoom().getRoomId());
                 }
             }
-            // 6. Lưu vào Database
             saveSingleBookingToDatabase(allShifts, bookingDTO, username, redirectAttributes, frontUrl, backUrl, frontId,backId);
 
             redirectAttributes.addFlashAttribute("toastMessage", "Đặt phòng thành công!");
@@ -236,23 +227,20 @@ public class BookingService {
         }
     }
 
-    /**
-     * Parse String từ DTO và tự động gán năm nếu thiếu
-     */
     private WorkShift parseToWorkShift(String input) {
         try {
             if (input == null || input.trim().isEmpty()) {
                 throw new IllegalArgumentException("Dữ liệu thời gian không được để trống!");
             }
 
-            // 1. Tách phần ngày: "25/03", "25" hoặc "25/03/2026"
+            // "25/03", "25" And "25/03/2026"
             String[] inputParts = input.split(" ");
             String datePart = inputParts[0].trim();
 
             LocalDate now = LocalDate.now();
             int day, month, year;
 
-            // 2. Xử lý logic parse ngày (Bắt lỗi "For input string" tại đây)
+            // Error String input
             try {
                 if (datePart.contains("/")) {
                     String[] parts = datePart.split("/");
@@ -266,18 +254,17 @@ public class BookingService {
                     year = now.getYear();
                 }
             } catch (NumberFormatException e) {
-                // Thay vì lỗi hệ thống, trả về thông báo Toast thân thiện
                 throw new IllegalArgumentException("Ngày '" + datePart + "' không đúng định dạng số!");
             }
 
             LocalDate baseDate = LocalDate.of(year, month, day);
 
-            // 3. Kiểm tra ngày trong quá khứ
+            // Check past Day
             if (baseDate.isBefore(now)) {
                 throw new IllegalArgumentException("Ngày " + datePart + " đã trôi qua, vui lòng chọn ngày khác!");
             }
 
-            // 4. Parse giờ (VD: (10:30 - 13:30))
+            // 4. Parse Hour (VD: (10:30 - 13:30))
             if (!input.contains("(") || !input.contains(")")) {
                 throw new IllegalArgumentException("Thiếu khung giờ cụ thể!");
             }
@@ -296,17 +283,11 @@ public class BookingService {
             return new WorkShift(baseDate.atStartOfDay(), startDateTime, endDateTime, extractType(input));
 
         } catch (IllegalArgumentException e) {
-            // Ném lỗi logic để hàm saveBooking bắt được
             throw e;
         } catch (Exception e) {
-            // Bắt mọi lỗi định dạng khác (lỗi split, lỗi parse giờ...)
             throw new IllegalArgumentException("Định dạng '" + input + "' không hợp lệ!");
         }
     }
-
-    /**
-     * Kiểm tra khung giờ khớp với Timetable trong DB
-     */
     private String validateShiftWithDatabase(Long roomId, WorkShift... shifts) {
         List<Timetable> timetableList = timeTableRepository.findAll();
 
@@ -318,7 +299,7 @@ public class BookingService {
             );
             if (!isValid) return "Ca " + s.getShiftType() + " không đúng khung giờ quy định của hệ thống!";
         }
-        return ""; // Không có lỗi
+        return "";
     }
     private void saveSingleBookingToDatabase(List<WorkShift> allShifts,
                                              BookingCustomerDTO bookingDTO,
@@ -334,23 +315,15 @@ public class BookingService {
            List<Timetable> timetableList = timeTableRepository.findAll();
            Customer customer = customerRepository.getCustomerByEmail(email);
 
-           // Lấy ca đầu và ca cuối để làm mốc Check-in/Check-out cho cả đơn hàng
+           // Use the first and last shifts as the check-in/check-out benchmarks for the entire order.
            WorkShift firstShift = allShifts.get(0);
            WorkShift lastShift = allShifts.get(allShifts.size() - 1);
 
-           // 1. Tính tổng tiền của TẤT CẢ các ca đã chọn
            BigDecimal totalAmount = calculateTotalAmount(allShifts, bookingDTO.getRoom().getRoomId());
 
            LocalDateTime checkInDate = firstShift.getStartTime();
            LocalDateTime checkOutDate = lastShift.getEndTime();
 
-           // Nếu ca cuối cùng là ca Đêm, ngày check-out thực tế là sáng hôm sau
-           if ("Đêm".equals(lastShift.getShiftType())) {
-               // Lưu ý: parseShift của bạn đã cộng 1 ngày cho endDateTime của ca Đêm rồi,
-               // nên checkOutDate = lastShift.getEndTime() thường đã là sáng hôm sau.
-           }
-
-           // 2. Tạo 1 BOOKING DUY NHẤT
            Booking newBooking = new Booking();
            newBooking.setCustomer(customer);
            Room room = new Room();
@@ -365,7 +338,6 @@ public class BookingService {
            newBooking.setCreatedAt(LocalDateTime.now());
            newBooking.setNote(bookingDTO.getNote());
 
-           // Hardcode URL hoặc gọi uploadToCloudinary
            newBooking.setIdCardFrontUrl(frontImg);
            newBooking.setIdCardBackUrl(backImg);
            newBooking.setIdCardFontPublicId(frontId);
@@ -380,10 +352,9 @@ public class BookingService {
            System.out.println("====================================");
            Booking savedBooking = bookingRepository.save(newBooking);
 
-           // 3. LƯU CÁC CA VÀO BẢNG SCHEDULER (Chi tiết của đơn hàng)
            for (WorkShift shift : allShifts) {
                Scheduler scheduler = new Scheduler();
-               scheduler.setBooking(savedBooking); // Liên kết với đơn hàng vừa tạo
+               scheduler.setBooking(savedBooking);
                scheduler.setDate(shift.getWorkDate());
 
                Long timetableId = null;
@@ -403,21 +374,14 @@ public class BookingService {
            }
 
     }
-    /**
-     * Tính tổng tiền của đơn hàng dựa trên giá phòng từ Database.
-     * Sáng, Chiều, Tối = basePrice
-     * Đêm = overnightPrice
-     */
     public BigDecimal calculateTotalAmount(List<WorkShift> group, Long roomId) {
 
-        // 2. Lấy giá cấu hình của phòng
         Room room1 = roomRepository.getPrice(roomId);
         BigDecimal dayPrice = room1.getRoomType().getBasePrice();      // Giá cho ca Sáng/Chiều/Tối
         BigDecimal nightPrice = room1.getRoomType().getOverPrice(); // Giá cho ca Đêm
 
         BigDecimal total = BigDecimal.ZERO;
 
-        // 3. Duyệt qua danh sách ca đã được validate và fill đầy đủ
         for (WorkShift shift : group) {
             if ("Đêm".equals(shift.getShiftType())) {
                 total = total.add(nightPrice);
@@ -433,14 +397,10 @@ public class BookingService {
         Booking isExisted = new Booking();
 
         do {
-            // Tạo mã theo format BK + Timestamp hiện tại
-            // Ví dụ: BK-1710912345678
             newCode = "BK-" + System.currentTimeMillis();
 
-            // Kiểm tra mã này đã tồn tại trong DB chưa
             isExisted = bookingRepository.getByBookingCode(newCode);
 
-            // Nếu đã tồn tại (isExisted = true), vòng lặp sẽ tiếp tục chạy lại
         } while (isExisted != null);
 
         return newCode;
@@ -456,18 +416,8 @@ public class BookingService {
         return "redirect:/detail/" + roomId;
     }
 
-
-    /**
-     * Hàm tổng hợp: Vừa kiểm tra khung giờ, vừa tính tổng tiền.
-     *
-     * @return Tổng số tiền dưới dạng String (VD: "250000")
-     * @throws IllegalArgumentException nếu có ca không hợp lệ
-     */
     private Map<String, String> uploadToCloudinary(MultipartFile file) throws IOException {
-        // Thực hiện upload
         Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
-
-        // Tạo một Map mới để chứa 2 thông tin quan trọng nhất
         Map<String, String> result = new HashMap<>();
         result.put("url", uploadResult.get("url").toString());
         result.put("public_id", uploadResult.get("public_id").toString());
@@ -479,8 +429,6 @@ public class BookingService {
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-
-        // 1. Kiểm tra trùng lặp nội bộ (Chặn chọn trùng 1 slot trong cùng 1 đơn)
         Set<String> internalCheck = new HashSet<>();
         for (WorkShift shift : allShifts) {
             String uniqueKey = shift.getWorkDate().toLocalDate().toString() + "-" + shift.getShiftType();
@@ -489,19 +437,12 @@ public class BookingService {
                 return "Bạn chọn trùng ca " + shift.getShiftType() + " ngày " + shift.getWorkDate().format(dateFormatter);
             }
         }
-
-        // 2. Lấy mốc thời gian bao quát toàn bộ các ca đã chọn
-        // Vì danh sách allShifts đã được sắp xếp theo thời gian trong hàm processAndValidateShifts
         LocalDateTime overallStart = allShifts.get(0).getStartTime();
         LocalDateTime overallEnd = allShifts.get(allShifts.size() - 1).getEndTime();
 
         System.out.println("--- KIỂM TRA TRÙNG LẶP TỔNG THỂ ---");
         System.out.println("Room ID: " + roomId);
         System.out.println("Khoảng thời gian cần check: " + overallStart.format(timeFormatter) + " -> " + overallEnd.format(timeFormatter));
-
-        // 3. Chỉ gọi Repo 1 lần duy nhất với khoảng thời gian lớn nhất
-        System.out.println(overallStart + "503");
-        System.out.println(overallEnd + " 504");
         boolean isOccupied = bookingRepository.isRoomOccupied(
                 roomId,
                 overallStart,
@@ -509,7 +450,6 @@ public class BookingService {
         );
 
         if (isOccupied) {
-            // Tìm ca cụ thể bị vướng (Tùy chọn: Có thể in thông báo chung hoặc duyệt lại để báo ca cụ thể)
             return "Rất tiếc, phòng đã có người đặt trong khoảng thời gian này.";
         }
         return "";
@@ -519,7 +459,6 @@ public class BookingService {
 
         List<WorkShift> fullList = new ArrayList<>();
         List<Timetable> timetableList = timeTableRepository.findAll();
-        // Sắp xếp timetable theo thứ tự Sáng -> Chiều -> Tối -> Đêm
         timetableList.sort(Comparator.comparing(Timetable::getTimetableId));
 
         WorkShift first = selectedShifts.get(0);
@@ -532,12 +471,12 @@ public class BookingService {
                 LocalDateTime slotStart = LocalDateTime.of(currentPointer.toLocalDate(), slot.getStartTime());
                 LocalDateTime slotEnd = LocalDateTime.of(currentPointer.toLocalDate(), slot.getEndTime());
 
-                // Xử lý ca đêm qua ngày hôm sau
+                // Processing the night shift the following day
                 if (slot.getEndTime().isBefore(slot.getStartTime())) {
                     slotEnd = slotEnd.plusDays(1);
                 }
 
-                // Nếu ca này nằm trong khoảng từ ca đầu đến ca cuối khách chọn
+                // If this shift falls within the range of the first and last shifts the customer chooses
                 if (!slotStart.isBefore(first.getStartTime()) && !slotStart.isAfter(last.getStartTime())) {
                     String type = extractType(slot.getSlotName());
                     fullList.add(new WorkShift(slotStart.toLocalDate().atStartOfDay(), slotStart, slotEnd, type));
@@ -560,16 +499,13 @@ public class BookingService {
     }
     @Transactional
     public String completeOfflineCheckin(Booking bookingData, MultipartFile frontImg, MultipartFile backImg, RedirectAttributes redirectAttributes) {
-        // 1. Lấy dữ liệu gốc từ DB
         Booking existingBooking = bookingRepository.findById(bookingData.getBookingId())
                 .orElseThrow(() -> new RuntimeException("Booking không tồn tại"));
 
-        // 2. Cập nhật các trường thông tin cơ bản
         existingBooking.setNote(bookingData.getNote());
         existingBooking.setBookingStatus(BookingStatus.CHECKED_IN);
         existingBooking.setUpdatedAt(LocalDateTime.now());
 
-        // 3. Xử lý ảnh mặt trước
         if (frontImg != null && !frontImg.isEmpty()) {
             try {
                 Map<String, String> imageData = uploadToCloudinary(frontImg);
@@ -579,9 +515,7 @@ public class BookingService {
                 return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt trước!", bookingData.getBookingId());
             }
         }
-        // Nếu không có frontImg mới, existingBooking.getIdCardFrontUrl() vẫn giữ giá trị cũ từ DB
 
-        // 4. Xử lý ảnh mặt sau
         if (backImg != null && !backImg.isEmpty()) {
             try {
                 Map<String, String> imageData = uploadToCloudinary(backImg);
@@ -592,7 +526,6 @@ public class BookingService {
             }
         }
 
-        // 5. Lưu lại Booking đã cập nhật
         bookingRepository.save(existingBooking);
 
         redirectAttributes.addFlashAttribute("toastMessage", "Check-in thành công!");
@@ -602,20 +535,20 @@ public class BookingService {
     }
     @Transactional
     public void cancelBookingStatus(Long bookingId) {
-        // 1. Tìm booking
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn đặt phòng để hủy"));
 
-        // 2. Kiểm tra điều kiện (Ví dụ: Không được hủy nếu đã Check-in)
         if ("CHECKED_IN".equals(booking.getBookingStatus())) {
             throw new RuntimeException("Không thể hủy đơn đã hoàn tất Check-in!");
         }
         System.out.println(bookingId + " test 494");
-        // 3. Cập nhật trạng thái
         booking.setBookingStatus(BookingStatus.FAILED);
         booking.setUpdatedAt(LocalDateTime.now());
 
-        // 4. Lưu lại
         bookingRepository.save(booking);
     }
 }
+
+
+
+// ========================Tan Loc=============================
