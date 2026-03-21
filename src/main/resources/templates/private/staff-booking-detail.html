@@ -249,10 +249,11 @@
         <!-- Cancel Disabled Notice -->
 
 
-        <div class="flex gap-2">
+        <div class="flex gap-2" >
 
         <!-- Nút cập nhật -->
         <a th:href="@{/admin/bookings/update/{bookingCode}(bookingCode=${booking.bookingCode})}"
+           th:classappend="${booking.bookingStatus.name == 'FAILED'} ? 'pointer-events-none opacity-50' : ''"
            class="flex items-center gap-2 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg font-medium transition">
           <i class="fa-solid fa-pen"></i>
           Cập nhật trạng thái
@@ -263,7 +264,7 @@
     </div>
 
   </div>
-
+  </div>
 </main>
 
 </body>
