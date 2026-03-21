@@ -36,7 +36,8 @@ public class JWTFilter extends OncePerRequestFilter {
         if (requestPath.contains("/auth/login") || requestPath.contains("/admin/login") || 
             requestPath.contains("/register") || requestPath.contains("/public") ||
             requestPath.contains("/auth/logout") ||
-                requestPath.contains("/pay") || requestPath.contains("/forgot-password")) {
+            requestPath.contains("/pay") || requestPath.contains("/forgot-password") ||
+            requestPath.contains("/booking/save")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -68,6 +69,8 @@ public class JWTFilter extends OncePerRequestFilter {
                 // validate token
                 if (userDetails != null && jwtService.validateToken(token, userDetails)) {
                     setAuthentication(userDetails, request);
+                } else {
+                    response.sendRedirect("/auth/login");
                 }
             } catch (Exception e) {
                 // Log error but don't block the request

@@ -66,14 +66,14 @@ public class BookingController {
             Booking booking = bookingService.getBookingById(id);
             BookingDTO bookingDTO = new BookingDTO(booking);
             Room room = booking.getRoom();
-            Payment payment = paymentService.getPaymentByBookingId(booking);
-            System.out.println(payment.getPaymentId());
+            List<Payment> payments = paymentService.getPaymentByBookingId(booking);
+
             if (booking == null || !booking.getCustomer().getEmail().equals(email)) {
                 return "redirect:/bookings/history";
             }
             model.addAttribute("booking", bookingDTO);
             model.addAttribute("room", new RoomDTO(room));
-            model.addAttribute("payment", new PaymentDTO(payment));
+            model.addAttribute("payments", payments.stream().map(PaymentDTO::new).toList());
             model.addAttribute("hasFeedback", hasFeedback);
             return "booking-detail";
         } catch (NumberFormatException e) {

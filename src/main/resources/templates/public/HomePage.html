@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -126,58 +127,64 @@
 </a>
 
 <!-- NAVBAR (Transparent Full Width) -->
-<nav class="fixed top-0 left-0 w-full flex justify-end items-center px-8 py-6 z-50 bg-gradient-to-b from-black/50 to-transparent transition-all duration-300"
+<nav class="fixed top-0 left-0 w-full flex justify-end items-center px-8 py-6 z-50 bg-gradient-to-b from-black/60 to-transparent transition-all duration-300"
      id="mainNavbar">
     <div class="flex items-center gap-8">
-        <a href="#" class="text-sm font-medium text-white hover:text-blue-200 transition-colors drop-shadow-sm">Về chúng
-            tôi</a>
+        <a href="#" class="text-sm font-medium text-white hover:text-blue-200 transition-colors drop-shadow-sm">Về
+            chúng tôi</a>
         <a href="#" class="text-sm font-medium text-white hover:text-blue-200 transition-colors drop-shadow-sm">Liên
             hệ</a>
 
-        <div class="w-px h-6 bg-white/30"></div>
-
-        <!-- Profile Dropdown Container -->
-        <div class="relative">
-            <button id="profileBtn" class="flex items-center gap-3 focus:outline-none group">
-                <div class="text-right hidden sm:block">
-                    <p class="text-xs font-bold text-white group-hover:text-blue-100 transition-colors drop-shadow-sm">
-                        Nguyễn Văn A</p>
-                    <p class="text-[10px] text-gray-200 group-hover:text-white transition-colors">Khách hàng</p>
-                </div>
-                <div class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/50 shadow-sm group-hover:bg-white group-hover:text-blue-600 transition-all">
-                    <i class="fa-solid fa-user"></i>
-                </div>
+        <div class="flex items-center gap-3" sec:authorize="!isAuthenticated()">
+            <a th:href="@{/auth/login}"
+               class="text-sm font-semibold text-white px-5 py-2.5 rounded-full shadow-md transition-all transform hover:text-blue-500 hover:-translate-y-0.5 active:translate-y-0">
+                Đăng nhập
+            </a>
+            <button
+                    class="text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-full shadow-md transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+                Đăng ký
             </button>
+        </div>
+        <!-- Profile Dropdown Container -->
+        <div sec:authorize="isAuthenticated()">
+            <div class="relative">
+                <button id="profileBtn" class="flex items-center gap-3 focus:outline-none group">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-xs font-bold text-white group-hover:text-blue-100 transition-colors drop-shadow-sm" sec:authentication="principal.fullName"></p>
+                        <p class="text-[10px] text-gray-200 group-hover:text-white transition-colors">Khách hàng</p>
+                    </div>
+                    <div
+                            class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/50 shadow-sm group-hover:bg-white group-hover:text-blue-600 transition-all">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </button>
 
-            <!-- Dropdown Menu -->
-            <div id="profileDropdown"
-                 class="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 dropdown-menu dropdown-hidden z-50">
-                <div class="px-4 py-3 border-b border-gray-100">
-                    <p class="text-sm font-medium text-gray-900">Tài khoản của tôi</p>
-                    <p class="text-xs text-gray-500 truncate">nguyenvana@gmail.com</p>
-                </div>
-                <ul class="py-1">
-                    <li>
-                        <a href="register_profile.html"
-                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
-                            <i class="fa-regular fa-id-card mr-2 w-4"></i> Hồ sơ của tôi
+                <!-- Dropdown Menu -->
+                <div id="profileDropdown"
+                     class="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 dropdown-menu dropdown-hidden z-50">
+                    <div class="px-4 py-3 border-b border-gray-100">
+                        <p class="text-sm font-medium text-gray-900">Tài khoản của tôi</p>
+                        <p class="text-xs text-gray-500 truncate" sec:authentication="principal.fullName"></p>
+                    </div>
+                    <ul class="py-1">
+                        <li>
+                            <a th:href="@{/user/profile}"
+                               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
+                                <i class="fa-regular fa-id-card mr-2 w-4"></i> Hồ sơ của tôi
+                            </a>
+                        </li>
+                        <li>
+                            <a th:href="@{/bookings/history}"
+                               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
+                                <i class="fa-solid fa-clock-rotate-left mr-2 w-4"></i> Lịch sử đặt phòng
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="border-t border-gray-100 mt-1 pt-1">
+                        <a  th:href="@{/auth/logout}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                            <i class="fa-solid fa-arrow-right-from-bracket mr-2 w-4"></i> Đăng xuất
                         </a>
-                    </li>
-                    <li>
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
-                            <i class="fa-solid fa-clock-rotate-left mr-2 w-4"></i> Lịch sử đặt phòng
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
-                            <i class="fa-regular fa-heart mr-2 w-4"></i> Phòng yêu thích
-                        </a>
-                    </li>
-                </ul>
-                <div class="border-t border-gray-100 mt-1 pt-1">
-                    <a href="customer_login.html" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                        <i class="fa-solid fa-arrow-right-from-bracket mr-2 w-4"></i> Đăng xuất
-                    </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -508,6 +515,31 @@
 
 <!-- SCRIPT -->
 <script th:inline="javascript">
+
+    // Profile Dropdown Logic
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+
+    profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isHidden = profileDropdown.classList.contains('dropdown-hidden');
+        if (isHidden) {
+            profileDropdown.classList.remove('dropdown-hidden');
+            profileDropdown.classList.add('dropdown-visible');
+        } else {
+            profileDropdown.classList.add('dropdown-hidden');
+            profileDropdown.classList.remove('dropdown-visible');
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+            profileDropdown.classList.add('dropdown-hidden');
+            profileDropdown.classList.remove('dropdown-visible');
+        }
+    });
+
+
     // --- 1. DỮ LIỆU TỪ BACKEND ---
     const rawRooms = /*[[${roomAll}]]*/ [];
     const rawSlots = /*[[${timeTable}]]*/ [];

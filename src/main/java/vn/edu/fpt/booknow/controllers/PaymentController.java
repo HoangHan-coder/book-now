@@ -8,10 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import vn.edu.fpt.booknow.model.dto.BookingDTO;
 import vn.edu.fpt.booknow.model.dto.MomoResponseDTO;
-import vn.edu.fpt.booknow.model.entities.Booking;
-import vn.edu.fpt.booknow.model.entities.BookingStatus;
-import vn.edu.fpt.booknow.model.entities.Payment;
+import vn.edu.fpt.booknow.model.entities.*;
 import vn.edu.fpt.booknow.services.BookingService;
 import vn.edu.fpt.booknow.services.MomoPaymentService;
 import vn.edu.fpt.booknow.services.PaymentService;
@@ -36,39 +36,82 @@ public class PaymentController {
         this.momoPaymentService = momoPaymentService;
     }
 
-    @GetMapping("/payment")
-    public String showPaymentForm() {
-        return "payment";
-    }
-
     @PostMapping("/create-payment")
     public String createPayment(
-            @RequestParam("bookingCode") String bookingCode,
-            @RequestParam("totalAmount") String totalAmount,
-            Model model) {
+            @RequestParam("bookingId") String bookingIdRaw,
+            @RequestParam(value = "timetableId", required = false) String timetableIdRaw,
+            RedirectAttributes redirectAttributes) {
         try {
-            long amount = Long.parseLong(totalAmount);
-            log.info("Nhận yêu cầu tạo thanh toán: amount={}, orderInfo={}", amount, bookingCode);
-            System.out.println("Nhận yêu cầu tạo thanh toán: amount="+amount+", orderInfo="+bookingCode);
+            Long bookingId = Long.parseLong(bookingIdRaw);
 
-            if (amount <= 0) {
-                model.addAttribute("error", "Số tiền phải lớn hơn 0");
-                return "payment";
+            MomoResponseDTO response;
+
+            Booking booking = bookingService.getBookingById(bookingId);
+
+            if (booking == null) {
+                redirectAttributes.addFlashAttribute("error", "Lỗi hệ thống: Không tìm thấy booking");
+                return "redirect:/bookings/" + bookingId;
             }
-            MomoResponseDTO response = momoPaymentService.createPayment(amount, bookingCode);
+
+            BookingDTO bookingDTO = new BookingDTO(booking);
+
+            if (bookingDTO.isOverStay()) {
+
+                if (timetableIdRaw == null) {
+                    return "error/500";
+                }
+
+                Long timetableId = Long.parseLong(timetableIdRaw);
+                response = payForExtendBooking(bookingId, timetableId);
+            } else {
+                response = payForNewBooking(bookingId);
+            }
+
+
+
+
             if (response.isSuccess() && response.getPayUrl() != null) {
                 log.info("Tạo thanh toán thành công, redirect đến: {}", response.getPayUrl());
                 return "redirect:" + response.getPayUrl();
             } else {
                 log.warn("MoMo trả về lỗi: resultCode={}, message={}", response.getResultCode(), response.getMessage());
-                model.addAttribute("error", "Lỗi tạo thanh toán: " + response.getMessage());
-                return "payment";
+                redirectAttributes.addFlashAttribute("error", "Lỗi tạo thanh toán: " + response.getMessage());
+                return "redirect:/bookings/" + bookingId;
             }
         } catch (Exception e) {
             log.error("Exception khi tạo thanh toán", e);
-            model.addAttribute("error", "Lỗi hệ thống: " + e.getMessage());
-            return "payment";
+            redirectAttributes.addFlashAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+            return "redirect:/bookings/" + bookingIdRaw;
         }
+    }
+
+    private MomoResponseDTO payForNewBooking(Long bookingId) throws Exception {
+        Booking booking = bookingService.getBookingById(bookingId);
+        if (booking == null) {
+            throw new Exception("Booking not exist");
+        }
+        return momoPaymentService.createPayment(booking.getTotalAmount().longValue(), booking.getBookingCode());
+    }
+
+    private MomoResponseDTO payForExtendBooking(Long bookingId, Long timetableId) throws Exception {
+        Booking booking = bookingService.getBookingById(bookingId);
+        if (booking == null) {
+            throw new Exception("Booking not exist");
+        }
+
+        if (timetableId < 1 || timetableId > 4) {
+            throw new Exception("Timetable invalid");
+        }
+
+        RoomType roomType = booking.getRoom().getRoomType();
+        if (roomType == null ) {
+            throw new Exception("RoomType invalid");
+        }
+        if (timetableId == 4) {
+            return momoPaymentService.createPayment(roomType.getOverPrice().longValue(), booking.getBookingCode());
+        }
+
+        return momoPaymentService.createPayment(roomType.getBasePrice().longValue(), booking.getBookingCode());
     }
 
     @GetMapping("/momo-return")
@@ -123,6 +166,15 @@ public class PaymentController {
                     total,
                     "MOMO Payment",
                     "SUCCESS"
+            ));
+        } else {
+            BigDecimal total = BigDecimal.valueOf(Double.parseDouble(amount));
+            bookingService.updateStatus(BookingStatus.FAILED, orderInfo);
+            paymentService.creatPayment(new Payment(
+                    booking,
+                    total,
+                    "MOMO Payment",
+                    "FAILED"
             ));
         }
         log.info("Kết quả thanh toán: success={}, transId={}", isSuccess, transId);

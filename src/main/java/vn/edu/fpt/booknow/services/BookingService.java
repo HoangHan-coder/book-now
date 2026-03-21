@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import vn.edu.fpt.booknow.model.dto.BookingCustomerDTO;
 import vn.edu.fpt.booknow.model.dto.BookingDTO;
 import vn.edu.fpt.booknow.model.dto.WorkShift;
 import vn.edu.fpt.booknow.model.entities.*;
@@ -159,7 +160,7 @@ public class BookingService {
                 .build();
     }
 
-    public String saveBooking(BookingDTO bookingDTO,
+    public String saveBooking(BookingCustomerDTO bookingDTO,
                               MultipartFile frontImg,
                               MultipartFile backImg,
                               RedirectAttributes redirectAttributes,
@@ -218,11 +219,14 @@ public class BookingService {
                 }
             }
             // 6. Lưu vào Database
-            saveSingleBookingToDatabase(allShifts, bookingDTO, username, redirectAttributes, frontUrl, backUrl);
+            Booking booking = saveSingleBookingToDatabase(allShifts, bookingDTO, username, redirectAttributes, frontUrl, backUrl);
 
-            redirectAttributes.addFlashAttribute("toastMessage", "Đặt phòng thành công!");
-            redirectAttributes.addFlashAttribute("toastType", "success");
-            return "redirect:/payment";
+//            redirectAttributes.addFlashAttribute("toastMessage", "Đặt phòng thành công!");
+//            redirectAttributes.addFlashAttribute("toastType", "success");
+            if (booking == null) {
+                return setErrorMessage(redirectAttributes,  "Đặt phòng không thành công!", bookingDTO.getRoom().getRoomId());
+            }
+            return "redirect:/bookings/" + booking.getBookingId();
 
         } catch (IllegalArgumentException e) {
             return setErrorMessage(redirectAttributes, e.getMessage(), bookingDTO.getRoom().getRoomId());
@@ -312,14 +316,14 @@ public class BookingService {
         }
         return ""; // Không có lỗi
     }
-    private void saveSingleBookingToDatabase(List<WorkShift> allShifts,
-                                             BookingDTO bookingDTO,
+    private Booking saveSingleBookingToDatabase(List<WorkShift> allShifts,
+                                             BookingCustomerDTO bookingDTO,
                                              String email,
                                              RedirectAttributes redirectAttributes,
                                              String frontImg,
                                              String backImg) {
 
-           if (allShifts.isEmpty()) return;
+           if (allShifts.isEmpty()) return null;
 
            List<Timetable> timetableList = timeTableRepository.findAll();
            Customer customer = customerRepository.getCustomerByEmail(email);
@@ -389,7 +393,7 @@ public class BookingService {
                    scheduleRepository.save(scheduler);
                }
            }
-
+        return savedBooking;
     }
     /**
      * Tính tổng tiền của đơn hàng dựa trên giá phòng từ Database.

@@ -3,6 +3,6 @@
   <component name="JpaBuddyIdeaProjectConfig" migrateIndexesAndConstraints="true" reUseTableSchema="true">
     <option name="migrateIndexesAndConstraints" value="true" />
     <option name="reLastEntityCreationPackage" value="src/main/java/vn/edu/fpt/booknow/model/entities" />
-    <option name="reverseEngineeringLastDbConnectionId" value="f61bb13d-f866-4c49-a27e-287079986105" />
+    <option name="reverseEngineeringLastDbConnectionId" value="e1cc8e85-6c33-4ffe-be61-260138411e65" />
   </component>
 </project>

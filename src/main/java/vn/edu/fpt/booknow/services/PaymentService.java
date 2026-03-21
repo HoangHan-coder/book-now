@@ -7,6 +7,8 @@ import vn.edu.fpt.booknow.model.entities.Booking;
 import vn.edu.fpt.booknow.model.entities.Payment;
 import vn.edu.fpt.booknow.repositories.PaymentRepository;
 
+import java.util.List;
+
 @Service
 public class PaymentService {
 
@@ -14,8 +16,8 @@ public class PaymentService {
     private PaymentRepository paymentRepository;
 
     @Transactional
-    public Payment getPaymentByBookingId(Booking booking) {
-        return paymentRepository.getPaymentsByBooking(booking).getLast();
+    public List<Payment> getPaymentByBookingId(Booking booking) {
+        return paymentRepository.getPaymentsByBooking(booking);
     }
 
     @Transactional

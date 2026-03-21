@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import vn.edu.fpt.booknow.model.dto.BookingCustomerDTO;
 import vn.edu.fpt.booknow.model.dto.BookingDTO;
 import vn.edu.fpt.booknow.services.BookingService;
 
@@ -18,7 +19,7 @@ public class BookingClientController {
     }
 
     @PostMapping("/booking/save")
-    public String bookingSave(@ModelAttribute BookingDTO bookingDTO, @RequestParam(value = "cccd_front", required = false) MultipartFile frontImg,
+    public String bookingSave(@ModelAttribute BookingCustomerDTO bookingDTO, @RequestParam(value = "cccd_front", required = false) MultipartFile frontImg,
                               @RequestParam(value = "cccd_back", required = false) MultipartFile backImg,
                               @CookieValue(name = "Access_token", required = false) String accessToken,
                               RedirectAttributes redirectAttributes, Model model) {

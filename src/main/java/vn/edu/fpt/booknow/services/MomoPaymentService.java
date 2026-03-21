@@ -15,6 +15,8 @@ import vn.edu.fpt.booknow.model.dto.MomoResponseDTO;
 import vn.edu.fpt.booknow.utils.SignatureUtils;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 @Service
@@ -37,6 +39,9 @@ public class MomoPaymentService {
     public MomoResponseDTO createPayment(long amount, String orderInfo) {
         String orderId   = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
         String requestId = orderId;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String expireDateStr = sdf.format(new Date(System.currentTimeMillis() + 15 * 60 * 1000));
 
         log.info("=== Bắt đầu tạo thanh toán MoMo ===");
         log.info("OrderId: {}, Amount: {}", orderId, amount);
@@ -66,6 +71,7 @@ public class MomoPaymentService {
                 .extraData("")
                 .requestType(momoConfig.getRequestType())
                 .signature(signature)
+                .expireDate(expireDateStr)
                 .build();
 
         HttpHeaders headers = new HttpHeaders();

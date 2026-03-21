@@ -47,10 +47,14 @@ public class SecurityConfig {
                 .securityMatcher("/admin/**")
                 .authenticationProvider(staffAuthProvider())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/login","/auth/login","/auth/logout", "/public/**", "/home","/search","/detail/**","/pay/**",
-
-                                "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password",
-                                "/404").permitAll()
+                        .requestMatchers("/admin/login","/auth/login",
+                                "/auth/logout", "/public/**",
+                                "/home","/search",
+                                "/detail/**","/pay/**",
+                                "/booking/save",
+                                "/forgot-password", "/verify-otp",
+                                "/resend-otp", "/reset-password",
+                                "/404", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -72,12 +76,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login",
                                 "/auth/logout", "/register",
-                                "/public/**", "/home","/pay/**", "/home","/search","/detail/**",
-                                "/forgot-password", 
+                                "/public/**", "/home","/pay/**",
+                                "/home","/search","/detail/**",
+                                "/forgot-password",
+                                "/booking/save",
                                 "/verify-otp", 
                                 "/resend-otp", 
                                 "/reset-password",
-                                "/404").permitAll()
+                                "/404", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
