@@ -151,66 +151,81 @@
                 </div>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
-                <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
-                    <i class="fa-regular fa-calendar-check text-blue-600"></i> Lịch trống phòng tuần này
-                </h3>
-                <div class="overflow-x-auto pb-2">
+                <div class="flex justify-center mb-8">
+                    <div class="inline-flex p-1 bg-gray-100 rounded-xl border border-gray-200">
+                        <button type="button" onclick="switchBookingMode('week')" id="btn-mode-week"
+                                class="px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-white text-blue-600 shadow-sm">
+                            Đặt theo tuần
+                        </button>
+                        <button type="button" onclick="switchBookingMode('longterm')" id="btn-mode-longterm"
+                                class="px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 text-gray-500 hover:text-gray-700">
+                            Đặt theo tháng/năm
+                        </button>
+                    </div>
+                </div>
+
+                <div  class="overflow-x-auto pb-2">
                     <div class="min-w-[600px]">
-                        <div class="grid grid-cols-8 gap-1 text-center">
-                            <div class="p-2 text-xs font-bold text-gray-400 uppercase">Slot</div>
-                            <div th:each="date : ${weekDates}"
-                                 th:classappend="${date.isEqual(today)} ? 'bg-blue-100 text-blue-800 ring-2 ring-blue-400' : 'bg-gray-100 text-gray-700'"
-                                 class="p-2 rounded text-sm font-semibold">
-                                <span th:if="${date.isEqual(today)}">Hôm nay</span>
-                                <span th:if="${!date.isEqual(today)}"
-                                      th:text="${date.getDayOfWeek().getValue() == 7 ? 'Chủ Nhật' : 'Thứ ' + (date.getDayOfWeek().getValue() + 1)}"></span>
-                                <br>
-                                <span class="text-xs font-normal"
-                                      th:classappend="${date.getDayOfWeek().getValue() == 7} ? 'text-red-500'"
-                                      th:text="${#temporals.format(date, 'dd/MM')}"></span>
-                            </div>
-                        </div>
-                        <div th:each="tItem : ${timeTable}" class="grid grid-cols-8 gap-1 items-center mt-1">
-                            <div class="text-[0.7rem] font-bold text-gray-500 text-center">
-                                <span th:utext="${tItem.slotName != null ? tItem.slotName.replaceFirst(' ', '<br/>') : ''}"></span>
-                            </div>
-                            <th:block th:each="date : ${weekDates}">
-                                <div class="w-full">
-                                    <th:block
-                                            th:with="currentKey=${#temporals.format(date, 'ddMM')} + '-' + ${tItem.timetableId}">
-                                        <div class="w-full py-1"
-                                             th:with="isNightSlot=${tItem.slotName.contains('Đêm') or tItem.timetableId > 4},
-                  currentPrice=${isNightSlot ? room.overPrice : room.basePrice}">
-
-                                            <button th:if="${!bookedKeys.contains(currentKey)}"
-                                                    type="button"
-                                                    th:id="'btn-' + ${currentKey}"
-                                                    th:data-index="${(dateStat.index * 4) + tItemStat.index}"
-                                                    th:data-slot-info="|${#temporals.format(date, 'dd/MM')} ${tItem.slotName}|"
-                                                    th:data-price="${currentPrice}"
-                                                    onclick="toggleSlot(this, this.getAttribute('data-slot-info'), this.getAttribute('data-price'))"
-                                                    th:classappend="${date.isEqual(today)} ? 'ring-1 ring-green-400 bg-green-100' : 'bg-[#e8fdf1]'"
-                                                    class="slot-button w-full relative hover:bg-[#d1fae5] text-green-700 border border-[#c2f5d8] text-sm py-3 rounded-lg font-medium transition-all duration-200 shadow-sm active:scale-95 overflow-hidden group">
-                                                <span class="slot-label transition-all duration-200">Trống</span>
-                                                <div class="check-mark absolute inset-0 bg-blue-600 text-white flex items-center justify-center opacity-0 translate-y-full transition-all duration-200">
-                                                    <i class="fa-solid fa-check"></i>
-                                                </div>
-                                            </button>
-
-                                            <button th:if="${bookedKeys.contains(currentKey)}"
-                                                    type="button"
-                                                    disabled
-                                                    class="w-full bg-gray-200 text-gray-400 border border-gray-300 text-sm py-3 rounded-lg font-medium cursor-not-allowed opacity-70">
-                                                <span th:text="${bookedKeys.contains(currentKey)} ? 'Đã đặt' : 'Không khả dụng'"></span>
-                                            </button>
-                                        </div>
-                                    </th:block>
+                        <div id="booking-week-container">
+                            <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
+                                <i class="fa-regular fa-calendar-check text-blue-600"></i> Lịch trống phòng tuần này
+                            </h3>
+                            <div class="grid grid-cols-8 gap-1 text-center">
+                                <div class="p-2 text-xs font-bold text-gray-400 uppercase">Slot</div>
+                                <div th:each="date : ${weekDates}"
+                                     th:classappend="${date.isEqual(today)} ? 'bg-blue-100 text-blue-800 ring-2 ring-blue-400' : 'bg-gray-100 text-gray-700'"
+                                     class="p-2 rounded text-sm font-semibold">
+                                    <span th:if="${date.isEqual(today)}">Hôm nay</span>
+                                    <span th:if="${!date.isEqual(today)}"
+                                          th:text="${date.getDayOfWeek().getValue() == 7 ? 'Chủ Nhật' : 'Thứ ' + (date.getDayOfWeek().getValue() + 1)}"></span>
+                                    <br>
+                                    <span class="text-xs font-normal"
+                                          th:classappend="${date.getDayOfWeek().getValue() == 7} ? 'text-red-500'"
+                                          th:text="${#temporals.format(date, 'dd/MM')}"></span>
                                 </div>
-                            </th:block>
-                        </div>
-                        <div class="mt-8 pt-6 border-t border-gray-200">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            </div>
+                            <div th:each="tItem : ${timeTable}" class="grid grid-cols-8 gap-1 items-center mt-1">
+                                <div class="text-[0.7rem] font-bold text-gray-500 text-center">
+                                    <span th:utext="${tItem.slotName != null ? tItem.slotName.replaceFirst(' ', '<br/>') : ''}"></span>
+                                </div>
+                                <th:block th:each="date : ${weekDates}">
+                                    <div class="w-full">
+                                        <th:block th:with="currentKey=${#temporals.format(date, 'ddMM')} + '-' + ${tItem.timetableId}">
+                                            <div class="w-full py-1"
+                                                 th:with="isNightSlot=${tItem.slotName.contains('Đêm') or tItem.timetableId > 4},
+                  currentPrice=${isNightSlot ? room.overPrice : room.basePrice},
+                  currentStatus=${bookedStatusMap != null ? bookedStatusMap.get(currentKey) : 'Empty'}">
 
+                                                <button th:if="${!bookedKeys.contains(currentKey) or currentStatus == 'CANCELLED' or currentStatus == 'FAILED'}"
+                                                        type="button"
+                                                        th:id="'btn-' + ${currentKey}"
+                                                        th:data-index="${(dateStat.index * 4) + tItemStat.index}"
+                                                        th:data-slot-info="|${#temporals.format(date, 'dd/MM')} ${tItem.slotName}|"
+                                                        th:data-price="${currentPrice}"
+                                                        onclick="toggleSlot(this, this.getAttribute('data-slot-info'), this.getAttribute('data-price'))"
+                                                        th:classappend="${date.isEqual(today)} ? 'ring-1 ring-green-400 bg-green-100' : 'bg-[#e8fdf1]'"
+                                                        class="slot-button w-full relative hover:bg-[#d1fae5] text-green-700 border border-[#c2f5d8] text-sm py-3 rounded-lg font-medium transition-all duration-200 shadow-sm active:scale-95 overflow-hidden group">
+                                                    <span class="slot-label transition-all duration-200">Trống</span>
+                                                    <div class="check-mark absolute inset-0 bg-blue-600 text-white flex items-center justify-center opacity-0 translate-y-full transition-all duration-200">
+                                                        <i class="fa-solid fa-check"></i>
+                                                    </div>
+                                                </button>
+
+                                                <button th:if="${bookedKeys.contains(currentKey) and currentStatus != 'Cancel' and currentStatus != 'Failed'}"
+                                                        type="button"
+                                                        disabled
+                                                        class="w-full bg-gray-200 text-gray-400 border border-gray-300 text-sm py-3 rounded-lg font-medium cursor-not-allowed opacity-70">
+                                                    <span>Đã đặt</span>
+                                                </button>
+
+                                            </div>
+                                        </th:block>
+                                    </div>
+                                </th:block>
+                            </div>
+                        </div>
+                        <div id="booking-longterm-container" class="hidden mt-8 pt-6 border-t border-gray-200">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="space-y-3 bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
                                     <h4 class="text-xs font-bold text-blue-600 uppercase tracking-widest flex items-center gap-2">
                                         <i class="fa-solid fa-calendar-check"></i> Thời gian Check-in
@@ -260,7 +275,8 @@
                                         <div>
                                             <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Giờ
                                                 (Ca)</label>
-                                            <select id="select-slot-out" onchange="checkContinuousSelection()" class="slot-select w-full p-2.5 bg-white border border-gray-200 rounded-lg text-xs">
+                                            <select id="select-slot-out" onchange="checkContinuousSelection()"
+                                                    class="slot-select w-full p-2.5 bg-white border border-gray-200 rounded-lg text-xs">
                                                 <option value="">Chọn ca</option>
                                                 <option th:each="tItem : ${timeTable}"
                                                         th:value="${tItem.timetableId}"
@@ -366,7 +382,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
         <div class="lg:col-span-1">
             <div class="bg-white p-6 rounded-2xl shadow-lg border border-blue-100 sticky top-32">
@@ -485,9 +500,30 @@
 
 <script th:inline="javascript">
     // Thêm hàm copy nhanh (Tùy chọn)
+    function switchBookingMode(mode) {
+        const weekCont = document.getElementById('booking-week-container');
+        const longCont = document.getElementById('booking-longterm-container');
+        const btnWeek = document.getElementById('btn-mode-week');
+        const btnLong = document.getElementById('btn-mode-longterm');
+
+        if (mode === 'week') {
+            weekCont.classList.remove('hidden');
+            longCont.classList.add('hidden');
+            // Style nút
+            btnWeek.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-white text-blue-600 shadow-sm";
+            btnLong.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 text-gray-500 hover:text-gray-700";
+        } else {
+            weekCont.classList.add('hidden');
+            longCont.classList.remove('hidden');
+            // Style nút
+            btnLong.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-white text-blue-600 shadow-sm";
+            btnWeek.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 text-gray-500 hover:text-gray-700";
+        }
+    }
 
     const selectedSlotsMap = new Map();
     let selectedSlots = new Set();
+
     function toggleSlot(btn, slotName, price) {
         clearDropdowns();
         const currentIndex = parseInt(btn.getAttribute('data-index'));
@@ -550,10 +586,11 @@
         } else {
             // Nếu không còn ô nào được chọn
             updatePriceSummaryLabels(null, null);
-            if(document.getElementById('display-total-price')) document.getElementById('display-total-price').innerText = "0";
-            if(document.getElementById('totalAmountHidden')) document.getElementById('totalAmountHidden').value = 0;
+            if (document.getElementById('display-total-price')) document.getElementById('display-total-price').innerText = "0";
+            if (document.getElementById('totalAmountHidden')) document.getElementById('totalAmountHidden').value = 0;
         }
     }
+
     function calculateTotalPrice() {
         // Nếu có dữ liệu trong Map (đang chọn bằng bảng)
         if (selectedSlotsMap && selectedSlotsMap.size > 0) {
@@ -564,6 +601,7 @@
             calculateSelectPrice();
         }
     }
+
     function syncDropdownToSummary() {
         const dInStr = document.getElementById('select-date-in').value;
         const sInEl = document.getElementById('select-slot-in');
@@ -592,13 +630,14 @@
         const checkoutDisplay = `${dOutStr} ${sOutEl.options[sOutEl.selectedIndex].text}`;
         updatePriceSummaryLabels(checkinDisplay, checkoutDisplay);
     }
-    document.addEventListener('DOMContentLoaded', function() {
+
+    document.addEventListener('DOMContentLoaded', function () {
         const dropdownIds = ['select-date-in', 'select-slot-in', 'select-date-out', 'select-slot-out'];
 
         dropdownIds.forEach(id => {
             const element = document.getElementById(id);
             if (element) {
-                element.addEventListener('change', function() {
+                element.addEventListener('change', function () {
                     // 1. Xóa lựa chọn trên bảng (vì bạn yêu cầu không được chọn cả hai)
                     if (this.value !== "") {
                         clearTableSelection();
@@ -615,6 +654,7 @@
             }
         });
     });
+
     function updatePriceSummaryLabels(inStr, outStr) {
         const inEl = document.getElementById('summary-checkin');
         const outEl = document.getElementById('summary-checkout');
@@ -641,6 +681,7 @@
         if (inEl) inEl.innerText = formatInfo(inStr, false);
         if (outEl) outEl.innerText = formatInfo(outStr, true);
     }
+
     // Hàm xóa trắng các dropdown
     function clearDropdowns() {
         const ids = ['select-date-in', 'select-slot-in', 'select-date-out', 'select-slot-out'];
@@ -653,8 +694,8 @@
             }
         });
 
-        if(document.getElementById('time-in-display')) document.getElementById('time-in-display').innerText = "--:--";
-        if(document.getElementById('time-out-display')) document.getElementById('time-out-display').innerText = "--:--";
+        if (document.getElementById('time-in-display')) document.getElementById('time-in-display').innerText = "--:--";
+        if (document.getElementById('time-out-display')) document.getElementById('time-out-display').innerText = "--:--";
     }
 
     // Hàm xóa tất cả các ô đã chọn trên bảng (Timetable)
@@ -672,13 +713,13 @@
     }
 
     // Lắng nghe sự kiện: Nếu người dùng động vào Dropdown thì xóa bảng
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const dropdownIds = ['select-date-in', 'select-slot-in', 'select-date-out', 'select-slot-out'];
 
         dropdownIds.forEach(id => {
             const element = document.getElementById(id);
             if (element) {
-                element.addEventListener('change', function() {
+                element.addEventListener('change', function () {
                     if (this.value !== "") {
                         clearTableSelection();
                         // Gọi lại hàm tính tiền sau khi xóa bảng
@@ -690,6 +731,7 @@
             }
         });
     });
+
     function fillGaps(newIndex) {
         let minIdx = newIndex;
         let maxIdx = newIndex;
@@ -930,6 +972,7 @@
             swiperContainer.style.display = 'none';
         }
     });
+
     function calculateSelectPrice() {
         const displayMoney = document.getElementById('display-total-price');
         const hiddenTotal = document.getElementById('totalAmountHidden');
@@ -942,7 +985,7 @@
 
         // 1. Kiểm tra đầu vào
         if (!dIn || sInElem.selectedIndex <= 0 || !dOut || sOutElem.selectedIndex <= 0) {
-            if(displayMoney) displayMoney.innerText = "0";
+            if (displayMoney) displayMoney.innerText = "0";
             return;
         }
 
@@ -974,7 +1017,7 @@
         // Lấy danh sách tất cả các ca hợp lệ
         const allSlots = Array.from(sInElem.options)
             .filter(opt => opt.value !== "")
-            .map(opt => ({ id: opt.value, name: opt.text }));
+            .map(opt => ({id: opt.value, name: opt.text}));
 
         // Lấy Index của ca bắt đầu và ca kết thúc
         const startIndex = allSlots.findIndex(s => s.id === sInElem.value);
@@ -1002,7 +1045,7 @@
                 }
             }
 
-            if(displayMoney) displayMoney.innerText = total.toLocaleString('vi-VN');
+            if (displayMoney) displayMoney.innerText = total.toLocaleString('vi-VN');
             if (hiddenTotal) hiddenTotal.value = total;
         }
     }
@@ -1045,6 +1088,7 @@
             updatePriceSummaryLabels(null, null);
         }
     }
+
     // Lắng nghe sự kiện thay đổi của tất cả các ô Select
     document.querySelectorAll('select').forEach(select => {
         select.addEventListener('change', calculateTotalPrice);
@@ -1055,6 +1099,7 @@
 
     // 2. Lấy danh sách ca đã được "làm sạch" (Không còn quan hệ lồng nhau)
     const slots = /*[[${timeTableJS}]]*/ [];
+
     function checkContinuousSelection() {
         const dateInStr = document.getElementById('select-date-in').value;
         const slotInSelect = document.getElementById('select-slot-in');
@@ -1133,13 +1178,13 @@
         calculateTotalPrice();
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const dropdownIds = ['select-date-in', 'select-slot-in', 'select-date-out', 'select-slot-out'];
 
         dropdownIds.forEach(id => {
             const element = document.getElementById(id);
             if (element) {
-                element.addEventListener('change', function() {
+                element.addEventListener('change', function () {
                     if (this.value !== "") {
                         clearTableSelection();
                     }

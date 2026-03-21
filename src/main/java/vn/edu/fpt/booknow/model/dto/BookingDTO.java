@@ -64,7 +64,7 @@ public class BookingDTO {
         this.bookingCode = booking.getBookingCode();
         this.createdAt = booking.getCreatedAt();
         this.note = booking.getNote();
-        this.updateAt = booking.getUpdateAt();
+        this.updateAt = booking.getUpdatedAt();
     }
 
     public String getCheckInDate() {

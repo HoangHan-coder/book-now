@@ -25,7 +25,6 @@ public class BookingClientController {
                               RedirectAttributes redirectAttributes, Model model) {
         try {
             long MAX_SIZE = 5 * 1024 * 1024; // 5MB
-            System.out.println(backImg + "  27");
             if (frontImg != null && frontImg.getSize() > MAX_SIZE) {
                 redirectAttributes.addFlashAttribute("toastMessage", "Ảnh mặt trước vượt quá 5MB!");
                 redirectAttributes.addFlashAttribute("toastType", "error");

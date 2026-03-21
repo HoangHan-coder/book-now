@@ -48,7 +48,6 @@ public class RoomController {
             Long roomId = Long.parseLong(roomIdString);
             String email = "";
             Customer customer = new Customer();
-            System.out.println(roomId + " detailRoomService");
             List<DetailRoomDTO> roomDetail = roomService.detailRoomService(roomId);
             if (roomDetail.isEmpty()) {
                 return "redirect:/404";
@@ -67,58 +66,14 @@ public class RoomController {
                 customer = customerService.findCusByEmail(email);
                 booking.setCustomer(customer);
             }
-            booking.setCustomer(customer);
-            for (int i = 0; i < 7; i++) {
-                weekDates.add(today.plusDays(i + 1));
-            }
-            Set<String> bookedKeys = new HashSet<>();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMM");
-
-            if (!getSlot.isEmpty()) {
-                // Nhóm các slot theo BookingId để xử lý các khoảng đặt dài
-                Map<Long, List<TimeTableDTO>> bookingsGrouped = getSlot.stream()
-                        .filter(s -> s.getBookingId() != null)
-                        .collect(Collectors.groupingBy(TimeTableDTO::getBookingId));
-
-                for (List<TimeTableDTO> slotsInBooking : bookingsGrouped.values()) {
-                    // Tìm slot bắt đầu và kết thúc của mỗi đơn đặt
-                    TimeTableDTO first = slotsInBooking.stream()
-                            .min(Comparator.comparing(TimeTableDTO::getDate)
-                                    .thenComparing(TimeTableDTO::getTimetableId)).get();
-
-                    TimeTableDTO last = slotsInBooking.stream()
-                            .max(Comparator.comparing(TimeTableDTO::getDate)
-                                    .thenComparing(TimeTableDTO::getTimetableId)).get();
-
-                    // Chuyển ngày và slot thành một con số tuyến tính để dễ so sánh (ví dụ: ngày * 10 + slotId)
-                    // Hoặc đơn giản là lặp qua danh sách weekDates và timetables để kiểm tra
-                    for (LocalDateTime d : weekDates) {
-                        for (Timetable t : timetables) {
-                            // Kiểm tra xem (d, t) có nằm giữa (first.date, first.slotId) và (last.date, last.slotId) không
-                            if (roomService.isBetween(d, t.getTimetableId(), first, last)) {
-                                bookedKeys.add(d.format(formatter) + "-" + t.getTimetableId());
-                            }
-                        }
-                    }
-                }
-            }
-
+            List<LocalDateTime> weekDates = roomService.getWeekDates(7);
+            Set<String> bookedKeys = roomService.getBookedKeys(getSlot, weekDates, timetables);
             Room room1 = roomService.findRoom(roomId);
             booking.setRoom(room1);
-            DateTimeFormatter formatterr = DateTimeFormatter.ofPattern("dd/MM/yyyy"); // Dùng "/" để dễ nhìn
-
-            List<String> monthDateStrings = IntStream.range(0, 365)
-                    .mapToObj(i -> LocalDate.now().plusDays(i+1).format(formatterr))
-                    .collect(Collectors.toList());
-            List<Map<String, Object>> simpleTimetables = timetables.stream().map(t -> {
-                Map<String, Object> map = new HashMap<>();
-                map.put("timetableId", t.getTimetableId());
-                map.put("slotName", t.getSlotName());
-                return map;
-            }).collect(Collectors.toList());
+            List<String> monthDateStrings = roomService.getNext365Days();
+            List<Map<String, Object>> simpleTimetables = roomService.getSimpleTimetables(timetables);
             model.addAttribute("timeTableJS", simpleTimetables);
             model.addAttribute("monthDates", monthDateStrings);
-
             model.addAttribute("bookedKeys", bookedKeys);
             model.addAttribute("timeTable", timetables);
             model.addAttribute("weekDates", weekDates);
@@ -143,17 +98,7 @@ public class RoomController {
         try {
             // Luôn mặc định về trang 0 khi bấm tìm mới
             Page<DetailRoomDTO> rooms = roomService.getSearchService(searchDTO, searchDTO.getPage());
-
-            // Tính toán phân trang trực tiếp trong hàm
-            int totalPages = rooms.getTotalPages();
-            int current = rooms.getNumber();
-            int displayRange = 5;
-            int start = Math.max(0, current - displayRange / 2);
-            int end = Math.min(totalPages - 1, start + displayRange - 1);
-            if (end - start + 1 < displayRange) start = Math.max(0, end - displayRange + 1);
-            List<Integer> pageNumbers = new ArrayList<>();
-            for (int i = start; i <= end; i++) pageNumbers.add(i);
-
+            List<Integer> pageNumbers = roomService.getPageNumbers(rooms, 5);
             model.addAttribute("rooms", rooms);
             model.addAttribute("search", searchDTO);
             model.addAttribute("pageNumbers", pageNumbers);
@@ -175,16 +120,7 @@ public class RoomController {
             // Sử dụng tham số 'page' từ URL
             Page<DetailRoomDTO> rooms = roomService.getSearchService(searchDTO, page);
 
-            // Tính toán phân trang trực tiếp trong hàm (lặp lại logic)
-            int totalPages = rooms.getTotalPages();
-            int current = rooms.getNumber();
-            int displayRange = 5;
-            int start = Math.max(0, current - displayRange / 2);
-            int end = Math.min(totalPages - 1, start + displayRange - 1);
-            if (end - start + 1 < displayRange) start = Math.max(0, end - displayRange + 1);
-
-            List<Integer> pageNumbers = new ArrayList<>();
-            for (int i = start; i <= end; i++) pageNumbers.add(i);
+            List<Integer> pageNumbers = roomService.getPageNumbers(rooms, 5);
 
             model.addAttribute("rooms", rooms);
             model.addAttribute("search", searchDTO);

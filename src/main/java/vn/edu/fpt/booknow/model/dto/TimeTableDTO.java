@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class TimeTableDTO {
     private Long bookingId;
     private Long roomId;
-    private String bookingStatus;
+    private BookingStatus bookingStatus;
     private BigDecimal totalAmount;
     private Long timetableId;
     private LocalDateTime date;

@@ -32,7 +32,7 @@ public class CheckOutService {
         }
 
         booking.setBookingStatus(BookingStatus.CHECKED_OUT);
-        booking.setUpdateAt(LocalDateTime.now());
+        booking.setUpdatedAt(LocalDateTime.now());
         booking.setActualCheckOutTime(LocalDateTime.now());
         bookingRepository.save(booking);
         return "Check-out thành công";
