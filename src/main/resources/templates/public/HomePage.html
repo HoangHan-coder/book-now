@@ -516,7 +516,7 @@
 
     const roomsData = Array.isArray(rawRooms) ? rawRooms : [];
     const slotsData = Array.isArray(rawSlots) ? rawSlots : [];
-    const bookedKeys = new Set(Array.isArray(rawBookedKeys) ? rawBookedKeys : []);
+    const bookedKeys = /*[[${bookedKeys}]]*/ {};
 
 
     let selectedSlot = null;
@@ -584,11 +584,17 @@
                 slotGrid.className = 'grid grid-cols-2 gap-1.5 justify-center';
 
                 formattedSlots.forEach(slot => {
-                    // Tạo Key để kiểm tra trạng thái khóa
                     const statusKey = `${room.id}_${date.fullDate}_${slot.id}`;
-                    const isBooked = bookedKeys.has(statusKey);
 
-                    // Kiểm tra trạng thái đang chọn
+                    // Lấy status từ Map (đã được Thymeleaf đổ vào biến bookedKeys)
+                    const currentStatus = bookedKeys[statusKey];
+                    console.log(currentStatus)
+                    // CHỈ khóa (disabled) nếu có trạng thái VÀ trạng thái đó KHÔNG PHẢI Cancel/Failed
+                    // Lưu ý: Viết đúng tên Enum của bạn (ví dụ: CANCELLED hoặc CANCEL)
+                    const isLocked = currentStatus &&
+                        currentStatus !== 'CANCELLED' &&
+                        currentStatus !== 'FAILED';
+
                     const isSelected = selectedSlot &&
                         String(selectedSlot.roomId) === String(room.id) &&
                         selectedSlot.date === date.fullDate &&
@@ -596,16 +602,19 @@
 
                     const btn = document.createElement('button');
 
-                    // Style Button dựa trên trạng thái (Booked > Selected > Default)
-                    if (isBooked) {
+                    if (isLocked) {
+                        // Hiển thị trạng thái ĐÃ KHÓA
                         btn.className = 'h-8 w-full rounded-md text-[10px] font-medium bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed';
                         btn.innerHTML = `<i class="fa-solid fa-lock text-[8px]"></i>`;
                         btn.disabled = true;
                     } else {
+                        // Hiển thị trạng thái TRỐNG (bao gồm cả những slot đã Cancel/Failed)
                         btn.className = `h-8 w-full rounded-md text-[10px] font-medium transition-all border ${
                             isSelected ? 'bg-blue-600 text-white border-blue-600 shadow-sm scale-105' :
                                 'bg-white text-gray-600 border-gray-200 hover:border-blue-400 hover:text-blue-600'
                         }`;
+
+
                         btn.innerHTML = `<span>${slot.name.split('(')[0].trim()}</span>`;
                         btn.onclick = () => handleSlotClick(room, date, slot);
                     }

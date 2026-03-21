@@ -8,6 +8,7 @@ public enum BookingStatus {
     CHECKED_IN,
     CHECKED_OUT,
     REJECTED,
+    CANCELLED,
     FAILED;
 
 
@@ -21,6 +22,7 @@ public enum BookingStatus {
             case CHECKED_OUT -> "bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600/20";
             case COMPLETED -> "bg-green-50 text-green-700 ring-1 ring-green-600/20";
             case REJECTED -> "bg-red-50 text-red-700 ring-1 ring-red-600/20";
+            case CANCELLED -> "bg-red-50 text-red-700 ring-1 ring-red-600/20";
             case FAILED -> "bg-red-50 text-red-700 ring-1 ring-red-600/20";
         };
     }
@@ -34,6 +36,7 @@ public enum BookingStatus {
             case CHECKED_OUT -> "Đang chờ FeedBack";
             case COMPLETED -> "Hoàn thành";
             case REJECTED -> "Từ chối";
+            case CANCELLED -> "HỦy";
             case FAILED -> "Thất bại";
         };
     }

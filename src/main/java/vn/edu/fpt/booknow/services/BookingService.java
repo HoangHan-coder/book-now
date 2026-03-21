@@ -500,6 +500,8 @@ public class BookingService {
         System.out.println("Khoảng thời gian cần check: " + overallStart.format(timeFormatter) + " -> " + overallEnd.format(timeFormatter));
 
         // 3. Chỉ gọi Repo 1 lần duy nhất với khoảng thời gian lớn nhất
+        System.out.println(overallStart + "503");
+        System.out.println(overallEnd + " 504");
         boolean isOccupied = bookingRepository.isRoomOccupied(
                 roomId,
                 overallStart,

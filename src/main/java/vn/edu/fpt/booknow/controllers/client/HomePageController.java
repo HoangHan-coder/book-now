@@ -30,8 +30,9 @@ public class HomePageController {
         List<DetailRoomDTO> roomAll = roomService.roomAll();
         List<LocalDateTime> weekDates = new ArrayList<>();
         LocalDateTime today = LocalDateTime.now();
-        List<Scheduler> schedulers = roomService.schedulers(); // Giả sử bạn lấy từ service
-        Set<String> bookedKeys = new HashSet<>();
+        List<Scheduler> schedulers = booking.stream()
+                .flatMap(b -> b.getSchedulers().stream()) // 'getSchedulers()' là hàm lấy list scheduler trong entity Booking
+                .collect(Collectors.toList());
         List<Map<String, Object>> simpleTimetables = timetables.stream().map(t -> {
             Map<String, Object> map = new HashMap<>();
             map.put("timetableId", t.getTimetableId());
@@ -42,13 +43,20 @@ public class HomePageController {
         }).collect(Collectors.toList());
         // Thay vì chỉ lấy 7 ngày, hãy lấy 30 ngày cho vào Model
 
+        Map<String, String> bookedKeys = new HashMap<>();
+
         for (Scheduler s : schedulers) {
-            // Format: RoomID_LocalDate_TimetableID
-            // Lưu ý: s.getDate() trả về LocalDateTime nên cần lấy toLocalDate()
+            // Lấy trạng thái từ đơn đặt phòng (Booking) của Scheduler đó
+            // Đảm bảo s.getBooking().getBookingStatus() trả về Enum hoặc String (CANCELLED, SUCCESS,...)
+            String status = s.getBooking().getBookingStatus().toString();
+
+            // Format Key: RoomID_LocalDate_TimetableID
             String key = s.getBooking().getRoom().getRoomId() + "_" +
                     s.getDate().toLocalDate().toString() + "_" +
                     s.getTimetable().getTimetableId();
-            bookedKeys.add(key);
+
+            // Lưu vào Map: Key là vị trí slot, Value là trạng thái
+            bookedKeys.put(key, status);
         }
         System.out.println(list.getTotalPages());
 
@@ -61,7 +69,6 @@ public class HomePageController {
         model.addAttribute("amenities", amenities);
         model.addAttribute("roomType", roomType);
         model.addAttribute("booking", booking);
-        model.addAttribute("bookedKeys", bookedKeys);
         model.addAttribute("timeTable", simpleTimetables);
         model.addAttribute("today", today);
         model.addAttribute("weekDates", weekDates);

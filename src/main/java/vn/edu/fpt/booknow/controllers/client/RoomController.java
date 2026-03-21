@@ -48,7 +48,6 @@ public class RoomController {
             Long roomId = Long.parseLong(roomIdString);
             String email = "";
             Customer customer = new Customer();
-            System.out.println(roomId + " detailRoomService");
             List<DetailRoomDTO> roomDetail = roomService.detailRoomService(roomId);
             if (roomDetail.isEmpty()) {
                 return "redirect:/404";
@@ -75,28 +74,33 @@ public class RoomController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMM");
 
             if (!getSlot.isEmpty()) {
-                // Nhóm các slot theo BookingId để xử lý các khoảng đặt dài
+                // 1. Nhóm các slot theo BookingId
                 Map<Long, List<TimeTableDTO>> bookingsGrouped = getSlot.stream()
                         .filter(s -> s.getBookingId() != null)
                         .collect(Collectors.groupingBy(TimeTableDTO::getBookingId));
 
                 for (List<TimeTableDTO> slotsInBooking : bookingsGrouped.values()) {
-                    // Tìm slot bắt đầu và kết thúc của mỗi đơn đặt
-                    TimeTableDTO first = slotsInBooking.stream()
-                            .min(Comparator.comparing(TimeTableDTO::getDate)
-                                    .thenComparing(TimeTableDTO::getTimetableId)).get();
+                    // Lấy slot đầu tiên để kiểm tra trạng thái của cả đơn đặt này
+                    TimeTableDTO representative = slotsInBooking.get(0);
+                    BookingStatus status = representative.getBookingStatus(); // Giả sử DTO của bạn có field status
 
-                    TimeTableDTO last = slotsInBooking.stream()
-                            .max(Comparator.comparing(TimeTableDTO::getDate)
-                                    .thenComparing(TimeTableDTO::getTimetableId)).get();
+                    // 2. CHỈ xử lý nếu trạng thái KHÔNG PHẢI là Cancel hoặc Failed
+                    // Nếu là Cancel/Failed, chúng ta bỏ qua (không add vào bookedKeys), mặc định nó sẽ hiện là "Trống"
+                    if (status != BookingStatus.CANCELLED && status != BookingStatus.FAILED) {
 
-                    // Chuyển ngày và slot thành một con số tuyến tính để dễ so sánh (ví dụ: ngày * 10 + slotId)
-                    // Hoặc đơn giản là lặp qua danh sách weekDates và timetables để kiểm tra
-                    for (LocalDateTime d : weekDates) {
-                        for (Timetable t : timetables) {
-                            // Kiểm tra xem (d, t) có nằm giữa (first.date, first.slotId) và (last.date, last.slotId) không
-                            if (roomService.isBetween(d, t.getTimetableId(), first, last)) {
-                                bookedKeys.add(d.format(formatter) + "-" + t.getTimetableId());
+                        TimeTableDTO first = slotsInBooking.stream()
+                                .min(Comparator.comparing(TimeTableDTO::getDate)
+                                        .thenComparing(TimeTableDTO::getTimetableId)).get();
+
+                        TimeTableDTO last = slotsInBooking.stream()
+                                .max(Comparator.comparing(TimeTableDTO::getDate)
+                                        .thenComparing(TimeTableDTO::getTimetableId)).get();
+
+                        for (LocalDateTime d : weekDates) {
+                            for (Timetable t : timetables) {
+                                if (roomService.isBetween(d, t.getTimetableId(), first, last)) {
+                                    bookedKeys.add(d.format(formatter) + "-" + t.getTimetableId());
+                                }
                             }
                         }
                     }

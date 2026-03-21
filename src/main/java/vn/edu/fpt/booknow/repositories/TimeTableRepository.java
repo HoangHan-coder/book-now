@@ -9,7 +9,7 @@ import vn.edu.fpt.booknow.model.entities.Timetable;
 import java.util.List;
 
 public interface TimeTableRepository extends JpaRepository<Timetable, Long> {
-    @Query("SELECT  new vn.edu.fpt.booknow.model.dto.TimeTableDTO(" +
+    @Query("SELECT new vn.edu.fpt.booknow.model.dto.TimeTableDTO(" +
             "    b.bookingId, " +
             "    r.roomId," +
             "    b.bookingStatus, " +
@@ -20,7 +20,7 @@ public interface TimeTableRepository extends JpaRepository<Timetable, Long> {
             "JOIN Room r ON r.roomId = b.room.roomId  " +
             "JOIN Scheduler s ON s.booking.bookingId = b.bookingId " +
             "JOIN Timetable t ON t.timetableId = s.timetable.timetableId " +
-            "WHERE r.roomId = :roomId")
+            "WHERE r.roomId = :roomId ") // Loại bỏ các đơn lỗi/hủy
     List<TimeTableDTO> getBookingDetailsByRoomId(@Param("roomId") Long roomId);
     @Query("SELECT new vn.edu.fpt.booknow.model.dto.TimeTableDTO(" +
             "    b.bookingId, " +
