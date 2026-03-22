@@ -1,53 +1,15 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi tiết đặt phòng - BookNow</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            DEFAULT: '#2563eb', // blue-600
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
+<head th:replace="~{fragments/head :: head(title='Chi tiết đặt phòng - BookNow')}"></head>
+<style>
         .gradient-text {
             background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-    </style>
-</head>
-<body class="bg-gray-50 font-sans text-gray-800">
-
-<!-- === LOGO (Fixed Top-Left, 25px margin) === -->
-<div style="position: fixed; top: 25px; left: 25px; z-index: 100;" class="bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow-sm border border-white/50">
-    <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
-        <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100">
-            <i class="fa-solid fa-house-chimney gradient-icon text-xl text-blue-600"></i>
-        </div>
-        <div class="flex flex-col justify-center">
-            <span class="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-blue-700 leading-none">BookNow</span>
-        </div>
-    </div>
-</div>
+</style>
+<body class="bg-gray-50 font-sans text-gray-800 flex flex-col min-h-screen">
+<div th:replace="~{fragments/navbar :: public-navbar}"></div>
 
 <!-- Main Container -->
 <div class="max-w-5xl mx-auto px-4 md:px-8 pt-32 pb-12">
@@ -225,5 +187,10 @@
 
 </script>
 
+<!-- FOOTER -->
+<div class="mt-auto">
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+<div th:replace="~{fragments/navbar :: dropdown-script}"></div>
 </body>
 </html>

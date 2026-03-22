@@ -1,113 +1,46 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi tiết phòng & Cập nhật trạng thái - BookNow</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<head th:replace="~{fragments/head :: head(title='Chi tiết phòng & Cập nhật trạng thái - BookNow')}"></head>
+<style>
+    /* Logo Positioning Rules - Strictly Followed */
+    .logo-fixed {
+        position: fixed;
+        top: 50px;
+        left: 50px;
+        z-index: 60;
+    }
+
+    .gradient-text {
+        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .gradient-icon {
+        color: #3b82f6;
+    }
+
+    /* Timeline Connector Line */
+    .timeline-line::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 15px;
+        width: 2px;
+        background-color: #f3f4f6;
+        z-index: 0;
+    }
     
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            light: '#60a5fa',
-                            DEFAULT: '#3b82f6',
-                            dark: '#2563eb',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <style>
-        /* Logo Positioning Rules - Strictly Followed */
-        .logo-fixed {
-            position: fixed;
-            top: 50px;
-            left: 50px;
-            z-index: 60;
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .gradient-icon {
-            color: #3b82f6;
-        }
-
-        /* Timeline Connector Line */
-        .timeline-line::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 15px;
-            width: 2px;
-            background-color: #f3f4f6;
-            z-index: 0;
-        }
-        
-        /* Disable interaction for read-only fields visual cue */
-        .read-only-field {
-            background-color: #f9fafb;
-            cursor: not-allowed;
-        }
-    </style>
-</head>
+    /* Disable interaction for read-only fields visual cue */
+    .read-only-field {
+        background-color: #f9fafb;
+        cursor: not-allowed;
+    }
+</style>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-    <!-- LOGO (Fixed Position: Top 50px, Left 50px) -->
-    <div class="logo-fixed flex items-center gap-3 select-none bg-white/90 backdrop-blur px-4 py-3 rounded-2xl shadow-sm lg:shadow-none lg:bg-transparent lg:p-0">
-        <div class="w-12 h-12 bg-white rounded-xl shadow-md flex items-center justify-center border border-blue-100">
-            <i class="fa-solid fa-house-chimney gradient-icon text-2xl"></i>
-        </div>
-        <div class="flex flex-col justify-center">
-            <span class="text-3xl font-extrabold tracking-tight gradient-text leading-none">BookNow</span>
-            <span class="text-[11px] text-gray-500 font-medium uppercase tracking-wider pl-0.5 mt-1">Homestay System</span>
-        </div>
-    </div>
-
-    <!-- MOBILE HEADER BUTTON -->
-    <div class="lg:hidden fixed top-0 w-full bg-white h-20 shadow-sm z-40 flex items-center justify-end px-6">
-        <button id="mobileMenuBtn" class="text-gray-500 hover:text-blue-600 focus:outline-none">
-            <i class="fa-solid fa-bars text-2xl"></i>
-        </button>
-    </div>
-
-    <!-- SIDEBAR NAVIGATION -->
-    <aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-72 bg-white border-r border-gray-200 z-50 transform -translate-x-full lg:translate-x-0 pt-36 overflow-y-auto hidden lg:block transition-transform duration-300">
-        <nav class="px-6 space-y-2">
-            <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Quản lý</div>
-            <a th:href="@{/admin/dashboard}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
-                <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
-            </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
-                <i class="fa-regular fa-calendar-check w-5"></i> Đơn đặt phòng
-            </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl font-medium transition-colors shadow-sm ring-1 ring-black/5">
-                <i class="fa-solid fa-door-open w-5"></i> Quản lý phòng
-            </a>
-            
-            <div class="px-4 py-2 mt-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tài khoản</div>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-medium transition-colors">
-                <i class="fa-solid fa-arrow-right-from-bracket w-5"></i> Đăng xuất
-            </a>
-        </nav>
-    </aside>
+<div th:replace="~{fragments/sidebar :: admin-sidebar(activePage='rooms')}"></div>
 
     <!-- MAIN CONTENT AREA -->
     <main class="lg:ml-72 min-h-screen pt-32 lg:pt-12 px-6 pb-20 transition-all duration-300">
@@ -460,19 +393,9 @@ newStatusSelect.addEventListener('change', () => {
         renderCurrentStatus();
         populateDropdown();
 
-        // Mobile Sidebar Toggle (Standard)
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const sidebar = document.getElementById('sidebar');
-        
-        mobileMenuBtn.addEventListener('click', () => {
-            const isClosed = sidebar.classList.contains('-translate-x-full');
-            if (isClosed) {
-                sidebar.classList.remove('-translate-x-full');
-            } else {
-                sidebar.classList.add('-translate-x-full');
-            }
-        });
+// Mobile Sidebar Toggle logic moved to fragment
 
     </script>
+<div th:replace="~{fragments/sidebar :: sidebar-scripts}"></div>
 </body>
 </html>

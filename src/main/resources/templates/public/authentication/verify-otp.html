@@ -1,12 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xác Thực OTP - BookNow</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+<head th:replace="~{fragments/head :: head(title='Xác Thực OTP - BookNow')}"></head>
 <body class="font-['Segoe_UI',Tahoma,Geneva,Verdana,sans-serif] bg-gradient-to-br from-[#667eea] to-[#764ba2] min-h-screen flex justify-center items-center m-0 p-0">
 <div class="bg-white p-[40px] rounded-[10px] shadow-[0_15px_35px_rgba(0,0,0,0.2)] w-full max-w-[400px]">
     <h2 class="text-center text-[#333] mb-[30px] text-2xl font-bold">

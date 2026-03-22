@@ -73,12 +73,6 @@ public class BookingUpdateService {
     private boolean isValidTransition(BookingStatus current, BookingStatus next) {
 
         return switch (current) {
-
-            case APPROVED ->
-                    next == BookingStatus.PENDING_PAYMENT ||
-                    next == BookingStatus.REJECTED ||
-                            next == BookingStatus.FAILED;
-
             case PENDING_PAYMENT ->
                     next == BookingStatus.PAID ||
                      next == BookingStatus.FAILED;

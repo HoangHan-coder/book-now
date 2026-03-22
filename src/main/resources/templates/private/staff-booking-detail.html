@@ -1,66 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Chi tiết đặt phòng</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
+<head th:replace="~{fragments/head :: head(title='Chi tiết đặt phòng - BookNow')}"></head>
 
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<!-- LOGO -->
-<div class="fixed top-6 left-6 z-50 flex items-center gap-3 select-none">
-    <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
-        <i class="fa-solid fa-house-chimney text-blue-600 text-xl"></i>
-    </div>
-    <div class="flex flex-col leading-none">
-        <span class="text-2xl font-extrabold tracking-tight text-blue-600">BookNow</span>
-        <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider">Homestay System</span>
-    </div>
-</div>
-
-<!-- SIDEBAR -->
-<aside class="fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-40 flex flex-col pt-28">
-
-    <nav class="px-4 space-y-2 flex-1">
-
-        <a href="#"
-           class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-            <i class="fa-solid fa-chart-line w-5"></i>
-            Bảng điều khiển
-        </a>
-
-        <a href="#"
-           class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium shadow-sm ring-1 ring-black/5">
-            <i class="fa-regular fa-calendar-check w-5"></i>
-            Đơn đặt phòng
-        </a>
-
-        <a href="#"
-           class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-            <i class="fa-solid fa-door-open w-5"></i>
-            Phòng
-        </a>
-
-        <a href="#"
-           class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-            <i class="fa-solid fa-users-gear w-5"></i>
-            Khách hàng
-        </a>
-
-    </nav>
-
-    <div class="p-4 border-t border-gray-100">
-        <a href="#"
-           class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
-            <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
-            Đăng xuất
-        </a>
-    </div>
-
-</aside>
+<div th:replace="~{fragments/sidebar :: staff-sidebar(activePage='bookings')}"></div>
 
 <!-- MAIN -->
 <main class="lg:ml-64 max-w-7xl mx-auto py-12 px-8">
@@ -301,6 +245,6 @@
         </div>
     </div>
 </main>
-
+<div th:replace="~{fragments/sidebar :: sidebar-scripts}"></div>
 </body>
 </html>

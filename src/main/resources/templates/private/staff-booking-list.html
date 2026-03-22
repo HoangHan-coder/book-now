@@ -1,131 +1,50 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh sách đặt phòng - BookNow</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<head th:replace="~{fragments/head :: head(title='Danh sách đặt phòng - BookNow')}"></head>
+<style>
+    /* Specific Logo Positioning Rule */
+    .logo-fixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        margin-top: 25px;
+        margin-left: 25px;
+        z-index: 60; /* Higher than sidebar */
+    }
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            light: '#60a5fa', // blue-400
-                            DEFAULT: '#3b82f6', // blue-500
-                            dark: '#2563eb', // blue-600
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    .gradient-text {
+        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
 
-    <style>
-        /* Specific Logo Positioning Rule */
-        .logo-fixed {
-            position: fixed;
-            top: 0;
-            left: 0;
-            margin-top: 25px;
-            margin-left: 25px;
-            z-index: 60; /* Higher than sidebar */
-        }
+    .gradient-icon {
+        color: #3b82f6;
+    }
 
-        .gradient-text {
-            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    /* Sidebar transitions */
+    .sidebar {
+        transition: transform 0.3s ease-in-out;
+    }
 
-        .gradient-icon {
-            color: #3b82f6;
-        }
+    /* Hide scrollbar for sidebar */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
 
-        /* Sidebar transitions */
-        .sidebar {
-            transition: transform 0.3s ease-in-out;
-        }
-
-        /* Hide scrollbar for sidebar */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        /* Status Badge Colors */
-        .status-pending { @apply bg-yellow-50 text-yellow-700 ring-1 ring-yellow-600/20; }
-        .status-confirmed { @apply bg-blue-50 text-blue-700 ring-1 ring-blue-600/20; }
-        .status-completed { @apply bg-green-50 text-green-700 ring-1 ring-green-600/20; }
-        .status-cancelled { @apply bg-red-50 text-red-700 ring-1 ring-red-600/20; }
-    </style>
-</head>
+    /* Status Badge Colors */
+    .status-pending { @apply bg-yellow-50 text-yellow-700 ring-1 ring-yellow-600/20; }
+    .status-confirmed { @apply bg-blue-50 text-blue-700 ring-1 ring-blue-600/20; }
+    .status-completed { @apply bg-green-50 text-green-700 ring-1 ring-green-600/20; }
+    .status-cancelled { @apply bg-red-50 text-red-700 ring-1 ring-red-600/20; }
+</style>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<!-- LOGO (Fixed Position) -->
-<div class="logo-fixed flex items-center gap-3 select-none bg-white/90 backdrop-blur px-3 py-2 rounded-xl shadow-sm lg:shadow-none lg:bg-transparent lg:p-0">
-    <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
-        <i class="fa-solid fa-house-chimney gradient-icon text-xl"></i>
-    </div>
-    <div class="flex flex-col justify-center">
-        <span class="text-2xl font-extrabold tracking-tight gradient-text leading-none">BookNow</span>
-        <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider pl-0.5">Homestay System</span>
-    </div>
-</div>
-
-<!-- MOBILE HEADER (Hamburger) -->
-<div class="lg:hidden fixed top-0 w-full bg-white h-20 shadow-sm z-40 flex items-center justify-end px-6">
-    <button id="mobileMenuBtn" class="text-gray-500 hover:text-blue-600 focus:outline-none">
-        <i class="fa-solid fa-bars text-2xl"></i>
-    </button>
-</div>
-
-<!-- SIDEBAR -->
-<aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform -translate-x-full lg:translate-x-0 pt-28 overflow-y-auto no-scrollbar">
-    <!-- Navigation Links -->
-    <nav class="px-4 space-y-2">
-        <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-            <i class="fa-solid fa-chart-line w-5"></i>
-            Bảng điều khiển
-        </a>
-        <a href="#" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium transition-colors shadow-sm ring-1 ring-black/5">
-            <i class="fa-regular fa-calendar-check w-5"></i>
-            Đơn đặt phòng
-        </a>
-        <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-            <i class="fa-solid fa-door-open w-5"></i>
-            Phòng
-        </a>
-        <a href="/admin/manage-housekeeping" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-            <i class="fa-solid fa-broom"></i>
-            Dọn dẹp
-        </a>
-        <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-            <i class="fa-solid fa-users-gear w-5"></i>
-            Khách hàng
-        </a>
-    </nav>
-
-    <!-- Logout at Bottom -->
-    <div class="absolute bottom-0 w-full p-4 border-t border-gray-100 bg-white">
-        <a href="#" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
-            <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
-            Đăng xuất
-        </a>
-    </div>
-</aside>
+<div th:replace="~{fragments/sidebar :: staff-sidebar(activePage='bookings')}"></div>
 
 <!-- MAIN CONTENT -->
 <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
@@ -386,24 +305,7 @@
 
 <!-- SCRIPT -->
 <script>
-    // Mobile Sidebar Toggle
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-    function toggleSidebar() {
-        const isClosed = sidebar.classList.contains('-translate-x-full');
-        if (isClosed) {
-            sidebar.classList.remove('-translate-x-full');
-            sidebarOverlay.classList.remove('hidden');
-        } else {
-            sidebar.classList.add('-translate-x-full');
-            sidebarOverlay.classList.add('hidden');
-        }
-    }
-
-    mobileMenuBtn.addEventListener('click', toggleSidebar);
-    sidebarOverlay.addEventListener('click', toggleSidebar);
+// Mobile Sidebar Toggle script moved to fragment
 </script>
 </body>
 </html>

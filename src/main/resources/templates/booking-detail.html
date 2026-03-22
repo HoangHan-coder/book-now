@@ -1,29 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${'Đặt phòng ' + booking.bookingCode + ' - BookNow'}">Chi tiết đặt phòng - BookNow</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {extend: {fontFamily: {sans: ['Inter', 'sans-serif']}}}
-        }
-    </script>
-</head>
-<body class="bg-gray-50 font-sans text-gray-800 min-h-screen">
+<head th:replace="~{fragments/head :: head(title=|Đặt phòng ${booking.bookingCode} - BookNow|)}"></head>
+<body class="bg-gray-50 font-sans text-gray-800 min-h-screen flex flex-col">
 
-<!-- ===== LOGO ===== -->
-<div class="fixed top-5 left-5 z-50 bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow border border-gray-100">
-    <a th:href="@{/home}" href="index.html" class="flex items-center gap-3">
-        <div class="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100">
-            <i class="fa-solid fa-house-chimney text-blue-600 text-base"></i>
-        </div>
-        <span class="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-blue-700">BookNow</span>
-    </a>
-</div>
+<div th:replace="~{fragments/navbar :: public-navbar}"></div>
 
 <!-- ===== MAIN LAYOUT ===== -->
 <div class="max-w-5xl mx-auto px-4 md:px-8 pt-24 pb-14">
@@ -440,5 +420,9 @@
         </div>
     </div>
 
+<div class="mt-auto">
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+<div th:replace="~{fragments/navbar :: dropdown-script}"></div>
 </body>
 </html>

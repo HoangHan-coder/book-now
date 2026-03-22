@@ -1,45 +1,11 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tìm kiếm phòng - BookNow</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=more_horiz"/>
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=more_horiz"/>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: { brand: { light: '#60a5fa', DEFAULT: '#3b82f6', dark: '#2563eb' } }
-                }
-            }
-        }
-    </script>
-</head>
+<head th:replace="~{fragments/head :: head(title='Tìm kiếm phòng - BookNow')}"></head>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=more_horiz"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <body class="bg-gray-50 font-sans text-gray-800 pb-12">
 
-<header class="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm px-6 py-3 md:px-8 border-b border-gray-100">
-    <div class="max-w-7xl mx-auto flex justify-between items-center">
-        <a th:href="@{/home}">
-            <div class="flex items-center gap-3 cursor-pointer">
-                <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100">
-                    <i class="fa-solid fa-house-chimney text-xl text-blue-600"></i>
-                </div>
-                <span class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-blue-700">BookNow</span>
-            </div>
-        </a>
-        <div class="flex items-center gap-3">
-            <button class="text-sm font-semibold text-gray-600 px-3 py-2">Đăng nhập</button>
-            <button class="text-sm font-semibold text-white bg-blue-600 px-5 py-2.5 rounded-full shadow-md">Đăng ký</button>
-        </div>
-    </div>
-</header>
+<div th:replace="~{fragments/navbar :: public-navbar}"></div>
 
 <div class="max-w-7xl mx-auto px-4 pt-32 flex flex-col lg:flex-row gap-8">
     <aside class="lg:w-1/4 space-y-6">
@@ -224,5 +190,6 @@
         toggleBtn.innerText = isExpanded ? "expand_less" : "more_horiz";
     });
 </script>
+<div th:replace="~{fragments/navbar :: dropdown-script}"></div>
 </body>
 </html>

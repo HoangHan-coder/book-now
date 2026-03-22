@@ -1,17 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hồ sơ cá nhân - BookNow</title>
+<head th:replace="~{fragments/head :: head(title='Hồ sơ cá nhân - BookNow')}"></head>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-          rel="stylesheet">
-</head>
-
-<body class="bg-gray-50 font-sans text-gray-800 min-h-screen relative pt-24 pb-12">
+<body class="bg-gray-50 font-sans text-gray-800 min-h-screen flex flex-col pt-24">
+<!-- NAVBAR -->
+<div th:replace="~{fragments/navbar :: public-navbar}"></div>
 
 <!-- MAIN -->
 <div class="max-w-5xl mx-auto px-4 md:px-8">
@@ -110,6 +103,14 @@
 
     </div>
 </div>
+
+<!-- FOOTER -->
+<div class="mt-auto">
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</div>
+
+<!-- SCRIPTS -->
+<div th:replace="~{fragments/navbar :: dropdown-script}"></div>
 
 </body>
 </html>
