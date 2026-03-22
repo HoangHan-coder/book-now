@@ -73,6 +73,10 @@
                           class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-700 border border-yellow-200">
                             <i class="fa-solid fa-circle-check text-xs"></i> Chờ kiểm duyệt
                         </span>
+                    <span th:if="${booking.bookingStatus.name() == 'APPROVED'}"
+                          class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-700 border border-yellow-200">
+                            <i class="fa-solid fa-circle-check text-xs"></i> Đã kiểm duyệt
+                        </span>
                     <span th:if="${booking.bookingStatus.name() == 'CHECKED_IN'}"
                           class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-green-100 text-green-700 border border-green-200">
                             <i class="fa-solid fa-door-open text-xs"></i> Đã nhận phòng
@@ -175,17 +179,6 @@
 
                     </div>
 
-                    <!-- Guest Note (if any) -->
-                    <div th:if="${booking.note != null and !#strings.isEmpty(booking.note)}"
-                         class="mt-4 bg-amber-50 rounded-xl border border-amber-100 px-5 py-4">
-                        <p class="text-xs text-amber-500 font-semibold mb-1">
-                            <i class="fa-regular fa-note-sticky mr-1"></i> Ghi chú từ khách
-                        </p>
-                        <p class="text-sm text-gray-700" th:text="${booking.note}">
-                            Please prepare an extra blanket.
-                        </p>
-                    </div>
-
                 </div>
             </div>
 
@@ -216,34 +209,10 @@
                                 Phòng Tiêu Chuẩn P.101
                             </h3>
                         </div>
-
                         <!-- Room Amenities -->
-                        <div class="grid grid-cols-2 gap-3 pt-2">
-
-                            <!-- Guest Capacity -->
-                            <div class="flex items-center gap-2 text-sm">
-                                <i class="fa-solid fa-users text-blue-500 w-4"></i>
-                                <span class="text-gray-700">
-                                        <span class="font-semibold" th:text="${room.roomType.maxGuests}">2</span>
-                                        <span class="text-gray-500">Người tối đa</span>
-                                    </span>
-                            </div>
-
-                            <!-- Room Size (if available) -->
-                            <div class="flex items-center gap-2 text-sm">
-                                <i class="fa-solid fa-vector-square text-blue-500 w-4"></i>
-                                <span class="text-gray-700">
-                                        <span class="font-semibold" th:if="${room.roomType.areaM2 != null}"
-                                              th:text="${room.roomType.areaM2}">35</span>
-                                        <span class="text-gray-500" th:if="${room.roomType.areaM2 != null}">m²</span>
-                                        <span class="text-gray-400 italic"
-                                              th:if="${room.roomType.areaM2 == null}">N/A</span>
-                                    </span>
-                            </div>
-
+                        <div class="grid grid-cols-2 gap-3 ">
                             <!-- Check-in Date -->
                             <div class="flex items-center gap-2 text-sm">
-                                <i class="fa-solid fa-calendar text-blue-500 w-4"></i>
                                 <div>
                                     <p class="text-gray-500 text-xs">Ngày nhận phòng</p>
                                     <p class="font-semibold text-gray-800 text-sm"
@@ -255,11 +224,32 @@
 
                             <!-- Check-in Time -->
                             <div class="flex items-center gap-2 text-sm">
-                                <i class="fa-solid fa-clock text-blue-500 w-4"></i>
                                 <div>
                                     <p class="text-gray-500 text-xs">Khung giờ</p>
                                     <p class="font-semibold text-blue-600 text-sm"
-                                       th:text="${booking.getCheckInTime()} + ' - ' + ${booking.getCheckOutDate()}">
+                                       th:text="${booking.getCheckInTime()}">
+                                        21:00 - 09:30 (Qua đêm)
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Check-out Date -->
+                            <div class="flex items-center gap-2 text-sm">
+                                <div>
+                                    <p class="text-gray-500 text-xs">Ngày trả phòng</p>
+                                    <p class="font-semibold text-gray-800 text-sm"
+                                       th:text="${booking.getCheckOutDate()}">
+                                        27/06/2026
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Check-in Time -->
+                            <div class="flex items-center gap-2 text-sm">
+                                <div>
+                                    <p class="text-gray-500 text-xs">Khung giờ</p>
+                                    <p class="font-semibold text-blue-600 text-sm"
+                                       th:text="${booking.getCheckOutTime()}">
                                         21:00 - 09:30 (Qua đêm)
                                     </p>
                                 </div>

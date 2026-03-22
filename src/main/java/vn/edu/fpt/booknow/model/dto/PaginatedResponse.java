@@ -11,6 +11,8 @@ public class PaginatedResponse<T> {
     private int pageSize;
     private boolean hasNext;
     private boolean hasPrevious;
+    private int startIndex;
+    private int endIndex;
 
     // Constructor
     public PaginatedResponse(List<T> data, int currentPage, int totalPages, long totalItems, int pageSize) {
@@ -21,6 +23,34 @@ public class PaginatedResponse<T> {
         this.pageSize = pageSize;
         this.hasNext = currentPage < totalPages;
         this.hasPrevious = currentPage > 1;
+    }
+
+    public PaginatedResponse(List<T> data, int currentPage, int totalPages, long totalItems, int pageSize, int startIndex, int endIndex) {
+        this.data = data;
+        this.currentPage = currentPage;
+        this.totalPages = totalPages;
+        this.totalItems = totalItems;
+        this.pageSize = pageSize;
+        this.hasNext = currentPage < totalPages;
+        this.hasPrevious = currentPage > 1;
+        this.startIndex = startIndex;
+        this.endIndex = endIndex;
+    }
+
+    public int getStartIndex() {
+        return startIndex;
+    }
+
+    public void setStartIndex(int startIndex) {
+        this.startIndex = startIndex;
+    }
+
+    public int getEndIndex() {
+        return endIndex;
+    }
+
+    public void setEndIndex(int endIndex) {
+        this.endIndex = endIndex;
     }
 
     // Getters

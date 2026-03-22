@@ -7,17 +7,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.dto.BookingDTO;
+import vn.edu.fpt.booknow.model.dto.PaginatedResponse;
 import vn.edu.fpt.booknow.model.dto.PaymentDTO;
 import vn.edu.fpt.booknow.model.dto.RoomDTO;
 import vn.edu.fpt.booknow.model.entities.*;
-import vn.edu.fpt.booknow.services.BookingService;
-
-import vn.edu.fpt.booknow.services.FeedbackService;
-import vn.edu.fpt.booknow.services.JWTService;
+import vn.edu.fpt.booknow.services.*;
 
 import java.util.List;
-
-import vn.edu.fpt.booknow.services.PaymentService;
 
 @Controller
 @RequestMapping("/bookings")
@@ -25,6 +21,9 @@ public class BookingController {
 
     @Autowired
     private BookingService bookingService;
+
+    @Autowired
+    private BookingListService bookingListService;
 
     @Autowired
     private PaymentService paymentService;
@@ -37,17 +36,24 @@ public class BookingController {
 
     @GetMapping("/history")
     public String historyBookingView(Model model,
-                                     @CookieValue(value = "Access_token", required = false) String token) {
+                                     @CookieValue(value = "Access_token", required = false) String token,
+                                     @RequestParam(name = "page", defaultValue = "1") Integer page) {
 
         String email = token != null ? jwtService.extractUserName(token) : null;
         if (email == null)
             return "redirect:/auth/login";
 
-        List<Booking> bookings = bookingService.getBookingByEmail(email);
+        PaginatedResponse<BookingDTO> paginatedBookings = bookingListService.bookingListWithPagination(page, email);
 
-        List<BookingDTO> bookingDTOList = bookings.stream().map(BookingDTO::new).toList();
+        model.addAttribute("bookings", paginatedBookings.getData());
+        model.addAttribute("currentPage", paginatedBookings.getCurrentPage());
+        model.addAttribute("totalPages", paginatedBookings.getTotalPages());
+        model.addAttribute("totalItems", paginatedBookings.getTotalItems());
+        model.addAttribute("hasNext", paginatedBookings.isHasNext());
+        model.addAttribute("hasPrevious", paginatedBookings.isHasPrevious());
+        model.addAttribute("startIndex", paginatedBookings.getStartIndex());
+        model.addAttribute("endIndex", paginatedBookings.getEndIndex());
 
-        model.addAttribute("bookings", bookingDTOList);
         return "booking-history";
     }
 

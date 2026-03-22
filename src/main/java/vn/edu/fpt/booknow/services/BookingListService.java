@@ -1,6 +1,7 @@
 package vn.edu.fpt.booknow.services;
 
 import org.springframework.stereotype.Service;
+import vn.edu.fpt.booknow.model.dto.BookingDTO;
 import vn.edu.fpt.booknow.model.dto.PaginatedResponse;
 import vn.edu.fpt.booknow.model.entities.Booking;
 import vn.edu.fpt.booknow.model.entities.BookingStatus;
@@ -8,6 +9,7 @@ import vn.edu.fpt.booknow.repositories.BookingRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -127,5 +129,31 @@ public class BookingListService {
 
         // 5️⃣ Return paginated response
         return new PaginatedResponse<>(pageData, page, totalPages, totalItems, PAGE_SIZE);
+    }
+
+    public PaginatedResponse<BookingDTO> bookingListWithPagination(int page, String email) {
+        List<Booking> bookingList = bookingRepository.getBookingByCustomer_Email(email).orElse(null);
+
+        if (bookingList == null) {
+            bookingList = new ArrayList<>();
+        }
+        List<BookingDTO> bookings = bookingList.stream().map(BookingDTO::new).toList();
+
+        final int PAGE_SIZE = 6;
+        long totalItems = bookings.size();
+        int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
+
+        if (page < 1) {
+            page = 1;
+        }
+        if (page > totalPages) {
+            page = totalPages;
+        }
+
+        // Slice data for current page
+        int startIndex = (page - 1) * PAGE_SIZE;
+        int endIndex = Math.min(startIndex + PAGE_SIZE, (int) totalItems);
+        List<BookingDTO> pageData = bookings.subList(startIndex, endIndex);
+        return new PaginatedResponse<>(pageData, page, totalPages, totalItems, PAGE_SIZE, startIndex, endIndex);
     }
 }

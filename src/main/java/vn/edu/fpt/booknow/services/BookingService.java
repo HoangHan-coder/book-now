@@ -220,7 +220,7 @@ public class BookingService {
                 }
             }
             // 6. Lưu vào Database
-            Booking booking = saveSingleBookingToDatabase(allShifts, bookingDTO, username, redirectAttributes, frontUrl, backUrl);
+            Booking booking = saveSingleBookingToDatabase(allShifts, bookingDTO, username, redirectAttributes, frontUrl, backUrl, frontId, backId);
 
 //            redirectAttributes.addFlashAttribute("toastMessage", "Đặt phòng thành công!");
 //            redirectAttributes.addFlashAttribute("toastType", "success");
@@ -564,7 +564,7 @@ public class BookingService {
             try {
                 b.setBookingStatus(BookingStatus.FAILED);
                 b.setNote("Hệ thống tự động hủy do quá hạn thanh toán 15 phút.");
-                b.setUpdateAt(LocalDateTime.now());
+                b.setUpdatedAt(LocalDateTime.now());
 
                 bookingRepository.save(b);
                 System.out.println("Đã tự động hủy đơn hàng quá hạn: " + b.getBookingId());

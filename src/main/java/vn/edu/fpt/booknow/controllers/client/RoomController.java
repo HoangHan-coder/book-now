@@ -55,7 +55,6 @@ public class RoomController {
             List<Timetable> timetables = roomService.getAllTimeTable();
             List<TimeTableDTO> getSlot = roomService.getSlot(roomId);
             BookingCustomerDTO booking = new BookingCustomerDTO();
-            List<LocalDateTime> weekDates = new ArrayList<>();
             LocalDateTime today = LocalDateTime.now();
             Room room = roomService.findRoom(roomId);
             List<Image> image = roomService.getImgRoom(room);

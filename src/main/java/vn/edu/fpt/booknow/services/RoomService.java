@@ -121,7 +121,7 @@ public class RoomService {
         for (List<TimeTableDTO> slotsInBooking : bookingsGrouped.values()) {
             TimeTableDTO representative = slotsInBooking.get(0);
             BookingStatus status = representative.getBookingStatus();
-            if (status != BookingStatus.CANCELLED && status != BookingStatus.FAILED) {
+            if (status != BookingStatus.CANCELED && status != BookingStatus.FAILED) {
 
                 TimeTableDTO first = slotsInBooking.stream()
                         .min(Comparator.comparing(TimeTableDTO::getDate)

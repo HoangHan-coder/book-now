@@ -20,7 +20,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("SELECT COUNT(b) > 0 FROM Booking b " +
             "WHERE b.room.roomId = :roomId " +
-            "AND b.bookingStatus <> vn.edu.fpt.booknow.model.entities.BookingStatus.CANCELLED " +
+            "AND b.bookingStatus <> vn.edu.fpt.booknow.model.entities.BookingStatus.CANCELED " +
             "AND b.bookingStatus <> vn.edu.fpt.booknow.model.entities.BookingStatus.FAILED " +
             "AND b.checkInTime < :shiftEnd " +   // Bắt đầu trước khi ca mới kết thúc
             "AND b.checkOutTime > :shiftStart")  // Kết thúc sau khi ca mới bắt đầu
