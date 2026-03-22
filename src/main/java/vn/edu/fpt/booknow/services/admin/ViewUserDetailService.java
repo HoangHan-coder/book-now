@@ -23,13 +23,12 @@ public class ViewUserDetailService {
     // UC-17.2: View User Detail
     public UserDetailDTO getUserDetail(String userId, String role) {
 
-        if ("STAFF".equalsIgnoreCase(role) || "ADMIN".equalsIgnoreCase(role)) {
+        // gom tất cả role thuộc Staff
+        if (!"CUSTOMER".equalsIgnoreCase(role)) {
 
             StaffAccount staff = staffRepo.findById(Long.parseLong(userId))
                     .orElseThrow(() ->
                             new RuntimeException("User not found"));
-
-
 
             return new UserDetailDTO(
                     String.valueOf(staff.getStaffAccountId()),
@@ -42,12 +41,11 @@ public class ViewUserDetailService {
                     staff.getCreatedAt()
             );
 
-        } else if ("CUSTOMER".equalsIgnoreCase(role)) {
+        } else {
 
             Customer customer = customerRepo.findById(Long.parseLong(userId))
                     .orElseThrow(() ->
                             new RuntimeException("User not found"));
-
 
             return new UserDetailDTO(
                     String.valueOf(customer.getCustomerId()),
@@ -59,9 +57,6 @@ public class ViewUserDetailService {
                     customer.getStatus(),
                     customer.getCreatedAt()
             );
-
-        } else {
-            throw new RuntimeException("Invalid role");
         }
     }
 }
