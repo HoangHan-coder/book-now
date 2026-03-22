@@ -18,6 +18,24 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
    List<Booking> getByBookingStatus(BookingStatus bookingStatus);
 
+ int countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+
+ @Query("""
+    SELECT b FROM Booking b
+    WHERE b.checkInTime <= :end
+    AND b.checkOutTime >= :start
+""")
+ List<Booking> findBookingByDate(
+         @Param("start") LocalDateTime start,
+         @Param("end") LocalDateTime end);
+
+ @Query("SELECT b FROM Booking b WHERE b.checkInTime BETWEEN :start AND :end AND b.bookingStatus IN :statuses")
+ List<Booking> findByCheckInTimeBetweenAndStatusIn(
+         @Param("start") LocalDateTime start,
+         @Param("end") LocalDateTime end,
+         @Param("statuses") List<BookingStatus> statuses
+ );
+
     @Query("SELECT COUNT(b) > 0 FROM Booking b " +
             "WHERE b.room.roomId = :roomId " +
             "AND b.bookingStatus <> vn.edu.fpt.booknow.model.entities.BookingStatus.CANCELED " +
@@ -121,7 +139,4 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
     );
-
-    @Query("SELECT b FROM Booking b WHERE b.bookingStatus = 'PENDING_PAYMENT' AND b.createdAt < :timeLimit")
-    List<Booking> findExpiredPendingBookings(@Param("timeLimit") LocalDateTime timeLimit);
 }

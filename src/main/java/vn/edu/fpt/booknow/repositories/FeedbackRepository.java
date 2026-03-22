@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import vn.edu.fpt.booknow.model.dto.FeedbackDetailDTO;
 import vn.edu.fpt.booknow.model.entities.Feedback;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,8 @@ import java.util.Optional;
 public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
 
     Optional<Feedback> findFeedbacksByBooking_BookingId(Long bookingId);
+
+    int countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
     @Query("""
     SELECT new vn.edu.fpt.booknow.model.dto.FeedbackDetailDTO(
