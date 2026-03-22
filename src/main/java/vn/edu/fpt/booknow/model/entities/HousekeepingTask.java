@@ -45,8 +45,9 @@ public class HousekeepingTask {
     @Column(name = "task_type")
     private String taskType;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "task_status")
-    private String taskStatus;
+    private TaskStatus taskStatus;
 
     @Column(name = "priority")
     private String priority;
@@ -62,6 +63,9 @@ public class HousekeepingTask {
 
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
+
+    @Column(name = "note_housekeeping")
+    private String noteHousekeeping;
 
     public LocalDate date(){
         return createdAt.toLocalDate();

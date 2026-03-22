@@ -27,7 +27,7 @@ public class CloudinaryService {
                 "secure", true));
     }
 
-    public String uploadVideo(MultipartFile file) {
+    public Map uploadVideo(MultipartFile file) {
         try {
             // Cloudinary yêu cầu xác định resource_type là video cho các file mp4, mov...
             Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
@@ -36,9 +36,8 @@ public class CloudinaryService {
                             "folder", "customer_identity_videos" // Lưu vào thư mục riêng
                     )
             );
-
             // Trả về URL của video đã upload thành công
-            return uploadResult.get("secure_url").toString();
+            return uploadResult;
 
         } catch (IOException e) {
             // Trong thực tế, bạn nên log lỗi và ném ra một Custom Exception

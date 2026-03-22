@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@ToString(exclude = {"invoices", "payments", "schedulers", "feedbacks", "customer", "room"})
+@ToString(exclude = {"invoices", "payments", "schedulers", "feedbacks", "customer", "room", "checkInSession"})
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,6 +68,9 @@ public class Booking {
 
     @OneToMany(mappedBy = "booking")
     private List<Scheduler> schedulers = new ArrayList<>();
+
+    @OneToOne(mappedBy = "booking")
+    private CheckInSession checkInSession;
 
     @Column(name = "note")
     private String note;

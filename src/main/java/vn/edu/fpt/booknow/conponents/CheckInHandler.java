@@ -6,16 +6,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import vn.edu.fpt.booknow.model.entities.Booking;
-import vn.edu.fpt.booknow.model.entities.BookingStatus;
-import vn.edu.fpt.booknow.model.entities.CheckInMessage;
-import vn.edu.fpt.booknow.model.entities.MessageSuccess;
+import vn.edu.fpt.booknow.model.entities.*;
+import vn.edu.fpt.booknow.repositories.StaffAccountRepository;
 import vn.edu.fpt.booknow.services.CheckInService;
 import vn.edu.fpt.booknow.services.CloudinaryService;
 import vn.edu.fpt.booknow.services.customer.BookingService;
+import vn.edu.fpt.booknow.services.customer.CheckInSessionService;
 import vn.edu.fpt.booknow.services.staff.BookingUpdateService;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -26,15 +26,27 @@ public class CheckInHandler {
     private final ObjectMapper jacksonObjectMapper;
     private final BookingUpdateService bookingUpdateService;
     private final BookingService bookingService;
+    private final CheckInSessionService checkInSessionService;
+
+
 
 
     public void startSession(Long bookingId, MultipartFile video) throws JsonProcessingException {
-        String videoUrl = cloudinaryService.uploadVideo(video);
+        CheckInMessage message = null;
+        Map uploadVideo = cloudinaryService.uploadVideo(video);
+        String videoUrl = uploadVideo.get("secure_url").toString();
+        String videoUrlId = uploadVideo.get("public_id").toString();
         System.out.println("videoUrl: " + videoUrl);
-
-        CheckInMessage message =
-                new CheckInMessage(bookingId, videoUrl, "PENDING");
-
+        try {
+            CheckInSession checkInSessionCheck = checkInSessionService.getCheckInSessionId(bookingId);
+            CheckInSession checkInSession = checkInSessionService.updateCheckInSession(checkInSessionCheck.getCheckInSessionId(), CheckInSessionStatus.PENDING, videoUrl);
+            message =
+                    new CheckInMessage(checkInSession.getCheckInSessionId(),bookingId, videoUrl, "PENDING");
+        } catch (Exception e) {
+            CheckInSession checkInSession = checkInSessionService.createCheckInSession(bookingId, videoUrl, CheckInSessionStatus.PENDING, videoUrlId);
+            message =
+                    new CheckInMessage(checkInSession.getCheckInSessionId(),bookingId, videoUrl, "PENDING");
+        }
 
         System.out.println("sending");
         messagingTemplate.convertAndSend(
@@ -43,12 +55,13 @@ public class CheckInHandler {
         System.out.println("sent");
     }
 
-    public void approve(Long bookingId) {
+    public void approve(Long bookingId, Long sessionId){
         String messageSuccess = "Check_in thành công";
         MessageSuccess mess = new MessageSuccess(messageSuccess, BookingStatus.CHECKED_IN);
         Booking booking = bookingService.findById(bookingId);
         LocalDateTime time = LocalDateTime.now();
         booking.setActualCheckInTime(time);
+        checkInSessionService.updateCheckInSessionWhenApprove(sessionId,CheckInSessionStatus.APPROVED);
         // 5. Notify User
         messagingTemplate.convertAndSend(
                 "/topic/checkin/user/" + bookingId,
@@ -56,10 +69,11 @@ public class CheckInHandler {
         );
     }
 
-    public void reject(Long bookingId) {
+    public void reject(Long bookingId, Long sessionId) {
         String note = bookingService.findById(bookingId).getNote();
         String messageSuccess = "REJECT do " + note + "vui lòng check_in lại";
         MessageSuccess mess = new MessageSuccess(messageSuccess, BookingStatus.REJECT);
+        checkInSessionService.updateCheckInSessionWhenReject(sessionId,CheckInSessionStatus.REJECTED);
         // 5. Notify User
         messagingTemplate.convertAndSend(
                 "/topic/checkin/user/" + bookingId,

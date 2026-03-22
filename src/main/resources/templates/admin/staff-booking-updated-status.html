@@ -439,8 +439,12 @@
 
                     <div class="flex justify-center mb-6">
                         <div class="relative w-full max-w-sm aspect-[3/4] bg-gray-900 rounded-xl overflow-hidden shadow-lg border-4 border-gray-100">
-                            <div id="mediaContainer" class="w-full h-full flex items-center justify-center text-white">
-                                Waiting for check-in...
+                            <input type="hidden" id="bookingId" th:value="${booking.bookingId}">
+                            <input type="hidden" id="checkInSessionId" th:value="${checkInSession.getCheckInSessionId()}">
+                            <div th:if="${checkInSession}" id="mediaContainer" class="w-full h-full flex items-center justify-center text-white">
+                                <video th:src="${checkInSession.getVideoUrl()}" class="w-full h-full object-cover"
+                                controls
+                                autoplay></video>
                             </div>
                             <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs backdrop-blur-sm">
                                 <i class="fa-solid fa-location-dot mr-1"></i> Tại Homestay
@@ -457,7 +461,7 @@
                                 class="px-6 py-2.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 font-medium transition-colors sm:w-auto w-full">
                             <i class="fa-solid fa-ban mr-2"></i>Từ chối
                         </button>
-                        <button id="btnApprove" class="px-6 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-sm transition-colors sm:w-auto w-full sm:ml-auto">
+                        <button onclick="approve()" id="btnApprove" class="px-6 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-sm transition-colors sm:w-auto w-full sm:ml-auto">
                             <i class="fa-solid fa-key mr-2"></i>Duyệt & Giao phòng
                         </button>
                     </div>
@@ -539,7 +543,8 @@
 
         </div>
     </div>
-
+        </div>
+    </div>
 </main>
 
 <script>
@@ -549,6 +554,8 @@
     const panelFailure = document.getElementById('panel_failure');
     const panelSuccess = document.getElementById('panel_success');
     let bookingStatus = document.getElementById('booking-status')?.value || "PENDING";
+    let checkInSessionId = document.getElementById('checkInSessionId').value;
+    let bookingId = document.getElementById('bookingId').value;
 
     const badge = document.getElementById('headerStatusBadge');
 
@@ -743,7 +750,7 @@
             const data = JSON.parse(message.body);
 
             console.log("PARSED:", data);
-            dataTemp = data.bookingId;
+
 
             showVideo(data.videoUrl, data.bookingId);
         });
@@ -758,7 +765,7 @@
         panel.classList.remove("hidden");
 
         const container = document.getElementById("mediaContainer");
-
+        container.innerHTML = ''
         container.innerHTML = `
     <video
         src="${videoUrl}"
@@ -768,25 +775,25 @@
     ></video>
   `;
 
-        // Gắn bookingId cho nút approve
-        const approveBtn = panel.querySelector("#btnApprove");
-        approveBtn.onclick = () => approve(bookingId);
+        // // Gắn bookingId cho nút approve
+        // const approveBtn = panel.querySelector("#btnApprove");
+        // approveBtn.onclick = () => approve(bookingId);
     }
 
     function Reject(){
         const panel = document.getElementById("panel_checkin");
         panel.classList.remove("hidden");
         const rejectBtn = panel.querySelector("#btnReject");
-        rejectBtn.onclick = () => reject(dataTemp);
+        rejectBtn.onclick = () => reject(bookingId);
     }
 
-    function approve(bookingId) {
+    function approve() {
         fetch("/book-now/checkin/approve", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ bookingId: bookingId , bookingStatus: "CHECKED_IN"})
+            body: JSON.stringify({ bookingId: bookingId , bookingStatus: "CHECKED_IN", checkInSessionId: checkInSessionId})
         })
             .then(res => {
                 if (!res.ok) {
@@ -812,7 +819,7 @@
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ bookingId: bookingId, bookingStatus: "REJECT" , reason : "Video va anh CCCD mờ, không thể đọc được thông tin, số định danh trong luc check-in."})
+            body: JSON.stringify({ bookingId: bookingId, bookingStatus: "REJECT" , reason : "Video va anh CCCD mờ, không thể đọc được thông tin, số định danh trong luc check-in.", checkInSessionId: checkInSessionId})
         })
             .then(res => {
                 if (!res.ok) {

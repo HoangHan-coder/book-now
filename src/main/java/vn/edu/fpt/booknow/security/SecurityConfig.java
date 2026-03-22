@@ -57,9 +57,7 @@ public class SecurityConfig {
                         .successHandler(successHandler)
                 ).exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
-
                             response.sendRedirect("/book-now/authen/login");
-
                         })
                 );
 

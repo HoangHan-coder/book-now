@@ -6,16 +6,20 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.entities.Booking;
 import vn.edu.fpt.booknow.model.entities.BookingStatus;
+import vn.edu.fpt.booknow.model.entities.CheckInSession;
+import vn.edu.fpt.booknow.services.customer.CheckInSessionService;
 import vn.edu.fpt.booknow.services.staff.BookingUpdateService;
 
-@Controller
-@RequestMapping("/staff/bookings")
-public class StaBookingUpdateStatusController {
+        @Controller
+        @RequestMapping("/staff/bookings")
+        public class StaBookingUpdateStatusController {
 
-    private final BookingUpdateService bookingUpdateService;
+            private final BookingUpdateService bookingUpdateService;
+            private final CheckInSessionService checkInSessionService;
 
-    public StaBookingUpdateStatusController(BookingUpdateService bookingUpdateService) {
-        this.bookingUpdateService = bookingUpdateService;
+            public StaBookingUpdateStatusController(BookingUpdateService bookingUpdateService, CheckInSessionService checkInSessionService) {
+                this.bookingUpdateService = bookingUpdateService;
+                this.checkInSessionService = checkInSessionService;
     }
 
     @GetMapping("/update/{bookingCode}")
@@ -25,9 +29,17 @@ public class StaBookingUpdateStatusController {
     ) {
         try {
             Booking booking = bookingUpdateService.getBookingOrThrow(bookingCode);
+            System.out.println("booking code: " + booking.getBookingCode());
+            try {
+                CheckInSession checkInSession = checkInSessionService.getCheckInSessionId(booking.getBookingId());
+                model.addAttribute("checkInSession", checkInSession);
+            } catch (Exception e) {
+                model.addAttribute("massageError", "CheckInSession not found");
+            }
             model.addAttribute("booking", booking);
             return "admin/staff-booking-updated-status";
         } catch (Exception e) {
+            System.out.println("loi o day");
             model.addAttribute("errorMessage", e.getMessage());
             return "error/404";
         }

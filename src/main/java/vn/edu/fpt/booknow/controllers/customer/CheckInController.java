@@ -84,7 +84,7 @@ public class CheckInController {
     ) {
         Booking booking = bookingService.findById(req.getBookingId());
         bookingUpdateService.updateStatus(booking.getBookingCode(), BookingStatus.CHECKED_IN, null);
-        checkInHandler.approve(req.getBookingId());
+        checkInHandler.approve(req.getBookingId(), req.getCheckInSessionId());
 
         return ResponseEntity.ok().build();
     }
@@ -95,7 +95,7 @@ public class CheckInController {
     ) {
         Booking booking = bookingService.findById(req.getBookingId());
         bookingUpdateService.updateStatus(booking.getBookingCode(), BookingStatus.REJECT, req.getReason());
-        checkInHandler.reject(req.getBookingId());
+        checkInHandler.reject(req.getBookingId(),req.getCheckInSessionId());
         return ResponseEntity.ok().build();
     }
 

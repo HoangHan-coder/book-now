@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,5 +68,8 @@ public class StaffAccount {
 
     @OneToMany(mappedBy = "createdBy")
     private List<HousekeepingTask> housekeepingTasksCreateBy = new ArrayList<>();
+
+    @OneToMany(mappedBy = "staffAccount")
+    private List<CheckInSession> checkInSession;
 
 }

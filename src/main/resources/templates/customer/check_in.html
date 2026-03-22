@@ -59,7 +59,7 @@
             stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             videoElement.srcObject = stream;
         } catch (err) {
-            alert("Cannot access camera: " + err.message);
+            alert("Cannot access camera: " + err.message + ",Please allow to access camera");
         }
     }
 
