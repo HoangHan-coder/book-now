@@ -41,14 +41,9 @@ public class Room {
 
 
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'AVAILABLE'")
     @Column(name = "status", nullable = false, length = 50)
     private RoomStatus status;
 
-    @NotNull
-    @ColumnDefault("0")
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = false;
 
 
 
@@ -67,5 +62,7 @@ public class Room {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    @OneToMany(mappedBy = "room")
+    private List<HousekeepingTask> housekeepingTasks = new ArrayList<>();
 
 }

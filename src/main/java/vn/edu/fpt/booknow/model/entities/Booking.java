@@ -10,6 +10,9 @@ import org.hibernate.annotations.Nationalized;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,4 +103,24 @@ public class Booking {
 
     @OneToMany(mappedBy = "booking")
     private List<Scheduler> schedulers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "booking")
+    private List<Feedback> feedbacks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "booking")
+    private List<vn.edu.fpt.booknow.model.entities.Invoice> invoices = new ArrayList<>();
+
+    @OneToMany(mappedBy = "booking")
+    private List<vn.edu.fpt.booknow.model.entities.Payment> payments = new ArrayList<>();
+
+    @OneToOne(mappedBy = "booking")
+    private CheckInSession checkInSession;
+
+
+    @Column(name = "update_at")
+    private LocalDateTime updateAt;
+
+    @OneToOne(mappedBy = "booking")
+    private HousekeepingTask housekeepingTasks;
+
 }

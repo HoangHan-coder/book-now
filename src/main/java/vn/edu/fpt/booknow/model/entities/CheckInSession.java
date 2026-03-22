@@ -1,57 +1,110 @@
 package vn.edu.fpt.booknow.model.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.Nationalized;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
 @Entity
-@Table(name = "CheckInSession", schema = "dbo")
+@Table(name = "checkinsession")
 public class CheckInSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "check_in_session_id", nullable = false)
+    @Column(name = "check_in_session_id")
     private Long checkInSessionId;
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "booking_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "bookingId")
     private Booking booking;
-
-    @Size(max = 500)
-    @NotNull
-    @Nationalized
-    @Column(name = "video_url", nullable = false, length = 500)
+    @Column(name = "video_url")
     private String videoUrl;
-
-    @Size(max = 255)
-    @Nationalized
     @Column(name = "video_public_id")
     private String videoPublicId;
-
-    @Size(max = 20)
-    @NotNull
-    @ColumnDefault("'PENDING'")
-    @Column(name = "status", nullable = false, length = 20)
-    private String status;
-
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private CheckInSessionStatus status;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reviewed_by")
-    private StaffAccount reviewedBy;
-
-    @NotNull
-    @ColumnDefault("sysdatetime()")
-    @Column(name = "created_at", nullable = false)
+    private StaffAccount staffAccount;
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
-
     @Column(name = "reviewed_at")
     private LocalDateTime reviewedAt;
 
+    public CheckInSession() {
+    }
+
+    public CheckInSession(Long checkInSessionId, Booking booking, String videoUrl, String videoPublicId, CheckInSessionStatus status, StaffAccount staffAccount, LocalDateTime createdAt, LocalDateTime reviewedAt) {
+        this.checkInSessionId = checkInSessionId;
+        this.booking = booking;
+        this.videoUrl = videoUrl;
+        this.videoPublicId = videoPublicId;
+        this.status = status;
+        this.staffAccount = staffAccount;
+        this.createdAt = createdAt;
+        this.reviewedAt = reviewedAt;
+    }
+
+    public Long getCheckInSessionId() {
+        return checkInSessionId;
+    }
+
+    public void setCheckInSessionId(Long checkInSessionId) {
+        this.checkInSessionId = checkInSessionId;
+    }
+
+    public Booking getBooking() {
+        return booking;
+    }
+
+    public void setBooking(Booking booking) {
+        this.booking = booking;
+    }
+
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
+    }
+
+    public CheckInSessionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CheckInSessionStatus status) {
+        this.status = status;
+    }
+
+    public String getVideoPublicId() {
+        return videoPublicId;
+    }
+
+    public void setVideoPublicId(String videoPublicId) {
+        this.videoPublicId = videoPublicId;
+    }
+
+    public StaffAccount getStaffAccount() {
+        return staffAccount;
+    }
+
+    public void setStaffAccount(StaffAccount staffAccount) {
+        this.staffAccount = staffAccount;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getReviewedAt() {
+        return reviewedAt;
+    }
+
+    public void setReviewedAt(LocalDateTime reviewedAt) {
+        this.reviewedAt = reviewedAt;
+    }
 }

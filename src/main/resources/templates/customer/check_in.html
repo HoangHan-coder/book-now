@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+
+<video id="preview" autoplay muted class="w-full"></video>
+
+<div class="flex gap-2 mt-3">
+    <input type="hidden" id="bookingId" th:value="${booking.bookingId}">
+    <button id="startBtn">Start Recording</button>
+    <button id="stopBtn" disabled>Stop</button>
+    <button id="submitBtn" disabled>Submit</button>
+</div>
+
+
+<script>
+
+    const socket = new SockJS('http://localhost:8081/book-now/ws');
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function(frame) {
+
+        console.log("Connected:", frame);
+
+        stompClient.subscribe("/topic/checkin/user/" + bookingId, function(message) {
+
+            console.log("RAW:", message.body);
+            const data = JSON.parse(message.body);
+            alert(data.message);
+            if (data.bookingStatus === 'REJECT'){
+                window.location.href = "/book-now/checkin/fail"
+            } else if (data.bookingStatus === 'CHECKED_IN'){
+                    window.location.href = "/book-now/checkin/success?bookingId=" + bookingId
+                }
+
+        });
+
+    }, function(error) {
+        console.error("STOMP error:", error);
+    });
+
+    const videoElement = document.getElementById("preview");
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const submitBtn = document.getElementById("submitBtn");
+
+    let mediaRecorder;
+    let recordedChunks = [];
+    let stream;
+    let bookingId = document.getElementById("bookingId").value;
+
+    async function initCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            videoElement.srcObject = stream;
+        } catch (err) {
+            alert("Cannot access camera: " + err.message + ",Please allow to access camera");
+        }
+    }
+
+    initCamera();
+
+
+    startBtn.onclick = () => {
+
+        recordedChunks = [];
+
+        mediaRecorder = new MediaRecorder(stream, {
+            mimeType: "video/webm"
+        });
+
+        mediaRecorder.ondataavailable = event => {
+            if (event.data.size > 0) {
+                recordedChunks.push(event.data);
+            }
+        };
+
+        mediaRecorder.onstop = () => {
+            submitBtn.disabled = false;
+        };
+
+        mediaRecorder.start();
+
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+    };
+
+
+    stopBtn.onclick = () => {
+        mediaRecorder.stop();
+        stopBtn.disabled = true;
+    };
+
+
+    submitBtn.onclick = async () => {
+
+        const blob = new Blob(recordedChunks, { type: "video/webm" });
+
+        const formData = new FormData();
+        formData.append("video", blob);
+        formData.append("bookingId", bookingId);
+
+        try {
+            const response = await fetch("/book-now/checkin/start", {
+                method: "POST",
+                body: formData
+            });
+
+            if (response.ok) {
+                alert("Video submitted. Waiting for admin approval...");
+            } else {
+                alert("Upload failed");
+            }
+
+        } catch (err) {
+            alert("Error: " + err.message);
+        }
+    };
+</script>
+</body>
+</html>

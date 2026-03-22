@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-in Thành công - BookNow Kiosk</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            DEFAULT: '#2563eb', // blue-600
+                        }
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 2s infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        /* Ẩn thanh cuộn */
+        body {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800 h-screen flex flex-col justify-center items-center relative overflow-hidden">
+
+<!-- === BACKGROUND DECORATION === -->
+<div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+    <div class="absolute -top-40 -right-40 w-96 h-96 bg-green-200 rounded-full opacity-30 blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-80 h-80 bg-blue-300 rounded-full opacity-20 blur-3xl"></div>
+</div>
+
+<!-- === LOGO (Fixed Top-Left, 25px margin) === -->
+<div style="position: fixed; top: 25px; left: 25px; z-index: 100;" class="bg-white/90 backdrop-blur px-6 py-3 rounded-2xl shadow-sm border border-white/50">
+    <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100">
+            <i class="fa-solid fa-house-chimney gradient-icon text-2xl text-blue-600"></i>
+        </div>
+        <div class="flex flex-col justify-center">
+            <span class="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-blue-700 leading-none">BookNow</span>
+        </div>
+    </div>
+</div>
+
+<!-- === MAIN KIOSK CARD === -->
+<div class="w-full max-w-xl px-4 relative z-10 text-center">
+
+    <div class="bg-white rounded-[2.5rem] shadow-2xl p-10 md:p-14 border border-white/60 relative overflow-hidden">
+
+        <!-- Confetti Decoration (CSS Shapes) -->
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-400 via-yellow-400 to-green-400"></div>
+
+        <!-- Success Icon -->
+        <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8 text-green-600 shadow-sm border border-green-200 animate-bounce-slow">
+            <i class="fa-solid fa-check text-5xl"></i>
+        </div>
+
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-2">Check-in thành công!</h1>
+        <p class="text-gray-500 text-lg mb-10">
+            Chào mừng bạn đến với homestay. Chúc bạn có một kỳ nghỉ tuyệt vời!
+        </p>
+
+        <!-- Room Access Info Card -->
+        <div class="bg-blue-50/80 rounded-3xl p-6 border border-blue-100 mb-8">
+
+            <div class="grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-blue-200/60">
+                <div class="text-left">
+                    <p class="text-sm text-gray-500 mb-1">Khách hàng</p>
+                    <p th:text="${booking.customer.getFullName()}" class="font-bold text-gray-900 text-lg"></p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-gray-500 mb-1">Số phòng</p>
+                    <p th:text="${booking.room.getRoomNumber()}" class="font-bold text-gray-900 text-lg"></p>
+                </div>
+            </div>
+
+            <!-- Passcode Display -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-blue-200">
+                <p class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-2">Mã vào cửa Homestay</p>
+                <div class="flex items-center justify-between gap-4">
+                    <div class="font-mono text-4xl md:text-5xl font-black text-gray-800 tracking-widest pl-4" id="passcode">
+                        <p th:text="${roomCode}"></p>
+                    </div>
+<!--                    <button onclick="copyPasscode()" class="bg-blue-100 hover:bg-blue-200 text-blue-700 p-3 rounded-xl transition-colors flex-shrink-0" title="Sao chép">-->
+<!--                        <i class="fa-regular fa-copy text-xl"></i>-->
+<!--                    </button>-->
+                </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-3 italic">
+                <i class="fa-solid fa-circle-info mr-1"></i> Nhập mã này trên khóa điện tử tại cửa phòng.
+            </p>
+
+        </div>
+
+        <!-- Action Button -->
+<!--        <button onclick="copyPasscode()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold py-4 rounded-2xl shadow-xl shadow-blue-500/30 transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3">-->
+<!--            <i class="fa-regular fa-copy"></i>-->
+<!--            <span>Sao chép mã vào cửa</span>-->
+<!--        </button>-->
+
+        <!-- Auto Redirect Timer -->
+        <div class="mt-8 text-gray-400 text-sm flex items-center justify-center gap-2">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span>Tự động về trang chủ sau <span id="countdown" class="font-bold text-gray-600">30</span>s</span>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 z-50 opacity-0 translate-y-10 transition-all duration-300">
+    <i class="fa-solid fa-circle-check text-green-400"></i>
+    <span class="font-medium">Đã sao chép mã!</span>
+</div>
+
+<!-- === SCRIPT LOGIC === -->
+<script>
+    // Countdown Logic
+    let timeLeft = 30;
+    const countdownEl = document.getElementById('countdown');
+
+    const timer = setInterval(() => {
+        timeLeft--;
+        countdownEl.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            window.location.href = 'checkin_enter_code.html'; // Back to home
+        }
+    }, 1000);
+
+    // Copy Function
+    // function copyPasscode() {
+    //     const code = document.getElementById('passcode').innerText.trim();
+    //     navigator.clipboard.writeText(code).then(() => {
+    //         showToast();
+    //     }).catch(err => {
+    //         // Fallback for kiosk/older browsers
+    //         console.log('Copy failed', err);
+    //         showToast(); // Show anyway for UX in demo
+    //     });
+    // }
+    //
+    // function showToast() {
+    //     const toast = document.getElementById('toast');
+    //     toast.classList.remove('opacity-0', 'translate-y-10');
+    //
+    //     setTimeout(() => {
+    //         toast.classList.add('opacity-0', 'translate-y-10');
+    //     }, 2000);
+    // }
+</script>
+</body>
+</html>

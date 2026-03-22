@@ -28,6 +28,12 @@ public class SecurityConfig {
     private JWTFilter jwtFilter;
 
     @Autowired
+    private HttpCookieOAuth2AuthorizationRequest cookieRepo;
+
+    @Autowired
+    private OAuth2LoginSuccessHandler successHandler;
+
+    @Autowired
     private CustomUserDetailsService detailsService;
 
     @Autowired
@@ -54,6 +60,7 @@ public class SecurityConfig {
                                 "/booking/save", "/assets/**",
                                 "/forgot-password", "/verify-otp",
                                 "/resend-otp", "/reset-password",
+                                "/book-now/staff/bookings/update/*",
                                 "/404", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -83,8 +90,26 @@ public class SecurityConfig {
                                 "/verify-otp", 
                                 "/resend-otp", 
                                 "/reset-password",
-                                "/404", "/error").permitAll()
+                                "/404", "/error", "/authen/verifiedOtp",
+                                "/authen/registerEmail", "/authen/otp",
+                                "/authen/registerForm",
+                                "/checkin/start",
+                                "/book-now/checkin/page/**","/authen/login").permitAll()
                         .anyRequest().authenticated()
+                )
+                
+                .oauth2Login(oauth -> oauth
+                        .authorizationEndpoint(authz -> authz
+                                .authorizationRequestRepository(cookieRepo)
+                        )
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
+                        .successHandler(successHandler)
+                ).exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendRedirect("/book-now/authen/login");
+                        })
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

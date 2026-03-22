@@ -28,12 +28,13 @@ public class Timetable {
     @Column(name = "slot_name", nullable = false, length = 50)
     private String slotName;
 
-    @NotNull
     @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
 
-    @NotNull
     @Column(name = "end_time", nullable = false)
     private LocalTime endTime;
+
+    @OneToMany(mappedBy = "timetable")
+    private List<Scheduler> schedulers = new ArrayList<>();
 
 }
