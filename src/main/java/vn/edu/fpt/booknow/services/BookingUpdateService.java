@@ -77,7 +77,7 @@ public class BookingUpdateService {
 
         return switch (current) {
 
-            case PENDING ->
+            case APPROVED ->
                     next == BookingStatus.PENDING_PAYMENT ||
                     next == BookingStatus.REJECTED ||
                             next == BookingStatus.FAILED;

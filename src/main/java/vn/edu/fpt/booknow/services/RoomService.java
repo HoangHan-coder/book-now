@@ -160,7 +160,7 @@ public class RoomService {
         return list;
     }
     public List<Booking> getAllBookingStatus() {
-        List<Booking> list = bookingRepository.getByBookingStatus(BookingStatus.PENDING);
+        List<Booking> list = bookingRepository.getByBookingStatus(BookingStatus.APPROVED);
         return list;
     }
 }

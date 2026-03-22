@@ -6,13 +6,10 @@ import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.dto.BookingCustomerDTO;
-import vn.edu.fpt.booknow.model.dto.BookingDTO;
 import vn.edu.fpt.booknow.model.dto.WorkShift;
 import vn.edu.fpt.booknow.model.entities.*;
 import vn.edu.fpt.booknow.repositories.*;
@@ -135,7 +132,7 @@ public class BookingService {
             booking.setIdCardBackUrl(idCardBackUrl);
             booking.setIdCardBackPublicId(publicIdCardBackUrl);
 
-            updateStatus(BookingStatus.PENDING, booking.getBookingCode());
+            updateStatus(BookingStatus.APPROVED, booking.getBookingCode());
 
         } catch (Exception e) {
             throw new Exception("Lỗi upload ảnh lên cloud");
