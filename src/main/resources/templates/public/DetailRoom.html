@@ -192,7 +192,7 @@
                                     <div class="w-full">
                                         <th:block th:with="currentKey=${#temporals.format(date, 'ddMM')} + '-' + ${tItem.timetableId}">
                                             <div class="w-full py-1"
-                                                 th:with="isNightSlot=${tItem.slotName.contains('Đêm') or tItem.timetableId > 4},
+                                                 th:with="isNightSlot=${tItem.slotName.toLowerCase().contains('đêm') or tItem.timetableId > 4},
                   currentPrice=${isNightSlot ? room.overPrice : room.basePrice},
                   currentStatus=${bookedStatusMap != null ? bookedStatusMap.get(currentKey) : 'Empty'}">
 
