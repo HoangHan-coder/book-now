@@ -19,6 +19,7 @@ public class FeedbackDetailService {
             throw new IllegalArgumentException("Feedback ID must not be null");
         }
         // Dùng hàm có JOIN FETCH để tránh lỗi Lazy Loading
-        return feedbackRepository.findDetailById(feedbackId).orElse(null);
+        return feedbackRepository.findDetailById(feedbackId)
+                .orElseThrow(() -> new RuntimeException("Feedback not found"));
     }
 }
