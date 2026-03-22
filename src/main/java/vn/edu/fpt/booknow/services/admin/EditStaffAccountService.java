@@ -65,8 +65,8 @@ public class EditStaffAccountService {
                     throw new RuntimeException("Avatar tối đa 10MB");
                 }
 
-                if(account.getAvatar_public_id() != null){
-                    cloudinary.uploader().destroy(account.getAvatar_public_id(), ObjectUtils.emptyMap());
+                if(account.getAvatarPublicId() != null){
+                    cloudinary.uploader().destroy(account.getAvatarPublicId(), ObjectUtils.emptyMap());
                 }
 
                 Map uploadResult = cloudinary.uploader().upload(
@@ -78,7 +78,7 @@ public class EditStaffAccountService {
                 );
 
                 account.setAvatarUrl(uploadResult.get("secure_url").toString());
-                account.setAvatar_public_id(uploadResult.get("public_id").toString());
+                account.setAvatarPublicId(uploadResult.get("public_id").toString());
             }
 
         } catch (Exception e) {
@@ -142,7 +142,7 @@ public class EditStaffAccountService {
             throw new RuntimeException("Phone must contain exactly 10 digits");
         }
 
-        if (!role.equals("STAFF") && !role.equals("ADMIN")) {
+        if (!role.equals("STAFF") && !role.equals("ADMIN") && !role.equals("HOUSEKEEPING")) {
             throw new RuntimeException("Invalid role");
         }
 

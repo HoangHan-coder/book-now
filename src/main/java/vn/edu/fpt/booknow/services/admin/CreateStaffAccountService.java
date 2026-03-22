@@ -73,7 +73,7 @@ public class CreateStaffAccountService {
                 );
 
                 account.setAvatarUrl(uploadResult.get("secure_url").toString());
-                account.setAvatar_public_id(uploadResult.get("public_id").toString());
+                account.setAvatarPublicId(uploadResult.get("public_id").toString());
             }
 
         } catch (Exception e) {

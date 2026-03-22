@@ -63,7 +63,7 @@ public class EditStaffAccountController {
             redirectAttributes.addFlashAttribute("successMessage",
                     "Cập nhật tài khoản thành công!");
 
-            return "redirect:/admin/users/detail?userId=" + userId + "&userType=STAFF";
+            return "redirect:/admin/users/detail?userId=" + userId + "&userType=" + role;
 
         } catch (Exception e) {
 
