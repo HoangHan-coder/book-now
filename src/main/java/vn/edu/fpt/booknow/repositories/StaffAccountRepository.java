@@ -12,10 +12,14 @@ import java.util.List;
 import java.util.Optional;
 public interface StaffAccountRepository extends JpaRepository<StaffAccount, Long> {
 
-    @Query("SELECT s FROM StaffAccount s " +
-            "WHERE (:role IS NULL OR s.role = :role) " +
-            "AND (:status IS NULL OR s.status = :status) " +
-            "AND (:keyword IS NULL OR LOWER(s.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    @Query("""
+    SELECT s FROM StaffAccount s
+    WHERE (:role IS NULL OR s.role = :role)
+    AND (:status IS NULL OR s.status = :status)
+    AND (:keyword IS NULL OR LOWER(s.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+    AND s.isDeleted = false
+    ORDER BY s.createdAt DESC       
+    """)
     List<StaffAccount> searchStaff(
             @Param("role") String role,
             @Param("status") String status,

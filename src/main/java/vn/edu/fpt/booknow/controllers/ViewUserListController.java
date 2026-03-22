@@ -8,6 +8,7 @@ import vn.edu.fpt.booknow.model.dto.UserDTO;
 import vn.edu.fpt.booknow.services.admin.ViewUserListService;
 
 import java.util.List;
+import java.util.Set;
 
 @Controller
 public class ViewUserListController {
@@ -27,6 +28,12 @@ public class ViewUserListController {
             Model model) {
         try {
             String roleParam = (role != null && !role.isBlank()) ? role.toUpperCase() : null;
+            Set<String> validRoles = Set.of("ADMIN", "STAFF", "HOUSEKEEPING", "CUSTOMER");
+
+            if (roleParam != null && !validRoles.contains(roleParam)) {
+                roleParam = null;
+            }
+
             String statusParam = (status != null && !status.isBlank()) ? status.toUpperCase() : null;
             String keywordParam = (search != null && !search.isBlank()) ? search : null;
 

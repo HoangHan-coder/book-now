@@ -142,6 +142,7 @@
                             <option value="ADMIN" th:selected="${param.role != null and param.role[0] == 'ADMIN'}">Quản trị viên (Admin)</option>
                             <option value="STAFF" th:selected="${param.role != null and param.role[0] == 'STAFF'}">Nhân viên (Staff)</option>
                             <option value="CUSTOMER" th:selected="${param.role != null and param.role[0] == 'CUSTOMER'}">Khách hàng (Customer)</option>
+                            <option value="HOUSEKEEPING" th:selected="${param.role != null and param.role[0] == 'HOUSEKEEPING'}">Housekeeping</option>
                         </select>
                         <i class="fa-solid fa-shield-halved absolute left-3 top-2.5 text-gray-400"></i>
                         <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-gray-400 pointer-events-none"></i>
@@ -210,7 +211,13 @@
                     <td class="py-4 px-6 text-sm text-gray-600" th:text="${user.email}">email@example.com</td>
                     <td class="py-4 px-6">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset"
-                                      th:classappend="${user.role == 'ADMIN' ? 'bg-purple-50 text-purple-700 ring-purple-600/20' : (user.role == 'STAFF' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' : 'bg-orange-50 text-orange-700 ring-orange-600/20')}"
+                                      th:classappend="${user.role == 'ADMIN' ?
+                                        'bg-purple-50 text-purple-700 ring-purple-600/20' :
+                                        user.role == 'STAFF' ?
+                                        'bg-blue-50 text-blue-700 ring-blue-600/20' :
+                                        user.role == 'HOUSEKEEPING' ?
+                                        'bg-green-50 text-green-700 ring-green-600/20' :
+                                        'bg-orange-50 text-orange-700 ring-orange-600/20'}"
                                       th:text="${user.role}">Role</span>
                     </td>
                     <td class="py-4 px-6">
