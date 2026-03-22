@@ -21,10 +21,10 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
 
     // UC-14.2: View Feedback Detail
     @Query("SELECT f FROM Feedback f " +
-                  "JOIN FETCH f.booking b " +
-                  "JOIN FETCH b.customer c " +
-                  "JOIN FETCH b.room r " +
-                  "WHERE f.feedbackId = :feedbackId")
+            "JOIN FETCH f.booking b " +
+            "JOIN FETCH b.customer c " +
+            "JOIN FETCH b.room r " +
+            "WHERE f.feedbackId = :feedbackId")
     Optional<Feedback> findDetailById(@Param("feedbackId") Long feedbackId);
 
     // UC-14.3 Hide/Show Feedback
@@ -36,52 +36,23 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     // UC-14.4: Update reply content of feedback
     @Modifying
     @Query("""
-           UPDATE Feedback f
-           SET f.contentReply = :replyContent
-           WHERE f.feedbackId = :feedbackId
-           """)
+            UPDATE Feedback f
+            SET f.contentReply = :replyContent
+            WHERE f.feedbackId = :feedbackId
+            """)
     void updateReply(@Param("feedbackId") Long feedbackId,
                      @Param("replyContent") String replyContent);
 
-//    @Query("""
-//SELECT f FROM Feedback f
-//JOIN f.booking b
-//JOIN b.customer c
-//JOIN b.room r
-//WHERE (:rating IS NULL OR f.rating = :rating)
-//AND (:hidden IS NULL OR f.isHidden = :hidden)
-//AND (
-//     :keyword IS NULL OR
-//     LOWER(c.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-//     CAST(f.feedbackId AS string) LIKE CONCAT('%', :keyword, '%')
-//)
-//ORDER BY f.createdAt DESC
-//""")
-//    List<Feedback> filterFeedback(
-//            @Param("rating") Integer rating,
-//            @Param("hidden") Boolean hidden,
-//            @Param("keyword") String keyword
-//    );
 
     @Query("""
-SELECT f FROM Feedback f
-JOIN f.booking b
-JOIN b.customer c
-JOIN b.room r
-WHERE (:rating IS NULL OR f.rating = :rating)
-AND (:hidden IS NULL OR f.isHidden = :hidden)
-AND (
-     :keyword IS NULL OR
-     LOWER(c.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-     CAST(f.feedbackId AS string) LIKE CONCAT('%', :keyword, '%')
-)
-ORDER BY f.createdAt DESC
-""")
-    Page<Feedback> filterFeedback(
-            @Param("rating") Integer rating,
-            @Param("hidden") Boolean hidden,
-            @Param("keyword") String keyword,
-            Pageable pageable
-    );
+            SELECT f FROM Feedback f
+            JOIN FETCH f.booking b
+            JOIN FETCH b.customer c
+            JOIN FETCH b.room r
+            WHERE (:rating IS NULL OR f.rating = :rating)
+            AND (:hidden IS NULL OR f.isHidden = :hidden)
+            ORDER BY f.createdAt DESC
+            """)
+    Page<Feedback> filterFeedback(Integer rating, Boolean hidden, Pageable pageable);
 
 }

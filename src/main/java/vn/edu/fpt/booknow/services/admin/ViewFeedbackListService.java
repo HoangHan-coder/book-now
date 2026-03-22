@@ -19,54 +19,82 @@ public class ViewFeedbackListService {
         this.feedbackRepository = feedbackRepository;
     }
 
-    /**
-     * UC-14.1 View Feedback List
-     * Retrieves feedback records for displaying in the feedback list.
-     */
-//    public List<FeedbackListDTO> getFeedbackList(Integer rating, Boolean hidden, String keyword) {
-//
-//        if (keyword != null && keyword.isBlank()) {
-//            keyword = null;
-//        }
-//
-//        List<Feedback> feedbacks = feedbackRepository.filterFeedback(rating, hidden, keyword);
-//
-//        return feedbacks.stream()
-//                .map(f -> new FeedbackListDTO(
-//                        f.getFeedbackId(),
-//                        f.getRating(),
-//                        f.getBooking().getCustomer().getFullName(),
-//                        f.getBooking().getRoom().getRoomNumber(),
-//                        f.getIsHidden(),
-//                        f.getCreatedAt()
-//                ))
-//                .toList();
-//    }
+
     public Page<FeedbackListDTO> getFeedbackList(Integer rating,
                                                  Boolean hidden,
                                                  String keyword,
                                                  int page,
                                                  int size) {
 
-        if (keyword != null && keyword.isBlank()) {
-            keyword = null;
-        }
+        //Normalize keyword
+        final String keywordNormalized = (keyword == null || keyword.isBlank()) ? null : normalize(keyword.trim());
 
         Pageable pageable = PageRequest.of(page, size);
 
+        //BỎ keyword khỏi quer
         Page<Feedback> feedbackPage =
-                feedbackRepository.filterFeedback(rating, hidden, keyword, pageable);
+                feedbackRepository.filterFeedback(rating, hidden, pageable);
 
-        return feedbackPage.map(f ->
-                new FeedbackListDTO(
+        //Filter lại bằng Java
+        List<FeedbackListDTO> filteredList = feedbackPage.getContent().stream()
+                .filter(f -> {
+
+                    if (keywordNormalized == null) return true;
+
+                    String customerName = f.getBooking().getCustomer().getFullName();
+                    String bookingCode = f.getBooking().getBookingCode();
+
+                    // normalize
+                    String nameNormalized = vn.edu.fpt.booknow.utils.TextUtils
+                            .removeAccent(customerName.toLowerCase());
+
+                    String bookingNormalized = normalize(bookingCode);
+
+                    // match name OR bookingCode
+                    return matchName(customerName, keywordNormalized)
+                            || matchBookingCode(bookingCode, keywordNormalized);
+                })
+                .map(f -> new FeedbackListDTO(
                         f.getFeedbackId(),
                         f.getRating(),
                         f.getBooking().getCustomer().getFullName(),
                         f.getBooking().getRoom().getRoomNumber(),
                         f.getIsHidden(),
                         f.getCreatedAt()
-                )
+                ))
+                .toList();
+
+        //Convert lại Page
+        return new org.springframework.data.domain.PageImpl<>(
+                filteredList,
+                pageable,
+                filteredList.size()
         );
+    }
+
+    private String normalize(String input) {
+        if (input == null) return null;
+
+        String noAccent = vn.edu.fpt.booknow.utils.TextUtils.removeAccent(input);
+
+        return noAccent.replaceAll("[^0-9a-zA-Z]", "").toLowerCase();
+    }
+
+    private boolean matchName(String name, String keyword) {
+        return normalize(name).contains(normalize(keyword));
+    }
+
+    private boolean matchBookingCode(String booking, String keyword) {
+
+        String bookingNorm = normalize(booking);
+        String keywordNorm = normalize(keyword);
+
+        // nếu là số, so đuôi (tránh match sai)
+        if (keywordNorm.matches("\\d+")) {
+            return bookingNorm.endsWith(keywordNorm);
+        }
+
+        return bookingNorm.contains(keywordNorm);
     }
 
 }
