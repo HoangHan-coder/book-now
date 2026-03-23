@@ -102,7 +102,7 @@
         <p class="text-sm text-gray-500">cleaning task to a housekeeping staff member</p>
     </div>
 
-    <form method="POST" th:action="@{'/admin/manage-housekeeping/task-detail/' + ${housekeepingTask.id}}" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <form method="POST" th:action="@{'/admin/manage-housekeeping/task-detail/' + ${housekeepingTask.taskId}}" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Main Form -->
         <div class="lg:col-span-2">
             <div class="bg-white rounded-lg shadow p-6">
@@ -112,7 +112,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Task ID</label>
-                                <input type="text" th:value="'#' + ${housekeepingTask.id}" readonly class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100 text-gray-700 font-mono">
+                                <input type="text" th:value="'#' + ${housekeepingTask.taskId}" readonly class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100 text-gray-700 font-mono">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Room Number</label>

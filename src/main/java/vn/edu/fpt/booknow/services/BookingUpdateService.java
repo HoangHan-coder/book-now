@@ -29,7 +29,7 @@ public class BookingUpdateService {
         validateStatusTransition(booking.getBookingStatus(), newStatus);
 
         booking.setBookingStatus(newStatus);
-
+        System.out.println(newStatus);
         if (newStatus == BookingStatus.REJECTED) {
 
             booking.setNote(reason);
@@ -57,7 +57,7 @@ public class BookingUpdateService {
                     reason
             );
         }
-        bookingRepository.save(booking);
+        System.out.println(bookingRepository.save(booking));
 
 
     }

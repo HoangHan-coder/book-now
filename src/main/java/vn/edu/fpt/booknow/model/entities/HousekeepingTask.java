@@ -82,7 +82,8 @@ public class HousekeepingTask {
 
     @Column(name = "note_housekeeping")
     private String noteHousekeeping;
-
+    @Column(name = "updated_at")
+    private String updatedAt;
     public LocalDate date(){
         return createdAt.toLocalDate();
     }
