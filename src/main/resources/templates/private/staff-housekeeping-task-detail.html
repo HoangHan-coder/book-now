@@ -1,7 +1,36 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: head(title='Chi tiết công việc - BookNow')}"></head>
-<style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách đặt phòng - BookNow</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            light: '#60a5fa', // blue-400
+                            DEFAULT: '#3b82f6', // blue-500
+                            dark: '#2563eb', // blue-600
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
         /* Specific Logo Positioning Rule */
         .logo-fixed {
             position: fixed;
@@ -41,12 +70,25 @@
         .status-confirmed { @apply bg-blue-50 text-blue-700 ring-1 ring-blue-600/20; }
         .status-completed { @apply bg-green-50 text-green-700 ring-1 ring-green-600/20; }
         .status-cancelled { @apply bg-red-50 text-red-700 ring-1 ring-red-600/20; }
-</style>
+    </style>
+</head>
 <body class="bg-gray-100 min-h-screen">
-<div th:replace="~{fragments/sidebar :: staff-sidebar(activePage='housekeeping')}"></div>
+<!-- Header -->
+<header class="bg-blue-600 text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold">Housekeeping Dashboard</h1>
+        <div class="flex items-center gap-4">
+            <span class="text-sm">Welcome, <span th:text="${#authentication.name}">User</span></span>
+            <a href="/logout" class="text-sm bg-blue-700 px-3 py-1 rounded hover:bg-blue-800">Logout</a>
+        </div>
+    </div>
+</header>
+
+<!-- Navigation -->
+
 
 <!-- Main Content -->
-<main class="lg:ml-64 max-w-7xl mx-auto px-4 py-6 min-h-screen pt-24 lg:pt-8">
+<main class="max-w-7xl mx-auto px-4 py-6">
     <!-- Back Link -->
     <a href="/admin/manage-housekeeping"
        class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium
@@ -212,6 +254,5 @@
         </div>
     </form>
 </main>
-<div th:replace="~{fragments/sidebar :: sidebar-scripts}"></div>
 </body>
 </html>

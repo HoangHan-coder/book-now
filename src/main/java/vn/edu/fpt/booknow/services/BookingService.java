@@ -67,6 +67,12 @@ public class BookingService {
         this.jwtService = jwtService;
     }
 
+
+    public Booking findById(long id) {
+        return bookingRepository.findById(id).orElse(null);
+    }
+
+
     // ========================Hoang Han=============================
 
 
@@ -167,9 +173,10 @@ public class BookingService {
                               MultipartFile backImg,
                               RedirectAttributes redirectAttributes,
                               String accessToken) {
-        String username = jwtService.extractUserName(accessToken);
+
 
         try {
+            String username = jwtService.extractUserName(accessToken);
             if (isRateLimited(username)) {
                 return setErrorMessage(redirectAttributes, "Thao tác quá nhanh! Vui lòng đợi 1 phút.", bookingDTO.getRoom().getRoomId());
             }
@@ -228,7 +235,7 @@ public class BookingService {
             }
             return "redirect:/bookings/" + booking.getBookingId();
 
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             return setErrorMessage(redirectAttributes, e.getMessage(), bookingDTO.getRoom().getRoomId());
         }
     }

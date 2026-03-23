@@ -9,6 +9,8 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -75,7 +77,7 @@ public class StaffAccount {
     private String avatarPublicId;
     @OneToMany(mappedBy = "admin")
 
-    private List<vn.edu.fpt.booknow.model.entities.Feedback> feedbacks = new ArrayList<>();
+    private List<Feedback> feedbacks = new ArrayList<>();
 
     @OneToMany(mappedBy = "staffAccount")
     private List<RefreshToken> refreshTokens = new ArrayList<>();

@@ -1,7 +1,11 @@
 package vn.edu.fpt.booknow.services.customer;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -11,18 +15,25 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@RequiredArgsConstructor
 public class OtpService {
+
     private final RedisTemplate<String, Integer> redisTemplateToSaveInt;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplateObj;
     private final JavaMailSender mailSender;
+
+    @Autowired
+    public OtpService(RedisTemplate<String, Integer> redisTemplateToSaveInt, RedisTemplate<String, Object> redisTemplateObj, JavaMailSender mailSender) {
+        this.redisTemplateToSaveInt = redisTemplateToSaveInt;
+        this.redisTemplateObj = redisTemplateObj;
+        this.mailSender = mailSender;
+    }
 
     private static final long OTP_EXPIRE = 1; // phút
 
     public void sendOtp(String email) {
         String otp = String.valueOf(100000 + new Random().nextInt(900000));
-        boolean flag = redisTemplate.hasKey("OTP:" + email);
-        redisTemplate.opsForValue()
+        boolean flag = redisTemplateObj.hasKey("OTP:" + email);
+        redisTemplateObj.opsForValue()
                 .set("OTP:" + email, otp, OTP_EXPIRE, TimeUnit.MINUTES);
         int count;
         if (flag) {
@@ -39,10 +50,10 @@ public class OtpService {
 
     public boolean verifyOtp(String email, String otp) {
         String key = "OTP:" + email;
-        Object savedOtp = redisTemplate.opsForValue().get(key);
+        Object savedOtp = redisTemplateObj.opsForValue().get(key);
 
         if (savedOtp != null && savedOtp.toString().equals(otp)) {
-            redisTemplate.delete(key);
+            redisTemplateObj.delete(key);
             return true;
         }
         return false;

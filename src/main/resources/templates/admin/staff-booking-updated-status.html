@@ -1,106 +1,77 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xác minh đặt phòng - BookNow</title>
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<head th:replace="~{fragments/head :: head(title='Xác minh đặt phòng - BookNow')}">
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            light: '#60a5fa',
-                            DEFAULT: '#3b82f6',
-                            dark: '#2563eb',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        .logo-fixed {
-            position: fixed;
-            top: 0;
-            left: 0;
-            margin-top: 25px;
-            margin-left: 25px;
-            z-index: 60;
-        }
-        .gradient-text {
-            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .gradient-icon {
-            color: #3b82f6;
-        }
-        .sidebar {
-            transition: transform 0.3s ease-in-out;
-        }
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        .step-line {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background-color: #e5e7eb;
-            z-index: 0;
-            transform: translateY(-50%);
-        }
-    </style>
 </head>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<style>
+    .logo-fixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        margin-top: 25px;
+        margin-left: 25px;
+        z-index: 60;
+    }
+
+    .gradient-text {
+        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .gradient-icon {
+        color: #3b82f6;
+    }
+
+    .sidebar {
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .step-line {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: #e5e7eb;
+        z-index: 0;
+        transform: translateY(-50%);
+    }
+</style>
+
 <body class="bg-gray-50 font-sans text-gray-800">
 <input type="hidden" id="booking-status" class="hs" th:value="${booking.bookingStatus.name()}">
 
-<div class="logo-fixed flex items-center gap-3 select-none bg-white/90 backdrop-blur px-3 py-2 rounded-xl shadow-sm lg:shadow-none lg:bg-transparent lg:p-0">
-    <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
-        <i class="fa-solid fa-house-chimney gradient-icon text-xl"></i>
-    </div>
-    <div class="flex flex-col justify-center">
-        <span class="text-2xl font-extrabold tracking-tight gradient-text leading-none">BookNow</span>
-        <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider pl-0.5">Homestay System</span>
-    </div>
-</div>
-
-<!-- ... existing code ... -->
-
+<div th:replace="~{fragments/sidebar :: staff-sidebar(activePage='bookings')}"></div>
 <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
 
-    <div th:if="${successMessage}" class="mb-4 p-4 bg-green-100 border border-green-300 text-green-700 rounded-xl flex items-center gap-3">
+    <div th:if="${successMessage}"
+         class="mb-4 p-4 bg-green-100 border border-green-300 text-green-700 rounded-xl flex items-center gap-3">
         <i class="fa-solid fa-circle-check"></i>
         <span th:text="${successMessage}">Cập nhật trạng thái thành công</span>
     </div>
 
-    <div th:if="${errorMessage}" class="mb-4 p-4 bg-red-100 border border-red-300 text-red-700 rounded-xl flex items-center gap-3">
+    <div th:if="${errorMessage}"
+         class="mb-4 p-4 bg-red-100 border border-red-300 text-red-700 rounded-xl flex items-center gap-3">
         <i class="fa-solid fa-circle-exclamation"></i>
         <span th:text="${errorMessage}">Có lỗi xảy ra</span>
     </div>
 
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div class="flex items-center gap-3">
-            <a href="#" class="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-colors">
+            <a href="#"
+               class="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-colors">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             <div>
@@ -128,30 +99,39 @@
             <div class="flex justify-between relative z-10">
                 <div class="step-line"></div>
 
-                <!-- Steps -->
+
                 <div class="relative z-10 text-center group w-1/6" id="tl_step1">
-                    <div class="w-8 h-8 rounded-full bg-yellow-500 text-white flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors ring-2 ring-yellow-500">1</div>
+                    <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">
+                        1
+                    </div>
+                    <p class="text-xs font-medium mt-2 text-gray-400">Thanh toán</p>
+                </div>
+
+                <div class="relative z-10 text-center group w-1/6" id="tl_step2">
+                    <div class="w-8 h-8 rounded-full bg-yellow-500 text-white flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors ring-2 ring-yellow-500">
+                        2
+                    </div>
                     <p class="text-xs font-semibold mt-2 text-yellow-600">Kiểm duyệt</p>
                 </div>
 
-
-                <div class="relative z-10 text-center group w-1/6" id="tl_step2">
-                    <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">2</div>
-                    <p class="text-xs font-medium mt-2 text-gray-400">Đã thanh toán</p>
-                </div>
-
                 <div class="relative z-10 text-center group w-1/6" id="tl_step3">
-                    <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">3</div>
+                    <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">
+                        3
+                    </div>
                     <p class="text-xs font-medium mt-2 text-gray-400">Check-in</p>
                 </div>
 
                 <div class="relative z-10 text-center group w-1/6" id="tl_step4">
-                    <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">4</div>
+                    <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">
+                        4
+                    </div>
                     <p class="text-xs font-medium mt-2 text-gray-400">Check-out</p>
                 </div>
 
                 <div class="relative z-10 text-center group w-1/6" id="tl_step5">
-                    <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">5</div>
+                    <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm transition-colors">
+                        5
+                    </div>
                     <p class="text-xs font-medium mt-2 text-gray-400">Hoàn thành</p>
                 </div>
             </div>
@@ -238,7 +218,8 @@
         <div class="xl:col-span-2 space-y-6">
 
             <!-- PANEL 1: Identity Verification (Step 1) -->
-            <div id="panel_identity" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
+            <div id="panel_identity"
+                 class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
                 <div class="px-6 py-4 border-b border-gray-100 bg-yellow-50 flex justify-between items-center">
                     <h3 class="font-bold text-yellow-800 flex items-center gap-2">
                         <i class="fa-solid fa-id-card"></i>
@@ -248,7 +229,8 @@
                 </div>
 
                 <div class="p-6">
-                    <p class="text-sm text-gray-600 mb-4">Vui lòng kiểm tra kỹ ảnh chụp mặt trước và mặt sau CCCD so với thông tin khách hàng cung cấp.</p>
+                    <p class="text-sm text-gray-600 mb-4">Vui lòng kiểm tra kỹ ảnh chụp mặt trước và mặt sau CCCD so với
+                        thông tin khách hàng cung cấp.</p>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div class="space-y-2">
@@ -261,7 +243,8 @@
                                     <i class="fa-regular fa-id-card text-4xl text-gray-300 mb-2"></i>
                                     <p class="text-xs text-gray-400">Ảnh CCCD Mặt trước</p>
                                 </div>
-                                <img th:src="${booking.idCardFrontUrl}" alt="Front ID" class="absolute inset-0 w-full h-full object-cover">
+                                <img th:src="${booking.idCardFrontUrl}" alt="Front ID"
+                                     class="absolute inset-0 w-full h-full object-cover">
                             </div>
                         </div>
 
@@ -275,32 +258,12 @@
                                     <i class="fa-regular fa-id-card text-4xl text-gray-300 mb-2"></i>
                                     <p class="text-xs text-gray-400">Ảnh CCCD Mặt sau</p>
                                 </div>
-                                <img th:src="${booking.idCardBackUrl}" alt="Back ID" class="absolute inset-0 w-full h-full object-cover">
+                                <img th:src="${booking.idCardBackUrl}" alt="Back ID"
+                                     class="absolute inset-0 w-full h-full object-cover">
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-6">
-                        <h4 class="text-sm font-bold text-gray-700 mb-3">Thông tin trích xuất (OCR)</h4>
-                        <div class="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <span class="text-gray-500 block">Họ và tên:</span>
-                                <span class="font-medium text-gray-800">NGUYEN VAN A</span>
-                            </div>
-                            <div>
-                                <span class="text-gray-500 block">Số CCCD:</span>
-                                <span class="font-medium text-gray-800">036098xxxxxx</span>
-                            </div>
-                            <div>
-                                <span class="text-gray-500 block">Ngày sinh:</span>
-                                <span class="font-medium text-gray-800">01/01/1990</span>
-                            </div>
-                            <div>
-                                <span class="text-gray-500 block">Quê quán:</span>
-                                <span class="font-medium text-gray-800">Cần Thơ</span>
-                            </div>
-                        </div>
-                    </div>
 
                     <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
                         <form th:action="@{/admin/bookings/update-status}" method="post" class="w-full space-y-3">
@@ -338,14 +301,9 @@
 
                             </select>
 
-                            <!-- optional note -->
-                            <textarea name="note"
-                                      class="w-full p-3 border border-gray-200 rounded-lg text-sm"
-                                      rows="2"
-                                      placeholder="Ghi chú thêm (không bắt buộc)"></textarea>
 
                             <button type="submit"
-                                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg font-medium">
+                                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg font-medium disabled:opacity-50 transition-colors w-full sm:w-auto">
                                 <i class="fa-solid fa-ban mr-2"></i>
                                 Từ chối hồ sơ
                             </button>
@@ -355,18 +313,20 @@
                         <form th:action="@{/admin/bookings/update-status}" method="post">
 
                             <input type="hidden" name="bookingCode" th:value="${booking.bookingCode}">
-                            <input type="hidden" name="status" value="PENDING_PAYMENT">
+                            <input type="hidden" name="status" value="APPROVED">
 
                             <button type="submit"
                                     class="px-6 py-2.5 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white font-medium shadow-sm transition-colors sm:w-auto w-full sm:ml-auto">
-                                <i class="fa-solid fa-check mr-2"></i>Duyệt & Chuyển bước thanh toán
+                                <i class="fa-solid fa-check mr-2"></i><span
+                                    th:text="${booking.bookingStatus.name() == 'PAID' ? 'Duyệt hồ sơ' : 'Duyệt & Chuyển bước check-in'}"></span>
                             </button>
                         </form>
                     </div>
                 </div>
             </div>
             <!-- 2 PANEL PAYMENT WAITING -->
-            <div id="panel_payment" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hidden">
+            <div id="panel_payment"
+                 class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hidden">
 
                 <div class="px-6 py-4 border-b border-gray-100 bg-blue-50 flex justify-between items-center">
                     <h3 class="font-bold text-blue-800 flex items-center gap-2">
@@ -439,12 +399,15 @@
 
                     <div class="flex justify-center mb-6">
                         <div class="relative w-full max-w-sm aspect-[3/4] bg-gray-900 rounded-xl overflow-hidden shadow-lg border-4 border-gray-100">
-                            <input type="hidden" id="bookingId" th:value="${booking.bookingId}">
-                            <input type="hidden" id="checkInSessionId" th:value="${checkInSession.getCheckInSessionId()}">
-                            <div th:if="${checkInSession}" id="mediaContainer" class="w-full h-full flex items-center justify-center text-white">
+
+                            <div th:if="${checkInSession != null}" id="mediaContainer"
+                                 class="w-full h-full flex items-center justify-center text-white">
+                                <input type="hidden" id="bookingId" th:value="${booking.bookingId}">
+                                <input type="hidden" id="checkInSessionId"
+                                       th:value="${checkInSession.getCheckInSessionId()}">
                                 <video th:src="${checkInSession.getVideoUrl()}" class="w-full h-full object-cover"
-                                controls
-                                autoplay></video>
+                                       controls
+                                       autoplay></video>
                             </div>
                             <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs backdrop-blur-sm">
                                 <i class="fa-solid fa-location-dot mr-1"></i> Tại Homestay
@@ -461,13 +424,16 @@
                                 class="px-6 py-2.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 font-medium transition-colors sm:w-auto w-full">
                             <i class="fa-solid fa-ban mr-2"></i>Từ chối
                         </button>
-                        <button onclick="approve()" id="btnApprove" class="px-6 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-sm transition-colors sm:w-auto w-full sm:ml-auto">
+                        <button onclick="approve()" id="btnApprove"
+                                class="px-6 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-sm transition-colors sm:w-auto w-full sm:ml-auto">
                             <i class="fa-solid fa-key mr-2"></i>Duyệt & Giao phòng
                         </button>
                     </div>
-
+                </div>
+            </div>
             <!-- PANEL FAILURE -->
-            <div id="panel_failure" class="bg-red-50 rounded-2xl shadow-sm border border-red-100 overflow-hidden hidden">
+            <div id="panel_failure"
+                 class="bg-red-50 rounded-2xl shadow-sm border border-red-100 overflow-hidden hidden">
                 <div class="p-6 text-center">
                     <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-red-600 text-3xl mx-auto mb-4">
                         <i class="fa-solid fa-triangle-exclamation"></i>
@@ -477,13 +443,15 @@
 
                     <div class="bg-white p-4 rounded-lg border border-red-100 text-left max-w-md mx-auto mb-6">
                         <span class="text-xs font-bold text-red-500 uppercase block mb-1">Lý do:</span>
-                        <p class="text-gray-800" id="failureReasonText">Ảnh CCCD mờ, không thể đọc được thông tin số định danh.</p>
+                        <p class="text-gray-800" id="failureReasonText">Ảnh CCCD mờ, không thể đọc được thông tin số
+                            định danh.</p>
                     </div>
                 </div>
             </div>
 
             <!-- PANEL SUCCESS -->
-            <div id="panel_success" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hidden">
+            <div id="panel_success"
+                 class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hidden">
                 <div class="p-8 text-center">
 
                     <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-4xl mx-auto mb-4">
@@ -543,8 +511,7 @@
 
         </div>
     </div>
-        </div>
-    </div>
+
 </main>
 
 <script>
@@ -553,10 +520,9 @@
     const panelCheckin = document.getElementById('panel_checkin');
     const panelFailure = document.getElementById('panel_failure');
     const panelSuccess = document.getElementById('panel_success');
-    let bookingStatus = document.getElementById('booking-status')?.value || "PENDING";
+    let bookingStatus = document.getElementById('booking-status')?.value || "APPROVED";
     let checkInSessionId = document.getElementById('checkInSessionId').value;
     let bookingId = document.getElementById('bookingId').value;
-
     const badge = document.getElementById('headerStatusBadge');
 
     const steps = {
@@ -621,9 +587,7 @@
                 text.className =
                     "text-xs font-medium mt-2 text-green-600";
 
-            }
-
-            else if (i === activeStep) {
+            } else if (i === activeStep) {
 
                 circle.className =
                     `w-8 h-8 rounded-full ${colorMap[color][0]} text-white flex items-center justify-center mx-auto text-sm font-bold border-4 border-white shadow-sm`;
@@ -645,50 +609,54 @@
         if (badge) {
             badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium";
         }
+        // if (bookingStatus === 'REJECTED_CHECKIN'){
+        //     bookingStatus = 'APPROVED';
+        // }
+
 
         switch (bookingStatus) {
-            case "PENDING":
-                panelIdentity?.classList.remove('hidden');
-                badge?.classList.add('bg-yellow-100', 'text-yellow-800');
-                if (badge) badge.textContent = "Chờ kiểm duyệt";
-                updateTimeline(1, "yellow");
-                break;
             case "PENDING_PAYMENT":
                 panelPayment?.classList.remove('hidden');
-                badge?.classList.add('bg-blue-100','text-blue-800');
+                badge?.classList.add('bg-blue-100', 'text-blue-800');
                 badge.textContent = "Chờ thanh toán";
-                updateTimeline(2,"blue");
+                updateTimeline(1, "blue");
                 break;
 
             case "PAID":
+                panelIdentity?.classList.remove('hidden');
+                badge?.classList.add('bg-yellow-100', 'text-yellow-800');
+                badge.textContent = "Chờ duyệt CCCD";
+                updateTimeline(2, "yellow");
+                break;
+            case "APPROVED":
                 panelCheckin?.classList.remove('hidden');
-                badge?.classList.add('bg-green-100','text-green-800');
-                badge.textContent = "Đã thanh toán";
-                updateTimeline(3,"purple");
+                badge?.classList.add('bg-purple-100', 'text-purple-800');
+                if (badge) badge.textContent = "Chờ xác thực check-in";
+                updateTimeline(3, "purple");
                 break;
 
             case "CHECKED_IN":
                 panelSuccess?.classList.remove('hidden');
-                badge?.classList.add('bg-green-100','text-green-800');
+                badge?.classList.add('bg-green-100', 'text-green-800');
                 badge.textContent = "Đã check-in";
-                document.getElementById('successTitle').textContent="Khách đã nhận phòng";
-                updateTimeline(4,"purple");
+                document.getElementById('successTitle').textContent = "Khách đã nhận phòng";
+                updateTimeline(5, "purple");
                 break;
 
             case "CHECKED_OUT":
                 panelSuccess?.classList.remove('hidden');
-                badge?.classList.add('bg-indigo-100','text-indigo-800');
+                badge?.classList.add('bg-indigo-100', 'text-indigo-800');
                 badge.textContent = "Đã check-out";
-                document.getElementById('successTitle').textContent="Khách đã trả phòng";
-                updateTimeline(5,"purple");
+                document.getElementById('successTitle').textContent = "Khách đã trả phòng";
+                updateTimeline(5, "purple");
                 break;
 
             case "COMPLETED":
                 panelSuccess?.classList.remove('hidden');
-                badge?.classList.add('bg-indigo-100','text-indigo-800');
+                badge?.classList.add('bg-indigo-100', 'text-indigo-800');
                 badge.textContent = "Hoàn tất";
-                document.getElementById('successTitle').textContent="Booking đã hoàn tất";
-                updateTimeline(6,"green");
+                document.getElementById('successTitle').textContent = "Booking đã hoàn tất";
+                updateTimeline(6, "green");
                 break;
 
             case "REJECTED":
@@ -696,15 +664,21 @@
                 badge?.classList.add('bg-red-100', 'text-red-800');
                 if (badge) badge.textContent = "Bị từ chối";
                 document.getElementById('failureReasonText').textContent = "Booking bị từ chối ở bước xác minh hồ sơ.";
-                resetTimeline();
+                updateTimeline(2, "yellow");
                 break;
-
+            // case "REJECTED_CHECKIN":
+            //     panelFailure?.classList.remove('hidden');
+            //     badge?.classList.add('bg-red-100', 'text-red-800');
+            //     if (badge) badge.textContent = "Bị từ chối";
+            //     document.getElementById('failureReasonText').textContent = "Booking bị từ chối ở bước check-in.";
+            //     updateTimeline(3, "yellow");
+            //     break;
             case "FAILED":
                 panelFailure?.classList.remove('hidden');
                 badge?.classList.add('bg-red-100', 'text-red-800');
                 if (badge) badge.textContent = "Thanh toán thất bại";
                 document.getElementById('failureReasonText').textContent = "Booking bị dừng do thanh toán thất bại.";
-                updateTimeline(2, "blue");
+                updateTimeline(1, "yellow");
                 break;
 
             default:
@@ -713,7 +687,6 @@
     }
 
     document.addEventListener("DOMContentLoaded", loadBookingState);
-
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -735,15 +708,15 @@
     mobileMenuBtn?.addEventListener('click', toggleSidebar);
     sidebarOverlay?.addEventListener('click', toggleSidebar);
 
-    const socket = new SockJS('http://localhost:8081/book-now/ws');
+    const socket = new SockJS('http://localhost:8080/book-now/ws');
     const stompClient = Stomp.over(socket);
 
 
-    stompClient.connect({}, function(frame) {
+    stompClient.connect({}, function (frame) {
 
         console.log("Connected:", frame);
 
-        stompClient.subscribe("/topic/checkin/admin", function(message) {
+        stompClient.subscribe("/topic/checkin/admin", function (message) {
 
             console.log("RAW:", message.body);
 
@@ -755,7 +728,7 @@
             showVideo(data.videoUrl, data.bookingId);
         });
 
-    }, function(error) {
+    }, function (error) {
         console.error("STOMP error:", error);
     });
 
@@ -780,7 +753,7 @@
         // approveBtn.onclick = () => approve(bookingId);
     }
 
-    function Reject(){
+    function Reject() {
         const panel = document.getElementById("panel_checkin");
         panel.classList.remove("hidden");
         const rejectBtn = panel.querySelector("#btnReject");
@@ -793,7 +766,11 @@
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ bookingId: bookingId , bookingStatus: "CHECKED_IN", checkInSessionId: checkInSessionId})
+            body: JSON.stringify({
+                bookingId: bookingId,
+                bookingStatus: "CHECKED_IN",
+                checkInSessionId: checkInSessionId
+            })
         })
             .then(res => {
                 if (!res.ok) {
@@ -819,7 +796,12 @@
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ bookingId: bookingId, bookingStatus: "REJECT" , reason : "Video va anh CCCD mờ, không thể đọc được thông tin, số định danh trong luc check-in.", checkInSessionId: checkInSessionId})
+            body: JSON.stringify({
+                bookingId: bookingId,
+                bookingStatus: "REJECTED_CHECKIN",
+                reason: "Video va anh CCCD mờ, không thể đọc được thông tin, số định danh trong luc check-in.",
+                checkInSessionId: checkInSessionId
+            })
         })
             .then(res => {
                 if (!res.ok) {
@@ -838,7 +820,9 @@
             });
     }
 
+    // Mobile Sidebar Toggle script moved to fragment
 </script>
 
+<div th:replace="~{fragments/sidebar :: sidebar-scripts}"></div>
 </body>
 </html>

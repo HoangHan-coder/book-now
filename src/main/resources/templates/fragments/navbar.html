@@ -4,7 +4,7 @@
 
 <!-- NAVBAR FRAGMENT -->
 <div th:fragment="public-navbar">
-    
+
     <!-- LOGO (Fixed Position) -->
     <a th:href="@{/home}">
         <div class="logo-fixed flex items-center gap-3 select-none cursor-pointer">
@@ -29,14 +29,13 @@
                     Đăng nhập
                 </a>
             </div>
-            
+
             <!-- Profile Dropdown Container -->
             <div sec:authorize="isAuthenticated()">
                 <div class="relative">
                     <button id="profileBtn" class="flex items-center gap-3 focus:outline-none group">
                         <div class="text-right hidden sm:block">
-                            <p class="text-xs font-bold text-white group-hover:text-blue-100 transition-colors drop-shadow-sm" sec:authentication="principal.fullName"></p>
-                            <p class="text-[10px] text-gray-200 group-hover:text-white transition-colors">Khách hàng</p>
+                            <p class="text-xs font-bold text-white group-hover:text-blue-100 transition-colors drop-shadow-sm" th:text="${fullName}"></p>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/50 shadow-sm group-hover:bg-white group-hover:text-blue-600 transition-all">
                             <i class="fa-solid fa-user"></i>
@@ -47,7 +46,7 @@
                     <div id="profileDropdown" class="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 dropdown-menu dropdown-hidden z-50">
                         <div class="px-4 py-3 border-b border-gray-100">
                             <p class="text-sm font-medium text-gray-900">Tài khoản của tôi</p>
-                            <p class="text-xs text-gray-500 truncate" sec:authentication="principal.fullName"></p>
+                            <p class="text-xs text-gray-500 truncate" th:text="${fullName}"></p>
                         </div>
                         <ul class="py-1">
                             <li>

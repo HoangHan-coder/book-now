@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.services.customer;
+package vn.edu.fpt.booknow.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

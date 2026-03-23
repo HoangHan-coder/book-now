@@ -15,12 +15,12 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter  {
 
     @Autowired
     private JwtUtils jwtUtils;
 
-    @Override
+
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
-                if ("access_token".equals(cookie.getName())) {
+                if ("Access_token".equals(cookie.getName())) {
                     token = cookie.getValue();
                 }
             }
@@ -62,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // ✅ TOKEN SAI → KHÔNG restart OAuth
                 SecurityContextHolder.clearContext();
 
-                response.sendRedirect("/book-now/authen/login");
+                response.sendRedirect("/book-now/auth/login");
                 return;
             }
 

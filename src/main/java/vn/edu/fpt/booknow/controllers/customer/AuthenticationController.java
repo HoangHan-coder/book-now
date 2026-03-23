@@ -1,12 +1,14 @@
 package vn.edu.fpt.booknow.controllers.customer;
 
-import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.fpt.booknow.model.entities.Customer;
-import vn.edu.fpt.booknow.services.customer.AuthService;
+import vn.edu.fpt.booknow.services.AuthService;
 import vn.edu.fpt.booknow.services.customer.OtpService;
 
 import java.util.concurrent.TimeUnit;
@@ -14,14 +16,22 @@ import java.util.concurrent.TimeUnit;
 
 
 @Controller
-@RequiredArgsConstructor
 @RequestMapping(value = "/authen")
 public class AuthenticationController {
+
     private final RedisTemplate<String, Integer> redisTemplateToSaveInt;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplateObj;
     private static final long OTP_EXPIRE = 1;
     private final OtpService otpService;
     private final AuthService authService;
+
+    @Autowired
+    public AuthenticationController(RedisTemplate<String, Integer> redisTemplateToSaveInt, RedisTemplate<String, Object> redisTemplateObj, OtpService otpService, AuthService authService) {
+        this.redisTemplateToSaveInt = redisTemplateToSaveInt;
+        this.redisTemplateObj = redisTemplateObj;
+        this.otpService = otpService;
+        this.authService = authService;
+    }
 
     @GetMapping(value = "/registerEmail")
     public String registerEmail() {
@@ -40,7 +50,7 @@ public class AuthenticationController {
 
     @GetMapping(value = "/otp")
     public String otp(@RequestParam(name = "email") String email, Model model) {
-        boolean flag = redisTemplate.hasKey("OTP:" + email);
+        boolean flag = redisTemplateObj.hasKey("OTP:" + email);
         String key = "OTP";
         System.out.println(flag);
         System.out.println(email);

@@ -50,6 +50,13 @@ public class BookingUpdateService {
             );
         }
 
+        if (newStatus == BookingStatus.REJECTED_CHECKIN){
+            emailService.sendReasonFailed(
+                    booking.getCustomer().getEmail(),
+                    booking.getBookingCode(),
+                    reason
+            );
+        }
         bookingRepository.save(booking);
 
 
@@ -83,14 +90,15 @@ public class BookingUpdateService {
 
             case APPROVED ->
                     next == BookingStatus.CHECKED_IN ||
-                            next == BookingStatus.REJECTED ||
+                            next == BookingStatus.REJECTED_CHECKIN ||
                next == BookingStatus.FAILED;
 
             case CHECKED_IN ->
                     next == BookingStatus.CHECKED_OUT ||
                     next == BookingStatus.REJECTED;
             case CHECKED_OUT -> next == BookingStatus.COMPLETED;
-
+            case REJECTED -> next == BookingStatus.APPROVED;
+            case REJECTED_CHECKIN -> next == BookingStatus.CHECKED_IN || next == BookingStatus.REJECTED_CHECKIN;
 
             default -> false;
         };

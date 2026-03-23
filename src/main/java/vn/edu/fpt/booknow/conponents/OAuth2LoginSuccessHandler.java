@@ -28,14 +28,15 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         if (isNewUser) {
             System.out.println("O day");
 
-            response.sendRedirect("/book-now/authen/login");
+            response.sendRedirect("/book-now/auth/login");
         } else {
             String email = oAuth2User.getAttribute("email");
+
 
             String token = JwtUtils.generateToken(email);
 
             // Tạo HttpOnly Cookie
-            Cookie jwtCookie = new Cookie("access_token", token);
+            Cookie jwtCookie = new Cookie("Access_token", token);
             jwtCookie.setHttpOnly(true);     // JS không đọc được
             jwtCookie.setSecure(false);      // true nếu dùng HTTPS
             jwtCookie.setPath("/");
@@ -54,7 +55,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 //            }
 //        """);
 
-            response.sendRedirect("/book-now/authen/home");
+            response.sendRedirect("/book-now/home");
         }
     }
 }

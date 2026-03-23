@@ -11,7 +11,7 @@ import vn.edu.fpt.booknow.model.entities.HousekeepingTask;
 import vn.edu.fpt.booknow.repositories.HousekeepingTaskRepository;
 import vn.edu.fpt.booknow.services.ExtendBookingService;
 import vn.edu.fpt.booknow.services.HousekeepingTaskService;
-import vn.edu.fpt.booknow.services.customer.BookingService;
+import vn.edu.fpt.booknow.services.BookingService;
 
 import java.util.List;
 

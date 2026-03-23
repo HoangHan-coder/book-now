@@ -6,14 +6,14 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "checkinsession")
+@Table(name = "CheckInSession")
 public class CheckInSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "check_in_session_id")
     private Long checkInSessionId;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "bookingId")
+    @JoinColumn(name = "booking_id")
     private Booking booking;
     @Column(name = "video_url")
     private String videoUrl;

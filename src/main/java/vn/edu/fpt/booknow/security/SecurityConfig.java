@@ -7,7 +7,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,8 +16,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import vn.edu.fpt.booknow.conponents.HttpCookieOAuth2AuthorizationRequest;
+import vn.edu.fpt.booknow.conponents.OAuth2LoginSuccessHandler;
 import vn.edu.fpt.booknow.services.CustomUserDetailsService;
-import vn.edu.fpt.booknow.services.RecaptchaService;
+import vn.edu.fpt.booknow.services.CustomOAuth2UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -29,6 +30,9 @@ public class SecurityConfig {
 
     @Autowired
     private HttpCookieOAuth2AuthorizationRequest cookieRepo;
+
+    @Autowired
+    private CustomOAuth2UserService customOAuth2UserService;
 
     @Autowired
     private OAuth2LoginSuccessHandler successHandler;

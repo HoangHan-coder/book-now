@@ -5,6 +5,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 
@@ -12,9 +13,9 @@ import java.util.Date;
 public class JwtUtils {
 
     private static final String SECRET =
-            "wM1zQxVvZ0kPq6QJmJmR0kPpUuYwzJYxO0w7KkR8YlQ=";
+            "$2a$12$P9xajysX2yD1RX2jHl52FepC1fxGGlCY7fABfWKAJc3e6BUggywVq";
 
-    private static final Key KEY =
+    private static final SecretKey KEY =
             Keys.hmacShaKeyFor(SECRET.getBytes());
 
     public static String generateToken(String email) {
@@ -31,11 +32,11 @@ public class JwtUtils {
     }
 
     public static String getEmailFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(KEY)
+        return Jwts.parser()
+                .verifyWith(KEY)
                 .build()
-                .parseClaimsJws(token)
-                .getBody()
+                .parseSignedClaims(token)
+                .getPayload()
                 .getSubject();
     }
 }

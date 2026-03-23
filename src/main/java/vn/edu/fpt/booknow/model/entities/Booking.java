@@ -116,10 +116,6 @@ public class Booking {
     @OneToOne(mappedBy = "booking")
     private CheckInSession checkInSession;
 
-
-    @Column(name = "update_at")
-    private LocalDateTime updateAt;
-
     @OneToOne(mappedBy = "booking")
     private HousekeepingTask housekeepingTasks;
 

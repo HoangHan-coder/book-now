@@ -3,10 +3,14 @@ package vn.edu.fpt.booknow.model.entities;
 import jakarta.persistence.Entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -49,9 +53,7 @@ public class HousekeepingTask {
     @Column(name = "notes", length = 1000)
     private String notes;
 
-    @NotNull
-    @ColumnDefault("sysdatetime()")
-    @Column(name = "created_at", nullable = false)
+
     // FK -> Booking
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "booking_id")
@@ -67,10 +69,6 @@ public class HousekeepingTask {
 
     @Column(name = "task_type")
     private String taskType;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "task_status")
-    private TaskStatus taskStatus;
 
 
     @Column(name = "created_at")

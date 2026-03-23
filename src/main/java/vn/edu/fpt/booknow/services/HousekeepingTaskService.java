@@ -29,7 +29,7 @@ public class HousekeepingTaskService {
         HousekeepingTask housekeepingTask = housekeepingTaskRepository.findById(id).orElse(null);
         if (housekeepingTask != null) {
             LocalDateTime now = LocalDateTime.now();
-            housekeepingTask.setTaskStatus(TaskStatus.COMPLETED);
+            housekeepingTask.setStatus(TaskStatus.COMPLETED);
             housekeepingTask.setCompletedAt(now);
         } else {
             throw new RuntimeException("HousekeepingTask not found");

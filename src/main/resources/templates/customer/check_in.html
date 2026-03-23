@@ -20,7 +20,7 @@
 
 <script>
 
-    const socket = new SockJS('http://localhost:8081/book-now/ws');
+    const socket = new SockJS('http://localhost:8080/book-now/ws');
     const stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function(frame) {
@@ -32,7 +32,7 @@
             console.log("RAW:", message.body);
             const data = JSON.parse(message.body);
             alert(data.message);
-            if (data.bookingStatus === 'REJECT'){
+            if (data.bookingStatus === 'REJECTED_CHECKIN'){
                 window.location.href = "/book-now/checkin/fail"
             } else if (data.bookingStatus === 'CHECKED_IN'){
                     window.location.href = "/book-now/checkin/success?bookingId=" + bookingId

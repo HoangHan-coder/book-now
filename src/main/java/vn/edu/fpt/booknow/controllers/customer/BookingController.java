@@ -39,22 +39,26 @@ public class BookingController {
                                      @CookieValue(value = "Access_token", required = false) String token,
                                      @RequestParam(name = "page", defaultValue = "1") Integer page) {
 
-        String email = token != null ? jwtService.extractUserName(token) : null;
-        if (email == null)
+        try {
+            String email = token != null ? jwtService.extractUserName(token) : null;
+            if (email == null)
+                return "redirect:/auth/login";
+
+            PaginatedResponse<BookingDTO> paginatedBookings = bookingListService.bookingListWithPagination(page, email);
+
+            model.addAttribute("bookings", paginatedBookings.getData());
+            model.addAttribute("currentPage", paginatedBookings.getCurrentPage());
+            model.addAttribute("totalPages", paginatedBookings.getTotalPages());
+            model.addAttribute("totalItems", paginatedBookings.getTotalItems());
+            model.addAttribute("hasNext", paginatedBookings.isHasNext());
+            model.addAttribute("hasPrevious", paginatedBookings.isHasPrevious());
+            model.addAttribute("startIndex", paginatedBookings.getStartIndex());
+            model.addAttribute("endIndex", paginatedBookings.getEndIndex());
+
+            return "booking-history";
+        } catch (Exception e) {
             return "redirect:/auth/login";
-
-        PaginatedResponse<BookingDTO> paginatedBookings = bookingListService.bookingListWithPagination(page, email);
-
-        model.addAttribute("bookings", paginatedBookings.getData());
-        model.addAttribute("currentPage", paginatedBookings.getCurrentPage());
-        model.addAttribute("totalPages", paginatedBookings.getTotalPages());
-        model.addAttribute("totalItems", paginatedBookings.getTotalItems());
-        model.addAttribute("hasNext", paginatedBookings.isHasNext());
-        model.addAttribute("hasPrevious", paginatedBookings.isHasPrevious());
-        model.addAttribute("startIndex", paginatedBookings.getStartIndex());
-        model.addAttribute("endIndex", paginatedBookings.getEndIndex());
-
-        return "booking-history";
+        }
     }
 
     @GetMapping("/{id}")
@@ -82,7 +86,7 @@ public class BookingController {
             model.addAttribute("payments", payments.stream().map(PaymentDTO::new).toList());
             model.addAttribute("hasFeedback", hasFeedback);
             return "booking-detail";
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             return "redirect:/bookings/history";
         }
     }

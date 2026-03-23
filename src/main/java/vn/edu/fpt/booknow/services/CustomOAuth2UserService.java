@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.services.customer;
+package vn.edu.fpt.booknow.services;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +28,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String email = String.valueOf(oAuth2User.getAttributes().get("email"));
         String name = String.valueOf(oAuth2User.getAttributes().get("name"));
         String avatar = String.valueOf(oAuth2User.getAttributes().get("picture"));
+        String avatarPublicId = String.valueOf(oAuth2User.getAttributes().get("sub"));
 
 
         boolean isNewUser = false;
@@ -36,7 +37,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         System.out.println(customer);
         if (customer == null) {
             isNewUser = true;
-            customerService.Save(email, name, avatar);
+            customerService.Save(email, name, avatar, avatarPublicId);
         }
         Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
         attributes.put("isNewUser", isNewUser);

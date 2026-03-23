@@ -31,17 +31,17 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestPath = request.getRequestURI();
-        
+
         // Skip JWT validation for public endpoints
-        if (requestPath.contains("/auth/login") || requestPath.contains("/admin/login") || 
-            requestPath.contains("/register") || requestPath.contains("/public") ||
-            requestPath.contains("/auth/logout") ||
-            requestPath.contains("/pay") || requestPath.contains("/forgot-password") ||
-            requestPath.contains("/booking/save")) {
+        if (requestPath.contains("/auth/login") || requestPath.contains("/admin/login") ||
+                requestPath.contains("/register") || requestPath.contains("/public") ||
+                requestPath.contains("/auth/logout") ||
+                requestPath.contains("/pay") || requestPath.contains("/forgot-password") ||
+                requestPath.contains("/booking/save")) {
             filterChain.doFilter(request, response);
             return;
         }
-        
+
         Cookie[] cookies = request.getCookies();
         String authHeader = null;
         if (cookies != null) {
@@ -58,7 +58,11 @@ public class JWTFilter extends OncePerRequestFilter {
         if (authHeader != null){
             token = authHeader;
             System.out.println("JWT TOKEN: " + token);
-            username = jwtService.extractUserName(token);
+            try {
+                username = jwtService.extractUserName(token);
+            } catch (Exception e) {
+
+            }
         }
 
         // validate token with username
@@ -70,6 +74,7 @@ public class JWTFilter extends OncePerRequestFilter {
                 if (userDetails != null && jwtService.validateToken(token, userDetails)) {
                     setAuthentication(userDetails, request);
                 } else {
+                    System.out.println("Invalid token");
                     response.sendRedirect("/auth/login");
                 }
             } catch (Exception e) {
@@ -77,6 +82,7 @@ public class JWTFilter extends OncePerRequestFilter {
                 System.err.println("JWT Filter error: " + e.getMessage());
             }
         }
+        System.out.println("Invalid token......");
         filterChain.doFilter(request,response);
     }
 

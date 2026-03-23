@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.services.customer;
+package vn.edu.fpt.booknow.services;
 
 
 import jakarta.transaction.Transactional;
@@ -22,12 +22,13 @@ public class AuthService {
     }
 
     @Transactional
-    public Customer Save(String email, String name, String avatar) {
+    public Customer Save(String email, String name, String avatar, String publicId) {
         Customer customer = new Customer();
         LocalDateTime now = LocalDateTime.now();
         customer.setEmail(email);
         customer.setFullName(name);
         customer.setAvatarUrl(avatar);
+        customer.setAvatarPublicId(publicId);
         customer.setCreatedAt(now);
         customer.setStatus("ACTIVE");
         return customerRepository.save(customer);

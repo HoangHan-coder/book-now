@@ -13,8 +13,9 @@ import vn.edu.fpt.booknow.conponents.CheckInHandler;
 import vn.edu.fpt.booknow.model.entities.ApproveRequest;
 import vn.edu.fpt.booknow.model.entities.Booking;
 import vn.edu.fpt.booknow.model.entities.BookingStatus;
-import vn.edu.fpt.booknow.services.customer.BookingService;
-import vn.edu.fpt.booknow.services.staff.BookingUpdateService;
+import vn.edu.fpt.booknow.services.BookingService;
+import vn.edu.fpt.booknow.services.BookingUpdateService;
+
 
 import java.util.Random;
 
@@ -55,7 +56,7 @@ public class CheckInController {
             model.addAttribute("bookingCodeError", "Booking code does not exist");
             return "customer/checkin_enter_code";
         }
-        if (booking.getBookingStatus().equals(BookingStatus.PENDING) || booking.getBookingStatus().equals(BookingStatus.PENDING_PAYMENT)) {
+        if (booking.getBookingStatus().equals(BookingStatus.PENDING_PAYMENT)) {
             model.addAttribute("bookingStatusError1", "Booking has not paid yet");
             return "customer/checkin_enter_code";
         }
@@ -94,7 +95,7 @@ public class CheckInController {
             @RequestBody ApproveRequest req
     ) {
         Booking booking = bookingService.findById(req.getBookingId());
-        bookingUpdateService.updateStatus(booking.getBookingCode(), BookingStatus.REJECT, req.getReason());
+        bookingUpdateService.updateStatus(booking.getBookingCode(), BookingStatus.REJECTED_CHECKIN, req.getReason());
         checkInHandler.reject(req.getBookingId(),req.getCheckInSessionId());
         return ResponseEntity.ok().build();
     }

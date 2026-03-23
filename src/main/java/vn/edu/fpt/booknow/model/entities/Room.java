@@ -65,4 +65,9 @@ public class Room {
     @OneToMany(mappedBy = "room")
     private List<HousekeepingTask> housekeepingTasks = new ArrayList<>();
 
+    @NotNull
+    @ColumnDefault("0")
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
+
 }

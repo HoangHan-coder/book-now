@@ -71,17 +71,17 @@ public class JWTService {
         return Keys.hmacShaKeyFor(keyByte);
     }
 
-    public String extractUserName(String token) {
+    public String extractUserName(String token) throws Exception{
         // extract the username from jwt token
         return extractClaim(token, Claims::getSubject);
     }
 
-    private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
+    private <T> T extractClaim(String token, Function<Claims, T> claimResolver) throws Exception{
         final Claims claims = extractAllClaims(token);
         return claimResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
+    private Claims extractAllClaims(String token) throws Exception{
         return Jwts.parser()
                 .verifyWith(getKey())
                 .build()
@@ -90,15 +90,15 @@ public class JWTService {
     }
 
 
-    private boolean isTokenExpired(String token) {
+    private boolean isTokenExpired(String token) throws Exception {
         return extractExpiration(token).before(new Date());
     }
 
-    private Date extractExpiration(String token) {
+    private Date extractExpiration(String token) throws Exception {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    public boolean validateToken(String token, UserDetails userDetails) {
+    public boolean validateToken(String token, UserDetails userDetails) throws Exception{
         String username = extractUserName(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
