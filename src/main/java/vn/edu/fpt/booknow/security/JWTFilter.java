@@ -82,7 +82,7 @@ public class JWTFilter extends OncePerRequestFilter {
                 System.err.println("JWT Filter error: " + e.getMessage());
             }
         }
-        System.out.println("Invalid token......");
+
         filterChain.doFilter(request,response);
     }
 

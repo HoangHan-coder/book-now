@@ -55,7 +55,7 @@ public class HousekeepingTask {
 
 
     // FK -> Booking
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "booking_id")
     private Booking booking;
 

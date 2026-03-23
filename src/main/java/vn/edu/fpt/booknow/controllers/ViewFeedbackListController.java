@@ -44,6 +44,7 @@ public class ViewFeedbackListController {
 
             return "private/Feedback_list";
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             model.addAttribute("error", e.getMessage());
             return "error-page";
         }

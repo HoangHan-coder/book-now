@@ -23,7 +23,7 @@ import vn.edu.fpt.booknow.services.CustomerService;
 import vn.edu.fpt.booknow.services.StaffAccountService;
 import vn.edu.fpt.booknow.services.MailService;
 import vn.edu.fpt.booknow.services.RecaptchaService;
-import vn.edu.fpt.booknow.services.CustomerService;
+import jakarta.servlet.http.HttpSession;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -57,6 +57,9 @@ public class AuthController {
         this.staffAccountService = staffAccountService;
     }
 
+
+
+
     @GetMapping("/admin/login")
     public String loginAdminPanel(Model model,
                                   @RequestParam(name = "error", required = false) String error,
@@ -71,22 +74,41 @@ public class AuthController {
         return "public/authentication/login-admin";
     }
 
+
+
+
     @PostMapping("/admin/login")
-    public String loginAdminHandle(@RequestParam(name = "g-recaptcha-response", required = false) String recaptchaResponse,
-                                   @ModelAttribute StaffAccount staffAccount,
-                                   HttpServletResponse response) {
+    public String loginAdminHandle(
+            @RequestParam(name = "g-recaptcha-response", required = false) String recaptchaResponse,
+            @ModelAttribute StaffAccount staffAccount,
+            HttpServletResponse response,
+            HttpSession session) {
 //        if (recaptchaResponse == null || recaptchaResponse.isEmpty() || !recaptchaService.verify(recaptchaResponse)) {
 //            model.addAttribute("errorRecaptcha", "Captcha không hợp lệ!");
 //            model.addAttribute("staffAccount", staffAccount);
 //            return "public/authentication/login-admin";
 //        }
         boolean loginStatus = staffAccountService.verify(staffAccount, response);
+        // ADD SESSION (KHÔNG ẢNH HƯỞNG LOGIC CŨ)
+        if (loginStatus) {
+            StaffAccount admin =
+                    staffAccountService.findByEmail(staffAccount.getEmail());
+
+            session.setAttribute("LOGIN_ADMIN", admin);
+        }
+
         if (!loginStatus) {
             return  "redirect:/admin/login?error";
         }
         return "redirect:/admin/bookings";
 
     }
+
+
+
+
+
+
 
     @GetMapping("/auth/login")
     public String loginCustomerPanel(Model model,

@@ -1,5 +1,6 @@
 package vn.edu.fpt.booknow.repositories;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -40,14 +41,30 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     int countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
     // UC-14.4: Update reply content of feedback
+//    @Modifying
+//    @Query("""
+//            UPDATE Feedback f
+//            SET f.contentReply = :replyContent
+//            WHERE f.feedbackId = :feedbackId
+//            """)
+//    void updateReply(@Param("feedbackId") Long feedbackId,
+//                     @Param("replyContent") String replyContent);
+    @Transactional
     @Modifying
     @Query("""
-            UPDATE Feedback f
-            SET f.contentReply = :replyContent
-            WHERE f.feedbackId = :feedbackId
-            """)
+    UPDATE Feedback f
+    SET f.contentReply = :replyContent,
+        f.replyAt = :replyAt,
+        f.admin.staffAccountId = :adminId
+    WHERE f.feedbackId = :feedbackId
+""")
     void updateReply(@Param("feedbackId") Long feedbackId,
-                     @Param("replyContent") String replyContent);
+                     @Param("replyContent") String replyContent,
+                     @Param("adminId") Long adminId,
+                     @Param("replyAt") LocalDateTime replyAt);
+
+
+
 
     @Query("""
             SELECT f FROM Feedback f
