@@ -56,13 +56,15 @@ public class CusCheckOutController {
         }
         // Kiểm tra booking thuộc về user đang đăng nhập
         Booking booking = bookingService.getBookingDetail(bookingCode);
+
+
         if (booking == null) {
             redirectAttributes.addFlashAttribute("error", "Không tìm thấy booking");
-            return "redirect:/";
+            return "error/404";
         }
         if (!booking.getCustomer().getEmail().equals(principal.getName())) {
             redirectAttributes.addFlashAttribute("error", "Bạn không có quyền thực hiện hành động này");
-            return "redirect:/";
+            return "redirect:/bookings/"+ booking.getBookingId();
         }
         String message = checkOutService.checkOut(bookingCode);
         if (message.equals("Check-out thành công")) {
@@ -70,6 +72,6 @@ public class CusCheckOutController {
         } else {
             redirectAttributes.addFlashAttribute("error", message);
         }
-        return "redirect:/user/booking-detail/" + bookingCode;
+        return "redirect:/bookings/" + booking.getBookingId();
     }
 }

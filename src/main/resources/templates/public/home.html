@@ -1,188 +1,176 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang chủ - BookNow</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=more_horiz"/>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            light: '#60a5fa', // blue-400
-                            DEFAULT: '#3b82f6', // blue-500
-                            dark: '#2563eb', // blue-600
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head(title='Trang chủ - BookNow')}"></head>
+<style>
+/* Định nghĩa độ rộng cố định cho mỗi cột phòng */
+.room-column {
+    min-width: 200px;
+    width: 200px;
+}
 
-    <style>
-        /* Định nghĩa độ rộng cố định cho mỗi cột phòng */
-        .room-column {
-            min-width: 200px; /* Đảm bảo mỗi phòng đủ rộng để hiện 4 slot */
-            width: 200px;
-        }
+table {
+    table-layout: fixed;
+    width: max-content;
+    min-width: 100%;
+}
 
-        /* Ép bảng không được co lại mà phải tràn ra ngoài để cuộn */
-        table {
-            table-layout: fixed;
-            width: max-content;
-            min-width: 100%;
-        }
+.scroll-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
 
-        /* Hiện thanh cuộn ngang (Xóa class no-scrollbar nếu muốn thấy thanh cuộn) */
-        .scroll-container {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        /* Specific Logo Positioning Rule */
-        .logo-fixed {
-            position: fixed;
-            top: 0;
-            left: 0;
-            margin-top: 25px;
-            margin-left: 25px;
-            z-index: 60; /* Higher than navbar */
-        }
-        .gradient-text {
-            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+.logo-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    margin-top: 25px;
+    margin-left: 25px;
+    z-index: 60;
+}
 
-        /* Hero Background */
-        .hero-bg {
-            background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-            height: 550px;
-        }
+.hero-bg {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+    height: 550px;
+}
 
-        /* Dropdown Animation */
-        .dropdown-menu {
-            transform-origin: top right;
-            transition: transform 0.1s ease-out, opacity 0.1s ease-out;
-        }
+.dropdown-menu {
+    transform-origin: top right;
+    transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+}
 
-        .dropdown-hidden {
-            transform: scale(0.95);
-            opacity: 0;
-            pointer-events: none;
-        }
+.dropdown-hidden {
+    transform: scale(0.95);
+    opacity: 0;
+    pointer-events: none;
+}
 
-        .dropdown-visible {
-            transform: scale(1);
-            opacity: 1;
-            pointer-events: auto;
-        }
+.dropdown-visible {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: auto;
+}
 
-        /* Horizontal Scroll Hide */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
 
-        .no-scrollbar {
-            -ms-overflow-style: none; /* IE and Edge */
-            scrollbar-width: none; /* Firefox */
-        }
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
 
-        /* Slot Button Selection */
-        .slot-btn.selected {
-            background-color: #2563eb;
-            color: white;
-            border-color: #2563eb;
-        }
-    </style>
-</head>
+.slot-btn.selected {
+    background-color: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+</style>
 <body class="bg-gray-50 font-sans text-gray-800 pb-24">
 
-<a th:href="@{/home}">
+<!-- NAVBAR FRAGMENT -->
+<div th:fragment="public-navbar">
+
     <!-- LOGO (Fixed Position) -->
-    <div class="logo-fixed flex items-center gap-3 select-none cursor-pointer" >
-        <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
-            <i class="fa-solid fa-house-chimney gradient-icon text-xl text-blue-600"></i>
+    <a th:href="@{/home}">
+        <div class="logo-fixed flex items-center gap-3 select-none cursor-pointer">
+            <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
+                <i class="fa-solid fa-house-chimney gradient-icon text-xl text-blue-600"></i>
+            </div>
+            <div class="flex flex-col justify-center">
+                <span class="text-2xl font-extrabold tracking-tight text-white leading-none drop-shadow-md">BookNow</span>
+                <span class="text-[10px] text-gray-100 font-medium uppercase tracking-wider pl-0.5 drop-shadow-sm">Homestay System</span>
+            </div>
         </div>
-        <div class="flex flex-col justify-center">
-            <span class="text-2xl font-extrabold tracking-tight text-white leading-none drop-shadow-md">BookNow</span>
-            <span class="text-[10px] text-gray-100 font-medium uppercase tracking-wider pl-0.5 drop-shadow-sm">Homestay System</span>
-        </div>
-    </div>
-</a>
+    </a>
 
-<!-- NAVBAR (Transparent Full Width) -->
-<nav class="fixed top-0 left-0 w-full flex justify-end items-center px-8 py-6 z-50 bg-gradient-to-b from-black/50 to-transparent transition-all duration-300"
-     id="mainNavbar">
-    <div class="flex items-center gap-8">
-        <a href="#" class="text-sm font-medium text-white hover:text-blue-200 transition-colors drop-shadow-sm">Về chúng
-            tôi</a>
-        <a href="#" class="text-sm font-medium text-white hover:text-blue-200 transition-colors drop-shadow-sm">Liên
-            hệ</a>
+    <!-- NAVBAR (Transparent Full Width) -->
+    <nav class="fixed top-0 left-0 w-full flex justify-end items-center px-8 py-6 z-50 bg-gradient-to-b from-black/60 to-transparent transition-all duration-300" id="mainNavbar">
+        <div class="flex items-center gap-8">
+            <a th:href="@{/home}" class="text-sm font-medium text-white hover:text-blue-200 transition-colors drop-shadow-sm">Trang chủ</a>
+            <a th:href="@{/search}" class="text-sm font-medium text-white hover:text-blue-200 transition-colors drop-shadow-sm">Tìm phòng</a>
 
-        <div class="w-px h-6 bg-white/30"></div>
+            <div class="flex items-center gap-3" sec:authorize="!isAuthenticated()">
+                <a th:href="@{/auth/login}" class="text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-full shadow-md transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+                    Đăng nhập
+                </a>
+            </div>
 
-        <!-- Profile Dropdown Container -->
-        <div class="relative">
-            <button id="profileBtn" class="flex items-center gap-3 focus:outline-none group">
-                <div class="text-right hidden sm:block">
-                    <p class="text-xs font-bold text-white group-hover:text-blue-100 transition-colors drop-shadow-sm">
-                        Nguyễn Văn A</p>
-                    <p class="text-[10px] text-gray-200 group-hover:text-white transition-colors">Khách hàng</p>
-                </div>
-                <div class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/50 shadow-sm group-hover:bg-white group-hover:text-blue-600 transition-all">
-                    <i class="fa-solid fa-user"></i>
-                </div>
-            </button>
+            <!-- Profile Dropdown Container -->
+            <div sec:authorize="isAuthenticated()">
+                <div class="relative">
+                    <button id="profileBtn" class="flex items-center gap-3 focus:outline-none group">
+                        <div class="text-right hidden sm:block">
+                            <p class="text-xs font-bold text-white group-hover:text-blue-100 transition-colors drop-shadow-sm" th:text="${fullName}"></p>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/50 shadow-sm group-hover:bg-white group-hover:text-blue-600 transition-all">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                    </button>
 
-            <!-- Dropdown Menu -->
-            <div id="profileDropdown"
-                 class="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 dropdown-menu dropdown-hidden z-50">
-                <div class="px-4 py-3 border-b border-gray-100">
-                    <p class="text-sm font-medium text-gray-900">Tài khoản của tôi</p>
-                    <p class="text-xs text-gray-500 truncate">nguyenvana@gmail.com</p>
-                </div>
-                <ul class="py-1">
-                    <li>
-                        <a href="register_profile.html"
-                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
-                            <i class="fa-regular fa-id-card mr-2 w-4"></i> Hồ sơ của tôi
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
-                            <i class="fa-solid fa-clock-rotate-left mr-2 w-4"></i> Lịch sử đặt phòng
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
-                            <i class="fa-regular fa-heart mr-2 w-4"></i> Phòng yêu thích
-                        </a>
-                    </li>
-                </ul>
-                <div class="border-t border-gray-100 mt-1 pt-1">
-                    <a href="customer_login.html" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                        <i class="fa-solid fa-arrow-right-from-bracket mr-2 w-4"></i> Đăng xuất
-                    </a>
+                    <!-- Dropdown Menu -->
+                    <div id="profileDropdown" class="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 dropdown-menu dropdown-hidden z-50">
+                        <div class="px-4 py-3 border-b border-gray-100">
+                            <p class="text-sm font-medium text-gray-900">Tài khoản của tôi</p>
+                            <p class="text-xs text-gray-500 truncate" th:text="${fullName}"></p>
+                        </div>
+                        <ul class="py-1">
+                            <li>
+                                <a th:href="@{/user/profile}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
+                                    <i class="fa-regular fa-id-card mr-2 w-4"></i> Hồ sơ của tôi
+                                </a>
+                            </li>
+                            <li>
+                                <a th:href="@{/bookings/history}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
+                                    <i class="fa-solid fa-clock-rotate-left mr-2 w-4"></i> Lịch sử đặt phòng
+                                </a>
+                            </li>
+                            <li>
+                                <a th:href="@{/user/customer-change-password}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
+                                    <i class="fa-solid fa-key mr-2 w-4"></i> Đổi mật khẩu
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="border-t border-gray-100 mt-1 pt-1">
+                            <a th:href="@{/auth/logout}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                <i class="fa-solid fa-arrow-right-from-bracket mr-2 w-4"></i> Đăng xuất
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</nav>
+    </nav>
+
+    <!-- Profile Dropdown Script Fragment -->
+    <script th:fragment="dropdown-script">
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        if(profileBtn && profileDropdown) {
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isHidden = profileDropdown.classList.contains('dropdown-hidden');
+                if (isHidden) {
+                    profileDropdown.classList.remove('dropdown-hidden');
+                    profileDropdown.classList.add('dropdown-visible');
+                } else {
+                    profileDropdown.classList.add('dropdown-hidden');
+                    profileDropdown.classList.remove('dropdown-visible');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                    profileDropdown.classList.add('dropdown-hidden');
+                    profileDropdown.classList.remove('dropdown-visible');
+                }
+            });
+        }
+    </script>
+</div>
 
 <!-- HERO SECTION -->
 <header class="hero-bg flex items-center justify-center relative">
@@ -506,17 +494,46 @@
     </div>
 </footer>
 
+<script>
+    // Profile Dropdown Logic
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+
+    profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isHidden = profileDropdown.classList.contains('dropdown-hidden');
+        if (isHidden) {
+            profileDropdown.classList.remove('dropdown-hidden');
+            profileDropdown.classList.add('dropdown-visible');
+        } else {
+            profileDropdown.classList.add('dropdown-hidden');
+            profileDropdown.classList.remove('dropdown-visible');
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+            profileDropdown.classList.add('dropdown-hidden');
+            profileDropdown.classList.remove('dropdown-visible');
+        }
+    });
+</script>
+
+
 <!-- SCRIPT -->
 <script th:inline="javascript">
+
+
+
+
     // --- 1. DỮ LIỆU TỪ BACKEND ---
     const rawRooms = /*[[${roomAll}]]*/ [];
     const rawSlots = /*[[${timeTable}]]*/ [];
     const rawWeekDates = /*[[${weekDates}]]*/ [];
-    const rawBookedKeys = /*[[${bookedKeys}]]*/ []; // Set<String> từ Java: "RoomID_YYYY-MM-DD_TimetableID"
 
     const roomsData = Array.isArray(rawRooms) ? rawRooms : [];
     const slotsData = Array.isArray(rawSlots) ? rawSlots : [];
-    const bookedKeys = new Set(Array.isArray(rawBookedKeys) ? rawBookedKeys : []);
+    const bookedKeys = /*[[${bookedKeys}]]*/ {};
 
 
     let selectedSlot = null;
@@ -584,11 +601,17 @@
                 slotGrid.className = 'grid grid-cols-2 gap-1.5 justify-center';
 
                 formattedSlots.forEach(slot => {
-                    // Tạo Key để kiểm tra trạng thái khóa
                     const statusKey = `${room.id}_${date.fullDate}_${slot.id}`;
-                    const isBooked = bookedKeys.has(statusKey);
 
-                    // Kiểm tra trạng thái đang chọn
+                    // Lấy status từ Map (đã được Thymeleaf đổ vào biến bookedKeys)
+                    const currentStatus = bookedKeys[statusKey];
+                    console.log(currentStatus)
+                    // CHỈ khóa (disabled) nếu có trạng thái VÀ trạng thái đó KHÔNG PHẢI Cancel/Failed
+                    // Lưu ý: Viết đúng tên Enum của bạn (ví dụ: CANCELLED hoặc CANCEL)
+                    const isLocked = currentStatus &&
+                        currentStatus !== 'CANCELLED' &&
+                        currentStatus !== 'FAILED';
+
                     const isSelected = selectedSlot &&
                         String(selectedSlot.roomId) === String(room.id) &&
                         selectedSlot.date === date.fullDate &&
@@ -596,16 +619,19 @@
 
                     const btn = document.createElement('button');
 
-                    // Style Button dựa trên trạng thái (Booked > Selected > Default)
-                    if (isBooked) {
+                    if (isLocked) {
+                        // Hiển thị trạng thái ĐÃ KHÓA
                         btn.className = 'h-8 w-full rounded-md text-[10px] font-medium bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed';
                         btn.innerHTML = `<i class="fa-solid fa-lock text-[8px]"></i>`;
                         btn.disabled = true;
                     } else {
+                        // Hiển thị trạng thái TRỐNG (bao gồm cả những slot đã Cancel/Failed)
                         btn.className = `h-8 w-full rounded-md text-[10px] font-medium transition-all border ${
                             isSelected ? 'bg-blue-600 text-white border-blue-600 shadow-sm scale-105' :
                                 'bg-white text-gray-600 border-gray-200 hover:border-blue-400 hover:text-blue-600'
                         }`;
+
+
                         btn.innerHTML = `<span>${slot.name.split('(')[0].trim()}</span>`;
                         btn.onclick = () => handleSlotClick(room, date, slot);
                     }

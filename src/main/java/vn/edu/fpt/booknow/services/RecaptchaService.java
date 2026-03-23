@@ -24,20 +24,20 @@ public class RecaptchaService {
 
         RestTemplate restTemplate = new RestTemplate();
 
-        // 1️⃣ Body
+        // Body
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("secret", secretKey);
         body.add("response", recaptchaResponse);
 
-        // 2️⃣ Headers
+        // Headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        // 3️⃣ Combine body + headers
+        // Combine body + headers
         HttpEntity<MultiValueMap<String, String>> request =
                 new HttpEntity<>(body, headers);
 
-        // 4️⃣ Call API
+        // Call API
         ResponseEntity<Map> response = restTemplate.postForEntity(
                 url,
                 request,

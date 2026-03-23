@@ -6,8 +6,11 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Nationalized;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,14 +41,9 @@ public class Room {
 
 
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'AVAILABLE'")
     @Column(name = "status", nullable = false, length = 50)
     private RoomStatus status;
 
-    @NotNull
-    @ColumnDefault("0")
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = false;
 
 
 
@@ -57,5 +55,19 @@ public class Room {
 
     @OneToMany(mappedBy = "room")
     private List<RoomAmenity> roomAmenities = new ArrayList<>();
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    @OneToMany(mappedBy = "room")
+    private List<HousekeepingTask> housekeepingTasks = new ArrayList<>();
+
+    @NotNull
+    @ColumnDefault("0")
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
 
 }

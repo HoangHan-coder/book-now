@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cleaning Tasks - BookNow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+<!-- Header -->
+<header class="bg-blue-600 text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold">Housekeeping Dashboard</h1>
+        <div class="flex items-center gap-4">
+            <span class="text-sm">Welcome, Nguyen Van A</span>
+            <a href="#" class="text-sm bg-blue-700 px-3 py-1 rounded hover:bg-blue-800">Logout</a>
+        </div>
+    </div>
+</header>
+
+
+<!-- Main Content -->
+<main class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Page Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Cleaning Tasks</h2>
+            <p class="text-sm text-gray-500">Rooms requiring cleaning after checkout</p>
+        </div>
+        <div class="flex gap-2">
+            <select class="border border-gray-300 rounded px-3 py-2 text-sm">
+                <option value="">All Status</option>
+                <option value="PENDING">Pending</option>
+                <option value="ASSIGNED">Assigned</option>
+                <option value="IN_PROGRESS">In Progress</option>
+            </select>
+            <select class="border border-gray-300 rounded px-3 py-2 text-sm">
+                <option value="">All Priority</option>
+                <option value="URGENT">Urgent</option>
+                <option value="HIGH">High</option>
+                <option value="NORMAL">Normal</option>
+                <option value="LOW">Low</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Task Table -->
+    <div class="bg-white rounded-lg shadow mb-8 overflow-hidden">
+        <table class="w-full">
+            <thead>
+            <tr class="bg-gray-50 border-b text-left text-sm font-semibold text-gray-700">
+                <th class="px-6 py-4">Room</th>
+                <th class="px-6 py-4">Type</th>
+                <th class="px-6 py-4">Task</th>
+                <th class="px-6 py-4">Priority</th>
+                <th class="px-6 py-4">Status</th>
+                <th class="px-6 py-4 text-center">Action</th>
+            </tr>
+            </thead>
+            <tbody class="text-sm divide-y">
+            <tr class="hover:bg-gray-50 transition">
+                <td class="px-6 py-4 font-bold text-gray-900">101</td>
+                <td class="px-6 py-4 text-gray-700">Deluxe</td>
+                <td class="px-6 py-4 text-gray-700">CLEANING</td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">NORMAL</span></td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">IN_PROGRESS</span></td>
+                <td class="px-6 py-4 text-center">
+                    <a href="task-detail.html?id=1024" class="inline-flex items-center px-3 py-2 text-blue-600 bg-blue-50 rounded hover:bg-blue-100 transition mr-2">View</a>
+                </td>
+            </tr>
+            <tr class="hover:bg-gray-50 transition">
+                <td class="px-6 py-4 font-bold text-gray-900">205</td>
+                <td class="px-6 py-4 text-gray-700">Standard</td>
+                <td class="px-6 py-4 text-gray-700">CLEANING</td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">HIGH</span></td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">PENDING</span></td>
+                <td class="px-6 py-4 text-center">
+                    <a href="task-detail.html?id=1025" class="inline-flex items-center px-3 py-2 text-blue-600 bg-blue-50 rounded hover:bg-blue-100 transition mr-2">View</a>
+                </td>
+            </tr>
+            <tr class="hover:bg-gray-50 transition">
+                <td class="px-6 py-4 font-bold text-gray-900">302</td>
+                <td class="px-6 py-4 text-gray-700">Suite</td>
+                <td class="px-6 py-4 text-gray-700">MAINTENANCE</td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">URGENT</span></td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">PENDING</span></td>
+                <td class="px-6 py-4 text-center">
+                    <a href="task-detail.html?id=1026" class="inline-flex items-center px-3 py-2 text-blue-600 bg-blue-50 rounded hover:bg-blue-100 transition mr-2">View</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Summary -->
+    <div class="mt-6 flex justify-between items-center text-sm text-gray-500">
+        <p>Showing 5 cleaning tasks</p>
+        <div class="flex gap-2">
+            <span class="px-3 py-1 bg-white rounded border">1</span>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-800 text-white text-center py-4 mt-8">
+    <p class="text-sm">BookNow Homestay Management System</p>
+</footer>
+
+<!-- Start Task Modal -->
+<div id="startTaskModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
+        <!-- Modal Header -->
+        <div class="bg-blue-600 text-white px-6 py-4 rounded-t-lg flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="text-lg font-semibold">Start Cleaning Task</h3>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="px-6 py-4">
+            <div class="mb-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Task #1027 - Room 108</h4>
+                <p class="text-sm text-gray-600">Deluxe Twin Room</p>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <p class="text-sm text-gray-700 mb-2">
+                    <strong class="text-blue-900">Before you start:</strong>
+                </p>
+                <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside">
+                    <li>Make sure you have all cleaning supplies</li>
+                    <li>Check the room for any special notes or damage</li>
+                    <li>Ensure proper ventilation during cleaning</li>
+                </ul>
+            </div>
+
+            <div class="border-t pt-4">
+                <label class="flex items-start gap-3">
+                    <input type="checkbox" id="confirmStartTask" class="mt-1 h-4 w-4 text-blue-600 rounded">
+                    <span class="text-sm text-gray-700">I'm ready to start the cleaning task and have all necessary supplies</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="bg-gray-50 px-6 py-4 rounded-b-lg flex gap-3 border-t">
+            <button type="button" onclick="document.getElementById('startTaskModal').classList.add('hidden')" class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded font-medium hover:bg-gray-400 transition">
+                Cancel
+            </button>
+            <button type="button" id="confirmStartBtn" disabled class="flex-1 bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
+                Start Task
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Enable/disable confirm button based on checkbox
+    const confirmCheckbox = document.getElementById('confirmStartTask');
+    const confirmBtn = document.getElementById('confirmStartBtn');
+
+    if (confirmCheckbox) {
+        confirmCheckbox.addEventListener('change', function() {
+            confirmBtn.disabled = !this.checked;
+        });
+
+        confirmBtn.addEventListener('click', function() {
+            // Submit form or make API call to start task
+            // Change status: ASSIGNED → IN_PROGRESS
+            // Set started_at timestamp
+            alert('Task started! Status changed to IN_PROGRESS');
+            document.getElementById('startTaskModal').classList.add('hidden');
+            // Redirect to task detail or my-tasks
+            window.location.href = 'my-tasks.html';
+        });
+    }
+</script>
+</body>
+</html>

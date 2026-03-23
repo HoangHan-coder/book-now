@@ -150,7 +150,7 @@
         <span th:text="${errorMessage}"></span>
     </div>
     <!-- FILTERS CARD -->
-    <!-- FILTERS CARD -->
+
     <form th:action="@{/admin/bookings}" method="get"
           class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
 
@@ -192,7 +192,7 @@
                         focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white">
 
                         <option value="">Tất cả</option>
-                        <option value="PENDING">Chờ kiểm duyệt</option>
+                        <option value="PENDING">Đã kiểm duyệt</option>
                         <option value="PENDING_PAYMENT">Chờ thanh toán</option>
                         <option value="PAID">Đã thanh toán</option>
                         <option value="CHECKED_IN">Đã nhận phòng</option>
@@ -315,17 +315,75 @@
             </table>
         </div>
 
-        <!-- Pagination -->
+        <!-- Pagination Controls -->
+        <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-white rounded-lg border border-gray-100">
+            
+            <!-- Previous Button -->
+            <a th:if="${currentPage > 1}"
+               th:href="@{/admin/bookings(
+                   page=${currentPage > 1 ? currentPage - 1 : totalPages},
+                   checkIn=${param.checkIn},
+                   checkOut=${param.checkOut},
+                   status=${param.status},
+                   keyword=${param.keyword}
+               )}"
+               class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <i class="fa-solid fa-chevron-left"></i>
+                <span>Trang trước</span>
+            </a>
+            
+            <a th:if="${currentPage == 1}"
+               th:href="@{/admin/bookings(
+                   page=${totalPages},
+                   checkIn=${param.checkIn},
+                   checkOut=${param.checkOut},
+                   status=${param.status},
+                   keyword=${param.keyword}
+               )}"
+               class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <i class="fa-solid fa-chevron-left"></i>
+                <span>Trang trước</span>
+            </a>
+
+            <!-- Page Info -->
+            <div class="text-center text-sm font-medium text-gray-700">
+                <span th:text="'Trang ' + ${currentPage} + ' / ' + ${totalPages}">Trang 1 / 5</span>
+                <span class="text-gray-500 text-xs ml-2" th:text="'(Tổng ' + ${totalItems} + ' bản ghi)'"> (Tổng 45 bản ghi)</span>
+            </div>
+
+            <!-- Next Button -->
+            <a th:if="${currentPage < totalPages}"
+               th:href="@{/admin/bookings(
+                   page=${currentPage + 1},
+                   checkIn=${param.checkIn},
+                   checkOut=${param.checkOut},
+                   status=${param.status},
+                   keyword=${param.keyword}
+               )}"
+               class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <span>Trang sau</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            
+            <a th:if="${currentPage == totalPages}"
+               th:href="@{/admin/bookings(
+                   page=1,
+                   checkIn=${param.checkIn},
+                   checkOut=${param.checkOut},
+                   status=${param.status},
+                   keyword=${param.keyword}
+               )}"
+               class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <span>Trang sau</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
 
     </div>
 
 </main>
 
 <!-- SCRIPT -->
-<!-- SockJS and STOMP for WebSocket -->
-<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-
 <script>
     // Mobile Sidebar Toggle
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
@@ -345,110 +403,6 @@
 
     mobileMenuBtn.addEventListener('click', toggleSidebar);
     sidebarOverlay.addEventListener('click', toggleSidebar);
-
-    // WebSocket Connection for Real-time Booking Updates
-    let stompClient = null;
-
-    function connectWebSocket() {
-        const socket = new SockJS('/ws');
-        stompClient = Stomp.over(socket);
-
-        stompClient.connect({}, function(frame) {
-            console.log('WebSocket Connected: ' + frame);
-
-            // Subscribe to booking updates topic
-            stompClient.subscribe('/topic/booking-updates', function(message) {
-                const update = JSON.parse(message.body);
-                handleBookingUpdate(update);
-            });
-        }, function(error) {
-            console.error('WebSocket Connection Error:', error);
-            // Retry connection after 5 seconds
-            setTimeout(connectWebSocket, 5000);
-        });
-    }
-
-    function handleBookingUpdate(update) {
-        console.log('Received booking update:', update);
-
-        // Find the booking row by booking code
-        const rows = document.querySelectorAll('tbody tr');
-        let bookingFound = false;
-
-        rows.forEach(row => {
-            const bookingCodeCell = row.querySelector('td:first-child');
-            if (bookingCodeCell && bookingCodeCell.textContent.trim() === update.bookingCode) {
-                bookingFound = true;
-                // Update the status badge
-                updateStatusBadge(row, update.bookingStatus);
-                // Show notification
-                showNotification(`Booking ${update.bookingCode} đã được cập nhật trạng thái`, 'success');
-            }
-        });
-
-        // If booking is new or not in current view, reload the page
-        if (!bookingFound && update.action === 'CREATED') {
-            showNotification('Có booking mới! Trang sẽ tự động tải lại...', 'info');
-            setTimeout(() => location.reload(), 2000);
-        }
-    }
-
-    function updateStatusBadge(row, newStatus) {
-        const statusCell = row.querySelector('td:nth-child(6) span');
-        if (statusCell) {
-            // Remove all status classes
-            statusCell.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium';
-
-            // Map status to display text and CSS class
-            const statusMap = {
-                'PENDING': { text: 'Chờ xử lý', class: 'status-pending' },
-                'PENDING_PAYMENT': { text: 'Chờ thanh toán', class: 'status-pending' },
-                'PAID': { text: 'Đã thanh toán', class: 'status-confirmed' },
-                'CHECKED_IN': { text: 'Đã nhận phòng', class: 'status-confirmed' },
-                'CHECKED_OUT': { text: 'Đã trả phòng', class: 'status-confirmed' },
-                'COMPLETED': { text: 'Hoàn thành', class: 'status-completed' },
-                'FAILED': { text: 'Thất bại', class: 'status-cancelled' },
-                'REJECTED': { text: 'Từ chối', class: 'status-cancelled' }
-            };
-
-            const statusInfo = statusMap[newStatus] || { text: newStatus, class: 'status-pending' };
-            statusCell.textContent = statusInfo.text;
-            statusCell.classList.add(statusInfo.class);
-
-            // Add animation
-            row.classList.add('bg-blue-50');
-            setTimeout(() => row.classList.remove('bg-blue-50'), 2000);
-        }
-    }
-
-    function showNotification(message, type = 'info') {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg transition-all transform translate-x-0 ${
-            type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'
-        } text-white font-medium`;
-        notification.textContent = message;
-
-        document.body.appendChild(notification);
-
-        // Auto remove after 5 seconds
-        setTimeout(() => {
-            notification.classList.add('translate-x-full', 'opacity-0');
-            setTimeout(() => notification.remove(), 300);
-        }, 5000);
-    }
-
-    // Connect when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        connectWebSocket();
-    });
-
-    // Disconnect when page unloads
-    window.addEventListener('beforeunload', function() {
-        if (stompClient !== null) {
-            stompClient.disconnect();
-        }
-    });
 </script>
 </body>
 </html>

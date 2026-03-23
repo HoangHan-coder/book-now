@@ -9,6 +9,8 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -73,5 +75,20 @@ public class StaffAccount {
     @Nationalized
     @Column(name = "avatar_public_id")
     private String avatarPublicId;
+    @OneToMany(mappedBy = "admin")
+
+    private List<Feedback> feedbacks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "staffAccount")
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
+
+    @OneToMany(mappedBy = "assignedTo")
+    private List<HousekeepingTask> housekeepingTasksAssignedTo = new ArrayList<>();
+
+    @OneToMany(mappedBy = "createdBy")
+    private List<HousekeepingTask> housekeepingTasksCreateBy = new ArrayList<>();
+
+    @OneToMany(mappedBy = "staffAccount")
+    private List<CheckInSession> checkInSession;
 
 }

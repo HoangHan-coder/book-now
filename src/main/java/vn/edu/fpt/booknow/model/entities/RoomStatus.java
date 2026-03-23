@@ -6,7 +6,9 @@ public enum RoomStatus {
     CLEANING,
     BOOKED,
     OCCUPIED,
-    OUT_OF_SERVICE;
+    OUT_OF_SERVICE,
+    MAINTENANCE,
+    INACTIVE;
 
 
 
@@ -17,7 +19,9 @@ public enum RoomStatus {
             case BOOKED -> "bg-blue-50 text-blue-700 ring-1 ring-blue-600/20";
             case OCCUPIED -> "bg-purple-50 text-purple-700 ring-1 ring-purple-600/20";
             case OUT_OF_SERVICE -> "bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600/20";
-            case DIRTY -> "bg-purple-50 text-purple-700 ring-1 ring-purple-600/20";
+            case DIRTY -> "bg-orange-50 text-orange-700 ring-1 ring-orange-600/20";
+            case MAINTENANCE -> "bg-amber-50 text-amber-700 ring-1 ring-amber-600/20";
+            case INACTIVE -> "bg-red-50 text-red-700 ring-1 ring-red-600/20";
         };
     }
 
@@ -29,6 +33,8 @@ public enum RoomStatus {
             case OCCUPIED -> "Đang ở";
             case OUT_OF_SERVICE -> "Quá giờ check out";
             case DIRTY-> "Phòng dơ";
+            case MAINTENANCE ->  "Phòng đang Bảo trì";
+            case INACTIVE -> "Phòng không hoạt động";
         };
     }
 }

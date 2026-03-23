@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống có lỗi | BookNow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+
+<div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-lg text-center border border-gray-100">
+    <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-6">
+        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+    </div>
+
+    <h2 class="text-2xl font-bold text-gray-800 mb-2">Ui da! Có lỗi rồi</h2>
+
+    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6 text-left">
+        <p class="text-sm text-red-700 italic" th:text="${errorMessage}">
+            Hệ thống đang gặp sự cố nhỏ, vui lòng thử lại sau.
+        </p>
+    </div>
+
+    <div class="space-y-3">
+        <a href="/admin/account_list"
+           class="block w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition duration-200 shadow-md">
+            Quay lại danh sách người dùng
+        </a>
+
+        <a href="/"
+           class="block w-full py-3 px-4 bg-white border border-gray-300 hover:bg-gray-50 text-gray-600 font-medium rounded-xl transition duration-200">
+            Về trang chủ
+        </a>
+    </div>
+
+    <p class="mt-8 text-xs text-gray-400 uppercase tracking-widest">BookNow System Support</p>
+</div>
+
+</body>
+</html>

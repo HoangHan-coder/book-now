@@ -64,7 +64,7 @@ public class BookingDTO {
         this.bookingCode = booking.getBookingCode();
         this.createdAt = booking.getCreatedAt();
         this.note = booking.getNote();
-        this.updateAt = booking.getUpdateAt();
+        this.updateAt = booking.getUpdatedAt();
     }
 
     public String getCheckInDate() {
@@ -73,6 +73,10 @@ public class BookingDTO {
 
     public String getCheckOutDate() {
         return checkOutTime.toLocalDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+    }
+
+    public String getCreateAt() {
+        return createdAt.format(DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy"));
     }
 
     public String getCheckInTime() {
@@ -101,5 +105,10 @@ public class BookingDTO {
 
     public String getActualCheckOutTime() {
         return actualCheckOutTime != null ? actualCheckOutTime.format(DateTimeFormatter.ofPattern("HH:mm")) : null;
+    }
+
+    public boolean isOverStay() {
+        LocalDateTime now = LocalDateTime.now();
+        return actualCheckOutTime == null && checkOutTime.isBefore(now);
     }
 }

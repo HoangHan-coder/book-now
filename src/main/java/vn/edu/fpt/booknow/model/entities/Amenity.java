@@ -8,14 +8,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Nationalized;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "Amenity", schema = "dbo", uniqueConstraints = {
@@ -46,4 +48,23 @@ public class Amenity {
     @OneToMany(mappedBy = "amenity")
     private List<RoomAmenity> roomAmenities = new ArrayList<>();
 
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Size(max = 255)
+    @Nationalized
+    @Column(name = "icon_public_id")
+    private String iconPublicId;
+
+    public Amenity() {
+    }
+
+    public Amenity(String name, String iconUrl) {
+        this.name = name;
+        this.iconUrl = iconUrl;
+    }
 }

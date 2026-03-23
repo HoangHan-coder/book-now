@@ -18,13 +18,13 @@ public interface TimeTableRepository extends JpaRepository<Timetable, Long> {
             "    t.timetableId, " +
             "    s.date) " +
             "FROM Booking b " +
-            "JOIN b.room r " +
-            "JOIN b.schedulers s " +
-            "JOIN s.timetable t " +
-            "WHERE r.roomId = :roomId")
+            "JOIN Room r ON r.roomId = b.room.roomId  " +
+            "JOIN Scheduler s ON s.booking.bookingId = b.bookingId " +
+            "JOIN Timetable t ON t.timetableId = s.timetable.timetableId " +
+            "WHERE r.roomId = :roomId ")
     List<TimeTableDTO> getBookingDetailsByRoomId(@Param("roomId") Long roomId);
 
-    @Query("SELECT new vn.edu.fpt.booknow.model.dto.TimeTableDTO(" +
+        @Query("SELECT new vn.edu.fpt.booknow.model.dto.TimeTableDTO(" +
             "    b.bookingId, " +
             "    r.roomId, " +
             "    b.bookingStatus, " +
@@ -36,4 +36,5 @@ public interface TimeTableRepository extends JpaRepository<Timetable, Long> {
             "JOIN b.schedulers s " +
             "JOIN s.timetable t")
     List<TimeTableDTO> getBookingDetails();
+
 }
