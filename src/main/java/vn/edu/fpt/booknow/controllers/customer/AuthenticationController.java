@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @Controller
-@RequestMapping(value = "/authen")
+@RequestMapping(value = "/auth")
 public class AuthenticationController {
 
     private final RedisTemplate<String, Integer> redisTemplateToSaveInt;
@@ -38,10 +38,6 @@ public class AuthenticationController {
         return "authentication/RegisterWithGoogle";
     }
 
-    @GetMapping(value = "/login")
-    public String login() {
-        return "authentication/login";
-    }
 
     @GetMapping(value = "/home")
     public String home() {
@@ -132,8 +128,7 @@ public class AuthenticationController {
              model.addAttribute("messageEmail", "Email is duplicated");
              return "authentication/registerForm";
          } else {
-             model.addAttribute("messageEmail", "Email has been registered successfully");
-             return "authentication/login";
+             return "redirect:/auth/login";
          }
 
 
