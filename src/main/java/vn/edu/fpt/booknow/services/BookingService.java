@@ -139,7 +139,7 @@ public class BookingService {
             booking.setIdCardBackUrl(idCardBackUrl);
             booking.setIdCardBackPublicId(publicIdCardBackUrl);
 
-            updateStatus(BookingStatus.APPROVED, booking.getBookingCode());
+            updateStatus(BookingStatus.PAID, booking.getBookingCode());
 
         } catch (Exception e) {
             throw new Exception("Lỗi upload ảnh lên cloud");

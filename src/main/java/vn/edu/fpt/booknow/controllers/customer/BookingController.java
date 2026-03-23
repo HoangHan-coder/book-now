@@ -112,10 +112,12 @@ public class BookingController {
 
 
     @GetMapping("/{id}/update-info")
-    public String updateBookingInfoView(@PathVariable("id") String id,
+    public String updateBookingInfoView(@PathVariable("id") String bookingIdRaw,
                                         Model model) {
+        System.out.println(bookingIdRaw);
         try {
-            Long bookingId = Long.parseLong(id);
+            Long bookingId = Long.parseLong(bookingIdRaw);
+            System.out.println(bookingIdRaw);
             Booking booking = bookingService.getBookingById(bookingId);
             if (booking == null) {
                 System.out.println("booking is null");
@@ -139,13 +141,13 @@ public class BookingController {
                                     Model model) {
         try {
             Long bookingId = Long.parseLong(id);
-
             try {
                 bookingService.updateIdCard(idCardFront, idCardBack, bookingId);
                 return "redirect:/bookings/" + bookingId;
             } catch (Exception e) {
+                System.out.println(e.getMessage() + " 148");
                 model.addAttribute("error", e.getMessage());
-                return "booking-update-info";
+                return "redirect:/error/404";
             }
 
         } catch (NumberFormatException e) {
