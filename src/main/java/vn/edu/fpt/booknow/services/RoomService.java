@@ -59,7 +59,7 @@ public class RoomService {
         } else {
             sort = Sort.by("r.roomId").descending();
         }
-        Pageable pageable = PageRequest.of(page, 2, sort);
+        Pageable pageable = PageRequest.of(page, 4, sort);
         List<String> amenities = searchDTO.getAmenity();
         Long amenityCount = (amenities != null && !amenities.isEmpty()) ? (long) amenities.size() : 0L;
         return roomRepository.searchRooms(

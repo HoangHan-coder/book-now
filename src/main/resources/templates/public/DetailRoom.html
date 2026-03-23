@@ -556,25 +556,33 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3 mt-4">
-                        <div onclick="document.getElementById('cccd_front').click()"
-                             class="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center cursor-pointer hover:border-blue-500 group relative min-h-[120px] flex items-center justify-center overflow-hidden">
-                            <input type="file" id="cccd_front" name="cccd_front" class="hidden" accept="image/*"
-                                   onchange="previewImage(this, 'preview_front_content')">
-                            <div id="preview_front_content" class="flex flex-col items-center">
-                                <i class="fa-solid fa-id-card text-2xl text-gray-400 group-hover:text-blue-500"></i>
-                                <p class="text-[10px] text-gray-500 mt-1">Mặt trước CCCD</p>
+                    <div class="mt-4">
+                        <div th:if="${informBooking.customer.fullName != null}" class="grid grid-cols-2 gap-3">
+                            <div onclick="document.getElementById('cccd_front').click()"
+                                 class="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center cursor-pointer hover:border-blue-500 group relative min-h-[120px] flex items-center justify-center overflow-hidden">
+                                <input type="file" id="cccd_front" name="cccd_front" class="hidden" accept="image/*"
+                                       onchange="previewImage(this, 'preview_front_content')">
+                                <div id="preview_front_content" class="flex flex-col items-center">
+                                    <i class="fa-solid fa-id-card text-2xl text-gray-400 group-hover:text-blue-500"></i>
+                                    <p class="text-[10px] text-gray-500 mt-1">Mặt trước CCCD</p>
+                                </div>
+                            </div>
+
+                            <div onclick="document.getElementById('cccd_back').click()"
+                                 class="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center cursor-pointer hover:border-blue-500 group relative min-h-[120px] flex items-center justify-center overflow-hidden">
+                                <input type="file" id="cccd_back" name="cccd_back" class="hidden" accept="image/*"
+                                       onchange="previewImage(this, 'preview_back_content')">
+                                <div id="preview_back_content" class="flex flex-col items-center">
+                                    <i class="fa-solid fa-id-card text-2xl text-gray-400 group-hover:text-blue-500"></i>
+                                    <p class="text-[10px] text-gray-500 mt-1">Mặt sau CCCD</p>
+                                </div>
                             </div>
                         </div>
 
-                        <div onclick="document.getElementById('cccd_back').click()"
-                             class="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center cursor-pointer hover:border-blue-500 group relative min-h-[120px] flex items-center justify-center overflow-hidden">
-                            <input type="file" id="cccd_back" name="cccd_back" class="hidden" accept="image/*"
-                                   onchange="previewImage(this, 'preview_back_content')">
-                            <div id="preview_back_content" class="flex flex-col items-center">
-                                <i class="fa-solid fa-id-card text-2xl text-gray-400 group-hover:text-blue-500"></i>
-                                <p class="text-[10px] text-gray-500 mt-1">Mặt sau CCCD</p>
-                            </div>
+                        <div th:unless="${informBooking.customer.fullName != null}"
+                             class="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center">
+                            <i class="fa-solid fa-circle-exclamation text-orange-500 mb-2"></i>
+                            <p class="text-sm text-orange-700 font-medium">Vui lòng đăng nhập để upload ảnh CCCD</p>
                         </div>
                     </div>
 

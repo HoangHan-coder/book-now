@@ -33,7 +33,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     JOIN r.roomType t 
     LEFT JOIN Image i ON i.room.roomId = r.roomId AND i.isCover = true 
     WHERE r.isDeleted = false
-      AND (:keyword IS NULL OR LOWER(t.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
+      AND (:keyword IS NULL OR LOWER(r.roomNumber) LIKE LOWER(CONCAT('%', :keyword, '%')))
       AND (:maxGuest IS NULL OR t.maxGuests = :maxGuest)
       AND (
             :price IS NULL OR :price = ''

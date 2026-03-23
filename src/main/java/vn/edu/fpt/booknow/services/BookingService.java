@@ -17,6 +17,7 @@ import vn.edu.fpt.booknow.repositories.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -408,15 +409,18 @@ public class BookingService {
         return total;
     }
     public String generateUniqueBookingCode() {
+        SecureRandom random = new SecureRandom();
         String newCode;
-        Booking isExisted = new Booking();
 
         do {
-            newCode = "BK" + System.currentTimeMillis();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 8; i++) {
+                sb.append(random.nextInt(10));
+            }
 
-            isExisted = bookingRepository.getByBookingCode(newCode);
+            newCode = "BK" + sb.toString();
 
-        } while (isExisted != null);
+        } while (bookingRepository.getByBookingCode(newCode) != null);
 
         return newCode;
     }
@@ -563,7 +567,7 @@ public class BookingService {
             throw new RuntimeException("Không thể hủy đơn đã hoàn tất Check-in!");
         }
         System.out.println(bookingId + " test 494");
-        booking.setBookingStatus(BookingStatus.FAILED);
+        booking.setBookingStatus(BookingStatus.CANCELED);
         booking.setUpdatedAt(LocalDateTime.now());
 
         bookingRepository.save(booking);
