@@ -39,10 +39,10 @@ public class AuthenticationController {
     }
 
 
-    @GetMapping(value = "/home")
-    public String home() {
-        return "index";
-    }
+//    @GetMapping(value = "/home")
+//    public String home() {
+//        return "index";
+//    }
 
     @GetMapping(value = "/otp")
     public String otp(@RequestParam(name = "email") String email, Model model) {
