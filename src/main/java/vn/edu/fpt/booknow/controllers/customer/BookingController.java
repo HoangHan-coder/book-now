@@ -184,7 +184,7 @@ public class BookingController {
                                  RedirectAttributes redirectAttributes) {
         try {
             Long bookingId = Long.parseLong(id);
-
+            System.out.println(content + " 187");
             if (ratingRaw == null || ratingRaw.isBlank()) {
                 System.out.println("Bạn chưa chọn số sao.");
                 redirectAttributes.addFlashAttribute("error", "Bạn chưa chọn số sao.");
