@@ -3,8 +3,7 @@
 <head th:replace="~{fragments/head :: head(title='Xác minh đặt phòng - BookNow')}">
 
 </head>
-<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
 <style>
     .logo-fixed {
         position: fixed;
@@ -400,14 +399,17 @@
                     <div class="flex justify-center mb-6">
                         <div class="relative w-full max-w-sm aspect-[3/4] bg-gray-900 rounded-xl overflow-hidden shadow-lg border-4 border-gray-100">
 
-                            <div th:if="${checkInSession != null}" id="mediaContainer"
+                            <div id="mediaContainer"
                                  class="w-full h-full flex items-center justify-center text-white">
-                                <input type="hidden" id="bookingId" th:value="${booking.bookingId}">
-                                <input type="hidden" id="checkInSessionId"
-                                       th:value="${checkInSession.getCheckInSessionId()}">
-                                <video th:src="${checkInSession.getVideoUrl()}" class="w-full h-full object-cover"
-                                       controls
-                                       autoplay></video>
+                                <div th:if="${checkInSession != null}">
+                                    <input type="hidden" id="bookingId" th:value="${booking.bookingId}">
+                                    <input type="hidden" id="checkInSessionId"
+                                           th:value="${checkInSession.getCheckInSessionId()}">
+                                    <video th:src="${checkInSession.getVideoUrl()}" class="w-full h-full object-cover"
+                                           controls
+                                           autoplay></video>
+                                </div>
+
                             </div>
                             <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs backdrop-blur-sm">
                                 <i class="fa-solid fa-location-dot mr-1"></i> Tại Homestay
@@ -666,13 +668,6 @@
                 document.getElementById('failureReasonText').textContent = "Booking bị từ chối ở bước xác minh hồ sơ.";
                 updateTimeline(2, "yellow");
                 break;
-            // case "REJECTED_CHECKIN":
-            //     panelFailure?.classList.remove('hidden');
-            //     badge?.classList.add('bg-red-100', 'text-red-800');
-            //     if (badge) badge.textContent = "Bị từ chối";
-            //     document.getElementById('failureReasonText').textContent = "Booking bị từ chối ở bước check-in.";
-            //     updateTimeline(3, "yellow");
-            //     break;
             case "FAILED":
                 panelFailure?.classList.remove('hidden');
                 badge?.classList.add('bg-red-100', 'text-red-800');
@@ -779,7 +774,6 @@
                 return res.text();
             })
             .then(data => {
-
                 console.log("Approve success:", data);
                 bookingStatus = "CHECKED_IN";
                 loadBookingState();
@@ -812,7 +806,7 @@
             .then(data => {
                 console.log("Reject success:", data);
                 alert('Reject thành công và đã gửi thông báo về khách hàng để thực hiện lại check_in');
-                bookingStatus = "PAID";
+                bookingStatus = "APPROVED";
                 loadBookingState();
             })
             .catch(err => {
