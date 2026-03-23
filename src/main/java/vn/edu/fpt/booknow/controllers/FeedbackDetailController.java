@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.fpt.booknow.model.entities.Feedback;
-import vn.edu.fpt.booknow.services.admin.FeedbackDetailService;
+import vn.edu.fpt.booknow.services.FeedbackDetailService;
 
 @Controller
 @RequestMapping("/admin/feedback")

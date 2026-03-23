@@ -191,7 +191,7 @@ public class EditStaffAccountService {
 
 
     private String hashPassword(String password){
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
         return encoder.encode(password);
     }
 }

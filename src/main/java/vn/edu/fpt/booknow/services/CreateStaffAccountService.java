@@ -128,6 +128,6 @@ public class CreateStaffAccountService {
     private String hashPassword(String password){
         return org.springframework.security.crypto.bcrypt.BCrypt
                 .hashpw(password,
-                        org.springframework.security.crypto.bcrypt.BCrypt.gensalt());
+                        org.springframework.security.crypto.bcrypt.BCrypt.gensalt(12));
     }
 }

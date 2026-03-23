@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.services.admin;
+package vn.edu.fpt.booknow.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
