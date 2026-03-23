@@ -71,6 +71,7 @@ public class RoomController {
             booking.setRoom(room1);
             List<String> monthDateStrings = roomService.getNext365Days();
             List<Map<String, Object>> simpleTimetables = roomService.getSimpleTimetables(timetables);
+            model.addAttribute("fullName", customer.getFullName());
             model.addAttribute("timeTableJS", simpleTimetables);
             model.addAttribute("monthDates", monthDateStrings);
             model.addAttribute("bookedKeys", bookedKeys);
@@ -93,16 +94,23 @@ public class RoomController {
 
     @PostMapping("/search")
     public String searchPost(@ModelAttribute("search") SearchDTO searchDTO,
-                             Model model) {
+                             Model model,
+                             @CookieValue(name = "Access_token", required = false) String accessToken) {
         try {
             // Luôn mặc định về trang 0 khi bấm tìm mới
-            Page<DetailRoomDTO> rooms = roomService.getSearchService(searchDTO, searchDTO.getPage());
+            String email;
+            Customer customer = new Customer();            Page<DetailRoomDTO> rooms = roomService.getSearchService(searchDTO, searchDTO.getPage());
             List<Integer> pageNumbers = roomService.getPageNumbers(rooms, 5);
+            if (accessToken != null && !accessToken.isEmpty()) {
+                email = jwtService.extractUserName(accessToken);
+                System.out.println(email);
+                customer = customerService.findCusByEmail(email);
+                model.addAttribute("fullName", customer.getFullName());
+            }
             model.addAttribute("rooms", rooms);
             model.addAttribute("search", searchDTO);
             model.addAttribute("pageNumbers", pageNumbers);
             model.addAttribute("amenities", roomService.getAllAmenity());
-
             return "public/SearchRoom";
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -118,9 +126,7 @@ public class RoomController {
         try {
             // Sử dụng tham số 'page' từ URL
             Page<DetailRoomDTO> rooms = roomService.getSearchService(searchDTO, page);
-
             List<Integer> pageNumbers = roomService.getPageNumbers(rooms, 5);
-
             model.addAttribute("rooms", rooms);
             model.addAttribute("search", searchDTO);
             model.addAttribute("pageNumbers", pageNumbers);

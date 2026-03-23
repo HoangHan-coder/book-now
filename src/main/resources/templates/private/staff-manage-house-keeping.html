@@ -119,7 +119,7 @@
       <h2 class="text-lg font-semibold text-gray-800">Bộ lọc</h2>
     </div>
     <div class="p-6">
-      <form method="get" action="/admin/manage-housekeeping" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <form method="get" th:action="@{/admin/manage-housekeeping}" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
         
         <!-- Task Status Filter -->
         <div class="flex flex-col">
@@ -157,7 +157,7 @@
             <i class="fa-solid fa-filter"></i>
             <span>Lọc</span>
           </button>
-          <a href="/admin/manage-housekeeping" class="flex-1 lg:flex-initial px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-colors font-medium flex items-center justify-center gap-2">
+          <a th:href="@{/admin/manage-housekeeping}" class="flex-1 lg:flex-initial px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-colors font-medium flex items-center justify-center gap-2">
             <i class="fa-solid fa-xmark"></i>
             <span>Xóa</span>
           </a>
@@ -240,7 +240,7 @@
           <!-- Action -->
           <td class="px-6 py-4">
 
-            <a th:href="@{/admin/manage-housekeeping/task-detail/{id}(id=${task.id})}"
+            <a th:href="@{/admin/manage-housekeeping/task-detail/{id}(id=${task.taskId})}"
                class="text-blue-600 hover:underline text-sm mr-3">
               View
             </a>

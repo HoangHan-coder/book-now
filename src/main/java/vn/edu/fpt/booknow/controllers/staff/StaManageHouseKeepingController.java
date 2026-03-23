@@ -80,6 +80,7 @@ public class StaManageHouseKeepingController {
     public String showHouseKeepingTaskDetail(
             @PathVariable("id") Long id,
             Model model) {
+        System.out.println(id);
         HousekeepingTask housekeepingTask = manageHouseKeepingService.getHousekeepingTaskById(id);
         model.addAttribute("housekeepingTask", housekeepingTask);
         model.addAttribute("availableStaff", staffAccountRepository.findAll());

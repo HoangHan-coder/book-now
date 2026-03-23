@@ -64,6 +64,7 @@ public class SecurityConfig {
                                 "/booking/save", "/assets/**",
                                 "/forgot-password", "/verify-otp",
                                 "/resend-otp", "/reset-password",
+                                "/admin/**",
                                 "/book-now/staff/bookings/update/*",
                                 "/404", "/error").permitAll()
                         .anyRequest().authenticated()
@@ -92,7 +93,8 @@ public class SecurityConfig {
                                 "/forgot-password",
                                 "/booking/save", "/assets/**",
                                 "/verify-otp", 
-                                "/resend-otp", 
+                                "/resend-otp",
+                                "/admin/**",
                                 "/reset-password",
                                 "/404", "/error", "/authen/verifiedOtp",
                                 "/authen/registerEmail", "/authen/otp",

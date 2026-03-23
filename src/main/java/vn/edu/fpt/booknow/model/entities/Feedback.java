@@ -24,7 +24,6 @@ public class Feedback {
 
 
 
-    @Size(max = 1000)
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "booking_id", nullable = false)

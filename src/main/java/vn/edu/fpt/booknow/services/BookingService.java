@@ -139,7 +139,7 @@ public class BookingService {
             booking.setIdCardBackUrl(idCardBackUrl);
             booking.setIdCardBackPublicId(publicIdCardBackUrl);
 
-            updateStatus(BookingStatus.APPROVED, booking.getBookingCode());
+            updateStatus(BookingStatus.PAID, booking.getBookingCode());
 
         } catch (Exception e) {
             throw new Exception("Lỗi upload ảnh lên cloud");
@@ -197,8 +197,10 @@ public class BookingService {
             if (!result.isEmpty()) {
                 return setErrorMessage(redirectAttributes, result, bookingDTO.getRoom().getRoomId());
             }
-            List<WorkShift> allShifts = fillMissingShifts(Arrays.asList(firstShift, lastShift), bookingDTO.getRoom().getRoomId());
-
+            List<WorkShift> allShifts = fillMissingShifts(Arrays.asList(firstShift, lastShift));
+            if (allShifts == null) {
+                return setErrorMessage(redirectAttributes, "Thời gian không hợp lệ!", bookingDTO.getRoom().getRoomId());
+            }
             String resultCheck = checkDuplicateShifts(allShifts, bookingDTO.getRoom().getRoomId());
             if (!resultCheck.isEmpty()) {
                 return setErrorMessage(redirectAttributes, resultCheck, bookingDTO.getRoom().getRoomId());
@@ -392,11 +394,11 @@ public class BookingService {
         Room room1 = roomRepository.getPrice(roomId);
         BigDecimal dayPrice = room1.getRoomType().getBasePrice();      // Giá cho ca Sáng/Chiều/Tối
         BigDecimal nightPrice = room1.getRoomType().getOverPrice(); // Giá cho ca Đêm
-
         BigDecimal total = BigDecimal.ZERO;
-
         for (WorkShift shift : group) {
-            if ("Đêm".equals(shift.getShiftType())) {
+            System.out.println(shift.getShiftType() + " 386");
+            if (shift.getShiftType().toLowerCase().contains("đêm")) {
+                System.out.println(shift.getShiftType() + " 388");
                 total = total.add(nightPrice);
             } else {
                 total = total.add(dayPrice);
@@ -410,7 +412,7 @@ public class BookingService {
         Booking isExisted = new Booking();
 
         do {
-            newCode = "BK-" + System.currentTimeMillis();
+            newCode = "BK" + System.currentTimeMillis();
 
             isExisted = bookingRepository.getByBookingCode(newCode);
 
@@ -446,7 +448,6 @@ public class BookingService {
         for (WorkShift shift : allShifts) {
             String uniqueKey = shift.getWorkDate().toLocalDate().toString() + "-" + shift.getShiftType();
             if (!internalCheck.add(uniqueKey)) {
-                System.out.println("tesst 286");
                 return "Bạn chọn trùng ca " + shift.getShiftType() + " ngày " + shift.getWorkDate().format(dateFormatter);
             }
         }
@@ -467,7 +468,7 @@ public class BookingService {
         }
         return "";
     }
-    private List<WorkShift> fillMissingShifts(List<WorkShift> selectedShifts, Long roomId) {
+    private List<WorkShift> fillMissingShifts(List<WorkShift> selectedShifts) {
         if (selectedShifts.size() < 2) return selectedShifts;
 
         List<WorkShift> fullList = new ArrayList<>();
@@ -492,6 +493,9 @@ public class BookingService {
                 // If this shift falls within the range of the first and last shifts the customer chooses
                 if (!slotStart.isBefore(first.getStartTime()) && !slotStart.isAfter(last.getStartTime())) {
                     String type = extractType(slot.getSlotName());
+                    if (type.equalsIgnoreCase("null")) {
+                        return null;
+                    }
                     fullList.add(new WorkShift(slotStart.toLocalDate().atStartOfDay(), slotStart, slotEnd, type));
                 }
             }
@@ -501,10 +505,14 @@ public class BookingService {
     }
 
     private String extractType(String slotName) {
-        if (slotName.contains("Sáng")) return "Sáng";
-        if (slotName.contains("Chiều")) return "Chiều";
-        if (slotName.contains("Tối")) return "Tối";
-        return "Đêm";
+        if (slotName == null || slotName.isEmpty()) return "null";
+
+        List<Timetable> allTypes = timeTableRepository.findAll();
+        return allTypes.stream()
+                .map(Timetable::getSlotName)
+                .filter(typeName -> slotName.contains(typeName))
+                .findFirst()
+                .orElse(null);
     }
     public Booking getFindCode(String code) {
         Booking booking = bookingRepository.getByBookingCode(code);
