@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head th:replace="~{fragments/head :: head(title='Staff Dashboard - BookNow')}"></head>
+<style>
+/* Specific Logo Positioning Rule */
+.logo-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    margin-top: 25px;
+    margin-left: 25px;
+    z-index: 60; /* Higher than sidebar */
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-icon {
+    color: #3b82f6;
+}
+
+/* Sidebar transitions */
+.sidebar {
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Hide scrollbar for sidebar */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+</style>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+<div th:replace="~{fragments/sidebar :: staff-sidebar(activePage='dashboard')}"></div>
+
+<!-- MAIN CONTENT -->
+<main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
+
+    <!-- TOP HEADER AREA -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <h1 class="text-2xl font-bold text-gray-800 lg:hidden">Dashboard</h1>
+        <!-- User Info -->
+        <div class="flex items-center gap-4 bg-white p-3 rounded-xl shadow-sm border border-gray-100 md:ml-auto">
+            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold border-2 border-white shadow-sm">
+                NV
+            </div>
+            <div class="pr-2">
+                <h4 class="text-sm font-bold text-gray-800 leading-none">Trần Thị B</h4>
+                <span class="text-xs text-green-600 font-semibold bg-green-50 px-2 py-0.5 rounded-full mt-1 inline-block">Nhân viên</span>
+            </div>
+            <button class="text-gray-400 hover:text-gray-600 ml-2">
+                <i class="fa-solid fa-chevron-down text-xs"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- DATE INFO -->
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Hoạt động trong ngày</h2>
+        <p th:text="${lastUpdate}" class="text-gray-500 text-sm mt-1" id="currentDate"></p>
+    </div>
+
+    <!-- STATS WIDGETS -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+        <!-- Widget 1: Đơn đặt phòng hôm nay -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div class="absolute right-0 top-0 w-24 h-24 bg-blue-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+            <div class="relative z-10">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Đơn mới hôm nay</p>
+                        <h3 th:text="${dashboard.newBookings}" class="text-3xl font-bold text-gray-800 mt-2"></h3>
+                    </div>
+                    <div class="p-2 bg-blue-100 rounded-lg text-blue-600 shadow-sm">
+                        <i class="fa-solid fa-calendar-plus text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-xs">
+                        <a href="#" class="text-blue-600 font-medium flex items-center gap-1">
+                            Xem chi tiết <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Widget 2: Số phòng còn trống -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div class="absolute right-0 top-0 w-24 h-24 bg-green-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+            <div class="relative z-10">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Phòng còn trống</p>
+                        <h3 th:text="${dashboard.availableRooms}" class="text-3xl font-bold text-gray-800 mt-2"></h3>
+                    </div>
+                    <div class="p-2 bg-green-100 rounded-lg text-green-600 shadow-sm">
+                        <i class="fa-solid fa-door-open text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-xs">
+                    <span th:text="|Tổng số phòng: ${dashboard.totalRooms}|" class="text-gray-500"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Widget 3: Check-in chờ xử lý -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div class="absolute right-0 top-0 w-24 h-24 bg-orange-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+            <div class="relative z-10">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Check-in chờ</p>
+                        <h3 th:text="${dashboard.checkinPending}" class="text-3xl font-bold text-gray-800 mt-2"></h3>
+                    </div>
+                    <div class="p-2 bg-orange-100 rounded-lg text-orange-600 shadow-sm">
+                        <i class="fa-solid fa-user-clock text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-xs">
+                    <a href="#" class="text-orange-500 font-bold animate-pulse">Cần xử lý ngay</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Widget 4: Phản hồi chưa trả lời -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div class="absolute right-0 top-0 w-24 h-24 bg-red-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+            <div class="relative z-10">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Phản hồi mới</p>
+                        <h3 th:text="${dashboard.newFeedback}" class="text-3xl font-bold text-gray-800 mt-2"></h3>
+                    </div>
+                    <div class="p-2 bg-red-100 rounded-lg text-red-600 shadow-sm">
+                        <i class="fa-regular fa-comment-dots text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-xs">
+                    <span class="text-gray-400">Từ khách hàng</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OPERATIONAL TABLE SECTION -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Check-in List -->
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="font-bold text-gray-800">Danh sách Check-in hôm nay</h3>
+                <a href="#" class="text-blue-600 text-sm hover:underline">Xem tất cả</a>
+            </div>
+            <div class="overflow-x-auto p-2">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                    <tr>
+                        <th class="text-xs font-semibold text-gray-500 uppercase p-3 bg-gray-50 rounded-l-lg">Khách
+                            hàng
+                        </th>
+                        <th class="text-xs font-semibold text-gray-500 uppercase p-3 bg-gray-50">Phòng</th>
+                        <th class="text-xs font-semibold text-gray-500 uppercase p-3 bg-gray-50">Giờ đến</th>
+                        <th class="text-xs font-semibold text-gray-500 uppercase p-3 bg-gray-50">Trạng thái</th>
+                        <th class="text-xs font-semibold text-gray-500 uppercase p-3 bg-gray-50 rounded-r-lg">Hành
+                            động
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody class="text-sm divide-y divide-gray-100">
+                    <tr th:each="booking, stat : ${dashboard.bookings}"
+                        th:if="${stat.index < 5}"
+                    >
+                        <td th:text="${booking.customer.fullName}" class="p-3 font-medium text-gray-800">Nguyễn Văn
+                            Khách
+                        </td>
+                        <td th:text="|${booking.room.roomNumber} (${booking.room.roomType.name})|"
+                            class="p-3 text-gray-600"></td>
+                        <td th:text="${#temporals.format(booking.checkInTime, 'HH:mm')}" class="p-3 text-gray-600"></td>
+                        <td class="p-3">
+    <span th:text="${booking.bookingStatus == T(vn.edu.fpt.booknow.model.entities.BookingStatus).PAID ? 'Chờ Check-in': (booking.bookingStatus == T(vn.edu.fpt.booknow.model.entities.BookingStatus).CHECKED_IN ? 'Đã Check-in' : booking.bookingStatus)}"
+          th:classappend="${booking.bookingStatus == T(vn.edu.fpt.booknow.model.entities.BookingStatus).PAID ? 'bg-orange-100 text-orange-600': (booking.bookingStatus == T(vn.edu.fpt.booknow.model.entities.BookingStatus).CHECKED_IN ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600')}"
+          class="px-2 py-1 rounded text-xs font-medium">
+    </span>
+                        </td>
+                        <td class="p-3">
+                            <a href="#" th:if="${booking.bookingStatus == T(vn.edu.fpt.booknow.model.entities.BookingStatus).PAID}"
+                                    class="text-blue-600 hover:text-blue-800 font-medium">
+                                Xử lý
+                            </a>
+                            <a href="#" th:if="${booking.bookingStatus == T(vn.edu.fpt.booknow.model.entities.BookingStatus).CHECKED_IN}"
+                                    class="text-gray-600 hover:text-gray-800 font-medium">
+                                Chi tiết
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Quick Room Status -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col">
+            <div class="p-5 border-b border-gray-100">
+                <h3 class="font-bold text-gray-800">Trạng thái phòng nhanh</h3>
+            </div>
+            <div class="p-5 flex-1 overflow-y-auto max-h-[300px] space-y-4">
+                <div th:if="${dashboard.rooms.size() == 0}"
+                     class="text-center text-gray-400 text-sm">
+                    Chưa có trạng thái hôm nay
+                </div>
+                <div th:each="room, stat : ${dashboard.rooms}"
+                     th:if="${stat.index < 5}">
+                    <!-- Room Item -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                            <div>
+                                <p th:text="${room.roomNumber}" class="text-sm font-medium text-gray-800"></p>
+                                <p th:text="${room.roomType.name}" class="text-xs text-gray-500"></p>
+                            </div>
+                        </div>
+                        <span th:text="${room.status.displayRoomName}"
+                              class="text-xs bg-green-50 text-green-600 px-2 py-1 rounded"
+                              th:classappend="${room.status.cssEnumClass}"
+                        ></span>
+                    </div>
+                </div>
+                <div class="p-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
+                    <a th:href="@{/admin/bookings}" class="block w-full text-center text-sm text-blue-600 font-medium hover:text-blue-700">
+                        xem Dash sách phòng
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- SCRIPT -->
+<script>
+    // Set Current Date in Vietnamese
+    const dateElement = document.getElementById('currentDate');
+    const options = {weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric'};
+    const today = new Date();
+    dateElement.textContent = today.toLocaleDateString('vi-VN', options);
+
+    // (Mobile sidebar script moved to fragment)
+</script>
+<div th:replace="~{fragments/sidebar :: sidebar-scripts}"></div>
+</body>
+</html>

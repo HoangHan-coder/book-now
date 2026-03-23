@@ -6,13 +6,11 @@ import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.dto.BookingCustomerDTO;
-import vn.edu.fpt.booknow.model.dto.BookingDTO;
 import vn.edu.fpt.booknow.model.dto.WorkShift;
 import vn.edu.fpt.booknow.model.entities.*;
 import vn.edu.fpt.booknow.repositories.*;
@@ -68,6 +66,12 @@ public class BookingService {
         this.customerRepository = customerRepository;
         this.jwtService = jwtService;
     }
+
+
+    public Booking findById(long id) {
+        return bookingRepository.findById(id).orElse(null);
+    }
+
 
     // ========================Hoang Han=============================
 
@@ -135,7 +139,7 @@ public class BookingService {
             booking.setIdCardBackUrl(idCardBackUrl);
             booking.setIdCardBackPublicId(publicIdCardBackUrl);
 
-            updateStatus(BookingStatus.PENDING, booking.getBookingCode());
+            updateStatus(BookingStatus.APPROVED, booking.getBookingCode());
 
         } catch (Exception e) {
             throw new Exception("Lỗi upload ảnh lên cloud");
@@ -160,14 +164,19 @@ public class BookingService {
                 .build();
     }
 
+    public Booking save(Booking booking) {
+        return bookingRepository.save(booking);
+    }
+
     public String saveBooking(BookingCustomerDTO bookingDTO,
                               MultipartFile frontImg,
                               MultipartFile backImg,
                               RedirectAttributes redirectAttributes,
                               String accessToken) {
-        String username = jwtService.extractUserName(accessToken);
+
 
         try {
+            String username = jwtService.extractUserName(accessToken);
             if (isRateLimited(username)) {
                 return setErrorMessage(redirectAttributes, "Thao tác quá nhanh! Vui lòng đợi 1 phút.", bookingDTO.getRoom().getRoomId());
             }
@@ -218,13 +227,17 @@ public class BookingService {
                     return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt sau!", bookingDTO.getRoom().getRoomId());
                 }
             }
-            saveSingleBookingToDatabase(allShifts, bookingDTO, username, redirectAttributes, frontUrl, backUrl, frontId,backId);
+            // 6. Lưu vào Database
+            Booking booking = saveSingleBookingToDatabase(allShifts, bookingDTO, username, redirectAttributes, frontUrl, backUrl, frontId, backId);
 
-            redirectAttributes.addFlashAttribute("toastMessage", "Đặt phòng thành công!");
-            redirectAttributes.addFlashAttribute("toastType", "success");
-            return "redirect:/payment";
+//            redirectAttributes.addFlashAttribute("toastMessage", "Đặt phòng thành công!");
+//            redirectAttributes.addFlashAttribute("toastType", "success");
+            if (booking == null) {
+                return setErrorMessage(redirectAttributes,  "Đặt phòng không thành công!", bookingDTO.getRoom().getRoomId());
+            }
+            return "redirect:/bookings/" + booking.getBookingId();
 
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             return setErrorMessage(redirectAttributes, e.getMessage(), bookingDTO.getRoom().getRoomId());
         }
     }
@@ -303,7 +316,7 @@ public class BookingService {
         }
         return "";
     }
-    private void saveSingleBookingToDatabase(List<WorkShift> allShifts,
+    private Booking saveSingleBookingToDatabase(List<WorkShift> allShifts,
                                              BookingCustomerDTO bookingDTO,
                                              String email,
                                              RedirectAttributes redirectAttributes,
@@ -312,7 +325,7 @@ public class BookingService {
                                              String frontId,
                                              String backId) {
 
-           if (allShifts.isEmpty()) return;
+           if (allShifts.isEmpty()) return null;
 
            List<Timetable> timetableList = timeTableRepository.findAll();
            Customer customer = customerRepository.getCustomerByEmail(email);
@@ -374,7 +387,7 @@ public class BookingService {
                    scheduleRepository.save(scheduler);
                }
            }
-
+        return savedBooking;
     }
     public BigDecimal calculateTotalAmount(List<WorkShift> group, Long roomId) {
 
@@ -554,6 +567,25 @@ public class BookingService {
         booking.setUpdatedAt(LocalDateTime.now());
 
         bookingRepository.save(booking);
+    }
+
+    @Transactional
+    @Scheduled(fixedRate = 60000)
+    public void cancelExpiredPendingPayments() {
+        LocalDateTime timeLimit = LocalDateTime.now().minusMinutes(15);
+        List<Booking> bookings = bookingRepository.findExpiredPendingBookings(timeLimit);
+        for (Booking b : bookings) {
+            try {
+                b.setBookingStatus(BookingStatus.FAILED);
+                b.setNote("Hệ thống tự động hủy do quá hạn thanh toán 15 phút.");
+                b.setUpdatedAt(LocalDateTime.now());
+
+                bookingRepository.save(b);
+                System.out.println("Đã tự động hủy đơn hàng quá hạn: " + b.getBookingId());
+            } catch (Exception e) {
+                System.err.println("Lỗi khi hủy booking " + b.getBookingId());
+            }
+        }
     }
 }
 

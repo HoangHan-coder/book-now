@@ -7,7 +7,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,8 +16,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import vn.edu.fpt.booknow.conponents.HttpCookieOAuth2AuthorizationRequest;
+import vn.edu.fpt.booknow.conponents.OAuth2LoginSuccessHandler;
 import vn.edu.fpt.booknow.services.CustomUserDetailsService;
-import vn.edu.fpt.booknow.services.RecaptchaService;
+import vn.edu.fpt.booknow.services.CustomOAuth2UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -26,6 +27,15 @@ public class SecurityConfig {
 
     @Autowired
     private JWTFilter jwtFilter;
+
+    @Autowired
+    private HttpCookieOAuth2AuthorizationRequest cookieRepo;
+
+    @Autowired
+    private CustomOAuth2UserService customOAuth2UserService;
+
+    @Autowired
+    private OAuth2LoginSuccessHandler successHandler;
 
     @Autowired
     private CustomUserDetailsService detailsService;
@@ -47,11 +57,15 @@ public class SecurityConfig {
                 .securityMatcher("/admin/**")
                 .authenticationProvider(staffAuthProvider())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/login","/auth/login","/auth/logout", "/public/**", "/home","/search","/detail/**","/pay/**",
-                                "/booking/save",
-                                "/error",
-                                "/forgot-password", "/verify-otp", "/resend-otp", "/reset-password",
-                                "/404").permitAll()
+                        .requestMatchers("/admin/login","/auth/login",
+                                "/auth/logout", "/public/**",
+                                "/home","/search",
+                                "/detail/**","/pay/**",
+                                "/booking/save", "/assets/**",
+                                "/forgot-password", "/verify-otp",
+                                "/resend-otp", "/reset-password",
+                                "/book-now/staff/bookings/update/*",
+                                "/404", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -73,15 +87,33 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login",
                                 "/auth/logout", "/register",
-                                "/public/**", "/home","/pay/**", "/home","/search","/detail/**",
-                                "/forgot-password", 
+                                "/public/**", "/home","/pay/**",
+                                "/home","/search","/detail/**",
+                                "/forgot-password",
+                                "/booking/save", "/assets/**",
                                 "/verify-otp", 
                                 "/resend-otp", 
                                 "/reset-password",
-                                "/error",
-                                "/booking/save",
-                                "/404").permitAll()
+                                "/404", "/error", "/authen/verifiedOtp",
+                                "/authen/registerEmail", "/authen/otp",
+                                "/authen/registerForm",
+                                "/checkin/start",
+                                "/book-now/checkin/page/**","/authen/login").permitAll()
                         .anyRequest().authenticated()
+                )
+                
+                .oauth2Login(oauth -> oauth
+                        .authorizationEndpoint(authz -> authz
+                                .authorizationRequestRepository(cookieRepo)
+                        )
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
+                        .successHandler(successHandler)
+                ).exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendRedirect("/book-now/authen/login");
+                        })
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

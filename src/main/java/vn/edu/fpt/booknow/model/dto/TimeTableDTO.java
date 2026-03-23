@@ -1,16 +1,14 @@
 package vn.edu.fpt.booknow.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import vn.edu.fpt.booknow.model.entities.BookingStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+
+@Setter
+@Getter
 public class TimeTableDTO {
     private Long bookingId;
     private Long roomId;
@@ -18,4 +16,20 @@ public class TimeTableDTO {
     private BigDecimal totalAmount;
     private Long timetableId;
     private LocalDateTime date;
+
+    public TimeTableDTO() {
+    }
+
+
+    public TimeTableDTO(Long bookingId, Long roomId, BookingStatus bookingStatus,
+                        BigDecimal totalAmount, Long timetableId, LocalDateTime date) {
+        this.bookingId = bookingId;
+        this.roomId = roomId;
+        this.bookingStatus = bookingStatus; // Safe string conversion
+        this.totalAmount = totalAmount;
+        this.timetableId = timetableId;
+        this.date = date;
+    }
+
+
 }

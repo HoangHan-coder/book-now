@@ -96,4 +96,83 @@ public class MailService {
             e.printStackTrace();
         }
     }
+    public void sendNewPassword(String toEmail, String newPassword) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(toEmail);
+            helper.setSubject("Mật khẩu mới của bạn");
+
+            String content = """
+            <div style="font-family:Arial,sans-serif;line-height:1.6">
+                <h2 style="color:#3b82f6;">Cập nhật mật khẩu thành công</h2>
+
+                <p>Xin chào,</p>
+
+                <p>Mật khẩu của bạn đã được cập nhật thành công.</p>
+
+                <p><b>Mật khẩu mới:</b> %s</p>
+
+                <p>Vui lòng đăng nhập và đổi lại mật khẩu nếu cần.</p>
+
+                <br>
+                <p style="color:#6b7280">
+                    Trân trọng,<br>
+                    BookNow System
+                </p>
+            </div>
+            """.formatted(newPassword);
+
+            helper.setText(content, true);
+
+            mailSender.send(message);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendAccountCreated(String toEmail, String fullName, String phone, String email, String password) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(toEmail);
+            helper.setSubject("Tài khoản của bạn đã được tạo");
+
+            String content = """
+        <div style="font-family:Arial,sans-serif;line-height:1.6">
+            <h2 style="color:#22c55e;">Tạo tài khoản thành công</h2>
+
+            <p>Xin chào <b>%s</b>,</p>
+
+            <p>Tài khoản của bạn đã được tạo thành công với thông tin:</p>
+
+            <ul>
+                <li><b>Họ tên:</b> %s</li>
+                <li><b>Số điện thoại:</b> %s</li>
+                <li><b>Email:</b> %s</li>
+                <li><b>Mật khẩu:</b> %s</li>
+            </ul>
+
+            <p>Bạn đã có thể đăng nhập vào hệ thống Booking rồi nhé!</p>
+
+            <br>
+            <p style="color:#6b7280">
+                Trân trọng,<br>
+                BookNow System
+            </p>
+        </div>
+        """.formatted(fullName, fullName, phone, email, password);
+
+            helper.setText(content, true);
+
+            mailSender.send(message);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

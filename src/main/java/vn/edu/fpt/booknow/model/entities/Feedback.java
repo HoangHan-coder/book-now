@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
@@ -20,21 +21,22 @@ public class Feedback {
     @Column(name = "feedback_id", nullable = false)
     private Long feedbackId;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "booking_id", nullable = false)
-    private Booking booking;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id")
-    private StaffAccount admin;
 
-    @NotNull
-    @Column(name = "rating", nullable = false)
-    private Integer rating;
 
     @Size(max = 1000)
     @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "booking_id", nullable = false)
+    private vn.edu.fpt.booknow.model.entities.Booking booking;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "admin_id", nullable = false)
+    private StaffAccount admin;
+
+    @Column(name = "rating", nullable = false)
+    private Integer rating;
+
     @Nationalized
     @Column(name = "content", nullable = false, length = 1000)
     private String content;

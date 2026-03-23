@@ -9,9 +9,10 @@ import vn.edu.fpt.booknow.model.entities.Timetable;
 import java.util.List;
 
 public interface TimeTableRepository extends JpaRepository<Timetable, Long> {
+
     @Query("SELECT new vn.edu.fpt.booknow.model.dto.TimeTableDTO(" +
             "    b.bookingId, " +
-            "    r.roomId," +
+            "    r.roomId, " +
             "    b.bookingStatus, " +
             "    b.totalAmount, " +
             "    t.timetableId, " +
@@ -22,5 +23,18 @@ public interface TimeTableRepository extends JpaRepository<Timetable, Long> {
             "JOIN Timetable t ON t.timetableId = s.timetable.timetableId " +
             "WHERE r.roomId = :roomId ")
     List<TimeTableDTO> getBookingDetailsByRoomId(@Param("roomId") Long roomId);
+
+        @Query("SELECT new vn.edu.fpt.booknow.model.dto.TimeTableDTO(" +
+            "    b.bookingId, " +
+            "    r.roomId, " +
+            "    b.bookingStatus, " +
+            "    b.totalAmount, " +
+            "    t.timetableId, " +
+            "    s.date) " +
+            "FROM Booking b " +
+            "JOIN b.room r " +
+            "JOIN b.schedulers s " +
+            "JOIN s.timetable t")
+    List<TimeTableDTO> getBookingDetails();
 
 }

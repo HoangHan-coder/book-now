@@ -5,10 +5,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -71,5 +74,12 @@ public class Customer {
     @Nationalized
     @Column(name = "avatar_public_id")
     private String avatarPublicId;
+
+
+    @OneToMany(mappedBy = "customer")
+    private List<Booking> bookings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "customer")
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
 
 }

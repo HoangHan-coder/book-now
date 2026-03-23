@@ -75,6 +75,10 @@ public class BookingDTO {
         return checkOutTime.toLocalDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
     }
 
+    public String getCreateAt() {
+        return createdAt.format(DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy"));
+    }
+
     public String getCheckInTime() {
         return checkInTime.format(DateTimeFormatter.ofPattern("HH:mm"));
     }
@@ -101,5 +105,10 @@ public class BookingDTO {
 
     public String getActualCheckOutTime() {
         return actualCheckOutTime != null ? actualCheckOutTime.format(DateTimeFormatter.ofPattern("HH:mm")) : null;
+    }
+
+    public boolean isOverStay() {
+        LocalDateTime now = LocalDateTime.now();
+        return actualCheckOutTime == null && checkOutTime.isBefore(now);
     }
 }

@@ -1,49 +1,40 @@
 package vn.edu.fpt.booknow.model.entities;
 
+import jakarta.persistence.Entity;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "HousekeepingTask", schema = "dbo", indexes = {
         @Index(name = "IX_HousekeepingTask_Status_Type", columnList = "task_status, task_type"),
         @Index(name = "IX_HousekeepingTask_AssignedTo", columnList = "assigned_to, task_status")
 })
+@ToString(exclude = {"room", "booking", "assignedTo", "createdBy"})
 public class HousekeepingTask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "task_id", nullable = false)
-    private Long id;
+    @Column(name = "task_id")
+    private Long taskId;
 
-    @NotNull
+    // FK -> Room
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "booking_id")
-    private Booking booking;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assigned_to")
-    private StaffAccount assignedTo;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by")
-    private StaffAccount createdBy;
-
-    @Size(max = 30)
-    @NotNull
-    @Column(name = "task_type", nullable = false, length = 30)
-    private String taskType;
 
     @Enumerated(EnumType.STRING)
     @NotNull
@@ -62,9 +53,25 @@ public class HousekeepingTask {
     @Column(name = "notes", length = 1000)
     private String notes;
 
-    @NotNull
-    @ColumnDefault("sysdatetime()")
-    @Column(name = "created_at", nullable = false)
+
+    // FK -> Booking
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "booking_id")
+    private Booking booking;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn (name = "assigned_to")
+    private StaffAccount assignedTo;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "created_by")
+    private StaffAccount createdBy;
+
+    @Column(name = "task_type")
+    private String taskType;
+
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "started_at")
@@ -72,5 +79,28 @@ public class HousekeepingTask {
 
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
+
+    @Column(name = "note_housekeeping")
+    private String noteHousekeeping;
+
+    public LocalDate date(){
+        return createdAt.toLocalDate();
+    }
+    public LocalTime createTime(){
+        return createdAt.toLocalTime();
+    }
+
+    public LocalDate dateStart(){
+        return startedAt.toLocalDate();
+    }
+
+    public LocalTime timeStart(){
+        return startedAt.toLocalTime();
+    }
+
+    public LocalTime completedTime(){
+        return completedAt.toLocalTime();
+    }
+
 
 }

@@ -15,6 +15,7 @@ public class MomoRequestDTO {
     @JsonProperty("extraData")    private String extraData;
     @JsonProperty("requestType")  private String requestType;
     @JsonProperty("signature")    private String signature;
+    @JsonProperty("expireDate") private String expireDate;
 
     private MomoRequestDTO() {}
 
@@ -29,6 +30,10 @@ public class MomoRequestDTO {
     public String getExtraData()   { return extraData; }
     public String getRequestType() { return requestType; }
     public String getSignature()   { return signature; }
+
+    public String getExpireDate() {
+        return expireDate;
+    }
 
     public static Builder builder() { return new Builder(); }
 
@@ -46,6 +51,8 @@ public class MomoRequestDTO {
         public Builder extraData(String v)    { obj.extraData    = v; return this; }
         public Builder requestType(String v)  { obj.requestType  = v; return this; }
         public Builder signature(String v)    { obj.signature    = v; return this; }
+        public Builder expireDate(String v)    { obj.expireDate    = v; return this; }
+
         public MomoRequestDTO build()         { return obj; }
     }
 }

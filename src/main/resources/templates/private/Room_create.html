@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head th:replace="~{fragments/head :: head(title='Thêm phòng mới - BookNow')}"></head>
+<style>
+/* Specific Logo Positioning Rule */
+.logo-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    margin-top: 25px;
+    margin-left: 25px;
+    z-index: 60; /* Higher than sidebar */
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-icon {
+    color: #3b82f6;
+}
+
+/* Sidebar transitions */
+.sidebar {
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Hide scrollbar for sidebar */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Upload Area Dashed Border Animation */
+.upload-area:hover {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+}
+</style>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+    <div th:replace="~{fragments/sidebar :: admin-sidebar(activePage='rooms')}"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
+        
+        <!-- HEADER -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+            <div class="flex items-center gap-3">
+                <a th:href="@{/admin/list}" class="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Thêm phòng mới</h1>
+                    <p class="text-sm text-gray-500 mt-1">Thiết lập thông tin và hình ảnh cho phòng</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORM CARD -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <form id="createRoomForm"
+                  th:action="@{/admin/rooms/create}"
+                  method="post"
+                  enctype="multipart/form-data"
+                  class="p-8">
+                
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                    <!-- LEFT COLUMN: Basic Info (2/3 width) -->
+                    <div class="xl:col-span-2 space-y-8">
+                        
+                        <!-- Section: General Info -->
+                        <div class="space-y-6">
+                            <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-2 flex items-center gap-2">
+                                <i class="fa-regular fa-id-card text-blue-500"></i> Thông tin cơ bản
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Room Number -->
+                                <div class="space-y-1">
+                                    <label class="block text-sm font-medium text-gray-700">Số phòng <span class="text-red-500">*</span></label>
+                                    <input id="roomNumber"
+                                           name="roomNumber"
+                                           type="text"
+                                           required
+                                           placeholder="Ví dụ: G-Cyber-01"
+                                           class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+
+                                    <p id="roomError" class="text-red-500 text-xs mt-1"></p>
+                                </div>
+
+                                <!-- Initial Status -->
+                                <div class="space-y-1">
+                                    <label class="block text-sm font-medium text-gray-700">Trạng thái ban đầu</label>
+                                    <div class="flex items-center gap-2 px-3 py-2.5 border border-green-200 rounded-lg bg-green-50 text-green-700 text-sm font-medium">
+                                        <i class="fa-solid fa-circle text-[8px]"></i>
+                                        AVAILABLE
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Room Type with Preview -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                                <div class="space-y-1">
+                                    <label class="block text-sm font-medium text-gray-700">Loại phòng <span class="text-red-500">*</span></label>
+                                    <select id="roomTypeSelect"
+                                            name="roomTypeId"
+                                            class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white mb-2">
+                                        <option value="" selected disabled>-- Chọn loại phòng --</option>
+                                        <option th:each="type : ${roomType}"
+                                                th:value="${type.roomTypeId}"
+                                                th:data-img="${type.imageUrl}"
+                                                th:data-baseprice="${type.basePrice}"
+                                                th:data-overprice="${type.overPrice}"
+                                                th:data-description="${type.description}"
+                                                th:text="${type.name}">
+                                        </option>
+
+                                    </select>
+                                    <p class="text-xs text-gray-500 italic">Chọn loại phòng để xem ảnh minh họa chuẩn.</p>
+                                </div>
+                                <div class="hidden md:block">
+                                    <div class="w-full aspect-video bg-gray-100 rounded-lg border border-gray-200 overflow-hidden flex items-center justify-center relative">
+                                        <img id="roomTypePreview" th:src="${roomType.size() > 0 ? roomType[0].imageUrl : '/images/default-room.jpg'}" alt="Room Type Preview" class="w-full h-full object-cover transition-opacity duration-300">
+                                        <div class="absolute inset-0 bg-black/5 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity pointer-events-none">
+                                            <span class="bg-white/90 px-2 py-1 rounded text-xs text-gray-700 shadow-sm">Ảnh minh họa</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pricing -->
+                            <div class="grid grid-cols-2 gap-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
+                                <div class="space-y-1">
+                                    <label class="block text-sm font-medium text-blue-900">
+                                        Giá / Slot (VND)
+                                    </label>
+                                    <div class="relative group">
+                                        <input type="text"
+                                               name="basePrice"
+                                               data-min="100000"
+                                               data-max="5000000"
+                                               data-step="1000"
+                                               th:value="${basePrice != null ? basePrice : 0}"
+                                               class="money-input block w-full pl-3 pr-8 py-2.5 border border-blue-200 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-bold">
+                                        <div class="absolute right-[21px] top-1/2 -translate-y-1/2
+                                                flex flex-col overflow-hidden
+                                                rounded bg-white-50
+                                                shadow-sm
+                                                opacity-0 pointer-events-none
+                                                group-hover:opacity-100 group-hover:pointer-events-auto
+                                                transition-opacity duration-200">
+                                            <!-- UP -->
+                                            <button type="button"
+                                                    data-action="increase"
+                                                    class="price-btn w-6 h-5 flex items-center justify-center
+                                                       text-[9px] text-gray-500
+                                                       hover:bg-gray-100 active:bg-gray-200
+                                                       transition select-none leading-none">
+                                                ▲
+                                            </button>
+
+                                            <!-- DOWN -->
+                                            <button type="button"
+                                                    data-action="decrease"
+                                                    class="price-btn w-6 h-5 flex items-center justify-center
+                                                       text-[9px] text-gray-500
+                                                       hover:bg-gray-100 active:bg-gray-200
+                                                       transition select-none leading-none">
+                                                ▼
+                                            </button>
+                                        </div>
+                                        <span class="absolute inset-y-0 right-3 flex items-center text-gray-400 text-xs">₫</span>
+                                    </div>
+                                    <p class="price-error hidden text-xs text-red-600 mt-1"></p>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="block text-sm font-medium text-blue-900">
+                                        Giá / Đêm (VND) <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative group">
+                                        <input type="text"
+                                               name="overPrice"
+                                               data-min="100000"
+                                               data-max="5000000"
+                                               data-step="1000"
+                                               th:value="${overPrice != null ? overPrice : 0}"
+                                               class="money-input block w-full pl-3 pr-8 py-2.5 border border-blue-200 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-bold">
+                                        <div class="absolute right-[21px] top-1/2 -translate-y-1/2
+                                                flex flex-col overflow-hidden
+                                                rounded bg-white-50
+                                                shadow-sm
+                                                opacity-0 pointer-events-none
+                                                group-hover:opacity-100 group-hover:pointer-events-auto
+                                                transition-opacity duration-200">
+                                            <!-- UP -->
+                                            <button type="button"
+                                                    data-action="increase"
+                                                    class="price-btn w-6 h-5 flex items-center justify-center
+                                                       text-[9px] text-gray-500
+                                                       hover:bg-gray-100 active:bg-gray-200
+                                                       transition select-none leading-none">
+                                                ▲
+                                            </button>
+
+                                            <!-- DOWN -->
+                                            <button type="button"
+                                                    data-action="decrease"
+                                                    class="price-btn w-6 h-5 flex items-center justify-center
+                                                       text-[9px] text-gray-500
+                                                       hover:bg-gray-100 active:bg-gray-200
+                                                       transition select-none leading-none">
+                                                ▼
+                                            </button>
+                                        </div>
+                                        <span class="absolute inset-y-0 right-3 flex items-center text-gray-400 text-xs">₫</span>
+                                    </div>
+                                    <p class="price-error hidden text-xs text-red-600 mt-1"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section: Images & Description -->
+                        <div class="space-y-6">
+                            <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-2 flex items-center gap-2">
+                                <i class="fa-regular fa-images text-purple-500"></i> Hình ảnh & Mô tả
+                            </h3>
+
+                            <!-- Image Upload -->
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">Thư viện ảnh phòng</label>
+                                <div class="upload-area w-full border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer transition-colors relative" id="dropZone">
+                                    <input type="file"
+                                           id="fileInput"
+                                           name="images"
+                                           multiple
+                                           accept="image/*"
+                                           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                    <div class="space-y-2">
+                                        <div class="mx-auto h-12 w-12 text-gray-300">
+                                            <i class="fa-solid fa-cloud-arrow-up text-4xl"></i>
+                                        </div>
+                                        <div class="text-sm text-gray-600">
+                                            <span class="font-medium text-blue-600 hover:text-blue-500">Tải ảnh lên</span> hoặc kéo thả vào đây
+                                        </div>
+                                        <p class="text-xs text-gray-500">PNG, JPG, GIF tối đa 2MB</p>
+                                    </div>
+                                </div>
+                                <!-- Image Preview Grid -->
+                                <div id="imagePreviewContainer" class="grid grid-cols-4 sm:grid-cols-5 gap-3 mt-4">
+                                    <!-- Previews will be added here via JS -->
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="space-y-1">
+                                <label class="block text-sm font-medium text-gray-700">Mô tả chi tiết</label>
+                                <textarea
+                                        name="description"
+                                        rows="4"
+                                        placeholder="Nhập mô tả chi tiết về phòng, view, hướng, điểm nổi bật..." class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Amenities & Actions (1/3 width) -->
+                    <div class="xl:col-span-1 space-y-8">
+                        
+                        <!-- Amenities -->
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-green-500"></i> Tiện nghi
+                            </h3>
+
+                            <!-- Add New Amenity -->
+                            <div class="mb-4">
+                                <button type="button"
+                                        id="openAmenityModal"
+                                        class="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700">
+
+        <span class="w-6 h-6 flex items-center justify-center rounded-full bg-blue-600 text-white text-xs">
+            <i class="fa-solid fa-plus"></i>
+        </span>
+
+                                    Thêm tiện nghi
+                                </button>
+                            </div>
+
+                            <div id="amenityModal"
+                                 class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
+
+                                <div class="bg-white w-full max-w-md rounded-xl p-6 shadow-lg">
+
+                                    <h3 class="text-lg font-semibold mb-4">
+                                        Thêm tiện nghi mới
+                                    </h3>
+
+                                    <!-- Name -->
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium mb-1">
+                                            Tên tiện nghi
+                                        </label>
+
+                                        <input type="text"
+                                               id="amenityNameInput"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
+
+                                        <!-- error message -->
+                                        <p id="amenityNameError"
+                                           class="text-red-500 text-xs mt-1 hidden">
+                                            Tên tiện nghi không được vượt quá 50 ký tự
+                                        </p>
+                                    </div>
+
+                                    <!-- Image -->
+                                    <div class="mb-6">
+                                        <label class="block text-sm font-medium mb-1">
+                                            Ảnh tiện nghi
+                                        </label>
+
+                                        <div id="amenityDropZone"
+                                             class="upload-area w-full border-2 border-dashed border-gray-300 rounded-xl p-4 text-center cursor-pointer transition-colors relative">
+
+                                            <input type="file"
+                                                   id="amenityImageInput"
+                                                   accept="image/*"
+                                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+
+                                            <div class="space-y-1" id="amenityUploadText">
+                                                <div class="mx-auto h-8 w-8 text-gray-300">
+                                                    <i class="fa-solid fa-image text-2xl"></i>
+                                                </div>
+                                                <p class="text-xs text-gray-500">
+                                                    Nhấn hoặc kéo thả ảnh tiện nghi (chỉ 1 ảnh)
+                                                </p>
+                                            </div>
+
+                                        </div>
+
+                                        <!-- preview -->
+                                        <div id="amenityPreview" class="mt-3 hidden"></div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="flex justify-end gap-2">
+
+                                        <button type="button"
+                                                id="closeAmenityModal"
+                                                class="px-4 py-2 text-sm border rounded-lg hover:bg-gray-50">
+                                            Hủy
+                                        </button>
+
+                                        <button type="button"
+                                                id="saveAmenityBtn"
+                                                class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                            Thêm tiện nghi
+                                        </button>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div id="amenitiesList"
+                                 class="space-y-2 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
+                                <label th:each="amenity : ${allAmenities}"
+                                       class="flex items-center gap-2 p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
+
+                                    <input type="checkbox"
+                                           name="amenityIds"
+                                           th:value="${amenity.amenityId}"
+                                           class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+
+                                    <img th:if="${amenity.iconUrl != null}"
+                                         th:src="${amenity.iconUrl}"
+                                         class="w-5 h-5 object-cover rounded">
+
+                                    <span th:text="${amenity.name}"
+                                          class="text-sm text-gray-700"></span>
+
+                                </label>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-end gap-3 sticky bottom-0 bg-white py-4 z-10">
+                    <a th:href="@{/admin/list}" class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors">
+                        Hủy bỏ
+                    </a>
+                    <button type="submit" class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Lưu phòng
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+    </main>
+
+    <!-- SCRIPT -->
+    <script th:inline="javascript">
+
+        /* =====================================================
+           PRICE FORMAT
+        ===================================================== */
+
+        const moneyInputs = document.querySelectorAll('.money-input');
+
+        function formatVND(value) {
+            return Number(value).toLocaleString('vi-VN');
+        }
+
+        function showError(input, msg){
+
+            const errorEl = input.closest('.space-y-1')?.querySelector('.price-error');
+
+            if(!errorEl) return;
+
+            if(!msg){
+                errorEl.classList.add('hidden');
+                errorEl.textContent = '';
+                input.classList.remove('border-red-400');
+                return;
+            }
+
+            errorEl.textContent = msg;
+            errorEl.classList.remove('hidden');
+            input.classList.add('border-red-400');
+        }
+
+
+        /* ===== INIT FORMAT ===== */
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            moneyInputs.forEach(input => {
+
+                const raw = input.value.replace(/[^\d]/g, '');
+
+                if(!raw){
+                    input.dataset.lastValid = "";
+                    input.value = "";
+                    return;
+                }
+
+                const value = Number(raw);
+
+                input.dataset.lastValid = value;
+                input.value = formatVND(value);
+
+            });
+
+        });
+
+
+        /* ===== INPUT REALTIME VALIDATE ===== */
+
+        moneyInputs.forEach(input => {
+
+            const MIN = Number(input.dataset.min || 100000);
+            const MAX = Number(input.dataset.max || 5000000);
+
+            input.addEventListener('input', () => {
+
+                showError(input,null);
+
+                let raw = input.value.replace(/[^\d]/g, '');
+
+                if(!raw){
+                    input.dataset.lastValid = "";
+                    input.value = "";
+                    showError(input,'Giá không được để trống');
+                    return;
+                }
+
+                let value = Number(raw);
+
+                if(value > MAX){
+                    showError(input,`Giá không vượt quá ${formatVND(MAX)}₫`);
+                }
+
+                else if(value < MIN){
+                    showError(input,`Giá tối thiểu là ${formatVND(MIN)}₫`);
+                }
+
+                else{
+                    showError(input,null);
+                }
+
+                input.dataset.lastValid = value;
+                input.value = formatVND(value);
+               validatePriceRelation();
+            });
+
+        });
+
+        function validatePriceRelation(){
+
+            const baseInput = document.querySelector('input[name="basePrice"]');
+            const overInput = document.querySelector('input[name="overPrice"]');
+
+            const basePrice = Number(baseInput.value.replace(/[^\d]/g,''));
+            const overPrice = Number(overInput.value.replace(/[^\d]/g,''));
+
+            if(basePrice < 100000){
+                showError(baseInput,"Giá / slot tối thiểu là 100.000₫");
+                return false;
+            }
+
+            if(overPrice < basePrice + 100000){
+                showError(overInput,"Giá đêm phải cao hơn giá phòng ít nhất 100.000₫");
+                return false;
+            }
+
+            showError(baseInput,null);
+            showError(overInput,null);
+
+            return true;
+        }
+
+
+        /* ===== PRICE BUTTON +/- ===== */
+
+        document.querySelectorAll('.price-btn').forEach(btn => {
+
+            btn.addEventListener('click', () => {
+
+                const input = btn.closest('.relative').querySelector('.money-input');
+
+                const MIN = Number(input.dataset.min || 100000);
+                const MAX = Number(input.dataset.max || 5000000);
+                const STEP = Number(input.dataset.step || 1000);
+
+                let current = Number(input.dataset.lastValid || MIN);
+
+                if(btn.dataset.action === 'increase'){
+                    current += STEP;
+                }else{
+                    current -= STEP;
+                }
+
+                if(current < MIN) current = MIN;
+                if(current > MAX) current = MAX;
+
+                input.dataset.lastValid = current;
+                input.value = formatVND(current);
+
+                showError(input,null);
+                validatePriceRelation();
+
+            });
+
+        });
+
+
+        /* =====================================================
+           VALIDATE ROOM NUMBER
+        ===================================================== */
+
+        const roomInput = document.getElementById("roomNumber");
+        const roomError = document.getElementById("roomError");
+        const existingRooms = /*[[${roomNumber}]]*/ [];
+
+        function validateRoomNumber(){
+
+            let value = roomInput.value.trim();
+            let error = "";
+
+            if(value === ""){
+                error = "Số phòng không được để trống";
+            }else if (existingRooms.includes(value)) {
+                error = "Số phòng đã tồn tại"
+            } else if(!value.includes("-")){
+                error = "Phải có dấu '-' để ngăn cách (ví dụ: G-Cyber-01)";
+            }
+            else{
+
+                let parts = value.split("-");
+
+                if(parts.length !== 3){
+                    error = "Phải có đúng 2 dấu '-' (ví dụ: G-Cyber-01)";
+                }
+                else if(!/^[A-Z]$/.test(parts[0])){
+                    error = "Chữ đầu phải viết hoa (G, N, O...)";
+                }
+                else if(!/^[A-Za-z]+$/.test(parts[1])){
+                    error = "Tên phòng chỉ được chứa chữ cái";
+                }
+                else if(!/^\d{2}$/.test(parts[2])){
+                    error = "Số phòng phải có đúng 2 chữ số (01,02...)";
+                }
+
+            }
+
+            roomError.innerText = error;
+
+            return error === "";
+        }
+
+        roomInput?.addEventListener("input", validateRoomNumber);
+
+
+        // (Sidebar toggle scripts moved to fragment)
+
+
+        /* =====================================================
+           ROOM TYPE IMAGE PREVIEW
+        ===================================================== */
+
+        const roomTypeSelect = document.getElementById('roomTypeSelect');
+        const roomTypePreview = document.getElementById('roomTypePreview');
+
+        roomTypeSelect?.addEventListener('change',function(){
+
+            const selectedOption = this.options[this.selectedIndex];
+            const imgUrl = selectedOption.getAttribute('data-img');
+
+            if(imgUrl){
+                roomTypePreview.style.opacity = 0;
+
+                setTimeout(()=>{
+                    roomTypePreview.src = imgUrl;
+                    roomTypePreview.style.opacity = 1;
+                },150);
+            }
+
+            const basePrice = selectedOption.getAttribute('data-baseprice');
+            const overPrice = selectedOption.getAttribute('data-overprice');
+            const description = selectedOption.getAttribute('data-description');
+
+            const baseInput = document.querySelector('input[name="basePrice"]');
+            const overInput = document.querySelector('input[name="overPrice"]');
+
+            if (basePrice) {
+                baseInput.value = Number(basePrice).toLocaleString('vi-VN');
+                baseInput.dataset.lastValid = basePrice;
+            }
+
+            if (overPrice) {
+                overInput.value = Number(overPrice).toLocaleString('vi-VN');
+                overInput.dataset.lastValid = overPrice;
+            }
+
+            const desc = document.querySelector('textarea[name="description"]');
+            if (desc) {
+                desc.value = description || '';
+            }
+
+        });
+
+
+        /* =====================================================
+           IMAGE UPLOAD PREVIEW
+        ===================================================== */
+
+        const fileInput = document.getElementById('fileInput');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+
+        const MAX_FILES = 5;
+
+        let dt = new DataTransfer();
+
+        function removeNewImage(btn){
+
+            const wrapper = btn.closest('.relative');
+            const index = Array.from(imagePreviewContainer.children).indexOf(wrapper);
+
+            dt.items.remove(index);
+
+            fileInput.files = dt.files;
+
+            wrapper.remove();
+        }
+
+        fileInput?.addEventListener('change',function(e){
+
+            const files = Array.from(e.target.files);
+
+            files.forEach(file=>{
+
+                if(dt.items.length >= MAX_FILES){
+                    alert("Chỉ được upload tối đa 5 ảnh");
+                    return;
+                }
+
+                if(!file.type.startsWith('image/')){
+                    alert("Chỉ được upload ảnh");
+                    return;
+                }
+
+                if(file.size > 2 * 1024 * 1024){
+                    alert("Ảnh phải nhỏ hơn 2MB");
+                    return;
+                }
+
+                dt.items.add(file);
+
+                const reader = new FileReader();
+
+                reader.onload=function(event){
+
+                    const div=document.createElement('div');
+
+                    div.className='relative aspect-square rounded-lg overflow-hidden border border-gray-200 group';
+
+                    div.innerHTML=`
+                <img src="${event.target.result}" class="w-full h-full object-cover">
+
+                <button type="button"
+                        class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5
+                               flex items-center justify-center text-xs opacity-0
+                               group-hover:opacity-100 transition-opacity"
+                        onclick="removeNewImage(this)">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                <span class="absolute bottom-1 right-1 bg-blue-500 text-white text-[10px] px-1 rounded">
+                    Mới
+                </span>
+            `;
+
+                    imagePreviewContainer.appendChild(div);
+
+                };
+
+                reader.readAsDataURL(file);
+
+            });
+
+            fileInput.files = dt.files;
+
+        });
+
+
+        /* =====================================================
+           FORM SUBMIT
+        ===================================================== */
+
+        document.getElementById('createRoomForm').addEventListener('submit',function(e){
+
+            if (!roomTypeSelect.value) {
+                alert("Vui lòng chọn loại phòng");
+                e.preventDefault();
+                return;
+            }
+
+            if(!validatePriceRelation()){
+                e.preventDefault();
+                return;
+            }
+
+            const hasError = document.querySelectorAll('.price-error:not(.hidden)').length > 0;
+
+            if(hasError){
+                e.preventDefault();
+                alert("Vui lòng sửa lỗi giá trước khi lưu");
+                return;
+            }
+
+            if(!validateRoomNumber()){
+                e.preventDefault();
+                return;
+            }
+
+            document.querySelectorAll(".money-input").forEach(input=>{
+                input.value = input.value.replace(/[^\d]/g,'');
+            });
+
+            const btn=this.querySelector('button[type="submit"]');
+
+            btn.innerHTML='<i class="fa-solid fa-circle-notch fa-spin"></i> Đang lưu...';
+            btn.disabled=true;
+
+        });
+
+        /* =====================================================
+       AMENITY MODAL OPEN / CLOSE
+    ===================================================== */
+
+        const openAmenityModal = document.getElementById("openAmenityModal");
+        const amenityModal = document.getElementById("amenityModal");
+        const closeAmenityModal = document.getElementById("closeAmenityModal");
+
+        openAmenityModal?.addEventListener("click", () => {
+            amenityModal.classList.remove("hidden");
+        });
+
+        closeAmenityModal?.addEventListener("click", () => {
+            amenityModal.classList.add("hidden");
+        });
+
+
+
+        /* =====================================================
+           AMENITY IMAGE UPLOAD (DRAG & DROP)
+        ===================================================== */
+
+        const amenityDropZone = document.getElementById("amenityDropZone");
+        const amenityInput = document.getElementById("amenityImageInput");
+        const amenityPreview = document.getElementById("amenityPreview");
+        const amenityUploadText = document.getElementById("amenityUploadText");
+
+        let amenityFile = null;
+
+
+        /* -------- render preview -------- */
+
+        function renderAmenityPreview(file){
+
+            const reader = new FileReader();
+
+            reader.onload = function(e){
+
+                amenityPreview.innerHTML = `
+            <div class="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200">
+
+                <img src="${e.target.result}"
+                     class="w-full h-full object-cover">
+
+                <button type="button"
+                        onclick="removeAmenityImage()"
+                        class="absolute top-1 right-1 bg-red-500 text-white
+                               w-5 h-5 rounded-full text-xs
+                               flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+            </div>
+        `;
+
+                amenityPreview.classList.remove("hidden");
+                amenityUploadText.classList.add("hidden");
+
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+
+        /* -------- remove image -------- */
+
+        function removeAmenityImage(){
+
+            amenityFile = null;
+
+            if(amenityInput){
+                amenityInput.value = "";
+            }
+
+            amenityPreview.classList.add("hidden");
+            amenityPreview.innerHTML = "";
+
+            amenityUploadText.classList.remove("hidden");
+        }
+
+
+        /* -------- input select image -------- */
+
+        amenityInput?.addEventListener("change", function(e){
+
+            const file = e.target.files[0];
+
+            if(!file) return;
+
+            /* chỉ cho 1 ảnh */
+            if(amenityFile){
+                alert("Chỉ được upload 1 ảnh cho tiện nghi");
+                amenityInput.value = "";
+                return;
+            }
+
+            if(!file.type.startsWith("image/")){
+                alert("Chỉ được upload ảnh");
+                amenityInput.value = "";
+                return;
+            }
+
+            if(file.size > 2 * 1024 * 1024){
+                alert("Ảnh phải nhỏ hơn 2MB");
+                amenityInput.value = "";
+                return;
+            }
+
+            amenityFile = file;
+
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            amenityInput.files = dt.files;
+
+            renderAmenityPreview(file);
+
+        });
+
+
+        /* -------- drag over -------- */
+
+        amenityDropZone?.addEventListener("dragover", (e)=>{
+            e.preventDefault();
+            amenityDropZone.classList.add("border-blue-400");
+        });
+
+
+        /* -------- drag leave -------- */
+
+        amenityDropZone?.addEventListener("dragleave", ()=>{
+            amenityDropZone.classList.remove("border-blue-400");
+        });
+
+
+        /* -------- drop image -------- */
+
+        amenityDropZone?.addEventListener("drop", (e)=>{
+
+            e.preventDefault();
+
+            amenityDropZone.classList.remove("border-blue-400");
+
+            const file = e.dataTransfer.files[0];   // ✅ LẤY FILE
+
+            if(!file) return;
+
+            if(e.dataTransfer.files.length > 1){
+                alert("Chỉ được upload 1 ảnh!");
+                return;
+            }
+
+            if(amenityFile){
+                alert("Chỉ được upload 1 ảnh cho tiện nghi");
+                return;
+            }
+
+            if(!file.type.startsWith("image/")){
+                alert("Chỉ được upload ảnh");
+                return;
+            }
+
+            if(file.size > 2 * 1024 * 1024){
+                alert("Ảnh phải nhỏ hơn 2MB");
+                return;
+            }
+
+            amenityFile = file;
+
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            amenityInput.files = dt.files;
+
+            renderAmenityPreview(file);
+
+        });
+
+
+        /* =====================================================
+           ADD NEW AMENITY
+        ===================================================== */
+
+        const saveAmenityBtn = document.getElementById("saveAmenityBtn");
+        const amenityNameInput = document.getElementById("amenityNameInput");
+        const amenitiesList = document.getElementById("amenitiesList");
+
+
+        saveAmenityBtn?.addEventListener("click", function () {
+
+
+
+            const name = amenityNameInput.value.trim();
+            const imageFile = amenityFile;
+
+            const regex = /^.{2,50}$/;
+
+            if (!name || !imageFile) {
+                alert("Phải nhập tên và chọn ảnh tiện nghi");
+                return;
+            }
+
+            if(!regex.test(name)) {
+                alert("Tên phải lớn hơn 2 ký tự và nhỏ hơn 50 ký tự");
+                return;
+            }
+
+
+
+            /* ----- check duplicate ----- */
+
+            const existingAmenities = document.querySelectorAll('#amenitiesList span');
+
+            for (let el of existingAmenities) {
+
+                if (el.textContent.trim().toLowerCase() === name.toLowerCase()) {
+
+                    alert("Tiện nghi này đã tồn tại!");
+                    return;
+
+                }
+            }
+
+
+            /* ----- create new amenity ----- */
+
+            const label = document.createElement("label");
+
+            label.className =
+                "flex items-center gap-2 p-2 bg-white rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors";
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.name = "newAmenityNames";
+            checkbox.value = name;
+            checkbox.checked = true;
+            checkbox.className = "h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500";
+
+
+            /* icon image */
+
+            const img = document.createElement("img");
+            img.className = "w-5 h-5 object-cover rounded";
+            img.src = URL.createObjectURL(imageFile);
+
+
+            /* name */
+
+            const span = document.createElement("span");
+            span.className = "text-sm text-gray-700";
+            span.textContent = name;
+
+
+            /* append */
+
+            label.appendChild(checkbox);
+            label.appendChild(img);
+            label.appendChild(span);
+
+            amenitiesList.prepend(label);
+
+            /* hidden input icon */
+            const hiddenFileInput = document.createElement("input");
+
+            hiddenFileInput.type = "file";
+            hiddenFileInput.name = "newAmenityIcons";
+            hiddenFileInput.style.display = "none";
+
+            const dt = new DataTransfer();
+            dt.items.add(imageFile);
+            hiddenFileInput.files = dt.files;
+
+            document.getElementById("createRoomForm").appendChild(hiddenFileInput);
+
+            /* reset modal */
+            amenityNameInput.value = "";
+            removeAmenityImage();
+
+            /* close modal */
+            amenityModal.classList.add("hidden");
+        });
+
+        amenityNameInput.addEventListener("input", function () {
+
+            const value = this.value.trim();
+            const regex = /^.{2,50}$/;
+
+            if (!regex.test(value)) {
+                amenityNameError.textContent = "Tên tiện nghi phải từ 2 đến 50 ký tự";
+                amenityNameError.classList.remove("hidden");
+            } else {
+                amenityNameError.classList.add("hidden");
+            }
+
+        });
+</script>
+<div th:replace="~{fragments/sidebar :: sidebar-scripts}"></div>
+</body>
+</html>

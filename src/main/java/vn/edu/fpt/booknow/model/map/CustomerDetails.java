@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.model.map;
+ package vn.edu.fpt.booknow.model.map;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
