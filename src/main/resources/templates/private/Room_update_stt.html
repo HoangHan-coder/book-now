@@ -40,7 +40,9 @@
 </style>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<div th:replace="~{fragments/sidebar :: admin-sidebar(activePage='rooms')}"></div>
+
+<div th:replace="fragments/sidebar :: staff-sidebar('rooms','staff')"></div>
+<script th:replace="fragments/sidebar :: sidebar-scripts('staff')"></script>
 
     <!-- MAIN CONTENT AREA -->
     <main class="lg:ml-72 min-h-screen pt-32 lg:pt-12 px-6 pb-20 transition-all duration-300">
@@ -396,6 +398,6 @@ newStatusSelect.addEventListener('change', () => {
 // Mobile Sidebar Toggle logic moved to fragment
 
     </script>
-<div th:replace="~{fragments/sidebar :: sidebar-scripts}"></div>
+
 </body>
 </html>
