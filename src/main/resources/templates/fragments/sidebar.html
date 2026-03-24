@@ -39,7 +39,7 @@
                 <i class="fa-solid fa-door-open w-5"></i>
                 Phòng
             </a>
-            <a href="#" th:classappend="${activePage == 'accounts' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
+            <a th:href="@{/admin/account_list}" th:classappend="${activePage == 'accounts' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
                 <i class="fa-solid fa-users-gear w-5"></i>
                 Tài khoản nhân viên
             </a>
@@ -47,7 +47,7 @@
                 <i class="fa-solid fa-broom"></i>
                 Dọn dẹp
             </a>
-            <a href="#" th:classappend="${activePage == 'feedback' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
+            <a th:href="@{/admin/feedback}" th:classappend="${activePage == 'feedback' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
                 <i class="fa-regular fa-comment-dots w-5"></i>
                 Phản hồi khách hàng
             </a>

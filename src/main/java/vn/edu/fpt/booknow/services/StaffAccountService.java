@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import vn.edu.fpt.booknow.model.entities.StaffAccount;
 import vn.edu.fpt.booknow.model.map.CustomerDetails;
+import vn.edu.fpt.booknow.repositories.StaffAccountRepository;
 
 @Service
 public class StaffAccountService {
@@ -19,7 +20,6 @@ public class StaffAccountService {
 
     @Autowired
     private JWTService jwtService;
-
     public boolean verify(StaffAccount users, HttpServletResponse response) {
         System.out.println("Verify is running..");
         try {

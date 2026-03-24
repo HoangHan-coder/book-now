@@ -526,7 +526,12 @@ public class BookingService {
     public String completeOfflineCheckin(Booking bookingData, MultipartFile frontImg, MultipartFile backImg, RedirectAttributes redirectAttributes) {
         Booking existingBooking = bookingRepository.findById(bookingData.getBookingId())
                 .orElseThrow(() -> new RuntimeException("Booking không tồn tại"));
+        if (BookingStatus.CANCELED.equals(bookingData.getBookingStatus())) {
+            redirectAttributes.addFlashAttribute("toastMessage", "Lỗi đơn đã hủy!");
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return "redirect:/offline-checkin";
 
+        }
         existingBooking.setNote(bookingData.getNote());
         existingBooking.setBookingStatus(BookingStatus.CHECKED_IN);
         existingBooking.setUpdatedAt(LocalDateTime.now());
@@ -559,12 +564,14 @@ public class BookingService {
         return "redirect:/offline-checkin";
     }
     @Transactional
-    public void cancelBookingStatus(Long bookingId) {
+    public void cancelBookingStatus(Long bookingId, RedirectAttributes redirectAttributes) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn đặt phòng để hủy"));
 
-        if ("CHECKED_IN".equals(booking.getBookingStatus())) {
-            throw new RuntimeException("Không thể hủy đơn đã hoàn tất Check-in!");
+        if (BookingStatus.CHECKED_IN.equals(booking.getBookingStatus())) {
+            redirectAttributes.addFlashAttribute("toastMessage", "Lỗi đơn đã checkin!");
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return;
         }
         System.out.println(bookingId + " test 494");
         booking.setBookingStatus(BookingStatus.CANCELED);

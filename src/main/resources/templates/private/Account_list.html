@@ -62,51 +62,12 @@
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<div class="logo-fixed flex items-center gap-3 select-none bg-white/90 backdrop-blur px-3 py-2 rounded-xl shadow-sm lg:shadow-none lg:bg-transparent lg:p-0">
-    <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
-        <i class="fa-solid fa-house-chimney gradient-icon text-xl"></i>
-    </div>
-    <div class="flex flex-col justify-center">
-        <span class="text-2xl font-extrabold tracking-tight gradient-text leading-none">BookNow</span>
-        <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider pl-0.5">Homestay System</span>
-    </div>
-</div>
-
-<div class="lg:hidden fixed top-0 w-full bg-white h-20 shadow-sm z-40 flex items-center justify-end px-6">
-    <button id="mobileMenuBtn" class="text-gray-500 hover:text-blue-600 focus:outline-none">
-        <i class="fa-solid fa-bars text-2xl"></i>
-    </button>
-</div>
-
-<aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform -translate-x-full lg:translate-x-0 pt-28 overflow-y-auto no-scrollbar">
-    <nav class="px-4 space-y-2">
-        <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-            <i class="fa-solid fa-chart-line w-5"></i> Bảng điều khiển
-        </a>
-        <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-            <i class="fa-regular fa-calendar-check w-5"></i> Đơn đặt phòng
-        </a>
-        <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-            <i class="fa-solid fa-door-open w-5"></i> Phòng
-        </a>
-        <a th:href="@{/admin/account_list}" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium transition-colors shadow-sm ring-1 ring-black/5">
-            <i class="fa-solid fa-users-gear w-5"></i> Tài khoản nhân viên
-        </a>
-        <a href="/admin/feedback" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-            <i class="fa-regular fa-comment-dots w-5"></i> Phản hồi khách hàng
-        </a>
-    </nav>
-
-    <div class="absolute bottom-0 w-full p-4 border-t border-gray-100 bg-white">
-        <a href="#" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
-            <i class="fa-solid fa-arrow-right-from-bracket w-5"></i> Đăng xuất
-        </a>
-    </div>
-</aside>
+<div th:replace="~{fragments/sidebar :: admin-sidebar(activePage='accounts')}"></div>
 
 <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden glass-effect"></div>
 
 <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
+    <div th:replace="~{private/infor_admin}"></div>
 
     <!-- thông báo tạo tài khoản thành công -->
     <div th:if="${success}"

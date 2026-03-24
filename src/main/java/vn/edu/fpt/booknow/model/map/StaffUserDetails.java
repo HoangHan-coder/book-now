@@ -16,10 +16,28 @@ public class StaffUserDetails implements UserDetails {
     @Setter
     @Getter
     private String fullName;
-
+    @Setter
+    @Getter
+    private String role;
     public StaffUserDetails(StaffAccount staffAccount) {
         this.staffAccount = staffAccount;
         this.fullName = staffAccount.getFullName();
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     @Override

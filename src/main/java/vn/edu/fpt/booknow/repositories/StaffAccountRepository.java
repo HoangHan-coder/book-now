@@ -31,5 +31,7 @@ public interface StaffAccountRepository extends JpaRepository<StaffAccount, Long
 
 
     Optional<StaffAccount> findStaffAccountByEmail(String email);
+
+    StaffAccount getByEmail(String email);
 }
 

@@ -64,7 +64,7 @@ public class CheckInOfflineController {
     @GetMapping("/cancel-booking/{id}")
     public String cancelBooking(@PathVariable("id") Long bookingId, RedirectAttributes redirectAttributes) {
         try {
-            bookingService.cancelBookingStatus(bookingId);
+            bookingService.cancelBookingStatus(bookingId, redirectAttributes);
             redirectAttributes.addFlashAttribute("toastMessage", "Đã hủy đơn đặt phòng thành công!");
             redirectAttributes.addFlashAttribute("toastType", "success");
         } catch (Exception e) {

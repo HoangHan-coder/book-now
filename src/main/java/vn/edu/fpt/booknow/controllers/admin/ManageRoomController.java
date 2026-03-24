@@ -15,9 +15,8 @@ import vn.edu.fpt.booknow.model.entities.RoomStatus;
 import vn.edu.fpt.booknow.model.entities.RoomType;
 import vn.edu.fpt.booknow.exceptions.InternalServerException;
 import vn.edu.fpt.booknow.exceptions.ResourceNotFoundException;
-import vn.edu.fpt.booknow.services.AmenityService;
-import vn.edu.fpt.booknow.services.ManageRoomServices;
-import vn.edu.fpt.booknow.services.RoomTypeService;
+import vn.edu.fpt.booknow.model.entities.StaffAccount;
+import vn.edu.fpt.booknow.services.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -34,11 +33,14 @@ public class ManageRoomController {
     private ManageRoomServices manageRoomServices;
     private RoomTypeService roomTypeService;
     private AmenityService amenityService;
-
-    public ManageRoomController(ManageRoomServices manageRoomServices, RoomTypeService roomTypeService, AmenityService amenityService) {
+    private JWTService jwtService;
+    private StaffAccountService staffAccountService;
+    public ManageRoomController(ManageRoomServices manageRoomServices, RoomTypeService roomTypeService, AmenityService amenityService, JWTService jwtService, StaffAccountService staffAccountService) {
         this.manageRoomServices = manageRoomServices;
         this.roomTypeService = roomTypeService;
         this.amenityService = amenityService;
+        this.jwtService = jwtService;
+        this.staffAccountService = staffAccountService;
     }
 
     @GetMapping("/dashboard")
@@ -51,7 +53,6 @@ public class ManageRoomController {
 
             String lastUpdate = LocalDateTime.now()
                     .format(DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy"));
-
             DashboardDTO data =
                     manageRoomServices.getDashboard(startDate, endDate);
 
@@ -78,18 +79,17 @@ public class ManageRoomController {
 
             String dateLabel =
                     start.format(displayFormat) + " – " + end.format(displayFormat);
-
             model.addAttribute("startDate", start);
             model.addAttribute("endDate", end);
             model.addAttribute("dashboard", data);
             model.addAttribute("lastUpdate", lastUpdate);
             model.addAttribute("dateLabel", dateLabel);
-
             return "private/Admin_dashboard";
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw e;
+            return "redirect:/403";
+
         }
     }
 

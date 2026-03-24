@@ -68,6 +68,7 @@ public class SecurityConfig {
                                 "/staff/complete-checkin",
                                 "/staff/cancel-booking/**",
                                 "/admin/**",
+                                "/staff/**",
                                 "/book-now/staff/bookings/update/*",
                                 "/404", "/error").permitAll()
                         .anyRequest().authenticated()
@@ -101,6 +102,7 @@ public class SecurityConfig {
                                 "/staff/complete-checkin",
                                 "/staff/cancel-booking/**",
                                 "/admin/**",
+                                "/staff/**",
                                 "/reset-password",
                                 "/404", "/error", "/authen/verifiedOtp",
                                 "/authen/registerEmail", "/authen/otp",
