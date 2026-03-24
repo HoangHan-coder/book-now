@@ -97,7 +97,7 @@ public class SecurityConfig {
                                 "/authen/registerEmail", "/authen/otp",
                                 "/authen/registerForm",
                                 "/checkin/start").permitAll()
-                        .anyRequest().hasRole("CUSTOMER")
+                        .anyRequest().authenticated()
                 )
                 
                 .oauth2Login(oauth -> oauth
