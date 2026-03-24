@@ -170,7 +170,7 @@
                             </div>
                         </div>
 
-                        <label class="w-full cursor-pointer">
+                        <label th:if="${booking.bookingStatus.name() == 'PENDING_PAYMENT'}" class="w-full cursor-pointer">
                             <input type="file" name="cccdFront" id="uploadFront" accept="image/*" class="hidden">
                             <div class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium text-center flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-upload"></i>
@@ -199,7 +199,7 @@
                             </div>
                         </div>
 
-                        <label class="w-full cursor-pointer">
+                        <label th:if="${booking.bookingStatus.name() == 'PENDING_PAYMENT'}" class="w-full cursor-pointer">
                             <input type="file" name="cccdBack" id="uploadBack" accept="image/*" class="hidden">
                             <div class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium text-center flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-upload"></i>

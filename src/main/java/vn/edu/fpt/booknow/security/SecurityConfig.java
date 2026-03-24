@@ -97,14 +97,11 @@ public class SecurityConfig {
                                 "/assets/**",
                                 "/verify-otp", 
                                 "/resend-otp",
-<<<<<<< HEAD
                                 "/staff/offline-checkin",
                                 "/staff/complete-checkin",
                                 "/staff/cancel-booking/**",
                                 "/admin/**",
                                 "/staff/**",
-=======
->>>>>>> master
                                 "/reset-password",
                                 "/404", "/error", "/authen/verifiedOtp",
                                 "/authen/registerEmail", "/authen/otp",
