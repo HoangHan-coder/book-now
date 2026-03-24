@@ -146,72 +146,91 @@
 
             </div>
     </section>
+    <div th:if="${message}"
+         class="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 text-center animate-fade-in">
+            <div class="mb-3">
+                <i class="fa-solid fa-circle-exclamation text-red-500 text-3xl"></i>
+            </div>
+
+            <!-- Nội dung message -->
+
+
+            <p class="text-sm text-gray-700 font-medium" th:text="${#strings.defaultString(message,'cannot update status completed for your task')}"></p>
+
+            <button onclick="this.closest('.fixed').remove()"
+                    class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                OK
+            </button>
+        </div>
+    </div>
 </main>
 
 <script>
-    (function () {
-        const optionButtons = document.querySelectorAll('.extend-option');
-        const checkoutDataEl = document.getElementById('checkoutData');
-        const newCheckoutPreviewEl = document.getElementById('newCheckoutPreview');
-        const selectedOptionLabelEl = document.getElementById('selectedOptionLabel');
-        const extendTypeInput = document.getElementById('extendTypeInput');
-        const extendAmountInput = document.getElementById('extendAmountInput');
-        const extendTypeDisplay = document.getElementById('extendTypeDisplay');
-        const extendAmountDisplay = document.getElementById('extendAmountDisplay');
-
-        const rawCurrentCheckout = checkoutDataEl ? checkoutDataEl.dataset.currentCheckout : '';
-        const currentCheckoutDate = rawCurrentCheckout ? new Date(rawCurrentCheckout) : null;
-
-        function formatDate(date) {
-            return new Intl.DateTimeFormat('en-GB', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            }).format(date).replace(',', '');
-        }
-
-        function applySelection(button) {
-            optionButtons.forEach((btn) => {
-                btn.classList.remove('border-blue-200', 'bg-blue-50', 'text-blue-700');
-                btn.classList.add('border-gray-200', 'bg-white', 'text-gray-700');
-            });
-
-            button.classList.remove('border-gray-200', 'bg-white', 'text-gray-700');
-            button.classList.add('border-blue-200', 'bg-blue-50', 'text-blue-700');
-
-            const extendType = button.dataset.type || 'hour';
-            const extendAmount = Number(button.dataset.amount || 1);
-            const optionLabel = button.dataset.label || '+1 Hour';
-
-            selectedOptionLabelEl.textContent = optionLabel;
-            extendTypeInput.value = extendType;
-            extendAmountInput.value = String(extendAmount);
-            extendTypeDisplay.textContent = extendType;
-            extendAmountDisplay.textContent = String(extendAmount);
-
-            if (!currentCheckoutDate || Number.isNaN(currentCheckoutDate.getTime())) {
-                return;
-            }
-
-            const nextCheckout = new Date(currentCheckoutDate.getTime());
-            if (extendType === 'day') {
-                nextCheckout.setDate(nextCheckout.getDate() + extendAmount);
-            } else {
-                nextCheckout.setHours(nextCheckout.getHours() + extendAmount);
-            }
-
-            newCheckoutPreviewEl.textContent = formatDate(nextCheckout);
-        }
-
-        optionButtons.forEach((button) => {
-            button.addEventListener('click', function () {
-                applySelection(button);
-            });
-        });
-    })();
+    // (function () {
+    //     const optionButtons = document.querySelectorAll('.extend-option');
+    //     const checkoutDataEl = document.getElementById('checkoutData');
+    //     const newCheckoutPreviewEl = document.getElementById('newCheckoutPreview');
+    //     const selectedOptionLabelEl = document.getElementById('selectedOptionLabel');
+    //     const extendTypeInput = document.getElementById('extendTypeInput');
+    //     const extendAmountInput = document.getElementById('extendAmountInput');
+    //     const extendTypeDisplay = document.getElementById('extendTypeDisplay');
+    //     const extendAmountDisplay = document.getElementById('extendAmountDisplay');
+    //
+    //     const rawCurrentCheckout = checkoutDataEl ? checkoutDataEl.dataset.currentCheckout : '';
+    //     const currentCheckoutDate = rawCurrentCheckout ? new Date(rawCurrentCheckout) : null;
+    //
+    //     function formatDate(date) {
+    //         return new Intl.DateTimeFormat('en-GB', {
+    //             day: '2-digit',
+    //             month: 'short',
+    //             year: 'numeric',
+    //             hour: '2-digit',
+    //             minute: '2-digit',
+    //             hour12: false
+    //         }).format(date).replace(',', '');
+    //     }
+    //
+    //     function applySelection(button) {
+    //         optionButtons.forEach((btn) => {
+    //             btn.classList.remove('border-blue-200', 'bg-blue-50', 'text-blue-700');
+    //             btn.classList.add('border-gray-200', 'bg-white', 'text-gray-700');
+    //         });
+    //
+    //         button.classList.remove('border-gray-200', 'bg-white', 'text-gray-700');
+    //         button.classList.add('border-blue-200', 'bg-blue-50', 'text-blue-700');
+    //
+    //         const extendType = button.dataset.type || 'hour';
+    //         const extendAmount = Number(button.dataset.amount || 1);
+    //         const optionLabel = button.dataset.label || '+1 Hour';
+    //
+    //         selectedOptionLabelEl.textContent = optionLabel;
+    //         extendTypeInput.value = extendType;
+    //         extendAmountInput.value = String(extendAmount);
+    //         extendTypeDisplay.textContent = extendType;
+    //         extendAmountDisplay.textContent = String(extendAmount);
+    //
+    //         if (!currentCheckoutDate || Number.isNaN(currentCheckoutDate.getTime())) {
+    //             return;
+    //         }
+    //
+    //         const nextCheckout = new Date(currentCheckoutDate.getTime());
+    //         if (extendType === 'day') {
+    //             nextCheckout.setDate(nextCheckout.getDate() + extendAmount);
+    //         } else {
+    //             nextCheckout.setHours(nextCheckout.getHours() + extendAmount);
+    //         }
+    //
+    //         newCheckoutPreviewEl.textContent = formatDate(nextCheckout);
+    //     }
+    //
+    //     optionButtons.forEach((button) => {
+    //         button.addEventListener('click', function () {
+    //             applySelection(button);
+    //         });
+    //     });
+    // })();
 </script>
 </body>
 </html>
