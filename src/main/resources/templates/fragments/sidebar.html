@@ -79,10 +79,15 @@
         </div>
     </a>
 
-
+    <!-- MOBILE HEADER (Hamburger) -->
+    <div class="lg:hidden fixed top-0 w-full bg-white h-20 shadow-sm z-40 flex items-center justify-end px-6">
+        <button id="mobileMenuBtn" class="text-gray-500 hover:text-blue-600 focus:outline-none">
+            <i class="fa-solid fa-bars text-2xl"></i>
+        </button>
+    </div>
 
     <!-- SIDEBAR -->
-    <aside id="sidebar1" class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform -translate-x-full lg:translate-x-0 pt-28 overflow-y-auto no-scrollbar transition-transform duration-300">
+    <aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform -translate-x-full lg:translate-x-0 pt-28 overflow-y-auto no-scrollbar transition-transform duration-300">
         <nav class="px-4 space-y-2">
             <a th:href="@{/staff/dashboard}" th:classappend="${activePage == 'dashboard' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors shadow-sm">
                 <i class="fa-solid fa-chart-line w-5"></i>
