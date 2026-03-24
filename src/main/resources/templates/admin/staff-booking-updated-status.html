@@ -398,11 +398,12 @@
 
                     <div class="flex justify-center mb-6">
                         <div class="relative w-full max-w-sm aspect-[3/4] bg-gray-900 rounded-xl overflow-hidden shadow-lg border-4 border-gray-100">
-
+                            <input type="hidden" id="bookingId" th:value="${booking.bookingId}">
                             <div id="mediaContainer"
                                  class="w-full h-full flex items-center justify-center text-white">
+
                                 <div th:if="${checkInSession != null}">
-                                    <input type="hidden" id="bookingId" th:value="${booking.bookingId}">
+
                                     <input type="hidden" id="checkInSessionId"
                                            th:value="${checkInSession.getCheckInSessionId()}">
                                     <video th:src="${checkInSession.getVideoUrl()}" class="w-full h-full object-cover"
@@ -714,6 +715,8 @@
             console.log("RAW:", message.body);
 
             const data = JSON.parse(message.body);
+            checkInSessionId = data.checkInId;
+            console.log("checkInSessionId nhận được:", checkInSessionId);
 
             console.log("PARSED:", data);
 

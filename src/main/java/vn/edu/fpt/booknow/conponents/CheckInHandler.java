@@ -59,6 +59,7 @@ public class CheckInHandler {
         booking.setActualCheckInTime(time);
         checkInSessionService.updateCheckInSessionWhenApprove(sessionId,CheckInSessionStatus.APPROVED);
         // 5. Notify User
+        System.out.println("senting.....");
         messagingTemplate.convertAndSend(
                 "/topic/checkin/user/" + bookingId,
                 mess
