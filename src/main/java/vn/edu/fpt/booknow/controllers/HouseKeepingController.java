@@ -5,9 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import vn.edu.fpt.booknow.model.entities.ApproveRequest;
-import vn.edu.fpt.booknow.model.entities.Booking;
-import vn.edu.fpt.booknow.model.entities.HousekeepingTask;
+import vn.edu.fpt.booknow.model.entities.*;
 import vn.edu.fpt.booknow.repositories.HousekeepingTaskRepository;
 import vn.edu.fpt.booknow.services.ExtendBookingService;
 import vn.edu.fpt.booknow.services.HousekeepingTaskService;
@@ -35,6 +33,11 @@ public class HouseKeepingController {
     @GetMapping(value = "/task-detail")
     public String home(Model model, @RequestParam(name = "taskId") Long taskId) {
         HousekeepingTask task = housekeepingTaskService.getHousekeepingTaskById(taskId);
+        if (task.getStatus().equals(TaskStatus.COMPLETED)) {
+            boolean completed = true;
+            model.addAttribute("completed", completed);
+            System.out.println("completed");
+        }
         model.addAttribute("housekeepingTaskDetail", task);
         return "housekeeping/task_detail";
     }
@@ -78,6 +81,12 @@ public class HouseKeepingController {
     @GetMapping(value = "/extend/booking")
     public String extendBooking(Model model, @RequestParam(name = "id")  Long id) {
         Booking booking = bookingService.findById(id);
+        Scheduler lastScheduler = booking.getSchedulers()
+                .get(booking.getSchedulers().size() - 1);
+
+        Long lastTimeId = lastScheduler.getTimetable().getTimetableId();
+
+        model.addAttribute("lastTimeId", lastTimeId);
         model.addAttribute("booking", booking);
         return "housekeeping/extend_booking";
 
@@ -98,10 +107,12 @@ public class HouseKeepingController {
         try{
             extendBookingService.updateCheckOutTime(id, timeId);
         } catch (Exception e) {
+            System.out.println("loi o day");
             model.addAttribute("message", e.getMessage());
             model.addAttribute("booking", booking);
             return "housekeeping/extend_booking";
         }
+        System.out.println("extend booking");
         redirectAttributes.addFlashAttribute("bookingId", id);
         redirectAttributes.addFlashAttribute("timetableId", timeId);
         return "redirect:/pay/create-payment";

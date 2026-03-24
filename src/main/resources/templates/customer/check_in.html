@@ -32,11 +32,14 @@
             console.log("RAW:", message.body);
             const data = JSON.parse(message.body);
             alert(data.message);
-            if (data.bookingStatus === 'REJECTED_CHECKIN'){
-                window.location.href = "/book-now/checkin/fail"
-            } else if (data.bookingStatus === 'CHECKED_IN'){
-                    window.location.href = "/book-now/checkin/success?bookingId=" + bookingId
-                }
+            switch (data.bookingStatus) {
+                case 'REJECTED_CHECKIN':
+                    window.location.href = "/book-now/checkin/fail";
+                    break;
+                case 'CHECKED_IN':
+                    window.location.href = "/book-now/checkin/success?bookingId=" + bookingId;
+                    break;
+            }
 
         });
 

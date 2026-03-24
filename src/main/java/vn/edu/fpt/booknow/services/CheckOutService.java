@@ -25,6 +25,9 @@ public class CheckOutService {
         if (booking.getBookingStatus() != BookingStatus.CHECKED_IN) {
             return "Booking chưa check-in";
         }
+        if (LocalDateTime.now().isBefore(booking.getCheckOutTime())) {
+            return "Chưa đến thời gian trả phòng";
+        }
 
         if (booking.getTotalAmount() == null ||
                 booking.getTotalAmount().compareTo(BigDecimal.ZERO) <= 0) {

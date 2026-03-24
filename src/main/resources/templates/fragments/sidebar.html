@@ -6,12 +6,12 @@
 <div th:fragment="admin-sidebar(activePage)">
     <!-- LOGO (Fixed Position) -->
     <a th:href="@{/home}">
-        <div class="logo-fixed flex items-center gap-3 select-none bg-white/90 backdrop-blur px-3 py-2 rounded-xl shadow-sm lg:shadow-none lg:bg-transparent lg:p-0 cursor-pointer z-50">
+        <div class="logo-fixed flex items-center gap-3 select-none bg-white/90 backdrop-blur px-3 py-2 rounded-xl shadow-sm lg:shadow-none lg:bg-transparent lg:p-0">
             <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
-                <i class="fa-solid fa-house-chimney gradient-icon text-xl text-blue-600"></i>
+                <i class="fa-solid fa-house-chimney gradient-icon text-xl"></i>
             </div>
             <div class="flex flex-col justify-center">
-                <span class="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 leading-none">BookNow</span>
+                <span class="text-2xl font-extrabold tracking-tight gradient-text leading-none">BookNow</span>
                 <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider pl-0.5">Homestay System</span>
             </div>
         </div>
@@ -39,7 +39,7 @@
                 <i class="fa-solid fa-door-open w-5"></i>
                 Phòng
             </a>
-            <a href="#" th:classappend="${activePage == 'accounts' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
+            <a th:href="@{/admin/account_list}" th:classappend="${activePage == 'accounts' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
                 <i class="fa-solid fa-users-gear w-5"></i>
                 Tài khoản nhân viên
             </a>
@@ -47,7 +47,7 @@
                 <i class="fa-solid fa-broom"></i>
                 Dọn dẹp
             </a>
-            <a href="#" th:classappend="${activePage == 'feedback' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
+            <a th:href="@{/admin/feedback}" th:classappend="${activePage == 'feedback' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
                 <i class="fa-regular fa-comment-dots w-5"></i>
                 Phản hồi khách hàng
             </a>
@@ -61,8 +61,7 @@
         </div>
     </aside>
 
-    <!-- OVERLAY (for mobile) -->
-    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden glass-effect"></div>
+
 </div>
 
 <!-- STAFF SIDEBAR FRAGMENT -->
