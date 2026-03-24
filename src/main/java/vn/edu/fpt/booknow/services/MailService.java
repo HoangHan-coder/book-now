@@ -1,5 +1,8 @@
 package vn.edu.fpt.booknow.services;
 
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Refill;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -7,11 +10,25 @@ import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Service
 public class MailService {
 
     @Autowired
     private JavaMailSender mailSender;
+    private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
+    private Bucket createNewBucket() {
+        return Bucket.builder()
+                .addLimit(Bandwidth.classic(1, Refill.intervally(1, Duration.ofMinutes(1))))
+                .build();
+    }
+    private boolean isRateLimited(String username) {
+        Bucket bucket = cache.computeIfAbsent(username, k -> createNewBucket());
+        return !bucket.tryConsume(1);
+    }
 
     public void send(String toEmail, String otp) {
         SimpleMailMessage message = new SimpleMailMessage();
@@ -22,9 +39,11 @@ public class MailService {
     }
     public void sendReasonFailed(String toEmail, String bookingCode, String reason) {
         try {
+            if (isRateLimited(toEmail)) {
+                return ;
+            }
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
             helper.setTo(toEmail);
             helper.setSubject("Thông báo hủy đơn booking");
 

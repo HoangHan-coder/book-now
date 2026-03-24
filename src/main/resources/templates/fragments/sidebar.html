@@ -3,8 +3,8 @@
 <body>
 
 <!-- ADMIN SIDEBAR FRAGMENT -->
-<div th:fragment="admin-sidebar(activePage)">
-    <!-- LOGO (Fixed Position) -->
+<div th:fragment="admin-sidebar(activePage, prefix)">
+    <!-- LOGO -->
     <a th:href="@{/home}">
         <div class="logo-fixed flex items-center gap-3 select-none bg-white/90 backdrop-blur px-3 py-2 rounded-xl shadow-sm lg:shadow-none lg:bg-transparent lg:p-0">
             <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
@@ -17,132 +17,105 @@
         </div>
     </a>
 
-    <!-- MOBILE HEADER (Hamburger) -->
+    <!-- MOBILE HEADER -->
     <div class="lg:hidden fixed top-0 w-full bg-white h-20 shadow-sm z-40 flex items-center justify-end px-6">
-        <button id="mobileMenuBtn" class="text-gray-500 hover:text-blue-600 focus:outline-none">
+        <button th:id="${prefix + '-mobileMenuBtn'}" class="text-gray-500 hover:text-blue-600 focus:outline-none">
             <i class="fa-solid fa-bars text-2xl"></i>
         </button>
     </div>
 
     <!-- SIDEBAR -->
-    <aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform -translate-x-full lg:translate-x-0 pt-28 overflow-y-auto no-scrollbar transition-transform duration-300">
+    <aside th:id="${prefix + '-sidebar'}"
+           class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform -translate-x-full lg:translate-x-0 pt-28 overflow-y-auto no-scrollbar transition-transform duration-300">
+
         <nav class="px-4 space-y-2">
-            <a th:href="@{/admin/dashboard}" th:classappend="${activePage == 'dashboard' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors shadow-sm">
-                <i class="fa-solid fa-chart-line w-5"></i>
-                Bảng điều khiển
+            <a th:href="@{/admin/dashboard}" th:classappend="${activePage == 'dashboard' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : ''}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium">
+                <i class="fa-solid fa-chart-line w-5"></i> Bảng điều khiển
             </a>
-            <a th:href="@{/admin/bookings}" th:classappend="${activePage == 'bookings' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
-                <i class="fa-regular fa-calendar-check w-5"></i>
-                Đơn đặt phòng
+            <a th:href="@{/admin/bookings}" th:classappend="${activePage == 'bookings' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : ''}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium">
+                <i class="fa-regular fa-calendar-check w-5"></i> Đơn đặt phòng
             </a>
-            <a th:href="@{/admin/list}" th:classappend="${activePage == 'rooms' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
-                <i class="fa-solid fa-door-open w-5"></i>
-                Phòng
+            <a th:href="@{/admin/list}" th:classappend="${activePage == 'rooms' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : ''}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium">
+                <i class="fa-solid fa-door-open w-5"></i> Phòng
             </a>
-            <a th:href="@{/admin/account_list}" th:classappend="${activePage == 'accounts' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
-                <i class="fa-solid fa-users-gear w-5"></i>
-                Tài khoản nhân viên
+            <a th:href="@{/admin/account_list}" th:classappend="${activePage == 'accounts' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : ''}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium">
+                <i class="fa-solid fa-users-gear w-5"></i> Tài khoản nhân viên
             </a>
-            <a th:href="@{/admin/manage-housekeeping}" th:classappend="${activePage == 'housekeeping' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
-                <i class="fa-solid fa-broom"></i>
-                Dọn dẹp
+            <a th:href="@{/admin/manage-housekeeping}" th:classappend="${activePage == 'housekeeping' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : ''}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium">
+                <i class="fa-solid fa-broom"></i> Dọn dẹp
             </a>
-            <a th:href="@{/admin/feedback}" th:classappend="${activePage == 'feedback' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
-                <i class="fa-regular fa-comment-dots w-5"></i>
-                Phản hồi khách hàng
+            <a th:href="@{/admin/feedback}" th:classappend="${activePage == 'feedback' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : ''}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium">
+                <i class="fa-regular fa-comment-dots w-5"></i> Phản hồi khách hàng
             </a>
         </nav>
 
         <div class="absolute bottom-0 w-full p-4 border-t border-gray-100 bg-white">
-            <a th:href="@{/auth/logout}" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
-                <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
-                Đăng xuất
+            <a th:href="@{/auth/logout}" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium">
+                <i class="fa-solid fa-arrow-right-from-bracket w-5"></i> Đăng xuất
             </a>
         </div>
     </aside>
 
-
+    <!-- OVERLAY -->
+    <div th:id="${prefix + '-sidebarOverlay'}" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
 </div>
 
+
 <!-- STAFF SIDEBAR FRAGMENT -->
-<div th:fragment="staff-sidebar(activePage)">
-    <!-- LOGO (Fixed Position) -->
+<div th:fragment="staff-sidebar(activePage, prefix)">
+    <!-- LOGO -->
     <a th:href="@{/home}">
-        <div class="logo-fixed flex items-center gap-3 select-none bg-white/90 backdrop-blur px-3 py-2 rounded-xl shadow-sm lg:shadow-none lg:bg-transparent lg:p-0 cursor-pointer z-50">
+        <div class="logo-fixed flex items-center gap-3">
             <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
-                <i class="fa-solid fa-house-chimney gradient-icon text-xl text-blue-600"></i>
+                <i class="fa-solid fa-house-chimney text-blue-600"></i>
             </div>
-            <div class="flex flex-col justify-center">
-                <span class="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 leading-none">BookNow</span>
-                <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider pl-0.5">Homestay System</span>
+            <div class="flex flex-col">
+                <span class="text-2xl font-bold text-blue-600">BookNow</span>
+                <span class="text-[10px] text-gray-500 uppercase">Homestay System</span>
             </div>
         </div>
     </a>
 
-    <!-- MOBILE HEADER (Hamburger) -->
+    <!-- MOBILE HEADER -->
     <div class="lg:hidden fixed top-0 w-full bg-white h-20 shadow-sm z-40 flex items-center justify-end px-6">
-        <button id="mobileMenuBtn" class="text-gray-500 hover:text-blue-600 focus:outline-none">
+        <button th:id="${prefix + '-mobileMenuBtn'}">
             <i class="fa-solid fa-bars text-2xl"></i>
         </button>
     </div>
 
     <!-- SIDEBAR -->
-    <aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform -translate-x-full lg:translate-x-0 pt-28 overflow-y-auto no-scrollbar transition-transform duration-300">
+    <aside th:id="${prefix + '-sidebar'}"
+           class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r z-50 transform -translate-x-full lg:translate-x-0 pt-28 transition-transform duration-300">
+
         <nav class="px-4 space-y-2">
-            <a th:href="@{/staff/dashboard}" th:classappend="${activePage == 'dashboard' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors shadow-sm">
-                <i class="fa-solid fa-chart-line w-5"></i>
-                Bảng điều khiển
-            </a>
-            <a th:href="@{/admin/bookings}" th:classappend="${activePage == 'bookings' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
-                <i class="fa-regular fa-calendar-check w-5"></i>
-                Đơn đặt phòng
-            </a>
-            <a th:href="@{/admin/list}" th:classappend="${activePage == 'rooms' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
-                <i class="fa-solid fa-door-open w-5"></i>
-                Phòng
-            </a>
-            <a th:href="@{/staff/offline-checkin}" th:classappend="${activePage == 'checkin' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
-                <i class="fa-solid fa-right-to-bracket w-5"></i>
-                Check-in trực tiếp
-            </a>
-            <a href="#" th:classappend="${activePage == 'feedback' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
-                <i class="fa-regular fa-comment-dots w-5"></i>
-                Phản hồi khách hàng
-            </a>
-            <a th:href="@{/admin/manage-housekeeping}" th:classappend="${activePage == 'housekeeping' ? 'bg-blue-50 text-blue-600 ring-1 ring-black/5' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors">
-                <i class="fa-solid fa-broom"></i>
-                Dọn dẹp
-            </a>
+            <a th:href="@{/staff/dashboard}" class="flex items-center gap-3 px-4 py-3">Dashboard</a>
+            <a th:href="@{/admin/bookings}" class="flex items-center gap-3 px-4 py-3">Bookings</a>
+            <a th:href="@{/admin/list}" class="flex items-center gap-3 px-4 py-3">Rooms</a>
+            <a th:href="@{/staff/offline-checkin}" class="flex items-center gap-3 px-4 py-3">Check-in</a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3">Feedback</a>
         </nav>
 
-        <div class="absolute bottom-0 w-full p-4 border-t border-gray-100 bg-white">
-            <a th:href="@{/auth/logout}" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
-                <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
-                Đăng xuất
-            </a>
+        <div class="absolute bottom-0 w-full p-4 border-t">
+            <a th:href="@{/auth/logout}" class="text-red-500">Đăng xuất</a>
         </div>
     </aside>
 
-    <!-- OVERLAY (for mobile) -->
-    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden glass-effect"></div>
+    <!-- OVERLAY -->
+    <div th:id="${prefix + '-sidebarOverlay'}" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
 </div>
 
-<script th:fragment="sidebar-scripts">
-    // Mobile Sidebar Toggle
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+<!-- SCRIPT -->
+<script th:fragment="sidebar-scripts(prefix)">
+    const mobileMenuBtn = document.getElementById([[${prefix}]] + '-mobileMenuBtn');
+    const sidebar = document.getElementById([[${prefix}]] + '-sidebar');
+    const sidebarOverlay = document.getElementById([[${prefix}]] + '-sidebarOverlay');
 
     if (mobileMenuBtn && sidebar && sidebarOverlay) {
         function toggleSidebar() {
             const isClosed = sidebar.classList.contains('-translate-x-full');
-            if (isClosed) {
-                sidebar.classList.remove('-translate-x-full');
-                sidebarOverlay.classList.remove('hidden');
-            } else {
-                sidebar.classList.add('-translate-x-full');
-                sidebarOverlay.classList.add('hidden');
-            }
+            sidebar.classList.toggle('-translate-x-full', !isClosed);
+            sidebarOverlay.classList.toggle('hidden', !isClosed);
         }
 
         mobileMenuBtn.addEventListener('click', toggleSidebar);
