@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.services.admin;
+package vn.edu.fpt.booknow.services;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;

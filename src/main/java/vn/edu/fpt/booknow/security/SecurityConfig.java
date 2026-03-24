@@ -71,9 +71,6 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-
-
         return http.build();
     }
 
@@ -92,6 +89,7 @@ public class SecurityConfig {
                                 "/assets/**",
                                 "/verify-otp", 
                                 "/resend-otp",
+                                "/oauth2/**",
                                 "/reset-password",
                                 "/404", "/error", "/authen/verifiedOtp",
                                 "/authen/registerEmail", "/authen/otp",
