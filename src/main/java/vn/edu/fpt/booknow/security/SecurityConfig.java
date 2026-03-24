@@ -64,7 +64,10 @@ public class SecurityConfig {
                                 "/forgot-password", "/verify-otp",
                                 "/resend-otp", "/reset-password",
                                 "/book-now/staff/bookings/update/*",
-                                "/404", "/error").permitAll()
+                                "/404", "/error", "/ws/**",
+                                "/checkin-ws/**",
+                                "/topic/**",
+                                "/app/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
