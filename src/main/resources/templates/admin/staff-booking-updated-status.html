@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head(title='Xác minh đặt phòng - BookNow')}">
-
 </head>
-<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+
 <style>
     .logo-fixed {
         position: fixed;
@@ -51,7 +50,7 @@
 </style>
 
 <body class="bg-gray-50 font-sans text-gray-800">
-<input type="hidden" id="booking-status" class="hs" th:value="${booking.bookingStatus.name()}">
+<input type="hidden" id="booking-status" class="hs" th:value="${booking.bookingStatus}">
 
 <div th:replace="~{fragments/sidebar :: staff-sidebar(activePage='bookings')}"></div>
 <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
@@ -303,9 +302,12 @@
 
 
                             <button type="submit"
-                                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg font-medium disabled:opacity-50 transition-colors w-full sm:w-auto">
-                                <i class="fa-solid fa-ban mr-2"></i>
-                                Từ chối hồ sơ
+                                    id="rejectBtn"
+                                    class="flex items-center justify-center gap-2 bg-white border border-yellow-200 text-yellow-600 hover:bg-yellow-50 px-4 py-2 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">
+
+                                <i id="rejectIcon" class="fa-solid fa-xmark"></i>
+                                <span id="rejectText">Từ chối</span>
+
                             </button>
 
                         </form>
@@ -318,7 +320,7 @@
                             <button type="submit"
                                     class="px-6 py-2.5 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white font-medium shadow-sm transition-colors sm:w-auto w-full sm:ml-auto">
                                 <i class="fa-solid fa-check mr-2"></i><span
-                                    th:text="${booking.bookingStatus.name() == 'PAID' ? 'Duyệt hồ sơ' : 'Duyệt & Chuyển bước check-in'}"></span>
+                                    th:text="${booking.bookingStatus == 'PAID' ? 'Duyệt hồ sơ' : 'Duyệt & Chuyển bước check-in'}"></span>
                             </button>
                         </form>
                     </div>
@@ -400,14 +402,17 @@
                     <div class="flex justify-center mb-6">
                         <div class="relative w-full max-w-sm aspect-[3/4] bg-gray-900 rounded-xl overflow-hidden shadow-lg border-4 border-gray-100">
 
-                            <div th:if="${checkInSession != null}" id="mediaContainer"
+                            <div id="mediaContainer"
                                  class="w-full h-full flex items-center justify-center text-white">
-                                <input type="hidden" id="bookingId" th:value="${booking.bookingId}">
-                                <input type="hidden" id="checkInSessionId"
-                                       th:value="${checkInSession.getCheckInSessionId()}">
-                                <video th:src="${checkInSession.getVideoUrl()}" class="w-full h-full object-cover"
-                                       controls
-                                       autoplay></video>
+                                <div th:if="${checkInSession != null}">
+                                    <input type="hidden" id="bookingId" th:value="${booking.bookingId}">
+                                    <input type="hidden" id="checkInSessionId"
+                                           th:value="${checkInSession.getCheckInSessionId()}">
+                                    <video th:src="${checkInSession.getVideoUrl()}" class="w-full h-full object-cover"
+                                           controls
+                                           autoplay></video>
+                                </div>
+
                             </div>
                             <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs backdrop-blur-sm">
                                 <i class="fa-solid fa-location-dot mr-1"></i> Tại Homestay
@@ -487,7 +492,7 @@
 
                     <!-- STAFF HOÀN TẤT BOOKING -->
                     <div class="mt-6 border-t pt-6 flex flex-col items-center gap-3"
-                         th:if="${booking.bookingStatus.name() == 'CHECKED_OUT'}">
+                         th:if="${booking.bookingStatus == 'CHECKED_OUT'}">
 
                         <p class="text-sm text-gray-500">
                             Khách chưa để lại feedback. Staff có thể hoàn tất booking thủ công.
@@ -513,7 +518,51 @@
     </div>
 
 </main>
+<script>
+    const rejectBtn = document.getElementById("rejectBtn");
+    const rejectText = document.getElementById("rejectText");
+    const rejectIcon = document.getElementById("rejectIcon");
+    const rejectCountdown = document.getElementById("rejectCountdown");
 
+    const rejectForm = rejectBtn?.closest("form");
+
+    if (rejectForm) {
+        rejectForm.addEventListener("submit", function (e) {
+
+            if (!confirm('Bạn có chắc chắn muốn TỪ CHỐI booking này không?')) {
+                return;
+            }
+
+            // loading
+            rejectBtn.disabled = true;
+            rejectText.innerText = "Đang xử lý...";
+            rejectIcon.classList.remove("fa-xmark");
+            rejectIcon.classList.add("fa-spinner", "fa-spin");
+
+            startRejectCountdown(60);
+        });
+    }
+
+    function startRejectCountdown(seconds) {
+        let time = seconds;
+
+        const interval = setInterval(() => {
+            rejectCountdown.innerText = `⏳ Vui lòng chờ ${time}s để thao tác lại`;
+            time--;
+
+            if (time < 0) {
+                clearInterval(interval);
+
+                rejectCountdown.innerText = "";
+                rejectBtn.disabled = false;
+
+                rejectText.innerText = "Từ chối";
+                rejectIcon.classList.remove("fa-spinner", "fa-spin");
+                rejectIcon.classList.add("fa-xmark");
+            }
+        }, 1000);
+    }
+</script>
 <script>
     const panelIdentity = document.getElementById('panel_identity');
     const panelPayment = document.getElementById('panel_payment');
@@ -521,8 +570,8 @@
     const panelFailure = document.getElementById('panel_failure');
     const panelSuccess = document.getElementById('panel_success');
     let bookingStatus = document.getElementById('booking-status')?.value || "APPROVED";
-    let checkInSessionId = document.getElementById('checkInSessionId').value;
-    let bookingId = document.getElementById('bookingId').value;
+    let checkInSessionId = document.getElementById('checkInSessionId')?.value || "";
+    let bookingId = document.getElementById('bookingId')?.value || "";
     const badge = document.getElementById('headerStatusBadge');
 
     const steps = {
@@ -609,15 +658,16 @@
         if (badge) {
             badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium";
         }
-        // if (bookingStatus === 'REJECTED_CHECKIN'){
-        //     bookingStatus = 'APPROVED';
-        // }
+        if (bookingStatus === 'REJECTED_CHECKIN'){
+            bookingStatus = 'APPROVED';
+        }
 
 
+        console.log(bookingStatus)
         switch (bookingStatus) {
             case "PENDING_PAYMENT":
                 panelPayment?.classList.remove('hidden');
-                badge?.classList.add('bg-blue-100', 'text-blue-800');
+                badge?.classList.add('bg-yellow-100', 'text-yellow-800');
                 badge.textContent = "Chờ thanh toán";
                 updateTimeline(1, "blue");
                 break;
@@ -640,7 +690,7 @@
                 badge?.classList.add('bg-green-100', 'text-green-800');
                 badge.textContent = "Đã check-in";
                 document.getElementById('successTitle').textContent = "Khách đã nhận phòng";
-                updateTimeline(5, "purple");
+                updateTimeline(4, "purple");
                 break;
 
             case "CHECKED_OUT":
@@ -666,13 +716,6 @@
                 document.getElementById('failureReasonText').textContent = "Booking bị từ chối ở bước xác minh hồ sơ.";
                 updateTimeline(2, "yellow");
                 break;
-            // case "REJECTED_CHECKIN":
-            //     panelFailure?.classList.remove('hidden');
-            //     badge?.classList.add('bg-red-100', 'text-red-800');
-            //     if (badge) badge.textContent = "Bị từ chối";
-            //     document.getElementById('failureReasonText').textContent = "Booking bị từ chối ở bước check-in.";
-            //     updateTimeline(3, "yellow");
-            //     break;
             case "FAILED":
                 panelFailure?.classList.remove('hidden');
                 badge?.classList.add('bg-red-100', 'text-red-800');
@@ -687,9 +730,6 @@
     }
 
     document.addEventListener("DOMContentLoaded", loadBookingState);
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
 
     function toggleSidebar() {
         if (!sidebar || !sidebarOverlay) return;
@@ -779,7 +819,6 @@
                 return res.text();
             })
             .then(data => {
-
                 console.log("Approve success:", data);
                 bookingStatus = "CHECKED_IN";
                 loadBookingState();
@@ -812,7 +851,7 @@
             .then(data => {
                 console.log("Reject success:", data);
                 alert('Reject thành công và đã gửi thông báo về khách hàng để thực hiện lại check_in');
-                bookingStatus = "PAID";
+                bookingStatus = "APPROVED";
                 loadBookingState();
             })
             .catch(err => {

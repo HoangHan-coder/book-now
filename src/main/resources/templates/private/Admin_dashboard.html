@@ -69,27 +69,13 @@ input[type="date"].drp-input:focus {
 </style>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<div th:replace="~{fragments/sidebar :: admin-sidebar(activePage='dashboard')}"></div>
+<div th:replace="fragments/sidebar :: admin-sidebar('dashboard','admin')"></div>
+<script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
 
 <!-- MAIN CONTENT -->
 <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
+    <div th:replace="~{fragments/infor_admin}"></div>
 
-    <!-- TOP HEADER AREA -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-        <!-- User Info -->
-        <div class="flex items-center gap-4 bg-white p-3 rounded-xl shadow-sm border border-gray-100 md:ml-auto">
-            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border-2 border-white shadow-sm">
-                AD
-            </div>
-            <div class="pr-2">
-                <h4 class="text-sm font-bold text-gray-800 leading-none">Nguyễn Văn A</h4>
-                <span class="text-xs text-blue-500 font-semibold bg-blue-50 px-2 py-0.5 rounded-full mt-1 inline-block">Admin</span>
-            </div>
-            <button class="text-gray-400 hover:text-gray-600 ml-2">
-                <i class="fa-solid fa-chevron-down text-xs"></i>
-            </button>
-        </div>
-    </div>
 
     <!-- ENHANCED FILTER BAR WITH TIME SCOPE -->
     <div class="flex flex-col xl:flex-row xl:items-end justify-between mb-6 gap-4">
@@ -374,7 +360,7 @@ input[type="date"].drp-input:focus {
     </div>
 
 </main>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- SCRIPT -->
 <script th:inline="javascript">
 

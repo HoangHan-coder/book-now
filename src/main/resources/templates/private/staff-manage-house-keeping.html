@@ -51,52 +51,11 @@
 </head>
 
 <body class="bg-gray-100 min-h-screen">
-<div class="logo-fixed flex items-center gap-3 select-none bg-white/90 backdrop-blur px-3 py-2 rounded-xl shadow-sm lg:shadow-none lg:bg-transparent lg:p-0">
-  <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
-    <i class="fa-solid fa-house-chimney gradient-icon text-xl"></i>
-  </div>
-  <div class="flex flex-col justify-center">
-    <span class="text-2xl font-extrabold tracking-tight gradient-text leading-none">BookNow</span>
-    <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider pl-0.5">Homestay System</span>
-  </div>
-</div>
 
-<aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform -translate-x-full lg:translate-x-0 pt-28 overflow-y-auto no-scrollbar">
-  <!-- Navigation Links -->
-  <nav class="px-4 space-y-2">
-    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-      <i class="fa-solid fa-chart-line w-5"></i>
-      Bảng điều khiển
-    </a>
-    <a href="#" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium transition-colors shadow-sm ring-1 ring-black/5">
-      <i class="fa-regular fa-calendar-check w-5"></i>
-      Đơn đặt phòng
-    </a>
-    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-      <i class="fa-solid fa-door-open w-5"></i>
-      Phòng
-    </a>
-    <a href="/admin/manage-housekeeping" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-      <i class="fa-solid fa-broom"></i>
-      Dọn dẹp
-    </a>
-    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-      <i class="fa-solid fa-users-gear w-5"></i>
-      Khách hàng
-    </a>
-  </nav>
-
-  <!-- Logout at Bottom -->
-  <div class="absolute bottom-0 w-full p-4 border-t border-gray-100 bg-white">
-    <a href="#" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
-      <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
-      Đăng xuất
-    </a>
-  </div>
-</aside>
+<div th:replace="~{fragments/sidebar :: admin-sidebar(activePage='housekeeping')}"></div>
 
 <main class="max-w-7xl mx-auto px-4 py-6 lg:ml-64">
-
+    <div th:replace="~{fragments/infor_admin}"></div>
   <!-- ERROR MESSAGE -->
   <div th:if="${errorMessage}"
        class="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 flex items-center gap-3 shadow-sm">
@@ -119,7 +78,7 @@
       <h2 class="text-lg font-semibold text-gray-800">Bộ lọc</h2>
     </div>
     <div class="p-6">
-      <form method="get" action="/admin/manage-housekeeping" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <form method="get" th:action="@{/admin/manage-housekeeping}" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
         
         <!-- Task Status Filter -->
         <div class="flex flex-col">
@@ -157,7 +116,7 @@
             <i class="fa-solid fa-filter"></i>
             <span>Lọc</span>
           </button>
-          <a href="/admin/manage-housekeeping" class="flex-1 lg:flex-initial px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-colors font-medium flex items-center justify-center gap-2">
+          <a th:href="@{/admin/manage-housekeeping}" class="flex-1 lg:flex-initial px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-colors font-medium flex items-center justify-center gap-2">
             <i class="fa-solid fa-xmark"></i>
             <span>Xóa</span>
           </a>
@@ -240,7 +199,7 @@
           <!-- Action -->
           <td class="px-6 py-4">
 
-            <a th:href="@{/admin/manage-housekeeping/task-detail/{id}(id=${task.id})}"
+            <a th:href="@{/admin/manage-housekeeping/task-detail/{id}(id=${task.taskId})}"
                class="text-blue-600 hover:underline text-sm mr-3">
               View
             </a>

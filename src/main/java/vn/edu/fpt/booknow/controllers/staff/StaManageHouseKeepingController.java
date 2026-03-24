@@ -3,6 +3,7 @@ package vn.edu.fpt.booknow.controllers.staff;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.dto.PaginatedResponse;
 import vn.edu.fpt.booknow.model.entities.HousekeepingTask;
 import vn.edu.fpt.booknow.model.entities.RoomStatus;
@@ -80,6 +81,7 @@ public class StaManageHouseKeepingController {
     public String showHouseKeepingTaskDetail(
             @PathVariable("id") Long id,
             Model model) {
+        System.out.println(id);
         HousekeepingTask housekeepingTask = manageHouseKeepingService.getHousekeepingTaskById(id);
         model.addAttribute("housekeepingTask", housekeepingTask);
         model.addAttribute("availableStaff", staffAccountRepository.findAll());
@@ -92,12 +94,15 @@ public class StaManageHouseKeepingController {
             @RequestParam(value = "assignedStaffId", required = false) Long assignedStaffId,
             @RequestParam(value = "priority", required = false) String priority,
             @RequestParam(value = "notes", required = false) String notes,
-            Model model) {
-        HousekeepingTask housekeepingTask = manageHouseKeepingService.updateHousekeepingTaskDetail(id, assignedStaffId, priority, notes);
-        model.addAttribute("housekeepingTask", housekeepingTask);
-        model.addAttribute("availableStaff", staffAccountRepository.findAll());
-        model.addAttribute("successMessage", "Task updated successfully!");
-        return "redirect:/admin/manage-housekeeping";
+            RedirectAttributes redirectAttributes) {
+        try {
+            HousekeepingTask housekeepingTask = manageHouseKeepingService.updateHousekeepingTaskDetail(id, assignedStaffId, priority, notes);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã giao nhiệm vụ thành công");
+            return "redirect:/admin/manage-housekeeping";
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage",  e.getMessage());
+            return "redirect:/admin/manage-housekeeping";
+        }
     }
 
 }

@@ -11,13 +11,14 @@ import vn.edu.fpt.booknow.repositories.BookingRepository;
 public class BookingUpdateService {
 
     private final BookingRepository bookingRepository;
-//    private final SimpMessagingTemplate messagingTemplate;
+
     private final MailService emailService;
+
     public BookingUpdateService(BookingRepository bookingRepository,
-//                                SimpMessagingTemplate messagingTemplate,
+
                                 MailService emailService) {
         this.bookingRepository = bookingRepository;
-//        this.messagingTemplate = messagingTemplate;
+
         this.emailService = emailService;
     }
 
@@ -29,7 +30,7 @@ public class BookingUpdateService {
         validateStatusTransition(booking.getBookingStatus(), newStatus);
 
         booking.setBookingStatus(newStatus);
-
+        System.out.println(newStatus);
         if (newStatus == BookingStatus.REJECTED) {
 
             booking.setNote(reason);
@@ -57,7 +58,7 @@ public class BookingUpdateService {
                     reason
             );
         }
-        bookingRepository.save(booking);
+        System.out.println(bookingRepository.save(booking));
 
 
     }
@@ -80,9 +81,8 @@ public class BookingUpdateService {
     private boolean isValidTransition(BookingStatus current, BookingStatus next) {
 
         return switch (current) {
-            case PENDING_PAYMENT ->
-                    next == BookingStatus.PAID ||
-                     next == BookingStatus.FAILED;
+            case PENDING_PAYMENT -> next == BookingStatus.PAID ||
+                    next == BookingStatus.FAILED;
 
             case PAID ->
                     next == BookingStatus.APPROVED ||
@@ -93,8 +93,7 @@ public class BookingUpdateService {
                             next == BookingStatus.REJECTED_CHECKIN ||
                next == BookingStatus.FAILED;
 
-            case CHECKED_IN ->
-                    next == BookingStatus.CHECKED_OUT ||
+            case CHECKED_IN -> next == BookingStatus.CHECKED_OUT ||
                     next == BookingStatus.REJECTED;
             case CHECKED_OUT -> next == BookingStatus.COMPLETED;
             case REJECTED -> next == BookingStatus.APPROVED;
@@ -103,24 +102,5 @@ public class BookingUpdateService {
             default -> false;
         };
     }
-//    @Transactional
-//    public void autoCheckOutExpiredBookings() {
-//
-//        List<Booking> checkedInBookings = bookingRepository.findByBookingStatus(BookingStatus.CHECKED_IN);
-//
-//        LocalDateTime now = LocalDateTime.now();
-//
-//        for (Booking booking : checkedInBookings) {
-//
-//            if (booking.getCheckOutTime() != null &&
-//                    booking.getCheckOutTime().isBefore(now)) {
-//
-//                booking.setBookingStatus(BookingStatus.CHECKED_OUT);
-//
-//                Booking savedBooking = bookingRepository.save(booking);
-//
-//                notifyBookingUpdate(savedBooking);
-//            }
-//        }
-//    }
+
 }

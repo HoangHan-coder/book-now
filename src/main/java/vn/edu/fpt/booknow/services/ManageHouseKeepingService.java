@@ -46,6 +46,14 @@ public class ManageHouseKeepingService {
         HousekeepingTask housekeepingTask = houseKeepingRepository.findById(taskId)
                 .orElseThrow(() -> new IllegalArgumentException("Task not found with ID: " + taskId));
 
+        // ❌ VALIDATION: Cannot update staff or priority if task is already completed
+        if (housekeepingTask.getStatus() == TaskStatus.COMPLETED) {
+            if ((assignedStaffId != null && assignedStaffId > 0) || 
+                (priority != null && !priority.isBlank())) {
+                throw new IllegalStateException("Bạn không thể thay đổi nhân viên hoặc cập nhật khi trạng thái đang ở COMPLETED");
+            }
+        }
+
         // Assign staff and auto-update status
         if (assignedStaffId != null && assignedStaffId > 0) {
             Optional<StaffAccount> staff = staffAccountRepository.findById(assignedStaffId);
@@ -73,7 +81,6 @@ public class ManageHouseKeepingService {
 
         return houseKeepingRepository.save(housekeepingTask);
     }
-
     /**
      * Get all housekeeping tasks with pagination
      * @param page Page number (1-indexed, auto-adjusted if invalid)

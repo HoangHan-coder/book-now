@@ -60,8 +60,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/login","/auth/login",
                                 "/auth/logout", "/public/**",
                                 "/home","/search",
-                                "/detail/**","/pay/**",
-                                "/booking/save", "/assets/**",
+                                "/detail/**","/pay/**", "/assets/**",
                                 "/forgot-password", "/verify-otp",
                                 "/resend-otp", "/reset-password",
                                 "/book-now/staff/bookings/update/*",
@@ -87,19 +86,18 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login",
                                 "/auth/logout", "/register",
-                                "/public/**", "/home","/pay/**",
+                                "/public/**", "/pay/**",
                                 "/home","/search","/detail/**",
                                 "/forgot-password",
-                                "/booking/save", "/assets/**",
+                                "/assets/**",
                                 "/verify-otp", 
-                                "/resend-otp", 
+                                "/resend-otp",
                                 "/reset-password",
                                 "/404", "/error", "/authen/verifiedOtp",
                                 "/authen/registerEmail", "/authen/otp",
                                 "/authen/registerForm",
-                                "/checkin/start",
-                                "/book-now/checkin/page/**","/authen/login").permitAll()
-                        .anyRequest().authenticated()
+                                "/checkin/start").permitAll()
+                        .anyRequest().hasRole("CUSTOMER")
                 )
                 
                 .oauth2Login(oauth -> oauth
@@ -112,7 +110,7 @@ public class SecurityConfig {
                         .successHandler(successHandler)
                 ).exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendRedirect("/book-now/authen/login");
+                            response.sendRedirect("/book-now/auth/login");
                         })
                 )
                 .sessionManagement(session -> session

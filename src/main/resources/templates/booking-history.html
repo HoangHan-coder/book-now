@@ -130,13 +130,17 @@
                               class="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
                                     Hoàn thành
                                 </span>
-                        <span th:if="${booking.bookingStatus.name() == 'CANCELLED'}"
+                        <span th:if="${booking.bookingStatus.name() == 'CANCELED'}"
                               class="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">
                                     Đã hủy
                                 </span>
-                        <span th:if="${booking.bookingStatus.name() == 'FAILED' or booking.bookingStatus.name() == 'REJECTED'}"
+                        <span th:if="${booking.bookingStatus.name() == 'FAILED'}"
                               class="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">
                                     Thất bại
+                                </span>
+                        <span th:if="${booking.bookingStatus.name() == 'REJECTED'}"
+                              class="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">
+                                    Từ chối
                                 </span>
                     </td>
                     <!-- Action -->
