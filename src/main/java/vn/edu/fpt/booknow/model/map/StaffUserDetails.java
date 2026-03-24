@@ -16,9 +16,19 @@ public class StaffUserDetails implements UserDetails {
     @Setter
     @Getter
     private String fullName;
+<<<<<<< HEAD
     @Setter
     @Getter
     private String role;
+=======
+
+    @Setter
+    @Getter
+    private String role;
+
+
+
+>>>>>>> master
     public StaffUserDetails(StaffAccount staffAccount) {
         this.staffAccount = staffAccount;
         this.fullName = staffAccount.getFullName();
@@ -47,6 +57,14 @@ public class StaffUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + staffAccount.getRole()));
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     @Override public boolean isEnabled() { return true; }

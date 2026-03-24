@@ -31,7 +31,7 @@ public class Scheduler {
     private Timetable timetable;
 
     @NotNull
-    @Column(name = "\"date\"", nullable = false)
+    @Column(name = "date", nullable = false)
     private LocalDateTime date;
 
 }

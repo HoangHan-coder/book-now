@@ -3,6 +3,7 @@ package vn.edu.fpt.booknow.services;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.edu.fpt.booknow.model.entities.Booking;
+import vn.edu.fpt.booknow.model.entities.BookingStatus;
 import vn.edu.fpt.booknow.repositories.BookingRepository;
 
 import java.time.Duration;
