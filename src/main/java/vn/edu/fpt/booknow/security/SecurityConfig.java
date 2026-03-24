@@ -108,8 +108,10 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService)
                         )
                         .successHandler(successHandler)
-                ).exceptionHandling(ex -> ex
+                )
+                .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
+                            System.out.println("throw exceptions tại security config ............................");
                             response.sendRedirect("/book-now/auth/login");
                         })
                 )

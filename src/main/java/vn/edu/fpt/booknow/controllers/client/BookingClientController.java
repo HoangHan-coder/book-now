@@ -37,12 +37,14 @@ public class BookingClientController {
                 return "redirect:/detail/" + bookingDTO.getRoom().getRoomId();
             }
             if (accessToken == null || accessToken.isEmpty()) {
+                System.out.println("sai access token........................");
                 return "redirect:/auth/login";
             }
             String rediect = bookingService.saveBooking(bookingDTO, frontImg, backImg, redirectAttributes, accessToken);
             return rediect;
 
         } catch (Exception e) {
+            System.out.println("chưa đăng nhập..........................");
             return "redirect:/auth/login";
         }
     }

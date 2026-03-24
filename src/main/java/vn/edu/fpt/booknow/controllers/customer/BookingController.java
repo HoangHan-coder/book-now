@@ -30,6 +30,9 @@ public class BookingController {
     private PaymentService paymentService;
 
     @Autowired
+    private CustomerService customerService;
+
+    @Autowired
     private FeedbackService feedbackService;
 
     @Autowired
@@ -42,11 +45,16 @@ public class BookingController {
 
         try {
             String email = token != null ? jwtService.extractUserName(token) : null;
-            if (email == null)
+            if (email == null) {
                 return "redirect:/auth/login";
+            }
+
+            Customer customer = customerService.findCusByEmail(email);
+
 
             PaginatedResponse<BookingDTO> paginatedBookings = bookingListService.bookingListWithPagination(page, email);
 
+            model.addAttribute("fullName", customer.getFullName());
             model.addAttribute("bookings", paginatedBookings.getData());
             model.addAttribute("currentPage", paginatedBookings.getCurrentPage());
             model.addAttribute("totalPages", paginatedBookings.getTotalPages());
@@ -82,6 +90,10 @@ public class BookingController {
             if (booking == null || !booking.getCustomer().getEmail().equals(email)) {
                 return "redirect:/bookings/history";
             }
+
+            Customer customer = customerService.findCusByEmail(email);
+
+            model.addAttribute("fullName", customer.getFullName());
             model.addAttribute("booking", bookingDTO);
             model.addAttribute("room", new RoomDTO(room));
             model.addAttribute("payments", payments.stream().map(PaymentDTO::new).toList());
@@ -102,6 +114,7 @@ public class BookingController {
                 System.out.println("booking is null");
                 return "redirect:/error/404";
             }
+
             bookingService.cancel(booking.getBookingId());
         } catch (NumberFormatException e) {
             System.out.println("Booking ID invalid");
@@ -114,6 +127,7 @@ public class BookingController {
 
     @GetMapping("/{id}/update-info")
     public String updateBookingInfoView(@PathVariable("id") String bookingIdRaw,
+                                        @CookieValue(value = "Access_token", required = false) String token,
                                         Model model) {
         System.out.println(bookingIdRaw);
         try {
@@ -124,9 +138,14 @@ public class BookingController {
                 System.out.println("booking is null");
                 return "redirect:/error/404";
             }
+            String email = token != null ? jwtService.extractUserName(token) : null;
+            if (email == null) return "redirect:/auth/login";
 
+            Customer customer = customerService.findCusByEmail(email);
+
+            model.addAttribute("fullName", customer.getFullName());
             model.addAttribute("booking", new BookingDTO(booking));
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             System.out.println("Booking ID invalid");
             return "redirect:/error/404";
         }

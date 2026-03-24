@@ -233,8 +233,7 @@
                                 Vui lòng chọn đầy đủ thông tin Check-in và Check-out
                             </div>
                         </div>
-                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 mt-8"
-                             th:if="${feedbackStats != null}">
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 mt-8">
                             <h3 class="text-lg font-bold text-gray-800 mb-8 flex items-center gap-2">
                                 <i class="fa-regular fa-comment-dots text-blue-600"></i> Đánh giá từ khách hàng
                             </h3>
@@ -242,80 +241,77 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
                                 <div class="flex flex-col items-center justify-center border-r border-gray-100">
                                     <div class="flex items-baseline gap-1">
-                                        <span class="text-6xl font-extrabold text-gray-800"
-                                              th:text="${#numbers.formatDecimal(feedbackStats.averageRating, 1, 1)}">4.8</span>
+                <span class="text-6xl font-extrabold text-gray-800"
+                      th:text="${feedbackStats != null ? #numbers.formatDecimal(feedbackStats.averageRating, 1, 1) : '0.0'}">0.0</span>
                                         <span class="text-xl text-gray-400 font-medium">/5</span>
                                     </div>
                                     <div class="flex text-yellow-400 my-3 text-lg">
                                         <th:block th:each="i : ${#numbers.sequence(1, 5)}">
-                                            <i th:class="${i <= feedbackStats.averageRating ? 'fa-solid fa-star' : (i - feedbackStats.averageRating < 1 ? 'fa-solid fa-star-half-stroke' : 'fa-regular fa-star')}"></i>
+                                            <i th:class="${feedbackStats != null && i <= feedbackStats.averageRating ? 'fa-solid fa-star' :
+                                 (feedbackStats != null && i - feedbackStats.averageRating < 1 ? 'fa-solid fa-star-half-stroke' : 'fa-regular fa-star')}"></i>
                                         </th:block>
                                     </div>
                                     <p class="text-sm text-gray-500 font-medium">
                                         Dựa trên <span class="text-gray-800"
-                                                       th:text="${feedbackStats.totalReviews + ' đánh giá'}">120 đánh giá</span>
+                                                       th:text="${(feedbackStats != null ? feedbackStats.totalReviews : 0) + ' đánh giá'}">0 đánh giá</span>
                                     </p>
                                 </div>
 
                                 <div class="md:col-span-2 space-y-3">
-                                    <div th:each="star : ${#numbers.sequence(5, 1, -1)}"
-                                         class="flex items-center gap-4">
+                                    <div th:each="star : ${#numbers.sequence(5, 1, -1)}" class="flex items-center gap-4">
                                         <span class="text-sm font-medium text-gray-600 w-12" th:text="${star + ' sao'}">5 sao</span>
                                         <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                                             <div class="h-full bg-yellow-400 rounded-full"
-                                                 th:style="'width: ' + (${feedbackStats.totalReviews > 0 ? (feedbackStats.ratingCounts.get(star) * 100.0 / feedbackStats.totalReviews) : 0}) + '%'">
+                                                 th:style="'width: ' + (${feedbackStats != null && feedbackStats.totalReviews > 0 ? (feedbackStats.ratingCounts.get(star) * 100.0 / feedbackStats.totalReviews) : 0}) + '%'">
                                             </div>
                                         </div>
                                         <span class="text-sm text-gray-400 w-8 text-right"
-                                              th:text="${feedbackStats.ratingCounts.get(star)}">0</span>
+                                              th:text="${feedbackStats != null ? feedbackStats.ratingCounts.get(star) : 0}">0</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="space-y-8">
-                                <div th:each="item : ${feedbackList}"
-                                     class="pb-8 border-b border-gray-50 last:border-0">
+                                <div th:if="${feedbackList == null || feedbackList.isEmpty()}" class="text-center py-10">
+                                    <p class="text-gray-400 italic">Hiện tại chưa có đánh giá nào cho dịch vụ này.</p>
+                                </div>
+
+                                <div th:each="item : ${feedbackList}" class="pb-8 border-b border-gray-50 last:border-0">
                                     <div class="flex justify-between items-start mb-4">
                                         <div class="flex items-center gap-3">
-                                            <img th:if="${item.avatarUrl != null}" th:src="${item.avatarUrl}"
-                                                 class="w-12 h-12 rounded-full object-cover">
+                                            <img th:if="${item.avatarUrl != null}" th:src="${item.avatarUrl}" class="w-12 h-12 rounded-full object-cover">
                                             <div th:unless="${item.avatarUrl != null}"
                                                  class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg"
-                                                 th:text="${#strings.substring(item.customerName, 0, 1)}">N
+                                                 th:text="${item.customerName != null ? #strings.substring(item.customerName, 0, 1) : '?'}">?
                                             </div>
                                             <div>
-                                                <h4 class="font-bold text-gray-800" th:text="${item.customerName}">Tên
-                                                    khách hàng</h4>
+                                                <h4 class="font-bold text-gray-800" th:text="${item.customerName ?: 'Khách hàng'}">Tên khách hàng</h4>
                                                 <p class="text-[10px] text-blue-600 font-bold uppercase tracking-wider"
-                                                   th:text="${'Đã đặt ' + item.bookingCount + ' lần'}">Đã đặt 0 lần</p>
+                                                   th:text="${'Đã đặt ' + (item.bookingCount ?: 0) + ' lần'}">Đã đặt 0 lần</p>
                                             </div>
                                         </div>
                                         <div class="text-right">
                                             <div class="flex text-yellow-400 text-xs mb-1">
                                                 <i th:each="i : ${#numbers.sequence(1, 5)}"
-                                                   th:class="${i <= item.rating ? 'fa-solid fa-star' : 'fa-regular fa-star'}"></i>
+                                                   th:class="${i <= (item.rating ?: 0) ? 'fa-solid fa-star' : 'fa-regular fa-star'}"></i>
                                             </div>
                                             <span class="text-[11px] text-gray-400"
-                                                  th:text="${#temporals.format(item.createdAt, 'dd/MM/yyyy')}">Ngày</span>
+                                                  th:text="${item.createdAt != null ? #temporals.format(item.createdAt, 'dd/MM/yyyy') : '--/--/----'}">Ngày</span>
                                         </div>
                                     </div>
-                                    <p class="text-gray-600 leading-relaxed text-sm mb-4" th:text="${item.content}">Nội
-                                        dung...</p>
+                                    <p class="text-gray-600 leading-relaxed text-sm mb-4" th:text="${item.content}">Nội dung...</p>
 
-                                    <div th:if="${item.replyContent != null}"
-                                         class="bg-blue-50/50 border-l-4 border-blue-200 p-4 rounded-r-xl ml-4">
+                                    <div th:if="${item.replyContent != null}" class="bg-blue-50/50 border-l-4 border-blue-200 p-4 rounded-r-xl ml-4">
                                         <div class="flex items-center gap-2 mb-2">
                                             <i class="fa-solid fa-reply text-blue-400 text-sm scale-x-[-1]"></i>
-                                            <span class="text-xs font-bold text-blue-700"
-                                                  th:text="${'Quản lý ' + (item.managerName ?: 'Homestay')}">Quản lý</span>
+                                            <span class="text-xs font-bold text-blue-700" th:text="${'Quản lý ' + (item.managerName ?: 'Homestay')}">Quản lý</span>
                                         </div>
-                                        <p class="text-sm text-gray-600 italic" th:text="${item.replyContent}">Lời cảm
-                                            ơn...</p>
+                                        <p class="text-sm text-gray-600 italic" th:text="${item.replyContent}">Lời cảm ơn...</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <button th:if="${feedbackStats.totalReviews > 5}"
+                            <button th:if="${feedbackStats != null && feedbackStats.totalReviews > 5}"
                                     class="w-full mt-6 py-3 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
                                 Xem thêm đánh giá khác
                             </button>

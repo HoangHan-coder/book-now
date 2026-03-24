@@ -2,30 +2,87 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head(title='Booking History - BookNow')}"></head>
 <style>
-        .scrollbar-thin::-webkit-scrollbar {
-            height: 5px;
-        }
+    .scrollbar-thin::-webkit-scrollbar {
+        height: 5px;
+    }
 
-        .scrollbar-thin::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
+    .scrollbar-thin::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
 
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    .room-column {
+        min-width: 200px;
+        width: 200px;
+    }
+
+    table {
+        table-layout: fixed;
+        width: max-content;
+        min-width: 100%;
+    }
+
+    .scroll-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .logo-fixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        margin-top: 25px;
+        margin-left: 25px;
+        z-index: 60;
+    }
+
+    .hero-bg {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+        background-size: cover;
+        background-position: center;
+        height: 550px;
+    }
+
+    .dropdown-menu {
+        transform-origin: top right;
+        transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+    }
+
+    .dropdown-hidden {
+        transform: scale(0.95);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .dropdown-visible {
+        transform: scale(1);
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .slot-btn.selected {
+        background-color: #2563eb;
+        color: white;
+        border-color: #2563eb;
+    }
 </style>
+
 <body class="bg-gray-50 font-sans text-gray-800 min-h-screen">
 
-<!-- ===== LOGO ===== -->
-<div class="fixed top-5 left-5 z-50 bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow border border-gray-100">
-    <a th:href="@{/}" href="index.html" class="flex items-center gap-3">
-        <div class="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100">
-            <i class="fa-solid fa-house-chimney text-blue-600 text-base"></i>
-        </div>
-        <span class="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-blue-700">BookNow</span>
-    </a>
-</div>
+<div th:replace="~{fragments/navbar :: public-navbar}"></div>
 
 <!-- ===== MAIN LAYOUT ===== -->
 <div class="max-w-7xl mx-auto px-4 md:px-8 pt-24 pb-14">
@@ -179,7 +236,7 @@
         <!-- ===== PAGINATION ===== -->
         <!-- We check totalPages > 1 to ensure pagination is actually needed -->
         <!-- ===== PAGINATION ===== -->
-        <div th:if="${totalPages != null and totalPages > 1}"
+        <div th:if="${totalPages != null and totalPages > 0}"
              class="px-5 py-4 border-t border-gray-100 flex items-center justify-between">
 
             <!-- Display Showing X - Y of Z -->
@@ -224,24 +281,10 @@
             </div>
         </div>
 
-
-        <!--            &lt;!&ndash; Static pagination (visible without Thymeleaf) &ndash;&gt;-->
-        <!--            <div class="px-5 py-4 border-t border-gray-100 flex items-center justify-between">-->
-        <!--                <span class="text-xs text-gray-500" th:text="'Tổng cộng: ' + ${bookings.size()}">Showing 1 – 6 of 6 bookings</span>-->
-        <!--                <div class="flex gap-1">-->
-        <!--                    <span class="w-8 h-8 rounded border border-gray-100 flex items-center justify-center text-gray-300 cursor-not-allowed">-->
-        <!--                        <i class="fa-solid fa-chevron-left text-xs"></i>-->
-        <!--                    </span>-->
-        <!--                    <span class="w-8 h-8 rounded bg-blue-600 text-white font-bold text-xs flex items-center justify-center shadow-sm">1</span>-->
-        <!--                    <span class="w-8 h-8 rounded border border-gray-100 flex items-center justify-center text-gray-300 cursor-not-allowed">-->
-        <!--                        <i class="fa-solid fa-chevron-right text-xs"></i>-->
-        <!--                    </span>-->
-        <!--                </div>-->
-        <!--            </div>-->
-
     </div>
-
 </div>
+<div th:replace="~{fragments/navbar :: dropdown-script}"></div>
 
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 </html>
