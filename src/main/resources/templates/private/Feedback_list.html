@@ -264,7 +264,7 @@
 
         <!-- Previous -->
         <a th:if="${currentPage > 0}"
-           th:href="@{/admin/feedback(page=${currentPage-1}, rating=${rating}, hidden=${hidden}, keyword=${keyword})}"
+           th:href="@{/admin/feedback(page=${currentPage - 1}, rating=${rating}, hidden=${hidden}, keyword=${keyword})}"
            class="px-3 py-1 border rounded">
           <i class="fa-solid fa-chevron-left"></i>
         </a>
@@ -278,7 +278,7 @@
     </span>
 
         <!-- Next -->
-        <a th:if="${currentPage < totalPages-1}"
+        <a th:if="${currentPage < totalPages - 1}"
            th:href="@{/admin/feedback(page=${currentPage+1}, rating=${rating}, hidden=${hidden}, keyword=${keyword})}"
            class="px-3 py-1 border rounded">
           <i class="fa-solid fa-chevron-right"></i>
