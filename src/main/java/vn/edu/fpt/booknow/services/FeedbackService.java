@@ -27,7 +27,6 @@ public class FeedbackService {
     public Map<String, Object> getRoomFeedbackData(Long roomId) {
         // 1. Lấy danh sách chi tiết
         List<FeedbackDetailDTO> details = feedbackRepository.findFeedbacksByRoomId(roomId);
-        System.out.println(details.size() + " detail");
         // 2. Khởi tạo Map kết quả (Đặt tên là feedback để khớp với HTML)
         Map<String, Object> feedback = new HashMap<>();
 

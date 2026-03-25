@@ -61,14 +61,12 @@ public class RoomController {
             Map<String, Object> feedbackData = feedbackService.getRoomFeedbackData(roomId);
             if (accessToken != null && !accessToken.isEmpty()) {
                 email = jwtService.extractUserName(accessToken);
-                System.out.println(email);
                 customer = customerService.findCusByEmail(email);
                 booking.setCustomer(customer);
             }
             List<LocalDateTime> weekDates = roomService.getWeekDates(7);
             Set<String> bookedKeys = roomService.getBookedKeys(getSlot, weekDates, timetables);
-            Room room1 = roomService.findRoom(roomId);
-            booking.setRoom(room1);
+            booking.setRoom(room);
             List<String> monthDateStrings = roomService.getNext365Days();
             List<Map<String, Object>> simpleTimetables = roomService.getSimpleTimetables(timetables);
             model.addAttribute("fullName", customer.getFullName());
@@ -99,7 +97,8 @@ public class RoomController {
         try {
             // Luôn mặc định về trang 0 khi bấm tìm mới
             String email;
-            Customer customer = new Customer();            Page<DetailRoomDTO> rooms = roomService.getSearchService(searchDTO, searchDTO.getPage());
+            Customer customer = new Customer();
+            Page<DetailRoomDTO> rooms = roomService.getSearchService(searchDTO, searchDTO.getPage());
             List<Integer> pageNumbers = roomService.getPageNumbers(rooms, 5);
             if (accessToken != null && !accessToken.isEmpty()) {
                 email = jwtService.extractUserName(accessToken);

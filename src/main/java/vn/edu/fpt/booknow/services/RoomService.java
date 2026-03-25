@@ -251,8 +251,4 @@ public class RoomService {
         List<DetailRoomDTO> list = roomRepository.findAllRoom();
         return list;
     }
-    public List<Booking> getAllBookingStatus() {
-        List<Booking> list = bookingRepository.getByBookingStatus(BookingStatus.APPROVED);
-        return list;
-    }
 }

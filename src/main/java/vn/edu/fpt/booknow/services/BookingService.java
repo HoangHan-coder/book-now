@@ -231,8 +231,8 @@ public class BookingService {
             // 6. Lưu vào Database
             Booking booking = saveSingleBookingToDatabase(allShifts, bookingDTO, username, redirectAttributes, frontUrl, backUrl, frontId, backId);
 
-//            redirectAttributes.addFlashAttribute("toastMessage", "Đặt phòng thành công!");
-//            redirectAttributes.addFlashAttribute("toastType", "success");
+            redirectAttributes.addFlashAttribute("toastMessage", "Đặt phòng thành công!");
+            redirectAttributes.addFlashAttribute("toastType", "success");
             if (booking == null) {
                 return setErrorMessage(redirectAttributes,  "Đặt phòng không thành công!", bookingDTO.getRoom().getRoomId());
             }
@@ -308,7 +308,6 @@ public class BookingService {
         List<Timetable> timetableList = timeTableRepository.findAll();
 
         for (WorkShift s : shifts) {
-            System.out.println(s.getShiftType() + " 314");
             boolean isValid = timetableList.stream().anyMatch(t ->
                     t.getSlotName().contains(s.getShiftType()) &&
                             t.getStartTime().equals(s.getStartTime().toLocalTime())
@@ -434,7 +433,11 @@ public class BookingService {
         ra.addFlashAttribute("toastType", "error");
         return "redirect:/detail/" + roomId;
     }
-
+    private String setErrorMessageCheckin(RedirectAttributes ra, String msg, String bookingCode) {
+        ra.addFlashAttribute("toastMessage", msg);
+        ra.addFlashAttribute("toastType", "error");
+        return "redirect:/staff/offline-checkin?searchTerm=" + bookingCode;
+    }
     private Map<String, String> uploadToCloudinary(MultipartFile file) throws IOException {
         Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
         Map<String, String> result = new HashMap<>();
@@ -526,6 +529,9 @@ public class BookingService {
     public String completeOfflineCheckin(Booking bookingData, MultipartFile frontImg, MultipartFile backImg, RedirectAttributes redirectAttributes) {
         Booking existingBooking = bookingRepository.findById(bookingData.getBookingId())
                 .orElseThrow(() -> new RuntimeException("Booking không tồn tại"));
+        if (isRateLimited(bookingData.getBookingCode())) {
+            return setErrorMessageCheckin(redirectAttributes, "Thao tác quá nhanh! Vui lòng đợi 1 phút.", bookingData.getBookingCode());
+        }
         if (BookingStatus.CANCELED.equals(bookingData.getBookingStatus())) {
             redirectAttributes.addFlashAttribute("toastMessage", "Lỗi đơn đã hủy!");
             redirectAttributes.addFlashAttribute("toastType", "error");
@@ -562,22 +568,6 @@ public class BookingService {
         redirectAttributes.addFlashAttribute("toastType", "success");
 
         return "redirect:/offline-checkin";
-    }
-    @Transactional
-    public void cancelBookingStatus(Long bookingId, RedirectAttributes redirectAttributes) {
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn đặt phòng để hủy"));
-
-        if (BookingStatus.CHECKED_IN.equals(booking.getBookingStatus())) {
-            redirectAttributes.addFlashAttribute("toastMessage", "Lỗi đơn đã checkin!");
-            redirectAttributes.addFlashAttribute("toastType", "error");
-            return;
-        }
-        System.out.println(bookingId + " test 494");
-        booking.setBookingStatus(BookingStatus.CANCELED);
-        booking.setUpdatedAt(LocalDateTime.now());
-
-        bookingRepository.save(booking);
     }
 
     @Transactional
