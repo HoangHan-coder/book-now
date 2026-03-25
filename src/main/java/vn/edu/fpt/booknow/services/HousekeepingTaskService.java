@@ -25,6 +25,11 @@ public class HousekeepingTaskService {
     }
 
     @Transactional
+    public HousekeepingTask getByBooKingCode(String bookingCode){
+        return housekeepingTaskRepository.getHousekeepingTaskByBooking_BookingCode(bookingCode);
+    }
+
+    @Transactional
     public void updateHousekeepingTask(Long id) throws Exception {
         HousekeepingTask housekeepingTask = housekeepingTaskRepository.findById(id).orElse(null);
         if (housekeepingTask != null) {

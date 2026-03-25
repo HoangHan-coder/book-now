@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface HousekeepingTaskRepository extends JpaRepository<HousekeepingTask, Long> {
-
+    HousekeepingTask getHousekeepingTaskByBooking_BookingCode(String bookingBookingCode);
 }

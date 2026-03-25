@@ -652,7 +652,7 @@ table {
         document.getElementById('formTimetableId').value = selectedSlot.slotId;
 
         // 3. Cập nhật action URL: /detail/{roomId}
-        form.action = /*[[@{/detail/}]]*/ "/detail/" + selectedSlot.roomId;
+        form.action ="/book-now/detail/" + selectedSlot.roomId;
 
         // 4. Gửi form
         form.submit();

@@ -563,8 +563,7 @@
                 const from = document.getElementById("drp-from").value;
                 const to = document.getElementById("drp-to").value;
                 console.log("Day la type ne:" + type);
-                const url =
-                /*[[@{/admin/dashboard/export/}]]*/ "/admin/dashboard/export/" +
+                const url = "http://localhost:8080/book-now/admin/dashboard/export/" +
                     type +
                     "?startDate=" + from +
                     "&endDate=" + to;

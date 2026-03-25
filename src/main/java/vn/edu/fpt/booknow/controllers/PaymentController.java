@@ -73,8 +73,6 @@ public class PaymentController {
             }
 
 
-
-
             if (response.isSuccess() && response.getPayUrl() != null) {
                 log.info("Tạo thanh toán thành công, redirect đến: {}", response.getPayUrl());
                 return "redirect:" + response.getPayUrl();
@@ -109,7 +107,7 @@ public class PaymentController {
         }
 
         RoomType roomType = booking.getRoom().getRoomType();
-        if (roomType == null ) {
+        if (roomType == null) {
             throw new Exception("RoomType invalid");
         }
         if (timetableId == 4) {
@@ -285,16 +283,20 @@ public class PaymentController {
                             "MOMO Payment",
                             "SUCCESS"
                     ));
-                    HousekeepingTask task = housekeepingTaskService.newTask(new HousekeepingTask(booking.getRoom(),
-                            TaskStatus.PENDING,
-                            PriorityStatus.NORMAL,
-                            booking,
-                            LocalDateTime.now(),
-                            "ClEANING",
-                            "Create by the system"));
-                    if (task == null) {
-                        log.error("Lỗi xử lý tạo task tự động");
+                    HousekeepingTask housekeepingTask = housekeepingTaskService.getByBooKingCode(orderInfo);
+                    if (housekeepingTask == null) {
+                        HousekeepingTask task = housekeepingTaskService.newTask(new HousekeepingTask(booking.getRoom(),
+                                TaskStatus.PENDING,
+                                PriorityStatus.NORMAL,
+                                booking,
+                                LocalDateTime.now(),
+                                "ClEANING",
+                                "Create by the system"));
+                        if (task == null) {
+                            log.error("Lỗi xử lý tạo task tự động");
+                        }
                     }
+
                 }
             } else {
                 log.warn("Thanh toán thất bại: orderId={}, resultCode={}", orderId, resultCode);
