@@ -19,14 +19,13 @@ public class ExtendBookingService {
     @Autowired
     private TimeTableRepository timeTableRepository;
 
-    public void updateCheckOutTime(Long timeId, Long bookingId) throws Exception {
+    public void updateCheckOutTime(Long bookingId, Long timeId) throws Exception {
         Booking booking = bookingRepository.findById(bookingId).orElse(null);
         Timetable timetable = timeTableRepository.findById(timeId).orElse(null);
 
         if(booking != null){
             LocalDateTime dateTime = booking.getCheckOutTime();
             LocalTime localTime = timetable.getEndTime();
-
             LocalDateTime result = dateTime.with(localTime);
             booking.setCheckOutTime(result);
             bookingRepository.save(booking);
