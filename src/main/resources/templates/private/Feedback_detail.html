@@ -43,7 +43,7 @@
   <div th:if="${feedback != null}">
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
       <div class="flex items-center gap-3">
-        <a th:href="@{/admin/feedback}" class="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:text-blue-600 transition-colors">
+        <a th:href="@{/staff/feedback}" class="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:text-blue-600 transition-colors">
           <i class="fa-solid fa-arrow-left"></i>
         </a>
         <div>
@@ -59,7 +59,7 @@
       </div>
       <div class="flex flex-wrap gap-2">
         <!-- UC-14.3 Hide/Show Feedback -->
-        <form th:action="@{/admin/feedback/{id}/visibility(id=${feedback.feedbackId})}" method="post">
+        <form th:action="@{/staff/feedback/{id}/visibility(id=${feedback.feedbackId})}" method="post">
           <input type="hidden" name="isHidden" th:value="${!feedback.isHidden}" />
 
           <button type="submit"
@@ -73,7 +73,7 @@
         </form>
 
         <!-- Back to Feedback List -->
-        <a th:href="@{/admin/feedback}"
+        <a th:href="@{/staff/feedback}"
            class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-sm font-medium transition-colors">
           <i class="fa-solid fa-reply"></i>
           <span>Trở lại</span>

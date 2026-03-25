@@ -16,7 +16,7 @@ public class ManageSttRoomController {
     private final UpdateSttService updateSttService;
 
     public ManageSttRoomController(ManageRoomServices manageRoomServices,
-                                   UpdateSttService updateSttService) {
+            UpdateSttService updateSttService) {
         this.manageRoomServices = manageRoomServices;
         this.updateSttService = updateSttService;
     }
@@ -24,7 +24,7 @@ public class ManageSttRoomController {
     // ================= GET =================
     @GetMapping("/update/{id}")
     public String updateSttRoom(Model model, @PathVariable Long id,
-                                RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) {
 
         try {
             Room room = manageRoomServices.findRoomById(id);
@@ -39,7 +39,7 @@ public class ManageSttRoomController {
 
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/admin/list";
+            return "redirect:/staff/rooms/list";
         }
     }
 
@@ -48,8 +48,7 @@ public class ManageSttRoomController {
     public String updateSttSubmit(
             @RequestParam(required = false) Long roomId,
             @RequestParam(required = false) RoomStatus status,
-            RedirectAttributes redirectAttributes
-    ) {
+            RedirectAttributes redirectAttributes) {
 
         try {
             // ✅ Validate input

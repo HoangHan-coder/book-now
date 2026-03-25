@@ -588,12 +588,12 @@ public class BookingService {
     @Transactional
     @Scheduled(fixedRate = 60000)
     public void cancelExpiredPendingPayments() {
-        LocalDateTime timeLimit = LocalDateTime.now().minusMinutes(15);
+        LocalDateTime timeLimit = LocalDateTime.now().minusMinutes(1);
         List<Booking> bookings = bookingRepository.findExpiredPendingBookings(timeLimit);
         for (Booking b : bookings) {
             try {
                 b.setBookingStatus(BookingStatus.FAILED);
-                b.setNote("Hệ thống tự động hủy do quá hạn thanh toán 15 phút.");
+                b.setNote("Hệ thống tự động hủy do quá hạn thanh toán 1 phút.");
                 b.setUpdatedAt(LocalDateTime.now());
 
                 bookingRepository.save(b);

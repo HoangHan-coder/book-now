@@ -86,7 +86,7 @@
                 <h2 class="text-lg font-semibold text-gray-800">Bộ lọc</h2>
             </div>
             <div class="p-6">
-                <form method="get" th:action="@{/admin/manage-housekeeping}"
+                <form method="get" th:action="@{/staff/manage-housekeeping}"
                       class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
 
                     <!-- Task Status Filter -->
@@ -127,7 +127,7 @@
                             <i class="fa-solid fa-filter"></i>
                             <span>Lọc</span>
                         </button>
-                        <a th:href="@{/admin/manage-housekeeping}"
+                        <a th:href="@{/staff/manage-housekeeping}"
                            class="flex-1 lg:flex-initial px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-colors font-medium flex items-center justify-center gap-2">
                             <i class="fa-solid fa-xmark"></i>
                             <span>Xóa</span>
@@ -212,7 +212,7 @@
                         <!-- Action -->
                         <td class="px-6 py-4">
 
-                            <a th:href="@{/admin/manage-housekeeping/task-detail/{id}(id=${task.taskId})}"
+                            <a th:href="@{/staff/manage-housekeeping/task-detail/{id}(id=${task.taskId})}"
                                class="text-blue-600 hover:underline text-sm mr-3">
                                 View
                             </a>
@@ -230,7 +230,7 @@
 
             <!-- Previous Button -->
             <a th:if="${currentPage > 1}"
-               th:href="@{/admin/manage-housekeeping(
+               th:href="@{/staff/manage-housekeeping(
                    page=${currentPage > 1 ? currentPage - 1 : totalPages},
                    taskStatus=${param.taskStatus},
                    priority=${param.priority}
@@ -241,7 +241,7 @@
             </a>
 
             <a th:if="${currentPage == 1}"
-               th:href="@{/admin/manage-housekeeping(
+               th:href="@{/staff/manage-housekeeping(
                    page=${totalPages},
                    taskStatus=${param.taskStatus},
                    priority=${param.priority}
@@ -259,7 +259,7 @@
 
             <!-- Next Button -->
             <a th:if="${currentPage < totalPages}"
-               th:href="@{/admin/manage-housekeeping(
+               th:href="@{/staff/manage-housekeeping(
                    page=${currentPage + 1},
                    taskStatus=${param.taskStatus},
                    priority=${param.priority}
@@ -270,7 +270,7 @@
             </a>
 
             <a th:if="${currentPage == totalPages}"
-               th:href="@{/admin/manage-housekeeping(
+               th:href="@{/staff/manage-housekeeping(
                    page=1,
                    taskStatus=${param.taskStatus},
                    priority=${param.priority}

@@ -1,723 +1,721 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head th:replace="~{fragments/head :: head(title='Admin Dashboard - BookNow')}"></head>
 <style>
-/* Specific Logo Positioning Rule */
-.logo-fixed {
-    position: fixed;
-    top: 0;
-    left: 0;
-    margin-top: 25px;
-    margin-left: 25px;
-    z-index: 60;
-}
+    /* Specific Logo Positioning Rule */
+    .logo-fixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        margin-top: 25px;
+        margin-left: 25px;
+        z-index: 60;
+    }
 
-.sidebar {
-    transition: transform 0.3s ease-in-out;
-}
+    .sidebar {
+        transition: transform 0.3s ease-in-out;
+    }
 
-.no-scrollbar::-webkit-scrollbar {
-    display: none;
-}
-.no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
 
-/* ── Date Range Picker ── */
-#drp-wrapper {
-    position: relative;
-    display: inline-block;
-}
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
 
-#drp-dropdown {
-    display: none;
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
-    width: 280px;
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 14px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
-    z-index: 200;
-    padding: 16px;
-    animation: drpFadeIn .15s ease;
-}
-#drp-dropdown.open {
-    display: block;
-}
-@keyframes drpFadeIn {
-    from { opacity: 0; transform: translateY(-6px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
+    /* ── Date Range Picker ── */
+    #drp-wrapper {
+        position: relative;
+        display: inline-block;
+    }
 
-input[type="date"].drp-input {
-    width: 100%;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 8px 10px;
-    font-size: 13px;
-    color: #1f2937;
-    outline: none;
-    transition: border-color .2s, box-shadow .2s;
-}
-input[type="date"].drp-input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59,130,246,.15);
-}
+    #drp-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        width: 280px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+        z-index: 200;
+        padding: 16px;
+        animation: drpFadeIn .15s ease;
+    }
+
+    #drp-dropdown.open {
+        display: block;
+    }
+
+    @keyframes drpFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-6px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    input[type="date"].drp-input {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-size: 13px;
+        color: #1f2937;
+        outline: none;
+        transition: border-color .2s, box-shadow .2s;
+    }
+
+    input[type="date"].drp-input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, .15);
+    }
 </style>
+
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<div th:replace="fragments/sidebar :: admin-sidebar('dashboard','admin')"></div>
-<script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
+    <div th:replace="fragments/sidebar :: admin-sidebar('dashboard','admin')"></div>
+    <script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
 
-<!-- MAIN CONTENT -->
-<main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
-    <div th:replace="~{fragments/infor_admin}"></div>
+    <!-- MAIN CONTENT -->
+    <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
+        <div th:replace="~{fragments/infor_admin}"></div>
 
 
-    <!-- ENHANCED FILTER BAR WITH TIME SCOPE -->
-    <div class="flex flex-col xl:flex-row xl:items-end justify-between mb-6 gap-4">
-        <div>
-            <h2 class="text-2xl font-bold text-gray-800">Tổng quan thống kê</h2>
-            <!-- Added "Last Updated" Timestamp -->
-            <p class="text-sm text-gray-500 mt-1 flex items-center gap-2">
-                <i class="fa-solid fa-clock-rotate-left text-gray-400"></i>
-                Dữ liệu cập nhật lúc: <span class="font-medium text-gray-700" th:text="${lastUpdate}"></span>
-            </p>
-        </div>
+        <!-- ENHANCED FILTER BAR WITH TIME SCOPE -->
+        <div class="flex flex-col xl:flex-row xl:items-end justify-between mb-6 gap-4">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Tổng quan thống kê</h2>
+                <!-- Added "Last Updated" Timestamp -->
+                <p class="text-sm text-gray-500 mt-1 flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-gray-400"></i>
+                    Dữ liệu cập nhật lúc: <span class="font-medium text-gray-700" th:text="${lastUpdate}"></span>
+                </p>
+            </div>
 
-        <div class="flex flex-wrap items-center gap-3">
-            <form
-                    id="dateFilterForm"
-                    method="get"
-                    th:action="@{/admin/dashboard}"
+            <div class="flex flex-wrap items-center gap-3">
+                <form id="dateFilterForm" method="get" th:action="@{/admin/dashboard}"
                     class="flex flex-wrap items-center gap-3">
 
-                <!-- Date Range Picker -->
-                <div id="drp-wrapper">
+                    <!-- Date Range Picker -->
+                    <div id="drp-wrapper">
 
-                    <!-- Trigger button -->
-                    <button type="button" id="drp-btn"
+                        <!-- Trigger button -->
+                        <button type="button" id="drp-btn"
                             class="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-700 shadow-sm hover:border-blue-400 hover:text-blue-600 transition-colors font-medium focus:outline-none">
-                        <i class="fa-regular fa-calendar-days text-blue-500"></i>
-                        <span id="drp-label"
-                              th:text="${#temporals.format(startDate,'dd/MM/yyyy') + ' – ' + #temporals.format(endDate,'dd/MM/yyyy')}">
+                            <i class="fa-regular fa-calendar-days text-blue-500"></i>
+                            <span id="drp-label"
+                                th:text="${#temporals.format(startDate,'dd/MM/yyyy') + ' – ' + #temporals.format(endDate,'dd/MM/yyyy')}">
                             </span>
-                        <i id="drp-chevron" class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
-                    </button>
-
-                    <!-- Dropdown -->
-                    <div id="drp-dropdown">
-
-                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-3">
-                            Khoảng thời gian
-                        </p>
-
-                        <div class="grid grid-cols-2 gap-3">
-
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 mb-1">
-                                    Từ ngày
-                                </label>
-
-                                <input
-                                        id="drp-from"
-                                        name="startDate"
-                                        type="date"
-                                        class="drp-input"
-                                        th:value="${startDate}"
-                                >
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 mb-1">
-                                    Đến ngày
-                                </label>
-
-                                <input
-                                        id="drp-to"
-                                        name="endDate"
-                                        type="date"
-                                        class="drp-input"
-                                        th:value="${endDate}"
-                                >
-                            </div>
-
-                        </div>
-
-                        <button type="submit"
-                                class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white text-sm py-2 rounded-lg">
-                            Áp dụng
+                            <i id="drp-chevron" class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                         </button>
 
+                        <!-- Dropdown -->
+                        <div id="drp-dropdown">
+
+                            <p class="text-[10px] font-bold text-gray-400 uppercase mb-3">
+                                Khoảng thời gian
+                            </p>
+
+                            <div class="grid grid-cols-2 gap-3">
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 mb-1">
+                                        Từ ngày
+                                    </label>
+
+                                    <input id="drp-from" name="startDate" type="date" class="drp-input"
+                                        th:value="${startDate}">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 mb-1">
+                                        Đến ngày
+                                    </label>
+
+                                    <input id="drp-to" name="endDate" type="date" class="drp-input"
+                                        th:value="${endDate}">
+                                </div>
+
+                            </div>
+
+                            <button type="submit"
+                                class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white text-sm py-2 rounded-lg">
+                                Áp dụng
+                            </button>
+
+                        </div>
                     </div>
-                </div>
 
-            </form>
+                </form>
 
-            <!-- Quick Filters -->
-            <div class="flex bg-white rounded-lg p-1 shadow-sm border border-gray-200">
-                <button id="btn-week"
-                        type="button"
-                        onclick="filterThisWeek()"
+                <!-- Quick Filters -->
+                <div class="flex bg-white rounded-lg p-1 shadow-sm border border-gray-200">
+                    <button id="btn-week" type="button" onclick="filterThisWeek()"
                         class="px-4 py-1.5 text-sm font-medium rounded-md ext-gray-500 hover:bg-gray-50">
-                    Tuần này
-                </button>
+                        Tuần này
+                    </button>
 
-                <button id="btn-month"
-                        type="button"
-                        onclick="filterThisMonth()"
+                    <button id="btn-month" type="button" onclick="filterThisMonth()"
                         class="px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:bg-gray-50">
-                    Tháng này
-                </button>
+                        Tháng này
+                    </button>
 
-                <button  id="btn-year"
-                        type="button"
-                        onclick="filterThisYear()"
+                    <button id="btn-year" type="button" onclick="filterThisYear()"
                         class="px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:bg-gray-50">
-                    Năm nay
-                </button>
+                        Năm nay
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- STATS WIDGETS -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- Widget 1: Bookings -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative">
-            <!-- Time Scope Badge -->
-            <span class="absolute top-4 right-4 bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-1 rounded"
+        <!-- STATS WIDGETS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Widget 1: Bookings -->
+            <div
+                class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative">
+                <!-- Time Scope Badge -->
+                <span class="absolute top-4 right-4 bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-1 rounded"
                     th:text="'Tháng ' + ${dashboard.currentMonth}"></span>
-            <div class="flex justify-between items-start mt-2">
-                <div>
-                    <p class="text-xs text-gray-500 font-semibold uppercase">Đơn đặt phòng</p>
-                    <h3 class="text-2xl font-bold text-gray-800 mt-1"
-                        th:text="${dashboard.bookingCount}">
-                    </h3>
+                <div class="flex justify-between items-start mt-2">
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Đơn đặt phòng</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1" th:text="${dashboard.totalBookings}">
+                        </h3>
+                    </div>
                 </div>
-            </div>
-            <div class="mt-4 flex items-center text-xs">
+                <div class="mt-4 flex items-center text-xs">
 
-    <span th:class="${dashboard.bookingPercent > 0} ? 'text-green-500 font-semibold flex items-center gap-1'
+                    <span th:class="${dashboard.bookingPercent > 0} ? 'text-green-500 font-semibold flex items-center gap-1'
         : (${dashboard.bookingPercent < 0} ? 'text-red-500 font-semibold flex items-center gap-1'
         : 'text-gray-500 font-semibold flex items-center gap-1')">
 
-        <i th:class="${dashboard.bookingPercent > 0} ? 'fa-solid fa-arrow-trend-up'
+                        <i th:class="${dashboard.bookingPercent > 0} ? 'fa-solid fa-arrow-trend-up'
             : (${dashboard.bookingPercent < 0} ? 'fa-solid fa-arrow-trend-down'
             : 'fa-solid fa-minus')">
-        </i>
-        <span th:text="${#numbers.formatDecimal(T(java.lang.Math).abs(dashboard.bookingPercent),0,0)} + '%'"></span>
-    </span>
-                <span class="text-gray-400 ml-2"
-                      th:text="${dashboard.compareLabel}">
-    </span>
-            </div>
-        </div>
-
-        <!-- Widget 2: Revenue -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative">
-            <!-- Time Scope Badge -->
-            <span class="absolute top-4 right-4 bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-1 rounded"
-                  th:text="'Tháng ' + ${dashboard.currentMonth}"
-            ></span>
-            <div class="flex justify-between items-start mt-2">
-                <div>
-                    <p class="text-xs text-gray-500 font-semibold uppercase">Tổng doanh thu</p>
-                    <h3 class="text-2xl font-bold text-gray-800 mt-1"
-                        th:text="${#numbers.formatInteger(dashboard.revenue, 0, 'COMMA')} + ' ₫'">
-                    </h3>
+                        </i>
+                        <span
+                            th:text="${#numbers.formatDecimal(T(java.lang.Math).abs(dashboard.bookingPercent),0,0)} + '%'"></span>
+                    </span>
+                    <span class="text-gray-400 ml-2" th:text="${dashboard.compareLabel}">
+                    </span>
                 </div>
             </div>
-            <div class="mt-4 flex items-center text-xs">
 
-    <span
-            th:class="${dashboard.revenuePercent > 0} ? 'text-green-500 font-bold flex items-center gap-1'
+            <!-- Widget 2: Revenue -->
+            <div
+                class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative">
+                <!-- Time Scope Badge -->
+                <span class="absolute top-4 right-4 bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-1 rounded"
+                    th:text="'Tháng ' + ${dashboard.currentMonth}"></span>
+                <div class="flex justify-between items-start mt-2">
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Tổng doanh thu</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1"
+                            th:text="${#numbers.formatInteger(dashboard.revenue, 0, 'COMMA')} + ' ₫'">
+                        </h3>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-xs">
+
+                    <span th:class="${dashboard.revenuePercent > 0} ? 'text-green-500 font-bold flex items-center gap-1'
             : (${dashboard.revenuePercent < 0} ? 'text-red-500 font-bold flex items-center gap-1'
             : 'text-gray-500 font-bold flex items-center gap-1')">
 
-        <i
-                th:class="${dashboard.revenuePercent > 0} ? 'fa-solid fa-arrow-trend-up'
+                        <i th:class="${dashboard.revenuePercent > 0} ? 'fa-solid fa-arrow-trend-up'
                 : (${dashboard.revenuePercent < 0} ? 'fa-solid fa-arrow-trend-down'
                 : 'fa-solid fa-minus')">
-        </i>
-        <span th:text="${#numbers.formatDecimal(dashboard.revenuePercent,0,0)} + '% '"></span>
-    </span>
-                <span class="text-gray-400 ml-2" th:text="${dashboard.compareLabel}"></span>
-            </div>
-        </div>
-
-        <!-- Widget NEW: Collected Revenue -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative">
-
-            <!-- Badge -->
-            <span class="absolute top-4 right-4 bg-green-50 text-green-600 text-[10px] font-bold px-2 py-1 rounded"
-                  th:text="'Tháng ' + ${dashboard.currentMonth}">
-    </span>
-
-            <div class="flex justify-between items-start mt-2">
-                <div>
-                    <p class="text-xs text-gray-500 font-semibold uppercase">
-                        Tiền đã thu
-                    </p>
-
-                    <h3 class="text-2xl font-bold text-gray-800 mt-1"
-                        th:text="${#numbers.formatInteger(dashboard.revenueReceived, 0, 'COMMA')} + ' ₫'">
-                    </h3>
+                        </i>
+                        <span th:text="${#numbers.formatDecimal(dashboard.revenuePercent,0,0)} + '% '"></span>
+                    </span>
+                    <span class="text-gray-400 ml-2" th:text="${dashboard.compareLabel}"></span>
                 </div>
             </div>
 
-            <div class="mt-4 flex items-center text-xs">
-        <span class="text-gray-500 font-medium">
-            Từ các đơn đã thanh toán
-        </span>
+            <!-- Widget NEW: Collected Revenue -->
+            <div
+                class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative">
+
+                <!-- Badge -->
+                <span class="absolute top-4 right-4 bg-green-50 text-green-600 text-[10px] font-bold px-2 py-1 rounded"
+                    th:text="'Tháng ' + ${dashboard.currentMonth}">
+                </span>
+
+                <div class="flex justify-between items-start mt-2">
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold uppercase">
+                            Tiền đã thu
+                        </p>
+
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1"
+                            th:text="${#numbers.formatInteger(dashboard.revenueReceived, 0, 'COMMA')} + ' ₫'">
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex items-center text-xs">
+                    <span class="text-gray-500 font-medium">
+                        Từ các đơn đã thanh toán
+                    </span>
+                </div>
+            </div>
+
+            <!-- Widget 3: Active Rooms -->
+            <div
+                class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative">
+                <!-- Time Scope Badge -->
+                <span class="absolute top-4 right-4 bg-green-50 text-green-600 text-[10px] font-bold px-2 py-1 rounded"
+                    th:text="'Tháng ' + ${dashboard.currentMonth}"></span>
+                <div class="flex justify-between items-start mt-2">
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Phòng hoạt động</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1"
+                            th:text="${dashboard.activeRooms} + '/' + ${dashboard.totalRooms}">
+                        </h3>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-xs">
+                    <span class="text-gray-500 font-medium"
+                        th:text="${dashboard.activeRooms * 100 / dashboard.totalRooms} + '% công suất thực tế'"></span>
+                </div>
             </div>
         </div>
 
-        <!-- Widget 3: Active Rooms -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative">
-            <!-- Time Scope Badge -->
-            <span class="absolute top-4 right-4 bg-green-50 text-green-600 text-[10px] font-bold px-2 py-1 rounded"
-                  th:text="'Tháng ' + ${dashboard.currentMonth}"></span>
-            <div class="flex justify-between items-start mt-2">
-                <div>
-                    <p class="text-xs text-gray-500 font-semibold uppercase">Phòng hoạt động</p>
-                    <h3 class="text-2xl font-bold text-gray-800 mt-1"
-                        th:text="${dashboard.activeRooms} + '/' + ${dashboard.totalRooms}">
-                    </h3>
-                </div>
-            </div>
-            <div class="mt-4 flex items-center text-xs">
-                <span class="text-gray-500 font-medium"
-                      th:text="${dashboard.activeRooms * 100 / dashboard.totalRooms} + '% công suất thực tế'"></span>
-            </div>
-        </div>
-    </div>
+        <!-- CHARTS SECTION -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-    <!-- CHARTS SECTION -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        <!-- Main Chart (Revenue) -->
-        <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <div class="flex justify-between items-center mb-2">
-                <div>
-                    <h3 class="font-bold text-gray-800 text-lg">Biểu đồ Doanh thu</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Kỳ báo cáo: <span class="font-medium text-gray-700" th:text="${dashboard.chartTitle}"></span></p>
-                </div>
-                <div class="relative">
-                    <button onclick="toggleExport()"
+            <!-- Main Chart (Revenue) -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-center mb-2">
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-lg">Biểu đồ Doanh thu</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">Kỳ báo cáo: <span class="font-medium text-gray-700"
+                                th:text="${dashboard.chartTitle}"></span></p>
+                    </div>
+                    <div class="relative">
+                        <button onclick="toggleExport()"
                             class="text-gray-400 hover:text-blue-600 bg-gray-50 p-2 rounded-lg">
-                        <i class="fa-solid fa-download"></i>
-                    </button>
-
-                    <div id="exportMenu"
-                         class="hidden absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg z-50">
-
-                        <button onclick="exportFile('csv')"
-                                class="block w-full text-left px-4 py-2 hover:bg-gray-50 text-sm">
-                            📑 CSV
+                            <i class="fa-solid fa-download"></i>
                         </button>
 
-                        <button onclick="exportFile('excel')"
+                        <div id="exportMenu"
+                            class="hidden absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg z-50">
+
+                            <button onclick="exportFile('csv')"
                                 class="block w-full text-left px-4 py-2 hover:bg-gray-50 text-sm">
-                            📊 Excel
-                        </button>
+                                📑 CSV
+                            </button>
+
+                            <button onclick="exportFile('excel')"
+                                class="block w-full text-left px-4 py-2 hover:bg-gray-50 text-sm">
+                                📊 Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative h-72 w-full mt-4">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Side Charts Column -->
+            <div class="space-y-6">
+
+                <!-- Bookings Chart -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="mb-4">
+                        <h3 class="font-bold text-gray-800">Lượng đặt phòng</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">Dữ liệu: <span class="font-medium text-gray-700"
+                                th:text="${dashboard.chartTitle}"></span></p>
+                    </div>
+                    <div class="relative h-48 w-full">
+                        <canvas id="bookingsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Occupancy Rate Chart -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="mb-4">
+                        <h3 class="font-bold text-gray-800"
+                            th:text="|Trạng thái đơn (Tháng ${dashboard.currentMonth})|"></h3>
+                        <p class="text-xs text-gray-500 mt-0.5" th:text="|Dựa trên ${dashboard.totalBookings} đơn đặt|">
+                        </p>
+                    </div>
+                    <div class="relative h-48 w-full flex items-center justify-center">
+                        <canvas id="occupancyChart"></canvas>
                     </div>
                 </div>
             </div>
-            <div class="relative h-72 w-full mt-4">
-                <canvas id="revenueChart"></canvas>
-            </div>
         </div>
 
-        <!-- Side Charts Column -->
-        <div class="space-y-6">
-
-            <!-- Bookings Chart -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <div class="mb-4">
-                    <h3 class="font-bold text-gray-800">Lượng đặt phòng</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Dữ liệu: <span class="font-medium text-gray-700" th:text="${dashboard.chartTitle}"></span></p>
-                </div>
-                <div class="relative h-48 w-full">
-                    <canvas id="bookingsChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Occupancy Rate Chart -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <div class="mb-4">
-                    <h3 class="font-bold text-gray-800"  th:text="|Trạng thái đơn (Tháng ${dashboard.currentMonth})|"></h3>
-                    <p class="text-xs text-gray-500 mt-0.5"
-                       th:text="|Dựa trên ${dashboard.totalBookings} đơn đặt|"></p>
-                </div>
-                <div class="relative h-48 w-full flex items-center justify-center">
-                    <canvas id="occupancyChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</main>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- SCRIPT -->
-<script th:inline="javascript">
-
-    document.addEventListener("DOMContentLoaded", function () {
-
-        /* ==============================
-           MOBILE SIDEBAR
-        ============================== */
-
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        const dateForm = document.getElementById("dateFilterForm");
-        const btnWeek = document.getElementById("btn-week");
-        const btnMonth = document.getElementById("btn-month");
-        const btnYear = document.getElementById("btn-year");
-
-        function setActive(btn){
-
-            const buttons = [btnWeek, btnMonth, btnYear];
-
-            buttons.forEach(b => {
-                b.classList.remove("bg-blue-50","text-blue-600");
-                b.classList.add("text-gray-500","hover:bg-gray-50");
-            });
-
-            btn.classList.remove("text-gray-500","hover:bg-gray-50");
-            btn.classList.add("bg-blue-50","text-blue-600");
-        }
-
-        function toggleSidebar() {
-
-            const isClosed = sidebar.classList.contains('-translate-x-full');
-
-            if (isClosed) {
-                sidebar.classList.remove('-translate-x-full');
-                sidebarOverlay.classList.remove('hidden');
-            } else {
-                sidebar.classList.add('-translate-x-full');
-                sidebarOverlay.classList.add('hidden');
-            }
-        }
-
-        if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
-        if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
-
-
-        /* ==============================
-           DATE RANGE PICKER
-        ============================== */
-
-        const btn = document.getElementById('drp-btn');
-        const dd = document.getElementById('drp-dropdown');
-        const chevron = document.getElementById('drp-chevron');
-        const fromEl = document.getElementById('drp-from');
-        const toEl = document.getElementById('drp-to');
-        const label = document.getElementById('drp-label');
-
-        let lastValidFrom = fromEl.value;
-        let lastValidTo = toEl.value;
-
-        function pad(n) {
-            return n < 10 ? '0' + n : n;
-        }
-
-        function formatDisplay(dateStr) {
-
-            if (!dateStr) return "";
-
-            const [y, m, d] = dateStr.split('-');
-
-             return d + "/" + m + "/" + y;
-        }
-
-function applyRange() {
-
-    if (!fromEl.value || !toEl.value) return;
-
-    if (fromEl.value > toEl.value) {
-
-        alert("Ngày kết thúc phải sau ngày bắt đầu");
-
-        // rollback
-        fromEl.value = lastValidFrom;
-        toEl.value = lastValidTo;
-
-        return;
-    }
-
-    // lưu giá trị hợp lệ
-    lastValidFrom = fromEl.value;
-    lastValidTo = toEl.value;
-
-    label.textContent =
-        formatDisplay(fromEl.value) + " – " + formatDisplay(toEl.value);
-}
-
-
-        btn.addEventListener("click", function (e) {
-
-            e.stopPropagation();
-
-            dd.classList.toggle("open");
-
-            if (dd.classList.contains("open")) {
-                chevron.style.transform = "rotate(180deg)";
-            } else {
-                chevron.style.transform = "rotate(0deg)";
-            }
-        });
-
-        document.addEventListener("click", function (e) {
-
-            if (!btn.contains(e.target) && !dd.contains(e.target)) {
-
-                dd.classList.remove("open");
-                chevron.style.transform = "rotate(0deg)";
-            }
-        });
-
-        fromEl.addEventListener("change", applyRange);
-        toEl.addEventListener("change", applyRange);
-
-
-
-        /* ==============================
-           QUICK FILTER BUTTONS
-        ============================== */
-
-        window.filterThisWeek = function () {
-
-            setActive(btnWeek);
-
-            const today = new Date();
-
-            const firstDay = new Date(today.setDate(today.getDate() - today.getDay()));
-
-            const lastDay = new Date();
-            lastDay.setDate(firstDay.getDate() + 6);
-
-            fromEl.value = firstDay.toISOString().slice(0, 10);
-            toEl.value = lastDay.toISOString().slice(0, 10);
-
-            applyRange();
-
-            dateForm.submit();
-        }
-
-        window.filterThisMonth = function () {
-
-            setActive(btnMonth);
-
-            const today = new Date();
-
-            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-
-            fromEl.value = firstDay.toISOString().slice(0, 10);
-            toEl.value = lastDay.toISOString().slice(0, 10);
-
-            applyRange();
-            dateForm.submit();
-        }
-
-
-        window.filterThisYear = function () {
-
-            setActive(btnYear);
-
-            const today = new Date();
-
-            const firstDay = new Date(today.getFullYear(), 0, 1);
-            const lastDay = new Date(today.getFullYear(), 11, 31);
-
-            fromEl.value = firstDay.toISOString().slice(0, 10);
-            toEl.value = lastDay.toISOString().slice(0, 10);
-
-            applyRange();
-            dateForm.submit();
-        }
-
-        /* ==============================
-   CLOSE EXPORT MENU OUTSIDE CLICK
-============================== */
-
-        document.addEventListener("click", function(e){
-
-            const menu = document.getElementById("exportMenu");
-
-            if(menu && !e.target.closest(".relative")){
-                menu.classList.add("hidden");
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SCRIPT -->
+    <script th:inline="javascript">
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            /* ==============================
+               MOBILE SIDEBAR
+            ============================== */
+
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const dateForm = document.getElementById("dateFilterForm");
+            const btnWeek = document.getElementById("btn-week");
+            const btnMonth = document.getElementById("btn-month");
+            const btnYear = document.getElementById("btn-year");
+
+            function setActive(btn) {
+
+                const buttons = [btnWeek, btnMonth, btnYear];
+
+                buttons.forEach(b => {
+                    b.classList.remove("bg-blue-50", "text-blue-600");
+                    b.classList.add("text-gray-500", "hover:bg-gray-50");
+                });
+
+                btn.classList.remove("text-gray-500", "hover:bg-gray-50");
+                btn.classList.add("bg-blue-50", "text-blue-600");
             }
 
-        });
+            function toggleSidebar() {
 
-        //hàm nút download
-        window.toggleExport = function(){
-            document.getElementById("exportMenu").classList.toggle("hidden");
-        }
+                const isClosed = sidebar.classList.contains('-translate-x-full');
 
-        window.exportFile = function(type){
+                if (isClosed) {
+                    sidebar.classList.remove('-translate-x-full');
+                    sidebarOverlay.classList.remove('hidden');
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    sidebarOverlay.classList.add('hidden');
+                }
+            }
 
-            const from = document.getElementById("drp-from").value;
-            const to = document.getElementById("drp-to").value;
+            if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
+            if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
 
-            const url =
-                "/book-now/admin/dashboard/export/" +
-                type +
-                "?startDate=" + from +
-                "&endDate=" + to;
 
-            window.location.href = url;
-        }
+            /* ==============================
+               DATE RANGE PICKER
+            ============================== */
 
-        /* ==============================
-           CHART.JS
-        ============================== */
+            const btn = document.getElementById('drp-btn');
+            const dd = document.getElementById('drp-dropdown');
+            const chevron = document.getElementById('drp-chevron');
+            const fromEl = document.getElementById('drp-from');
+            const toEl = document.getElementById('drp-to');
+            const label = document.getElementById('drp-label');
 
-        /* -------- Revenue Chart -------- */
-        const revenueCanvas = document.getElementById("revenueChart");
+            let lastValidFrom = fromEl.value;
+            let lastValidTo = toEl.value;
 
-        if (revenueCanvas) {
+            function pad(n) {
+                return n < 10 ? '0' + n : n;
+            }
 
-            const revenueLabels = /*[[${dashboard.revenueLabels}]]*/ [];
-            const revenueData = /*[[${dashboard.revenueData}]]*/ [];
+            function formatDisplay(dateStr) {
 
-            console.log("Labels:", revenueLabels);
-            console.log("Data:", revenueData);
-            const ctxRevenue = revenueCanvas.getContext("2d");
+                if (!dateStr) return "";
 
-            new Chart(ctxRevenue, {
-                type: "line",
-                data: {
-                    labels: revenueLabels,
-                    datasets: [{
-                        label: "Doanh thu",
-                        data: revenueData,
-                        borderColor: "#3b82f6",
-                        backgroundColor: "rgba(59,130,246,0.1)",
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: true,
-                        pointBackgroundColor: "#ffffff",
-                        pointBorderColor: "#3b82f6",
-                        pointBorderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: "#f3f4f6" }
-                        },
-                        x: {
-                            offset: true,
-                            grid: { display: false }
-                        }
-                    }
+                const [y, m, d] = dateStr.split('-');
+
+                return d + "/" + m + "/" + y;
+            }
+
+            function applyRange() {
+
+                if (!fromEl.value || !toEl.value) return;
+
+                if (fromEl.value > toEl.value) {
+
+                    alert("Ngày kết thúc phải sau ngày bắt đầu");
+
+                    // rollback
+                    fromEl.value = lastValidFrom;
+                    toEl.value = lastValidTo;
+
+                    return;
+                }
+
+                // lưu giá trị hợp lệ
+                lastValidFrom = fromEl.value;
+                lastValidTo = toEl.value;
+
+                label.textContent =
+                    formatDisplay(fromEl.value) + " – " + formatDisplay(toEl.value);
+            }
+
+
+            btn.addEventListener("click", function (e) {
+
+                e.stopPropagation();
+
+                dd.classList.toggle("open");
+
+                if (dd.classList.contains("open")) {
+                    chevron.style.transform = "rotate(180deg)";
+                } else {
+                    chevron.style.transform = "rotate(0deg)";
                 }
             });
-        }
 
+            document.addEventListener("click", function (e) {
 
-        /* -------- Bookings Chart -------- */
-        const quarterBookings = /*[[${dashboard.quarterBookings}]]*/ [];
-        const quarterLabels = /*[[${dashboard.quarterLabels}]]*/ [];
-        const bookingCanvas = document.getElementById("bookingsChart");
+                if (!btn.contains(e.target) && !dd.contains(e.target)) {
 
-        if (bookingCanvas) {
-
-            const ctxBooking = bookingCanvas.getContext("2d");
-
-            new Chart(ctxBooking, {
-                type: "bar",
-                data: {
-                    labels: quarterLabels,
-                    datasets: [{
-                        data: quarterBookings,
-                        backgroundColor: "#60a5fa",
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { display: false }
-                        },
-                        x: {
-                            grid: { display: false }
-                        }
-                    }
+                    dd.classList.remove("open");
+                    chevron.style.transform = "rotate(0deg)";
                 }
             });
-        }
+
+            fromEl.addEventListener("change", applyRange);
+            toEl.addEventListener("change", applyRange);
 
 
-        /* -------- Booking Status Chart -------- */
-        const statusData = /*[[${dashboard.statusData}]]*/ [];
-        const statusLabels = /*[[${dashboard.statusLabels}]]*/ [];
-        const statusCanvas = document.getElementById("occupancyChart");
 
-        if (statusCanvas) {
+            /* ==============================
+               QUICK FILTER BUTTONS
+            ============================== */
 
-            const ctxStatus = statusCanvas.getContext("2d");
+            window.filterThisWeek = function () {
 
-            new Chart(ctxStatus, {
-                type: "doughnut",
-                data: {
-                    labels: statusLabels,
-                    datasets: [{
-                        data: statusData,
-                        backgroundColor: statusLabels.map(label => {
-                            switch (label) {
-                                case "PAID": return "#10b981";           // xanh lá
-                                case "PENDING": return "#f59e0b";        // vàng cam
-                                case "FAILED": return "#ef4444";         // đỏ
-                                case "CHECKED_IN": return "#3b82f6";     // xanh dương
-                                case "CHECKED_OUT": return "#8b5cf6";    // tím
-                                case "COMPLETED": return "#14b8a6";      // teal
-                                case "PENDING_PAYMENT": return "#facc15";// vàng sáng
-                                case "REJECTED": return "#f43f5e";       // hồng đỏ
-                                default: return "#6b7280";
-                            }
-                        }),
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: "70%",
-                    plugins: {
-                        legend: {
-                            position: "bottom",
-                            labels: {
-                                boxWidth: 10,
-                                font: { size: 11 }
+                setActive(btnWeek);
+
+                const today = new Date();
+
+                const firstDay = new Date(today.setDate(today.getDate() - today.getDay()));
+
+                const lastDay = new Date();
+                lastDay.setDate(firstDay.getDate() + 6);
+
+                fromEl.value = firstDay.toISOString().slice(0, 10);
+                toEl.value = lastDay.toISOString().slice(0, 10);
+
+                applyRange();
+
+                dateForm.submit();
+            }
+
+            window.filterThisMonth = function () {
+
+                setActive(btnMonth);
+
+                const today = new Date();
+
+                const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+                fromEl.value = firstDay.toISOString().slice(0, 10);
+                toEl.value = lastDay.toISOString().slice(0, 10);
+
+                applyRange();
+                dateForm.submit();
+            }
+
+
+            window.filterThisYear = function () {
+
+                setActive(btnYear);
+
+                const today = new Date();
+
+                const firstDay = new Date(today.getFullYear(), 0, 1);
+                const lastDay = new Date(today.getFullYear(), 11, 31);
+
+                fromEl.value = firstDay.toISOString().slice(0, 10);
+                toEl.value = lastDay.toISOString().slice(0, 10);
+
+                applyRange();
+                dateForm.submit();
+            }
+
+            /* ==============================
+       CLOSE EXPORT MENU OUTSIDE CLICK
+    ============================== */
+
+            document.addEventListener("click", function (e) {
+
+                const menu = document.getElementById("exportMenu");
+
+                if (menu && !e.target.closest(".relative")) {
+                    menu.classList.add("hidden");
+                }
+
+            });
+
+            //hàm nút download
+            window.toggleExport = function () {
+                document.getElementById("exportMenu").classList.toggle("hidden");
+            }
+
+            window.exportFile = function (type) {
+
+                const from = document.getElementById("drp-from").value;
+                const to = document.getElementById("drp-to").value;
+                console.log("Day la type ne:" + type);
+                const url =
+                /*[[@{/admin/dashboard/export/}]]*/ "/admin/dashboard/export/" +
+                    type +
+                    "?startDate=" + from +
+                    "&endDate=" + to;
+
+                window.location.href = url;
+            }
+
+            /* ==============================
+               CHART.JS
+            ============================== */
+
+            /* -------- Revenue Chart -------- */
+            const revenueCanvas = document.getElementById("revenueChart");
+
+            if (revenueCanvas) {
+
+                const revenueLabels = /*[[${dashboard.revenueLabels}]]*/[];
+                const revenueData = /*[[${dashboard.revenueData}]]*/[];
+
+                console.log("Labels:", revenueLabels);
+                console.log("Data:", revenueData);
+                const ctxRevenue = revenueCanvas.getContext("2d");
+
+                new Chart(ctxRevenue, {
+                    type: "line",
+                    data: {
+                        labels: revenueLabels,
+                        datasets: [{
+                            label: "Doanh thu",
+                            data: revenueData,
+                            borderColor: "#3b82f6",
+                            backgroundColor: "rgba(59,130,246,0.1)",
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: "#ffffff",
+                            pointBorderColor: "#3b82f6",
+                            pointBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: "#f3f4f6" }
+                            },
+                            x: {
+                                offset: true,
+                                grid: { display: false }
                             }
                         }
                     }
-                }
-            });
-        }
+                });
+            }
 
-    });
 
-</script>
+            /* -------- Bookings Chart -------- */
+            const quarterBookings = /*[[${dashboard.quarterBookings}]]*/[];
+            const quarterLabels = /*[[${dashboard.quarterLabels}]]*/[];
+            const bookingCanvas = document.getElementById("bookingsChart");
+
+            if (bookingCanvas) {
+
+                const ctxBooking = bookingCanvas.getContext("2d");
+
+                new Chart(ctxBooking, {
+                    type: "bar",
+                    data: {
+                        labels: quarterLabels,
+                        datasets: [{
+                            data: quarterBookings,
+                            backgroundColor: "#60a5fa",
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { display: false }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+
+
+            /* -------- Booking Status Chart -------- */
+            const statusData = /*[[${dashboard.statusData}]]*/[];
+            const statusLabels = /*[[${dashboard.statusLabels}]]*/[];
+            const statusCanvas = document.getElementById("occupancyChart");
+
+            if (statusCanvas) {
+
+                const ctxStatus = statusCanvas.getContext("2d");
+
+                new Chart(ctxStatus, {
+                    type: "doughnut",
+                    data: {
+                        labels: statusLabels,
+                        datasets: [{
+                            data: statusData,
+                            backgroundColor: statusLabels.map(label => {
+                                switch (label) {
+                                    case "PAID": return "#10b981";           // xanh lá
+                                    case "PENDING": return "#f59e0b";        // vàng cam
+                                    case "FAILED": return "#ef4444";         // đỏ
+                                    case "CHECKED_IN": return "#3b82f6";     // xanh dương
+                                    case "CHECKED_OUT": return "#8b5cf6";    // tím
+                                    case "COMPLETED": return "#14b8a6";      // teal
+                                    case "PENDING_PAYMENT": return "#facc15";// vàng sáng
+                                    case "REJECTED": return "#f43f5e";       // hồng đỏ
+                                    default: return "#6b7280";
+                                }
+                            }),
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: "70%",
+                        plugins: {
+                            legend: {
+                                position: "bottom",
+                                labels: {
+                                    boxWidth: 10,
+                                    font: { size: 11 }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+        });
+
+    </script>
 </body>
+
 </html>

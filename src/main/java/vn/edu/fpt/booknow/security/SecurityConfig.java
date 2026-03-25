@@ -53,7 +53,7 @@ public class SecurityConfig {
     public SecurityFilterChain StaffAccountFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .securityMatcher("/admin/**", "/staff/**", "/housekeeping/**")
+                .securityMatcher("/admin/**", "/staff/**", "/housekeeping/**","/checkin/**")
                 .authenticationProvider(staffAuthProvider())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/login", "/auth/login",
@@ -63,7 +63,7 @@ public class SecurityConfig {
                                 "/forgot-password", "/verify-otp",
                                 "/resend-otp", "/reset-password",
                                 "/staff/offline-checkin",
-                                "/404", "/error")
+                                "/404", "/error", "/approve","reject")
                         .permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/staff/**").hasAnyRole("ADMIN", "STAFF")
@@ -101,7 +101,7 @@ public class SecurityConfig {
                                 "/checkin/page",
                                 "/checkin/success",
                                 "/checkin/fail",
-                                "/ws/**")
+                                "/ws/**", "/checkin/approve", "/checkin/reject")
                         .permitAll()
                         .anyRequest().hasRole("CUSTOMER"))
 

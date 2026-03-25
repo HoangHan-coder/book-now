@@ -36,7 +36,7 @@
         <!-- HEADER -->
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
             <div class="flex items-center gap-3">
-                <a th:href="@{/admin/list}" class="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-colors">
+                <a th:href="@{/staff/rooms/list}" class="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-colors">
                     <i class="fa-solid fa-arrow-left"></i>
                 </a>
                 <div>
@@ -200,7 +200,7 @@
 
                 <!-- Footer Actions -->
                 <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-end gap-3 sticky bottom-0 bg-white py-4 z-10">
-                    <form th:action="@{/admin/room/delete/{id}(id=${room.roomId})}"
+                    <form th:action="@{/staff/room/delete/{id}(id=${room.roomId})}"
                           method="post"
                           th:if="${room.status.name() == 'AVAILABLE'}">
 
@@ -216,7 +216,7 @@
 
                     <!-- Nếu KHÔNG phải DELETED -->
                     <a th:if="${!isDeleted}"
-                       th:href="@{/admin/edit/{id}(id=${room.roomId})}"
+                       th:href="@{/staff/rooms/edit/{id}(id=${room.roomId})}"
                        class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm flex items-center gap-2">
 
                         <i class="fa-regular fa-pen-to-square"></i>
@@ -225,7 +225,7 @@
 
                     <!-- Nếu là DELETED -->
                     <form th:if="${isDeleted}"
-                          th:action="@{/admin/room/restore/{id}(id=${room.roomId})}"
+                          th:action="@{/staff/room/restore/{id}(id=${room.roomId})}"
                           method="post">
 
                         <button type="submit"

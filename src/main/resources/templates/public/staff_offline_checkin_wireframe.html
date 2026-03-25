@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Offline Check-in - BookNow</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         .gradient-text {
             background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
@@ -17,16 +16,20 @@
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<div sec:authorize="hasRole('ADMIN')">
-    <div th:replace="fragments/sidebar :: admin-sidebar('check-in','admin')"></div>
-    <script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
-</div>
-<div sec:authorize="hasRole('STAFF')">
-    <div th:replace="fragments/sidebar :: staff-sidebar('check-in','staff')"></div>
-    <script th:replace="fragments/sidebar :: sidebar-scripts('staff')"></script>
+<div style="position: fixed; top: 25px; left: 25px; z-index: 100;"
+     class="bg-white/90 backdrop-blur px-6 py-3 rounded-2xl shadow-sm border border-white/50">
+    <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100">
+            <i class="fa-solid fa-house-chimney text-2xl text-blue-600"></i>
+        </div>
+        <div class="flex flex-col justify-center">
+            <span class="text-3xl font-extrabold tracking-tight gradient-text leading-none">BookNow</span>
+            <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider">Staff Portal</span>
+        </div>
+    </div>
 </div>
 
-<div class="max-w-8xl mx-auto px-4 py-6 lg:ml-64">
+<div class="max-w-7xl mx-auto px-6 pt-32 pb-12">
 
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-2">📝 Offline Check-in</h1>
@@ -50,7 +53,6 @@
                            id="searchTerm"
                            th:value="${searchTerm}"
                            required
-
                            title="Booking Code must start with BK followed by 8 digits (e.g., BK00143697)"
                            placeholder="BK00143697"
                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500">
@@ -69,15 +71,6 @@
                 <i class="fa-solid fa-circle-check text-green-600 text-xl"></i>
                 <span class="text-green-800 font-medium">
                 Booking found! Displaying details for: <span class="font-bold" th:text="${searchTerm}"></span>
-            </span>
-            </div>
-        </div>
-
-        <div th:if="${booking == null}" class="mt-4">
-            <div class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
-                <i class="fa-solid fa-circle-xmark text-red-600 text-xl"></i>
-                <span class="text-red-800 font-medium">
-                No booking found with ID: <span class="font-bold" th:text="${searchTerm}"></span>. Please check again!
             </span>
             </div>
         </div>
@@ -165,7 +158,7 @@
                             </div>
                         </div>
 
-                        <label class="w-full cursor-pointer">
+                        <label th:if="${booking.bookingStatus.name() == 'REJECTED'}" class="w-full cursor-pointer">
                             <input type="file" name="cccdFront" id="uploadFront" accept="image/*" class="hidden">
                             <div class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium text-center flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-upload"></i>
@@ -194,7 +187,7 @@
                             </div>
                         </div>
 
-                        <label class="w-full cursor-pointer">
+                        <label th:if="${booking.bookingStatus.name() == 'REJECTED'}" class="w-full cursor-pointer">
                             <input type="file" name="cccdBack" id="uploadBack" accept="image/*" class="hidden">
                             <div class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium text-center flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-upload"></i>
@@ -237,32 +230,57 @@
                             </div>
                         </div>
 
-                        <div class="flex items-start gap-4 p-3 rounded-xl border border-gray-100 hover:shadow-md transition-shadow bg-white">
+                        <div th:if="*{customer.phone != null}"
+                             class="flex items-start gap-4 p-3 rounded-xl border border-gray-100 hover:shadow-md transition-shadow bg-white">
+
                             <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center text-green-600 flex-shrink-0">
                                 <i class="fa-solid fa-phone-flip text-lg"></i>
                             </div>
+
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Phone
-                                    Number</label>
+                                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">
+                                    Phone Number
+                                </label>
                                 <p class="text-gray-700 font-bold tracking-wide" th:text="*{customer.phone}">
-                                    0909123456</p>
-                                <input type="hidden" th:field="*{customer.phone}">
+                                    0909123456
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
         <div class="mt-6 flex gap-4 justify-end">
-            <div th:if="*{bookingStatus.toString() == 'REJECTED' || bookingStatus.toString() ==  'APPROVED'}" class="flex gap-4">
+            <div th:if="*{bookingStatus.toString() == 'REJECTED'}" class="flex gap-4">
                 <button type="submit"
                         class="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold shadow-lg transition-colors">
                     ✅ COMPLETE CHECK-IN
                 </button>
+
             </div>
         </div>
     </form>
+    <div id="toast-container" class="fixed top-5 right-5 z-[1000] flex flex-col gap-3">
+        <div th:if="${toastMessage}"
+             id="toast-notification"
+             th:classappend="${toastType == 'error' ? 'border-red-500 bg-red-50' : 'border-green-500 bg-green-50'}"
+             class="min-w-[300px] flex items-center p-4 rounded-xl border-l-4 shadow-lg transition-all duration-500 transform translate-x-full opacity-0">
+
+            <div class="flex-shrink-0">
+                <i th:classappend="${toastType == 'error' ? 'fa-circle-xmark text-red-500' : 'fa-circle-check text-green-500'}"
+                   class="fa-solid text-xl"></i>
+            </div>
+
+            <div class="ml-3">
+                <p class="text-sm font-bold text-gray-900" th:text="${toastType == 'error' ? 'Lỗi' : 'Thành công'}"></p>
+                <p class="text-xs text-gray-600" th:text="${toastMessage}"></p>
+            </div>
+
+            <button onclick="closeToast()" class="ml-auto text-gray-400 hover:text-gray-600 transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    </div>
 
 </div>
 
@@ -278,7 +296,30 @@
             }
         });
     }
+    // Hiệu ứng hiển thị Toast khi trang load
+    window.addEventListener('DOMContentLoaded', (event) => {
+        const toast = document.getElementById('toast-notification');
+        if (toast) {
+            // Hiện toast
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full', 'opacity-0');
+                toast.classList.add('translate-x-0', 'opacity-100');
+            }, 100);
 
+            // Tự động đóng sau 5 giây
+            setTimeout(() => {
+                closeToast();
+            }, 5000);
+        }
+    });
+
+    function closeToast() {
+        const toast = document.getElementById('toast-notification');
+        if (toast) {
+            toast.classList.add('translate-x-full', 'opacity-0');
+            setTimeout(() => { toast.remove(); }, 500);
+        }
+    }
     setupPreview('uploadFront', 'previewFrontContainer', 'frontPlaceholder', 'previewFront');
     setupPreview('uploadBack', 'previewBackContainer', 'backPlaceholder', 'previewBack');
 </script>

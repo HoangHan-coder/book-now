@@ -563,7 +563,7 @@
         }, 1000);
     }
 </script>
-<script>
+<script th:inline="javascript">
     const panelIdentity = document.getElementById('panel_identity');
     const panelPayment = document.getElementById('panel_payment');
     const panelCheckin = document.getElementById('panel_checkin');
@@ -748,7 +748,7 @@
     mobileMenuBtn?.addEventListener('click', toggleSidebar);
     sidebarOverlay?.addEventListener('click', toggleSidebar);
 
-    const socket = new SockJS('http://localhost:8080/book-now/ws');
+    const socket = new SockJS(/*[[@{/ws}]]*/ 'http://localhost:8080/book-now/ws');
     const stompClient = Stomp.over(socket);
 
 
@@ -802,7 +802,8 @@
     }
 
     function approve() {
-        fetch("/book-now/checkin/approve", {
+        console.log("running....");
+        fetch(/*[[@{/checkin/approve}]]*/ "http://localhost:8080/book-now/checkin/approve", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -831,7 +832,7 @@
     }
 
     function reject(bookingId) {
-        fetch("/book-now/checkin/reject", {
+        fetch(/*[[@{/checkin/reject}]]*/ "http://localhost:8080/book-now/checkin/reject", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

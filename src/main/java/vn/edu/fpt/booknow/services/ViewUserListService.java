@@ -18,14 +18,14 @@ public class ViewUserListService {
     private final CustomerRepository customerRepository;
 
     public ViewUserListService(StaffAccountRepository staffAccountRepository,
-            CustomerRepository customerRepository) {
+                               CustomerRepository customerRepository) {
         this.staffAccountRepository = staffAccountRepository;
         this.customerRepository = customerRepository;
     }
 
     public List<UserDTO> getUserList(String roleFilter,
-            String statusFilter,
-            String keyword) {
+                                     String statusFilter,
+                                     String keyword) {
 
         List<UserDTO> result = new ArrayList<>();
 
@@ -35,38 +35,53 @@ public class ViewUserListService {
             keywordNormalized = TextUtils.removeAccent(keyword.trim());
         }
 
-        // STAFF
-        List<StaffAccount> staffList = staffAccountRepository.searchStaff(roleFilter, statusFilter, null); // ❌ bỏ
-                                                                                                           // keyword DB
+        List<StaffAccount> staffList =
+                staffAccountRepository.searchStaff(roleFilter, statusFilter, null);
+        List<Customer> customerList = new ArrayList<>();
 
+        if (roleFilter == null || roleFilter.equals("CUSTOMER")) {
+            customerList = customerRepository.searchCustomer(statusFilter, null);
+        }
+
+        // STAFF
         for (StaffAccount s : staffList) {
 
-            String nameNormalized = TextUtils.removeAccent(s.getFullName());
+            boolean matchKeyword = true;
 
-            if (keywordNormalized == null || nameNormalized.contains(keywordNormalized)) {
+            if (keywordNormalized != null) {
+                String nameNormalized = TextUtils.removeAccent(s.getFullName());
+                matchKeyword = nameNormalized.contains(keywordNormalized);
+            }
+
+            if (matchKeyword) {
                 result.add(new UserDTO(
                         s.getStaffAccountId(),
                         s.getFullName(),
                         s.getEmail(),
                         s.getRole(),
-                        s.getStatus()));
+                        s.getStatus()
+                ));
             }
         }
 
         // CUSTOMER
-        List<Customer> customerList = customerRepository.searchCustomer(statusFilter, null);
-
         for (Customer c : customerList) {
 
-            String nameNormalized = TextUtils.removeAccent(c.getFullName());
+            boolean matchKeyword = true;
 
-            if (keywordNormalized == null || nameNormalized.contains(keywordNormalized)) {
+            if (keywordNormalized != null) {
+                String nameNormalized = TextUtils.removeAccent(c.getFullName());
+                matchKeyword = nameNormalized.contains(keywordNormalized);
+            }
+
+            if (matchKeyword) {
                 result.add(new UserDTO(
                         c.getCustomerId(),
                         c.getFullName(),
                         c.getEmail(),
                         "CUSTOMER",
-                        c.getStatus()));
+                        c.getStatus()
+                ));
             }
         }
 

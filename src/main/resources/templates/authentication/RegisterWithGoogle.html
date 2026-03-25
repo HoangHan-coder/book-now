@@ -58,7 +58,7 @@
 <body class="min-h-screen flex items-center justify-center font-sans text-gray-800 relative p-4">
 
 <!-- LOGO (Fixed Position) -->
-<div class="logo-fixed flex items-center gap-3 select-none cursor-pointer" onclick="window.location.href='/auth/login'">
+<div class="logo-fixed flex items-center gap-3 select-none cursor-pointer" th:onclick="|window.location.href='@{/auth/login}'|">
     <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
         <i class="fa-solid fa-house-chimney gradient-icon text-xl text-blue-600"></i>
     </div>
