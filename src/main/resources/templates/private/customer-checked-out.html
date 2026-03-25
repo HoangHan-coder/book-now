@@ -47,17 +47,7 @@
   <div class="absolute bottom-0 left-0 w-80 h-80 bg-blue-300 rounded-full opacity-20 blur-3xl"></div>
 </div>
 
-<!-- === LOGO (Fixed Top-Left, 25px margin) === -->
-<div style="position: fixed; top: 25px; left: 25px; z-index: 100;" class="bg-white/90 backdrop-blur px-6 py-3 rounded-2xl shadow-sm border border-white/50">
-  <div class="flex items-center gap-3">
-    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100">
-      <i class="fa-solid fa-house-chimney gradient-icon text-2xl text-blue-600"></i>
-    </div>
-    <div class="flex flex-col justify-center">
-      <span class="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-blue-700 leading-none">BookNow</span>
-    </div>
-  </div>
-</div>
+<div th:replace="~{fragments/navbar :: public-navbar}"></div>
 
 <!-- === MAIN KIOSK CARD === -->
 <div class="w-full max-w-xl px-4 relative z-10 text-center">
@@ -138,6 +128,10 @@
   </div>
 
 </div>
+
+<div th:replace="~{fragments/navbar :: dropdown-script}"></div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 
 <!-- === SCRIPT LOGIC === -->
 <script>

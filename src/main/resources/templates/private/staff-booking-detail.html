@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <title>Chi tiết đặt phòng</title>
@@ -10,9 +11,15 @@
 
 <body class="bg-gray-50 font-sans text-gray-800">
 
+<div sec:authorize="hasRole('ADMIN')">
+    <div th:replace="fragments/sidebar :: admin-sidebar('bookings','admin')"></div>
+    <script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
+</div>
+<div sec:authorize="hasRole('STAFF')">
+    <div th:replace="fragments/sidebar :: staff-sidebar('bookings','staff')"></div>
+    <script th:replace="fragments/sidebar :: sidebar-scripts('staff')"></script>
+</div>
 
-<div th:replace="fragments/sidebar :: admin-sidebar('bookings','admin')"></div>
-<script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
 
 <!-- MAIN -->
 <main class="lg:ml-64 max-w-7xl mx-auto py-12 px-8">
@@ -37,7 +44,7 @@
       </p>
     </div>
 
-    <a th:href="@{/admin/bookings}"
+    <a th:href="@{/staff/bookings}"
        class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 text-sm transition">
       ← Quay lại
     </a>
@@ -182,7 +189,7 @@
       <!-- ACTION BUTTONS -->
       <div class="flex flex-col gap-3">
 
-          <form th:action="@{/admin/bookings/cancel/{bookingCode}(bookingCode=${booking.bookingCode})}"
+          <form th:action="@{/staff/bookings/cancel/{bookingCode}(bookingCode=${booking.bookingCode})}"
                 method="post"
                 onsubmit="return confirm('Bạn có chắc chắn muốn hủy đặt phòng này không?')">
 
@@ -214,7 +221,7 @@
         <div class="flex gap-2" >
 
         <!-- Nút cập nhật -->
-        <a th:href="@{/admin/bookings/update/{bookingCode}(bookingCode=${booking.bookingCode})}"
+        <a th:href="@{/staff/bookings/update/{bookingCode}(bookingCode=${booking.bookingCode})}"
            th:classappend="${booking.bookingStatus.name == 'FAILED'} ? 'pointer-events-none opacity-50' : ''"
            class="flex items-center gap-2 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg font-medium transition">
           <i class="fa-solid fa-pen"></i>

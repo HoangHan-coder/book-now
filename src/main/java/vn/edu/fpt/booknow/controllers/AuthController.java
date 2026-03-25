@@ -87,7 +87,7 @@ public class AuthController {
 
         switch (account.getRole()) {
             case "ADMIN" -> {
-                return "redirect:/admin//dashboard";
+                return "redirect:/admin/dashboard";
             }
             case "STAFF" -> {
                 return "redirect:/staff/dashboard";

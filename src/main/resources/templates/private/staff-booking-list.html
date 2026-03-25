@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -60,23 +61,40 @@
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
+
         .no-scrollbar {
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
 
         /* Status Badge Colors */
-        .status-pending { @apply bg-yellow-50 text-yellow-700 ring-1 ring-yellow-600/20; }
-        .status-confirmed { @apply bg-blue-50 text-blue-700 ring-1 ring-blue-600/20; }
-        .status-completed { @apply bg-green-50 text-green-700 ring-1 ring-green-600/20; }
-        .status-cancelled { @apply bg-red-50 text-red-700 ring-1 ring-red-600/20; }
+        .status-pending {
+            @apply bg-yellow-50 text-yellow-700 ring-1 ring-yellow-600/20;
+        }
+
+        .status-confirmed {
+            @apply bg-blue-50 text-blue-700 ring-1 ring-blue-600/20;
+        }
+
+        .status-completed {
+            @apply bg-green-50 text-green-700 ring-1 ring-green-600/20;
+        }
+
+        .status-cancelled {
+            @apply bg-red-50 text-red-700 ring-1 ring-red-600/20;
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<div th:replace="fragments/sidebar :: admin-sidebar('bookings','admin')"></div>
-<script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
-
+<div sec:authorize="hasRole('ADMIN')">
+    <div th:replace="fragments/sidebar :: admin-sidebar('bookings','admin')"></div>
+    <script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
+</div>
+<div sec:authorize="hasRole('STAFF')">
+    <div th:replace="fragments/sidebar :: staff-sidebar('bookings','staff')"></div>
+    <script th:replace="fragments/sidebar :: sidebar-scripts('staff')"></script>
+</div>
 
 <!-- MAIN CONTENT -->
 <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
@@ -102,7 +120,7 @@
     </div>
     <!-- FILTERS CARD -->
 
-    <form th:action="@{/admin/bookings}" method="get"
+    <form th:action="@{/staff/bookings}" method="get"
           class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -195,7 +213,9 @@
                     <th class="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Ngày nhận</th>
                     <th class="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Ngày trả</th>
                     <th class="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Trạng thái</th>
-                    <th class="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Hành động</th>
+                    <th class="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Hành
+                        động
+                    </th>
                 </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -250,7 +270,7 @@
 
                     <!-- Action -->
                     <td class="py-4 px-6 text-right">
-                        <a th:href="@{/admin/booking-detail/{bookingCode}(bookingCode=${booking.bookingCode})}"
+                        <a th:href="@{/staff/booking-detail/{bookingCode}(bookingCode=${booking.bookingCode})}"
                            class="text-blue-600 hover:text-blue-900 font-medium text-sm">
                             Xem chi tiết
                         </a>
@@ -268,10 +288,10 @@
 
         <!-- Pagination Controls -->
         <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-white rounded-lg border border-gray-100">
-            
+
             <!-- Previous Button -->
             <a th:if="${currentPage > 1}"
-               th:href="@{/admin/bookings(
+               th:href="@{/staff/bookings(
                    page=${currentPage > 1 ? currentPage - 1 : totalPages},
                    checkIn=${param.checkIn},
                    checkOut=${param.checkOut},
@@ -282,9 +302,9 @@
                 <i class="fa-solid fa-chevron-left"></i>
                 <span>Trang trước</span>
             </a>
-            
+
             <a th:if="${currentPage == 1}"
-               th:href="@{/admin/bookings(
+               th:href="@{/staff/bookings(
                    page=${totalPages},
                    checkIn=${param.checkIn},
                    checkOut=${param.checkOut},
@@ -304,7 +324,7 @@
 
             <!-- Next Button -->
             <a th:if="${currentPage < totalPages}"
-               th:href="@{/admin/bookings(
+               th:href="@{/staff/bookings(
                    page=${currentPage + 1},
                    checkIn=${param.checkIn},
                    checkOut=${param.checkOut},
@@ -315,9 +335,9 @@
                 <span>Trang sau</span>
                 <i class="fa-solid fa-chevron-right"></i>
             </a>
-            
+
             <a th:if="${currentPage == totalPages}"
-               th:href="@{/admin/bookings(
+               th:href="@{/staff/bookings(
                    page=1,
                    checkIn=${param.checkIn},
                    checkOut=${param.checkOut},

@@ -3,10 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!--
-        th:text trên title: thay đổi tiêu đề tab dựa trên kết quả.
-        Biểu thức ternary Thymeleaf: ${condition} ? 'A' : 'B'
-    -->
     <title th:text="${success} ? 'Thanh toán thành công ✅' : 'Thanh toán thất bại ❌'">Kết quả thanh toán</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -97,11 +93,6 @@
 <body>
 <div class="card">
 
-    <!--
-        th:if="${success}": render block NÀY nếu success = true
-        th:unless="${success}": render block NÀY nếu success = false
-        Hai block loại trừ nhau.
-    -->
     <div th:if="${success}">
         <div class="icon">✅</div>
         <div class="title ok">Thanh toán thành công!</div>
@@ -172,5 +163,7 @@
     </div>
 
 </div>
+
+
 </body>
 </html>

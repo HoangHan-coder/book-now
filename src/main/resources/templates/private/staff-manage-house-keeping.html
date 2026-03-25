@@ -1,282 +1,289 @@
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Danh sách đặt phòng - BookNow</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome for Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách đặt phòng - BookNow</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    </script>
 
-<style>
-  /* Specific Logo Positioning Rule */
-  .logo-fixed {
-    position: fixed;
-    top: 0;
-    left: 0;
-    margin-top: 25px;
-    margin-left: 25px;
-    z-index: 60; /* Higher than sidebar */
-  }
+    <style>
+        /* Specific Logo Positioning Rule */
+        .logo-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin-top: 25px;
+            margin-left: 25px;
+            z-index: 60; /* Higher than sidebar */
+        }
 
-  .gradient-text {
-    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-  .gradient-icon {
-    color: #3b82f6;
-  }
+        .gradient-icon {
+            color: #3b82f6;
+        }
 
-  /* Sidebar transitions */
-  .sidebar {
-    transition: transform 0.3s ease-in-out;
-  }
+        /* Sidebar transitions */
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
 
-  /* Hide scrollbar for sidebar */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+        /* Hide scrollbar for sidebar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
 
-</style>
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+    </style>
 
 </head>
 
 <body class="bg-gray-100 min-h-screen">
 
-<div th:replace="fragments/sidebar :: admin-sidebar('housekeeping','staff')"></div>
-<script th:replace="fragments/sidebar :: sidebar-scripts('staff')"></script>
-<main class="max-w-7xl mx-auto px-4 py-6 lg:ml-64">
+<div sec:authorize="hasRole('ADMIN')">
+    <div th:replace="fragments/sidebar :: admin-sidebar('housekeeping','admin')"></div>
+    <script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
+</div>
+<div sec:authorize="hasRole('STAFF')">
+    <div th:replace="fragments/sidebar :: staff-sidebar('housekeeping','staff')"></div>
+    <script th:replace="fragments/sidebar :: sidebar-scripts('staff')"></script>
+</div>
+
+<main class="max-w-8xl mx-auto px-4 py-6 lg:ml-64">
     <div th:replace="~{fragments/infor_admin}"></div>
-  <!-- ERROR MESSAGE -->
-  <div th:if="${errorMessage}"
-       class="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 flex items-center gap-3 shadow-sm">
-    <i class="fa-solid fa-circle-exclamation text-red-500 text-lg"></i>
-    <span th:text="${errorMessage}">Có lỗi xảy ra</span>
-  </div>
-
-  <!-- SUCCESS MESSAGE -->
-  <div th:if="${successMessage}"
-       class="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 flex items-center gap-3 shadow-sm">
-    <i class="fa-solid fa-circle-check text-green-500 text-lg"></i>
-    <span th:text="${successMessage}">Thành công</span>
-  </div>
-
-  <div id="housekeeping-lower-content">
-
-  <!-- Filter Section -->
-  <div class="bg-white rounded-lg shadow mb-8 overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-200">
-      <h2 class="text-lg font-semibold text-gray-800">Bộ lọc</h2>
+    <!-- ERROR MESSAGE -->
+    <div th:if="${errorMessage}"
+         class="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 flex items-center gap-3 shadow-sm">
+        <i class="fa-solid fa-circle-exclamation text-red-500 text-lg"></i>
+        <span th:text="${errorMessage}">Có lỗi xảy ra</span>
     </div>
-    <div class="p-6">
-      <form method="get" th:action="@{/admin/manage-housekeeping}" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        
-        <!-- Task Status Filter -->
-        <div class="flex flex-col">
-          <label for="taskStatus" class="text-sm font-medium text-gray-700 mb-2">Trạng thái công việc</label>
-          <select id="taskStatus" name="taskStatus" 
-                  class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">-- Tất cả --</option>
-            <option th:each="status : ${taskStatuses}" 
-                    th:value="${status.name()}" 
-                    th:text="${status.displayName}"
-                    th:selected="${selectedTaskStatus == status}">
-              Status
-            </option>
-          </select>
+
+    <!-- SUCCESS MESSAGE -->
+    <div th:if="${successMessage}"
+         class="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 flex items-center gap-3 shadow-sm">
+        <i class="fa-solid fa-circle-check text-green-500 text-lg"></i>
+        <span th:text="${successMessage}">Thành công</span>
+    </div>
+
+    <div id="housekeeping-lower-content">
+
+        <!-- Filter Section -->
+        <div class="bg-white rounded-lg shadow mb-8 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-800">Bộ lọc</h2>
+            </div>
+            <div class="p-6">
+                <form method="get" th:action="@{/admin/manage-housekeeping}"
+                      class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+                    <!-- Task Status Filter -->
+                    <div class="flex flex-col">
+                        <label for="taskStatus" class="text-sm font-medium text-gray-700 mb-2">Trạng thái công
+                            việc</label>
+                        <select id="taskStatus" name="taskStatus"
+                                class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">-- Tất cả --</option>
+                            <option th:each="status : ${taskStatuses}"
+                                    th:value="${status.name()}"
+                                    th:text="${status.displayName}"
+                                    th:selected="${selectedTaskStatus == status}">
+                                Status
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Priority Filter -->
+                    <div class="flex flex-col">
+                        <label for="priority" class="text-sm font-medium text-gray-700 mb-2">Độ ưu tiên</label>
+                        <select id="priority" name="priority"
+                                class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">-- Tất cả --</option>
+                            <option th:each="prio : ${priorities}"
+                                    th:value="${prio.name()}"
+                                    th:text="${prio.displayName}"
+                                    th:selected="${selectedPriority == prio}">
+                                Priority
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex items-end gap-2 col-span-1 md:col-span-3 lg:col-span-1">
+                        <button type="submit"
+                                class="flex-1 lg:flex-initial px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-filter"></i>
+                            <span>Lọc</span>
+                        </button>
+                        <a th:href="@{/admin/manage-housekeeping}"
+                           class="flex-1 lg:flex-initial px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-colors font-medium flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-xmark"></i>
+                            <span>Xóa</span>
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
 
-        <!-- Priority Filter -->
-        <div class="flex flex-col">
-          <label for="priority" class="text-sm font-medium text-gray-700 mb-2">Độ ưu tiên</label>
-          <select id="priority" name="priority" 
-                  class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">-- Tất cả --</option>
-            <option th:each="prio : ${priorities}" 
-                    th:value="${prio.name()}" 
-                    th:text="${prio.displayName}"
-                    th:selected="${selectedPriority == prio}">
-              Priority
-            </option>
-          </select>
-        </div>
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg shadow mb-8 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-800">Tasks List</h2>
+            </div>
+            <div class="p-6">
 
-        <!-- Buttons -->
-        <div class="flex items-end gap-2 col-span-1 md:col-span-3 lg:col-span-1">
-          <button type="submit" class="flex-1 lg:flex-initial px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2">
-            <i class="fa-solid fa-filter"></i>
-            <span>Lọc</span>
-          </button>
-          <a th:href="@{/admin/manage-housekeeping}" class="flex-1 lg:flex-initial px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-colors font-medium flex items-center justify-center gap-2">
-            <i class="fa-solid fa-xmark"></i>
-            <span>Xóa</span>
-          </a>
-        </div>
-      </form>
-    </div>
-  </div>
+                <!-- Task Table -->
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                    <tr class="text-left text-sm text-gray-600">
+                        <th class="px-6 py-4 font-medium">Room Number</th>
+                        <th class="px-6 py-4 font-medium">Room Type</th>
+                        <th class="px-6 py-4 font-medium">Time Checkout</th>
+                        <th class="px-6 py-4 font-medium">Priority</th>
+                        <th class="px-6 py-4 font-medium">Status</th>
+                        <th class="px-6 py-4 font-medium">Assigned To</th>
+                        <th class="px-6 py-4 font-medium">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
 
-  <!-- Quick Actions -->
-  <div class="bg-white rounded-lg shadow mb-8 overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-200">
-      <h2 class="text-lg font-semibold text-gray-800">Tasks List</h2>
-    </div>
-    <div class="p-6">
+                    <tr th:each="task : ${housekeepingTaskLists}" class="hover:bg-gray-50">
 
-      <!-- Task Table -->
-      <table class="w-full">
-        <thead class="bg-gray-50">
-        <tr class="text-left text-sm text-gray-600">
-          <th class="px-6 py-4 font-medium">Room Number</th>
-          <th class="px-6 py-4 font-medium">Room Type</th>
-          <th class="px-6 py-4 font-medium">Time Checkout</th>
-          <th class="px-6 py-4 font-medium">Priority</th>
-          <th class="px-6 py-4 font-medium">Status</th>
-          <th class="px-6 py-4 font-medium">Assigned To</th>
-          <th class="px-6 py-4 font-medium">Action</th>
-        </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-
-        <tr th:each="task : ${housekeepingTaskLists}" class="hover:bg-gray-50">
-
-          <!-- Room Number -->
-          <td class="px-6 py-4">
+                        <!-- Room Number -->
+                        <td class="px-6 py-4">
     <span class="font-bold text-gray-800"
           th:text="${task.room.roomNumber}">
       101
     </span>
-          </td>
+                        </td>
 
-          <!-- Room Type -->
-          <td class="px-6 py-4 text-gray-600"
-              th:text="${task.room.roomType.name}">
-            Deluxe
-          </td>
+                        <!-- Room Type -->
+                        <td class="px-6 py-4 text-gray-600"
+                            th:text="${task.room.roomType.name}">
+                            Deluxe
+                        </td>
 
-          <!-- Last Checkout -->
-          <td class="px-6 py-4 text-gray-600">
-            <div th:text="${#temporals.format(task.booking.checkOutTime,'yyyy-MM-dd')}">
-              2026-03-13
-            </div>
-            <p class="text-xs text-gray-500 mt-1" th:text="${#temporals.format(task.booking.checkOutTime,'HH:mm')}">
-              10:00 AM
-            </p>
-          </td>
+                        <!-- Last Checkout -->
+                        <td class="px-6 py-4 text-gray-600">
+                            <div th:text="${#temporals.format(task.booking.checkOutTime,'yyyy-MM-dd')}">
+                                2026-03-13
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1"
+                               th:text="${#temporals.format(task.booking.checkOutTime,'HH:mm')}">
+                                10:00 AM
+                            </p>
+                        </td>
 
-          <!-- Priority -->
-          <td class="px-6 py-4">
+                        <!-- Priority -->
+                        <td class="px-6 py-4">
      <span class="px-2 py-1 rounded text-xs font-medium"
            th:text="${task.priority}"
            th:classappend="${task.priority.cssEnumClass}">
 </span>
 
-          </td>
+                        </td>
 
-          <!-- Status -->
-          <td class="px-6 py-4">
+                        <!-- Status -->
+                        <td class="px-6 py-4">
         <span class="px-2 py-1 rounded text-xs font-medium"
               th:text="${task.status}"
               th:classappend="${task.status.cssEnumClass}">
         </span>
-          </td>
+                        </td>
 
-          <!-- Assigned Staff -->
-          <td class="px-6 py-4 text-gray-600"
-              th:text="${task.assignedTo!= null ? task.assignedTo.fullName : 'Unassigned'}">
-            Unassigned
-          </td>
+                        <!-- Assigned Staff -->
+                        <td class="px-6 py-4 text-gray-600"
+                            th:text="${task.assignedTo!= null ? task.assignedTo.fullName : 'Unassigned'}">
+                            Unassigned
+                        </td>
 
-          <!-- Action -->
-          <td class="px-6 py-4">
+                        <!-- Action -->
+                        <td class="px-6 py-4">
 
-            <a th:href="@{/admin/manage-housekeeping/task-detail/{id}(id=${task.taskId})}"
-               class="text-blue-600 hover:underline text-sm mr-3">
-              View
-            </a>
-          </td>
+                            <a th:href="@{/admin/manage-housekeeping/task-detail/{id}(id=${task.taskId})}"
+                               class="text-blue-600 hover:underline text-sm mr-3">
+                                View
+                            </a>
+                        </td>
 
-        </tr>
+                    </tr>
 
-        </tbody>
+                    </tbody>
 
-      </table>
-    </div>
-  </div>
-    <!-- Pagination Controls -->
-    <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-white rounded-lg border border-gray-100">
+                </table>
+            </div>
+        </div>
+        <!-- Pagination Controls -->
+        <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-white rounded-lg border border-gray-100">
 
-      <!-- Previous Button -->
-      <a th:if="${currentPage > 1}"
-         th:href="@{/admin/manage-housekeeping(
+            <!-- Previous Button -->
+            <a th:if="${currentPage > 1}"
+               th:href="@{/admin/manage-housekeeping(
                    page=${currentPage > 1 ? currentPage - 1 : totalPages},
                    taskStatus=${param.taskStatus},
                    priority=${param.priority}
                )}"
-         class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-        <i class="fa-solid fa-chevron-left"></i>
-        <span>Trang trước</span>
-      </a>
+               class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <i class="fa-solid fa-chevron-left"></i>
+                <span>Trang trước</span>
+            </a>
 
-      <a th:if="${currentPage == 1}"
-         th:href="@{/admin/manage-housekeeping(
+            <a th:if="${currentPage == 1}"
+               th:href="@{/admin/manage-housekeeping(
                    page=${totalPages},
                    taskStatus=${param.taskStatus},
                    priority=${param.priority}
                )}"
-         class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-        <i class="fa-solid fa-chevron-left"></i>
-        <span>Trang trước</span>
-      </a>
+               class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <i class="fa-solid fa-chevron-left"></i>
+                <span>Trang trước</span>
+            </a>
 
-      <!-- Page Info -->
-      <div class="text-center text-sm font-medium text-gray-700">
-        <span th:text="'Trang ' + ${currentPage} + ' / ' + ${totalPages}">Trang 1 / 5</span>
-        <span class="text-gray-500 text-xs ml-2" th:text="'(Tổng ' + ${totalItems} + ' bản ghi)'"> (Tổng 45 bản ghi)</span>
-      </div>
+            <!-- Page Info -->
+            <div class="text-center text-sm font-medium text-gray-700">
+                <span th:text="'Trang ' + ${currentPage} + ' / ' + ${totalPages}">Trang 1 / 5</span>
+                <span class="text-gray-500 text-xs ml-2" th:text="'(Tổng ' + ${totalItems} + ' bản ghi)'"> (Tổng 45 bản ghi)</span>
+            </div>
 
-      <!-- Next Button -->
-      <a th:if="${currentPage < totalPages}"
-         th:href="@{/admin/manage-housekeeping(
+            <!-- Next Button -->
+            <a th:if="${currentPage < totalPages}"
+               th:href="@{/admin/manage-housekeeping(
                    page=${currentPage + 1},
                    taskStatus=${param.taskStatus},
                    priority=${param.priority}
                )}"
-         class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-        <span>Trang sau</span>
-        <i class="fa-solid fa-chevron-right"></i>
-      </a>
+               class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <span>Trang sau</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
 
-      <a th:if="${currentPage == totalPages}"
-         th:href="@{/admin/manage-housekeeping(
+            <a th:if="${currentPage == totalPages}"
+               th:href="@{/admin/manage-housekeeping(
                    page=1,
                    taskStatus=${param.taskStatus},
                    priority=${param.priority}
                )}"
-         class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-        <span>Trang sau</span>
-        <i class="fa-solid fa-chevron-right"></i>
-      </a>
+               class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <span>Trang sau</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+
+
     </div>
-
-
-
-  </div>
 </main>
-
-<!-- Footer -->
-<footer class="bg-gray-800 text-white text-center py-4 mt-8">
-  <p class="text-sm">BookNow Homestay Management System</p>
-</footer>
 
 </body>
 

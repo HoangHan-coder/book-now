@@ -39,19 +39,7 @@
         .animate-scale-bounce { animation: scaleBounce 0.5s ease-out forwards; }
 </style>
 <body class="font-sans text-gray-800 h-screen flex flex-col">
-
-    <!-- Top Bar -->
-    <header class="bg-white border-b border-gray-100 px-8 py-3 flex items-center justify-between flex-shrink-0">
-        <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
-            <div class="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100">
-                <i class="fa-solid fa-house-chimney text-lg text-blue-600"></i>
-            </div>
-            <span class="text-xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-blue-700">BookNow</span>
-        </div>
-        <a href="booking_detail.html" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition" title="Đóng">
-            <i class="fa-solid fa-xmark text-lg"></i>
-        </a>
-    </header>
+<div th:replace="~{fragments/navbar :: public-navbar}"></div>
 
     <!-- Main 2-Column Layout -->
     <div class="flex-1 flex min-h-0 p-5 gap-5 bg-gray-100">
@@ -237,6 +225,8 @@
         });
 
     </script>
+    <div th:replace="~{fragments/navbar :: dropdown-script}"></div>
 
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 </html>

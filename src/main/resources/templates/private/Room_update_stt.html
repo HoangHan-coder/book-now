@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/head :: head(title='Chi tiết phòng & Cập nhật trạng thái - BookNow')}"></head>
 <style>
     /* Logo Positioning Rules - Strictly Followed */
@@ -41,8 +41,15 @@
 <body class="bg-gray-50 font-sans text-gray-800">
 
 
-<div th:replace="fragments/sidebar :: staff-sidebar('rooms','staff')"></div>
-<script th:replace="fragments/sidebar :: sidebar-scripts('staff')"></script>
+<div sec:authorize="hasRole('ADMIN')">
+    <div th:replace="fragments/sidebar :: admin-sidebar('rooms','admin')"></div>
+    <script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
+</div>
+<div sec:authorize="hasRole('STAFF')">
+    <div th:replace="fragments/sidebar :: staff-sidebar('rooms','staff')"></div>
+    <script th:replace="fragments/sidebar :: sidebar-scripts('staff')"></script>
+</div>
+
 
     <!-- MAIN CONTENT AREA -->
     <main class="lg:ml-72 min-h-screen pt-32 lg:pt-12 px-6 pb-20 transition-all duration-300">
