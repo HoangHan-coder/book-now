@@ -62,6 +62,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                         SELECT b FROM Booking b
                         JOIN FETCH b.customer
                         JOIN FETCH b.room
+                        ORDER BY b.bookingId desc 
                         """)
         List<Booking> findAllWithCustomer();
 

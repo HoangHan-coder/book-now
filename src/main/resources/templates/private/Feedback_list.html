@@ -77,7 +77,8 @@
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<div th:replace="~{fragments/sidebar :: admin-sidebar(activePage='dashboard')}"></div>
+<div th:replace="fragments/sidebar :: admin-sidebar('feedback','admin')"></div>
+<script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
 
 <!-- OVERLAY (for mobile) -->
 <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden glass-effect"></div>

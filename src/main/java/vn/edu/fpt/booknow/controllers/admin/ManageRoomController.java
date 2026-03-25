@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @Controller
-@RequestMapping(value = "/admin")
+@RequestMapping(value = "/staff")
 public class ManageRoomController {
     final static int ITEM_PER_PAGE = 10;
     private ManageRoomServices manageRoomServices;
@@ -113,6 +114,7 @@ public class ManageRoomController {
         }
     }
 
+
     @GetMapping(value = "/list")
     public String listRoom(
             Model model,
@@ -133,7 +135,7 @@ public class ManageRoomController {
             );
 
         if (page > roomlist.getTotalPages() && roomlist.getTotalPages() > 0) {
-            return "redirect:/admin/list?page=1"
+            return "redirect:/staff/list?page=1"
                     + "&status=" + (status == null ? "" : status)
                     + "&type=" + (type == null ? "" : type)
                     + "&roomNumber=" + (roomNumber == null ? "" : roomNumber);
@@ -154,6 +156,7 @@ public class ManageRoomController {
         return "private/Room_list";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/delete-rooms")
     @ResponseBody
     public ResponseEntity<?> deleteRooms(@RequestParam List<Long> roomIds) {
@@ -175,9 +178,10 @@ public class ManageRoomController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/admin/list";
+        return "redirect:/staff/list";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/room/restore/{id}")
     public String restoreRoom(@PathVariable Long id,
                               RedirectAttributes redirectAttributes) {
@@ -187,9 +191,11 @@ public class ManageRoomController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/admin/list";
+        return "redirect:/staff/list";
     }
 
+
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/create")
     public String createRoom(Model model) {
 
@@ -199,6 +205,7 @@ public class ManageRoomController {
         return "private/Room_create";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/rooms/create")
     public String createRoom(
             @RequestParam String roomNumber,
@@ -234,7 +241,7 @@ public class ManageRoomController {
             throw new InternalServerException("Create room failed: " + e.getMessage());
         }
 
-        return "redirect:/admin/list";
+        return "redirect:/staff/list";
     }
 
     @GetMapping("/detail/{id}")
@@ -252,6 +259,7 @@ public class ManageRoomController {
     }
 
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/edit/{id}")
     public String editRoom(Model model, @PathVariable("id") Long id) {
         Room room = manageRoomServices.findRoomById(id);
@@ -261,7 +269,7 @@ public class ManageRoomController {
         }
 
         if (room.getStatus() == RoomStatus.INACTIVE) {
-            return "redirect:/admin/detail/" + id + "?error=deleted";
+            return "redirect:/staff/detail/" + id + "?error=deleted";
         }
 
         if (room.getRoomType() == null) {
@@ -300,7 +308,9 @@ public class ManageRoomController {
         return "private/Room_edit";
     }
 
+
     // submit form edit
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/edit")
     public String editRoomSubmit(
 
@@ -348,7 +358,7 @@ public class ManageRoomController {
         catch (Exception e) {
             throw new InternalServerException("Lỗi hệ thống khi cập nhật phòng");
         }
-        return "redirect:/admin/detail/" + roomId;
+        return "redirect:/staff/detail/" + roomId;
     }
 
 }

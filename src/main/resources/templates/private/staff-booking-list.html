@@ -74,7 +74,9 @@
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<div th:replace="~{fragments/sidebar :: admin-sidebar(activePage='bookings')}"></div>
+<div th:replace="fragments/sidebar :: admin-sidebar('bookings','admin')"></div>
+<script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
+
 
 <!-- MAIN CONTENT -->
 <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
@@ -141,7 +143,7 @@
                         focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white">
 
                         <option value="">Tất cả</option>
-                        <option value="PENDING">Đã kiểm duyệt</option>
+                        <option value="APPROVED">Đã kiểm duyệt</option>
                         <option value="PENDING_PAYMENT">Chờ thanh toán</option>
                         <option value="PAID">Đã thanh toán</option>
                         <option value="CHECKED_IN">Đã nhận phòng</option>

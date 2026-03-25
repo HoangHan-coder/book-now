@@ -48,35 +48,31 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(12);
     }
 
-
     @Bean
     @Order(1)
     public SecurityFilterChain StaffAccountFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .securityMatcher("/admin/**")
+                .securityMatcher("/admin/**", "/staff/**", "/housekeeping/**")
                 .authenticationProvider(staffAuthProvider())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/login","/auth/login",
+                        .requestMatchers("/admin/login", "/auth/login",
                                 "/auth/logout", "/public/**",
-                                "/home","/search",
-                                "/detail/**","/pay/**", "/assets/**",
+                                "/home", "/search",
+                                "/detail/**", "/pay/**", "/assets/**",
                                 "/forgot-password", "/verify-otp",
                                 "/resend-otp", "/reset-password",
-                                "/book-now/staff/bookings/update/*",
-                                "/404", "/error", "/ws/**",
-                                "/checkin-ws/**",
-                                "/topic/**",
-                                "/app/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                                "/staff/offline-checkin",
+                                "/404", "/error")
+                        .permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/staff/**").hasAnyRole("ADMIN", "STAFF")
+                        .requestMatchers("/housekeeping/**").hasRole("HOUSEKEEPING")
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-
-
         return http.build();
     }
 
@@ -90,39 +86,43 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login",
                                 "/auth/logout", "/register",
                                 "/public/**", "/pay/**",
-                                "/home","/search","/detail/**",
+                                "/home", "/search", "/detail/**",
                                 "/forgot-password",
                                 "/assets/**",
-                                "/verify-otp", 
+                                "/verify-otp",
                                 "/resend-otp",
+                                "/oauth2/**",
                                 "/reset-password",
-                                "/404", "/error", "/authen/verifiedOtp",
-                                "/authen/registerEmail", "/authen/otp",
-                                "/authen/registerForm",
-                                "/checkin/start").permitAll()
-                        .anyRequest().hasRole("CUSTOMER")
-                )
-                
+                                "/404", "/error", "/auth/verifiedOtp",
+                                "/auth/registerEmail", "/auth/otp",
+                                "/auth/registerForm",
+                                "/checkin/start",
+                                "/checkin/booking-code",
+                                "/checkin/page",
+                                "/checkin/success",
+                                "/checkin/fail",
+                                "/ws/**")
+                        .permitAll()
+                        .anyRequest().hasRole("CUSTOMER"))
+
                 .oauth2Login(oauth -> oauth
                         .authorizationEndpoint(authz -> authz
-                                .authorizationRequestRepository(cookieRepo)
-                        )
+                                .authorizationRequestRepository(cookieRepo))
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService)
-                        )
-                        .successHandler(successHandler)
-                ).exceptionHandling(ex -> ex
+                                .userService(customOAuth2UserService))
+                        .successHandler(successHandler))
+                .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
+                            System.out.println(
+                                    "throw exceptions tại security config ............................");
                             response.sendRedirect("/book-now/auth/login");
-                        })
-                )
+                        }))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-                return http.build();
+        return http.build();
     }
-
 
     @Bean
     public AuthenticationProvider customerAuthProvider() {

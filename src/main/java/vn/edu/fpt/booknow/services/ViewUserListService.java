@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.services.admin;
+package vn.edu.fpt.booknow.services;
 
 import vn.edu.fpt.booknow.model.dto.UserDTO;
 import vn.edu.fpt.booknow.model.entities.Customer;
@@ -18,14 +18,14 @@ public class ViewUserListService {
     private final CustomerRepository customerRepository;
 
     public ViewUserListService(StaffAccountRepository staffAccountRepository,
-                               CustomerRepository customerRepository) {
+            CustomerRepository customerRepository) {
         this.staffAccountRepository = staffAccountRepository;
         this.customerRepository = customerRepository;
     }
 
     public List<UserDTO> getUserList(String roleFilter,
-                                     String statusFilter,
-                                     String keyword) {
+            String statusFilter,
+            String keyword) {
 
         List<UserDTO> result = new ArrayList<>();
 
@@ -36,8 +36,8 @@ public class ViewUserListService {
         }
 
         // STAFF
-        List<StaffAccount> staffList =
-                staffAccountRepository.searchStaff(roleFilter, statusFilter, null); // ❌ bỏ keyword DB
+        List<StaffAccount> staffList = staffAccountRepository.searchStaff(roleFilter, statusFilter, null); // ❌ bỏ
+                                                                                                           // keyword DB
 
         for (StaffAccount s : staffList) {
 
@@ -49,14 +49,12 @@ public class ViewUserListService {
                         s.getFullName(),
                         s.getEmail(),
                         s.getRole(),
-                        s.getStatus()
-                ));
+                        s.getStatus()));
             }
         }
 
         // CUSTOMER
-        List<Customer> customerList =
-                customerRepository.searchCustomer(statusFilter, null);
+        List<Customer> customerList = customerRepository.searchCustomer(statusFilter, null);
 
         for (Customer c : customerList) {
 
@@ -68,8 +66,7 @@ public class ViewUserListService {
                         c.getFullName(),
                         c.getEmail(),
                         "CUSTOMER",
-                        c.getStatus()
-                ));
+                        c.getStatus()));
             }
         }
 

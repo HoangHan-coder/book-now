@@ -7,7 +7,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.services.FeedbackVisibilityService;
 
 @Controller
-@RequestMapping("/admin/feedback")
+@RequestMapping("/staff/feedback")
 @RequiredArgsConstructor
 public class FeedbackVisibilityController {
 
@@ -41,6 +41,6 @@ public class FeedbackVisibilityController {
                     "Hệ thống không phản hồi vui lòng thử lại sau.");
         }
 
-        return "redirect:/admin/feedback/detail/" + feedbackId;
+        return "redirect:/staff/feedback/detail/" + feedbackId;
     }
 }

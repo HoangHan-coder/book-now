@@ -135,10 +135,11 @@ public class BookingListService {
         List<Booking> bookingList = bookingRepository.getBookingByCustomer_Email(email).orElse(null);
 
         if (bookingList == null) {
-            bookingList = new ArrayList<>();
+            System.out.println("customer có email" + email + "không có booking nào đã đặt");
+            return null;
         }
         List<BookingDTO> bookings = bookingList.stream().map(BookingDTO::new).toList();
-
+        System.out.println("Đã map thành công list booking thành list bookingDTO.");
         final int PAGE_SIZE = 6;
         long totalItems = bookings.size();
         int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
@@ -153,7 +154,14 @@ public class BookingListService {
         // Slice data for current page
         int startIndex = (page - 1) * PAGE_SIZE;
         int endIndex = Math.min(startIndex + PAGE_SIZE, (int) totalItems);
-        List<BookingDTO> pageData = bookings.subList(startIndex, endIndex);
-        return new PaginatedResponse<>(pageData, page, totalPages, totalItems, PAGE_SIZE, startIndex, endIndex);
+        try {
+            List<BookingDTO> pageData = bookings.subList(startIndex, endIndex);
+            System.out.println("Return list bookingDTO đã split rồi nhé.......");
+            return new PaginatedResponse<>(pageData, page, totalPages, totalItems, PAGE_SIZE, startIndex, endIndex);
+        } catch (Exception e) {
+            System.out.println("list bookingDTO bị lỏ ròi bạn ơi.........");
+            return null;
+        }
+
     }
 }

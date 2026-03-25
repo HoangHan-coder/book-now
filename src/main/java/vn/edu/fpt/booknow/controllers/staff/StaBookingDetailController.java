@@ -8,7 +8,7 @@ import vn.edu.fpt.booknow.model.entities.Booking;
 import vn.edu.fpt.booknow.services.BookingDetailService;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/staff")
 public class StaBookingDetailController {
 
     private final BookingDetailService bookingDetailService;

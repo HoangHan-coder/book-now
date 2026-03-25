@@ -68,7 +68,7 @@ table {
     border-color: #2563eb;
 }
 </style>
-<body class="bg-gray-50 font-sans text-gray-800 pb-24">
+<body class="bg-gray-50 font-sans text-gray-800">
 
 <!-- NAVBAR FRAGMENT -->
 <div th:fragment="public-navbar">
@@ -125,11 +125,6 @@ table {
                             <li>
                                 <a th:href="@{/bookings/history}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
                                     <i class="fa-solid fa-clock-rotate-left mr-2 w-4"></i> Lịch sử đặt phòng
-                                </a>
-                            </li>
-                            <li>
-                                <a th:href="@{/user/customer-change-password}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
-                                    <i class="fa-solid fa-key mr-2 w-4"></i> Đổi mật khẩu
                                 </a>
                             </li>
                         </ul>

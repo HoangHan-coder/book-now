@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.dto.UserDetailDTO;
-import vn.edu.fpt.booknow.services.admin.EditStaffAccountService;
+import vn.edu.fpt.booknow.services.EditStaffAccountService;
 
 // Boundary Class (COMET)
 // UC-17.x: Edit Staff Account
@@ -23,7 +23,7 @@ public class EditStaffAccountController {
     // UC-17.x: Show Edit Staff Form
     @GetMapping("/edit")
     public String showEditForm(@RequestParam("userId") Long userId,
-                               Model model) {
+            Model model) {
 
         UserDetailDTO staff = service.getStaffAccountById(userId);
 
@@ -43,8 +43,7 @@ public class EditStaffAccountController {
             @RequestParam(value = "newPassword", required = false) String newPassword,
             @RequestParam(value = "confirmNewPassword", required = false) String confirmNewPassword,
             @RequestParam(value = "avatar", required = false) MultipartFile avatar,
-            RedirectAttributes redirectAttributes
-    ) {
+            RedirectAttributes redirectAttributes) {
 
         try {
 
@@ -56,8 +55,7 @@ public class EditStaffAccountController {
                     status,
                     newPassword,
                     confirmNewPassword,
-                    avatar
-            );
+                    avatar);
 
             // gửi message
             redirectAttributes.addFlashAttribute("successMessage",

@@ -10,52 +10,9 @@
 
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<!-- LOGO -->
-<div class="fixed top-6 left-6 z-50 flex items-center gap-3 select-none">
-  <div class="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center border border-blue-100">
-    <i class="fa-solid fa-house-chimney text-blue-600 text-xl"></i>
-  </div>
-  <div class="flex flex-col leading-none">
-    <span class="text-2xl font-extrabold tracking-tight text-blue-600">BookNow</span>
-    <span class="text-[10px] text-gray-500 font-medium uppercase tracking-wider">Homestay System</span>
-  </div>
-</div>
 
-<!-- SIDEBAR -->
-<aside class="fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-40 flex flex-col pt-28">
-
-  <nav class="px-4 space-y-2 flex-1">
-
-    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-      <i class="fa-solid fa-chart-line w-5"></i>
-      Bảng điều khiển
-    </a>
-
-    <a href="#" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium shadow-sm ring-1 ring-black/5">
-      <i class="fa-regular fa-calendar-check w-5"></i>
-      Đơn đặt phòng
-    </a>
-
-    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-      <i class="fa-solid fa-door-open w-5"></i>
-      Phòng
-    </a>
-
-    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
-      <i class="fa-solid fa-users-gear w-5"></i>
-      Khách hàng
-    </a>
-
-  </nav>
-
-  <div class="p-4 border-t border-gray-100">
-    <a href="#" class="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
-      <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
-      Đăng xuất
-    </a>
-  </div>
-
-</aside>
+<div th:replace="fragments/sidebar :: admin-sidebar('bookings','admin')"></div>
+<script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
 
 <!-- MAIN -->
 <main class="lg:ml-64 max-w-7xl mx-auto py-12 px-8">
@@ -238,11 +195,16 @@
                       class="w-full border border-gray-300 rounded-lg p-2 text-sm mb-3"></textarea>
 
             <button type="submit"
-                    class="flex items-center gap-2 bg-white border border-red-200 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg font-medium transition">
-              <i class="fa-solid fa-ban"></i>
-              Hủy đặt phòng
+                    id="cancelBtn"
+                    class="flex items-center justify-center gap-2 bg-white border border-red-200 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">
+
+              <i id="cancelIcon" class="fa-solid fa-ban"></i>
+              <span id="cancelText">Hủy đặt phòng</span>
+
             </button>
 
+            <p id="cancelCountdown"
+               class="text-xs text-red-500 mt-2 font-medium text-center"></p>
           </form>
 
 
@@ -266,6 +228,48 @@
   </div>
   </div>
 </main>
+<script>
+  const form = document.querySelector("form");
+  const btn = document.getElementById("cancelBtn");
+  const text = document.getElementById("cancelText");
+  const icon = document.getElementById("cancelIcon");
+  const countdown = document.getElementById("cancelCountdown");
 
+  form.addEventListener("submit", function (e) {
+
+    if (!confirm('Bạn có chắc chắn muốn hủy đặt phòng này không?')) {
+      return;
+    }
+
+    // UI loading
+    btn.disabled = true;
+    text.innerText = "Đang xử lý...";
+    icon.classList.remove("fa-ban");
+    icon.classList.add("fa-spinner", "fa-spin");
+
+    // chạy countdown UI
+    startCountdown(10);
+  });
+
+  function startCountdown(seconds) {
+    let time = seconds;
+
+    const interval = setInterval(() => {
+      countdown.innerText = `⏳ Vui lòng chờ ${time}s để thao tác lại`;
+      time--;
+
+      if (time < 0) {
+        clearInterval(interval);
+
+        countdown.innerText = "";
+        btn.disabled = false;
+
+        text.innerText = "Hủy đặt phòng";
+        icon.classList.remove("fa-spinner", "fa-spin");
+        icon.classList.add("fa-ban");
+      }
+    }, 1000);
+  }
+</script>
 </body>
 </html>

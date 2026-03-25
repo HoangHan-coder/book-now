@@ -12,7 +12,7 @@ import vn.edu.fpt.booknow.services.CheckInSessionService;
 
 
 @Controller
-@RequestMapping("/admin/bookings")
+@RequestMapping("/staff/bookings")
 public class StaBookingUpdateStatusController {
 
     private final BookingUpdateService bookingUpdateService;
@@ -70,7 +70,7 @@ public class StaBookingUpdateStatusController {
             );
         }
 
-        return "redirect:/admin/bookings/update/" + bookingCode;
+        return "redirect:/staff/bookings/update/" + bookingCode;
     }
 
     @PostMapping("/cancel/{bookingCode}")
@@ -101,6 +101,6 @@ public class StaBookingUpdateStatusController {
             );
         }
 
-        return "redirect:/admin/bookings";
+        return "redirect:/staff/bookings";
     }
 }

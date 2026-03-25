@@ -11,18 +11,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
 
-//    @Value("${spring.data.redis.host:localhost}")
-//    private String redisHost;
-//
-//    @Value("${spring.data.redis.port:6379}")
-//    private int redisPort;
-//
-//    @Bean
-//    public RedisConnectionFactory redisConnectionFactory() {
-//        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisHost, redisPort);
-//        return new LettuceConnectionFactory(config);
-//    }
-
     @Bean
     public RedisTemplate<String, String> redisTemplateStr(RedisConnectionFactory factory) {
         RedisTemplate<String, String> template = new RedisTemplate<>();

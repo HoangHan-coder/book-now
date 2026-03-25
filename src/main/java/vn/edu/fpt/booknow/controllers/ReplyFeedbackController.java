@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import vn.edu.fpt.booknow.services.admin.ReplyFeedbackService;
+import vn.edu.fpt.booknow.services.ReplyFeedbackService;
 
 @Controller
-@RequestMapping("/admin/feedback")
+@RequestMapping("/staff/feedback")
 @RequiredArgsConstructor
 public class ReplyFeedbackController {
 
@@ -18,8 +18,8 @@ public class ReplyFeedbackController {
      */
     @PostMapping("/reply")
     public String replyFeedback(@RequestParam Long feedbackId,
-                                @RequestParam String replyContent,
-                                RedirectAttributes redirectAttributes) {
+            @RequestParam String replyContent,
+            RedirectAttributes redirectAttributes) {
 
         try {
 
@@ -27,7 +27,7 @@ public class ReplyFeedbackController {
             if (replyContent == null || replyContent.trim().isEmpty()) {
                 redirectAttributes.addFlashAttribute("error",
                         "Reply content must not be empty.");
-                return "redirect:/admin/feedback/detail/" + feedbackId;
+                return "redirect:/staff/feedback/detail/" + feedbackId;
             }
 
             // Main Flow
@@ -43,6 +43,6 @@ public class ReplyFeedbackController {
                     "Failed to submit reply.");
         }
 
-        return "redirect:/admin/feedback/detail/" + feedbackId;
+        return "redirect:/staff/feedback/detail/" + feedbackId;
     }
 }
