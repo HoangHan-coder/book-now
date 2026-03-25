@@ -69,7 +69,8 @@ input[type="date"].drp-input:focus {
 </style>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<div th:replace="~{fragments/sidebar :: admin-sidebar(activePage='dashboard')}"></div>
+<div th:replace="fragments/sidebar :: admin-sidebar('dashboard','admin')"></div>
+<script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
 
 <!-- MAIN CONTENT -->
 <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">

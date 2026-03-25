@@ -1,9 +1,16 @@
 package vn.edu.fpt.booknow.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.entities.*;
 import vn.edu.fpt.booknow.repositories.HousekeepingTaskRepository;
@@ -12,6 +19,7 @@ import vn.edu.fpt.booknow.services.HousekeepingTaskService;
 import vn.edu.fpt.booknow.services.BookingService;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/housekeeping")
@@ -93,7 +101,7 @@ public class HouseKeepingController {
     }
 
     @PostMapping(value = "/extend/booking/handle")
-    public String handleExtendBooking(Model model, @RequestParam(name = "extendBookingId")  Long id, @RequestParam(name = "timeId") Long timeId, RedirectAttributes redirectAttributes) {
+    public String handleExtendBooking(Model model, @RequestParam(name = "extendBookingId")  Long id, @RequestParam(name = "timeId") Long timeId) {
         Booking booking = bookingService.findById(id);
         if (timeId == 1){
             timeId += 1L;
@@ -105,7 +113,7 @@ public class HouseKeepingController {
             timeId = 1L;
         }
         try{
-            extendBookingService.updateCheckOutTime(id, timeId);
+            extendBookingService.updateCheckOutTime(timeId, id);
         } catch (Exception e) {
             System.out.println("loi o day");
             model.addAttribute("message", e.getMessage());
@@ -113,9 +121,36 @@ public class HouseKeepingController {
             return "housekeeping/extend_booking";
         }
         System.out.println("extend booking");
-        redirectAttributes.addFlashAttribute("bookingId", id);
-        redirectAttributes.addFlashAttribute("timetableId", timeId);
-        return "redirect:/pay/create-payment";
+//        redirectAttributes.addFlashAttribute("bookingId", id);
+//        redirectAttributes.addFlashAttribute("timetableId", timeId);
+
+        String url = "http://localhost:8080/book-now/pay/create-payment";
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        // 1️⃣ Body
+        MultiValueMap<String, Long> body = new LinkedMultiValueMap<>();
+        body.add("bookingId", id);
+        body.add("timetableId", timeId);
+
+        // 2️⃣ Headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        // 3️⃣ Combine body + headers
+        HttpEntity<MultiValueMap<String, Long>> request =
+                new HttpEntity<>(body, headers);
+
+        // 4️⃣ Call API
+        ResponseEntity<Map> response = restTemplate.postForEntity(
+                url,
+                request,
+                Map.class
+        );
+        String urlPayment = response.getBody().toString();
+//        model.addAttribute("message", "Thanh toan thanh cong roi nha");
+//        model.addAttribute("booking", booking);
+        return urlPayment;
     }
 
 

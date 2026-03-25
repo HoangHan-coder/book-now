@@ -52,8 +52,8 @@
 
 <body class="bg-gray-100 min-h-screen">
 
-<div th:replace="~{fragments/sidebar :: admin-sidebar(activePage='housekeeping')}"></div>
-
+<div th:replace="fragments/sidebar :: admin-sidebar('housekeeping','staff')"></div>
+<script th:replace="fragments/sidebar :: sidebar-scripts('staff')"></script>
 <main class="max-w-7xl mx-auto px-4 py-6 lg:ml-64">
     <div th:replace="~{fragments/infor_admin}"></div>
   <!-- ERROR MESSAGE -->

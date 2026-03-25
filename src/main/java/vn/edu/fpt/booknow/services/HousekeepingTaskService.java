@@ -37,6 +37,7 @@ public class HousekeepingTaskService {
         housekeepingTaskRepository.save(housekeepingTask);
     }
 
+    @Transactional
     public void addNotesToHousekeepingTask(Long id, String notes) throws Exception {
         HousekeepingTask task = housekeepingTaskRepository.findById(id).orElse(null);
         if (task != null) {
@@ -45,6 +46,11 @@ public class HousekeepingTaskService {
             throw new RuntimeException("HousekeepingTask not found");
         }
         housekeepingTaskRepository.save(task);
+    }
+
+    @Transactional
+    public HousekeepingTask newTask(HousekeepingTask housekeepingTask) {
+        return housekeepingTaskRepository.save(housekeepingTask);
     }
 
 }

@@ -78,19 +78,19 @@
                     </div>
                     <div>
                         <span class="text-gray-500">Created By</span>
-                        <p th:text="${housekeepingTaskDetail.getCreatedBy().getFullName()}" class="font-medium"></p>
+                        <p th:text="${#strings.defaultString(housekeepingTaskDetail.createdBy?.fullName, 'SYSTEM')}" class="font-medium"></p>
                     </div>
                     <div>
                         <span class="text-gray-500">Assigned To</span>
-                        <p th:text="${housekeepingTaskDetail.getAssignedTo().getFullName()}" class="font-medium"></p>
+                        <p  th:text="${#strings.defaultString(housekeepingTaskDetail.assignedTo?.fullName, 'Chưa gán')}" class="font-medium"></p>
                     </div>
                     <div>
                         <span class="text-gray-500">Created At</span>
-                        <p th:text="${housekeepingTaskDetail.date()} + ' ' + ${housekeepingTaskDetail.createTime()}" class="font-medium"></p>
+                        <p th:text="${housekeepingTaskDetail.date() + ' ' + housekeepingTaskDetail.createTime()}" class="font-medium"></p>
                     </div>
                     <div>
                         <span class="text-gray-500">Started At</span>
-                        <p th:text="${housekeepingTaskDetail.dateStart()} + ' ' + ${housekeepingTaskDetail.timeStart()}" class="font-medium">2026-03-13 01:00 PM</p>
+                        <p th:text="${housekeepingTaskDetail.dateStart() + ' ' + housekeepingTaskDetail.timeStart()}" class="font-medium">2026-03-13 01:00 PM</p>
                     </div>
                 </div>
             </div>
@@ -107,7 +107,7 @@
                         </div>
                         <div class="flex-1 pt-1">
                             <p class="font-medium text-gray-800">Task Created</p>
-                            <p th:text="${housekeepingTaskDetail.date()} + ' ' + ${housekeepingTaskDetail.createTime()}" class="text-xs text-gray-600"></p>
+                            <p th:text="${housekeepingTaskDetail.date() + ' ' + housekeepingTaskDetail.createTime()}" class="text-xs text-gray-600"></p>
                             <p class="text-sm text-gray-600 mt-1">System auto-created after checkout</p>
                         </div>
                     </div>
@@ -120,7 +120,11 @@
                         </div>
                         <div class="flex-1 pt-1">
                             <p class="font-medium text-gray-800">Task Assigned</p>
-                            <p th:text="'Assigned to ' + ${housekeepingTaskDetail.getAssignedTo().getFullName()} + ' By ' + ${housekeepingTaskDetail.getCreatedBy().getFullName()}" class="text-sm text-gray-600 mt-1"></p>
+                            <p th:text="${'Assigned to '
+    + #strings.defaultString(housekeepingTaskDetail.assignedTo?.fullName, 'Chưa gán')
+    + ' By '
+    + #strings.defaultString(housekeepingTaskDetail.createdBy?.fullName, 'SYSTEM')}">
+                            </p>
                         </div>
                     </div>
 
@@ -132,8 +136,8 @@
                         </div>
                         <div class="flex-1 pt-1">
                             <p class="font-medium text-gray-800">Task Started</p>
-                            <p th:text="${housekeepingTaskDetail.dateStart()} + ' ' + ${housekeepingTaskDetail.timeStart()}" class="text-xs text-gray-600"></p>
-                            <p th:text="'Housekeeping began working on room ' + ${housekeepingTaskDetail.room.getRoomNumber()}" class="text-sm text-gray-600 mt-1"> 101</p>
+                            <p th:text="${housekeepingTaskDetail.dateStart() + ' ' + housekeepingTaskDetail.timeStart()}" class="text-xs text-gray-600"></p>
+                            <p th:text="${'Housekeeping began working on room ' + housekeepingTaskDetail.room.roomNumber}"></p>
                         </div>
                     </div>
 

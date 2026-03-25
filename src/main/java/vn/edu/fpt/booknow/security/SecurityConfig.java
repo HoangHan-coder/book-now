@@ -74,9 +74,6 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-
-
         return http.build();
     }
 
@@ -95,12 +92,13 @@ public class SecurityConfig {
                                 "/assets/**",
                                 "/verify-otp", 
                                 "/resend-otp",
+                                "/oauth2/**",
                                 "/reset-password",
                                 "/404", "/error", "/authen/verifiedOtp",
                                 "/authen/registerEmail", "/authen/otp",
                                 "/authen/registerForm",
                                 "/checkin/start").permitAll()
-                        .anyRequest().hasRole("CUSTOMER")
+                        .anyRequest().authenticated()
                 )
                 
                 .oauth2Login(oauth -> oauth
@@ -111,8 +109,10 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService)
                         )
                         .successHandler(successHandler)
-                ).exceptionHandling(ex -> ex
+                )
+                .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
+                            System.out.println("throw exceptions tại security config ............................");
                             response.sendRedirect("/book-now/auth/login");
                         })
                 )

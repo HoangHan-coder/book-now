@@ -38,7 +38,9 @@
 </style>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<div th:replace="~{fragments/sidebar :: admin-sidebar(activePage='rooms')}"></div>
+
+<div th:replace="fragments/sidebar :: admin-sidebar('rooms','staff')"></div>
+<script th:replace="fragments/sidebar :: sidebar-scripts('staff')"></script>
 
 <!-- MAIN CONTENT -->
 <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
@@ -322,6 +324,5 @@
         });
     }
 </script>
-<div th:replace="~{fragments/sidebar :: sidebar-scripts}"></div>
 </body>
 </html>

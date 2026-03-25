@@ -36,8 +36,7 @@ public class JWTFilter extends OncePerRequestFilter {
         if (requestPath.contains("/auth/login") || requestPath.contains("/admin/login") ||
                 requestPath.contains("/register") || requestPath.contains("/public") ||
                 requestPath.contains("/auth/logout") ||
-                requestPath.contains("/pay") || requestPath.contains("/forgot-password") ||
-                requestPath.contains("/booking/save")) {
+                requestPath.contains("/pay") || requestPath.contains("/forgot-password")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -82,7 +81,6 @@ public class JWTFilter extends OncePerRequestFilter {
                 System.err.println("JWT Filter error: " + e.getMessage());
             }
         }
-        System.out.println("Invalid token......");
         filterChain.doFilter(request,response);
     }
 

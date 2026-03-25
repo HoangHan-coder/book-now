@@ -2,7 +2,7 @@ package vn.edu.fpt.booknow.controllers;
 
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.fpt.booknow.model.dto.StaffAccountCreateDTO;
-import vn.edu.fpt.booknow.services.admin.CreateStaffAccountService;
+import vn.edu.fpt.booknow.services.CreateStaffAccountService;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

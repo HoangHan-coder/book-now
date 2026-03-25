@@ -84,6 +84,17 @@ public class HousekeepingTask {
     private String noteHousekeeping;
     @Column(name = "updated_at")
     private String updatedAt;
+
+    public HousekeepingTask(Room room, TaskStatus status, PriorityStatus priority, Booking booking, LocalDateTime createdAt, String taskType, String notes) {
+        this.room = room;
+        this.status = status;
+        this.priority = priority;
+        this.booking = booking;
+        this.createdAt = createdAt;
+        this.taskType = taskType;
+        this.notes = notes;
+    }
+
     public LocalDate date(){
         return createdAt.toLocalDate();
     }

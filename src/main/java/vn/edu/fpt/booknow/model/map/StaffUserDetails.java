@@ -11,14 +11,14 @@ import vn.edu.fpt.booknow.model.entities.StaffAccount;
 import java.util.Collection;
 import java.util.List;
 
+
+@Setter
+@Getter
 public class StaffUserDetails implements UserDetails {
     private final StaffAccount staffAccount;
-    @Setter
-    @Getter
+
     private String fullName;
 
-    @Setter
-    @Getter
     private String role;
 
 
@@ -38,11 +38,15 @@ public class StaffUserDetails implements UserDetails {
     }
 
     public String getRole() {
-        return role;
+        return staffAccount.getRole();
+    }
+
+    public String getFullName() {
+        return staffAccount.getFullName();
     }
 
     public void setRole(String role) {
-        this.role = role;
+        this.staffAccount.setRole(role);
     }
 
     @Override public boolean isEnabled() { return true; }

@@ -13,10 +13,12 @@ import vn.edu.fpt.booknow.model.dto.BookingDTO;
 import vn.edu.fpt.booknow.model.dto.MomoResponseDTO;
 import vn.edu.fpt.booknow.model.entities.*;
 import vn.edu.fpt.booknow.services.BookingService;
+import vn.edu.fpt.booknow.services.HousekeepingTaskService;
 import vn.edu.fpt.booknow.services.MomoPaymentService;
 import vn.edu.fpt.booknow.services.PaymentService;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/pay")
@@ -24,6 +26,9 @@ public class PaymentController {
 
     @Autowired
     private BookingService bookingService;
+
+    @Autowired
+    private HousekeepingTaskService housekeepingTaskService;
 
     @Autowired
     private PaymentService paymentService;
@@ -280,9 +285,20 @@ public class PaymentController {
                             "MOMO Payment",
                             "SUCCESS"
                     ));
+                    HousekeepingTask task = housekeepingTaskService.newTask(new HousekeepingTask(booking.getRoom(),
+                            TaskStatus.PENDING,
+                            PriorityStatus.NORMAL,
+                            booking,
+                            LocalDateTime.now(),
+                            "ClEANING",
+                            "Create by the system"));
+                    if (task == null) {
+                        log.error("Lỗi xử lý tạo task tự động");
+                    }
                 }
             } else {
                 log.warn("Thanh toán thất bại: orderId={}, resultCode={}", orderId, resultCode);
+                assert amount != null;
                 BigDecimal total = BigDecimal.valueOf(Double.parseDouble(amount));
                 bookingService.updateStatus(BookingStatus.FAILED, orderInfo);
                 paymentService.creatPayment(new Payment(
