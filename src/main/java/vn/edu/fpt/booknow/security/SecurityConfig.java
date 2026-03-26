@@ -53,7 +53,7 @@ public class SecurityConfig {
     public SecurityFilterChain StaffAccountFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .securityMatcher("/admin/**", "/staff/**", "/housekeeping/**","/checkin/**")
+                .securityMatcher("/admin/**", "/staff/**", "/housekeeping/**","/checkin/**", "/payments/**")
                 .authenticationProvider(staffAuthProvider())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/login", "/auth/login",
@@ -63,11 +63,11 @@ public class SecurityConfig {
                                 "/forgot-password", "/verify-otp",
                                 "/resend-otp", "/reset-password",
                                 "/staff/offline-checkin",
-                                "/404", "/error", "/approve","reject")
+                                "/404", "/error", "/approve","reject", "/payments/**")
                         .permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/staff/**").hasAnyRole("ADMIN", "STAFF")
-                        .requestMatchers("/housekeeping/**").hasRole("HOUSEKEEPING")
+                        .requestMatchers("/housekeeping/**", "/payments/**").hasRole("HOUSEKEEPING")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -101,7 +101,7 @@ public class SecurityConfig {
                                 "/checkin/page",
                                 "/checkin/success",
                                 "/checkin/fail",
-                                "/ws/**", "/checkin/approve", "/checkin/reject")
+                                "/ws/**", "/checkin/approve", "/checkin/reject", "/payments/**")
                         .permitAll()
                         .anyRequest().hasRole("CUSTOMER"))
 

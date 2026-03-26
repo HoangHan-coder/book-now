@@ -11,10 +11,13 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import vn.edu.fpt.booknow.model.dto.MomoRequestDTO;
+import vn.edu.fpt.booknow.model.dto.MomoResponseDTO;
 import vn.edu.fpt.booknow.model.entities.*;
 import vn.edu.fpt.booknow.services.ExtendBookingService;
 import vn.edu.fpt.booknow.services.HousekeepingTaskService;
 import vn.edu.fpt.booknow.services.BookingService;
+import vn.edu.fpt.booknow.services.MomoPaymentService;
 
 import java.util.List;
 import java.util.Map;
@@ -28,6 +31,9 @@ public class HouseKeepingController {
     private BookingService bookingService;
     @Autowired
     private ExtendBookingService  extendBookingService;
+
+    @Autowired
+    private MomoPaymentService momoPaymentService;
 
     @GetMapping(value = "/task")
     public String task(Model model) {
@@ -119,36 +125,25 @@ public class HouseKeepingController {
             return "housekeeping/extend_booking";
         }
         System.out.println("extend booking");
-//        redirectAttributes.addFlashAttribute("bookingId", id);
-//        redirectAttributes.addFlashAttribute("timetableId", timeId);
 
-        String url = "http://localhost:8080/book-now/pay/create-payment";
+        try {
+            MomoResponseDTO responseDTO = momoPaymentService.payForExtendBooking(id, timeId);
 
-        RestTemplate restTemplate = new RestTemplate();
+            if (responseDTO == null) {
+                System.out.println("Momo response lo roi :))");
+                model.addAttribute("message", "Momo response lo roi :))");
+                model.addAttribute("booking", booking);
+                return "housekeeping/extend_booking";
+            }
 
-        // 1️⃣ Body
-        MultiValueMap<String, Long> body = new LinkedMultiValueMap<>();
-        body.add("bookingId", id);
-        body.add("timetableId", timeId);
+            return "redirect:" +  responseDTO.getPayUrl();
+        } catch (Exception e) {
+            System.out.println("Momo response lo roi :))");
+            model.addAttribute("message", "Momo response lo roi :))");
+            model.addAttribute("booking", booking);
+            return "housekeeping/extend_booking";
+        }
 
-        // 2️⃣ Headers
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        // 3️⃣ Combine body + headers
-        HttpEntity<MultiValueMap<String, Long>> request =
-                new HttpEntity<>(body, headers);
-
-        // 4️⃣ Call API
-        ResponseEntity<Map> response = restTemplate.postForEntity(
-                url,
-                request,
-                Map.class
-        );
-        String urlPayment = response.getBody().toString();
-//        model.addAttribute("message", "Thanh toan thanh cong roi nha");
-//        model.addAttribute("booking", booking);
-        return urlPayment;
     }
 
 

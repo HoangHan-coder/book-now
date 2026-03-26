@@ -12,6 +12,8 @@ import org.springframework.web.client.RestTemplate;
 import vn.edu.fpt.booknow.config.MomoConfig;
 import vn.edu.fpt.booknow.model.dto.MomoRequestDTO;
 import vn.edu.fpt.booknow.model.dto.MomoResponseDTO;
+import vn.edu.fpt.booknow.model.entities.Booking;
+import vn.edu.fpt.booknow.model.entities.RoomType;
 import vn.edu.fpt.booknow.utils.SignatureUtils;
 
 import java.math.BigDecimal;
@@ -27,13 +29,16 @@ public class MomoPaymentService {
     private final MomoConfig momoConfig;
     private final SignatureUtils signatureUtils;
     private final RestTemplate restTemplate;
+    private final BookingService bookingService;
 
     public MomoPaymentService(MomoConfig momoConfig,
                               SignatureUtils signatureUtils,
-                              RestTemplate restTemplate) {
+                              RestTemplate restTemplate,
+                              BookingService bookingService) {
         this.momoConfig     = momoConfig;
         this.signatureUtils = signatureUtils;
         this.restTemplate   = restTemplate;
+        this.bookingService= bookingService;
     }
 
     public MomoResponseDTO createPayment(long amount, String orderInfo) {
@@ -151,4 +156,26 @@ public class MomoPaymentService {
 
         return signatureUtils.verifySignature(rawSignature, receivedSignature, momoConfig.getSecretKey());
     }
+
+    public MomoResponseDTO payForExtendBooking(Long bookingId, Long timetableId) throws Exception {
+        Booking booking = bookingService.getBookingById(bookingId);
+        if (booking == null) {
+            throw new Exception("Booking not exist");
+        }
+
+        if (timetableId < 1 || timetableId > 4) {
+            throw new Exception("Timetable invalid");
+        }
+
+        RoomType roomType = booking.getRoom().getRoomType();
+        if (roomType == null) {
+            throw new Exception("RoomType invalid");
+        }
+        if (timetableId == 4) {
+            return createPayment(roomType.getOverPrice().longValue(), booking.getBookingCode());
+        }
+
+        return createPayment(roomType.getBasePrice().longValue(), booking.getBookingCode());
+    }
+
 }
