@@ -30,6 +30,7 @@ public class StaffDashBoardController {
                 .format(DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy"));
 
         LocalDate date = LocalDate.now();
+//        LocalDate date = LocalDate.of(2026, 3, 30);
 
         // Gọi service duy nhất để lấy toàn bộ dữ liệu dashboard
         DashBoardStaffDTO dashboard = dashBoardStaffService.getDashboard(date);

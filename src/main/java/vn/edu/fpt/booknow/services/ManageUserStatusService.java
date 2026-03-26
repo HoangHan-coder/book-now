@@ -17,11 +17,9 @@ public class ManageUserStatusService {
         this.customerRepository = customerRepository;
     }
 
-    // UC-17.3: Inactivate / Reactivate User Account
     @Transactional
     public void changeUserStatus(Long userId, String userType, String status) {
 
-        // Validate input
         if (userId == null || userType == null || status == null) {
             throw new IllegalArgumentException("Invalid input data");
         }
@@ -30,18 +28,10 @@ public class ManageUserStatusService {
             throw new IllegalArgumentException("Invalid status value");
         }
 
-        // Staff account
-        if (userType.equalsIgnoreCase("STAFF")
-                || userType.equalsIgnoreCase("ADMIN")) {
-
+        if (!userType.equalsIgnoreCase("CUSTOMER")) {
             staffAccountRepository.updateStatus(userId, status);
-        }
-        // Customer account
-        else if (userType.equalsIgnoreCase("CUSTOMER")) {
+        } else {
             customerRepository.updateStatus(userId.intValue(), status);
-        }
-        else {
-            throw new IllegalArgumentException("Invalid user type");
         }
     }
 }

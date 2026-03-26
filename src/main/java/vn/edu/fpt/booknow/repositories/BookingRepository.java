@@ -31,7 +31,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                         @Param("start") LocalDateTime start,
                         @Param("end") LocalDateTime end);
 
-        @Query("SELECT b FROM Booking b WHERE b.checkInTime BETWEEN :start AND :end AND b.bookingStatus IN :statuses")
+        @Query("SELECT b FROM Booking b WHERE b.createdAt BETWEEN :start AND :end AND b.bookingStatus IN :statuses")
         List<Booking> findByCheckInTimeBetweenAndStatusIn(
                         @Param("start") LocalDateTime start,
                         @Param("end") LocalDateTime end,
