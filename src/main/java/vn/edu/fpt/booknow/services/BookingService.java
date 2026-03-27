@@ -335,7 +335,7 @@ public class BookingService {
                     return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt sau!", bookingData.getBookingId());
                 }
             }
-            if (BookingStatus.REJECTED.equals(existingBooking.getBookingStatus()) || BookingStatus.APPROVED.equals(existingBooking.getBookingStatus())) {
+            if (BookingStatus.REJECTED_CHECKIN.equals(existingBooking.getBookingStatus()) || BookingStatus.APPROVED.equals(existingBooking.getBookingStatus())) {
                 existingBooking.setNote(bookingData.getNote());
                 existingBooking.setBookingStatus(BookingStatus.CHECKED_IN);
                 existingBooking.setUpdatedAt(LocalDateTime.now());
