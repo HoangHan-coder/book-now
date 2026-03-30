@@ -19,6 +19,7 @@ import vn.edu.fpt.booknow.services.HousekeepingTaskService;
 import vn.edu.fpt.booknow.services.BookingService;
 import vn.edu.fpt.booknow.services.MomoPaymentService;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -105,8 +106,11 @@ public class HouseKeepingController {
     }
 
     @PostMapping(value = "/extend/booking/handle")
-    public String handleExtendBooking(Model model, @RequestParam(name = "extendBookingId")  Long id, @RequestParam(name = "timeId") Long timeId) {
+    public String handleExtendBooking(Model model, @RequestParam(name = "extendBookingId")  Long id, @RequestParam(name = "timeId") Long timeId, @RequestParam("price")BigDecimal price) {
         Booking booking = bookingService.findById(id);
+        BigDecimal priceTotal = booking.getTotalAmount();
+        BigDecimal result = priceTotal.add(price);
+        booking.setTotalAmount(result);
         if (timeId == 1){
             timeId += 1L;
         } else if (timeId == 2){

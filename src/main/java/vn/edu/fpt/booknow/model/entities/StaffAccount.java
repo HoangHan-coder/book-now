@@ -79,9 +79,6 @@ public class StaffAccount {
 
     private List<Feedback> feedbacks = new ArrayList<>();
 
-    @OneToMany(mappedBy = "staffAccount")
-    private List<RefreshToken> refreshTokens = new ArrayList<>();
-
     @OneToMany(mappedBy = "assignedTo")
     private List<HousekeepingTask> housekeepingTasksAssignedTo = new ArrayList<>();
 

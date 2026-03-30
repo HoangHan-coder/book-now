@@ -79,7 +79,4 @@ public class Customer {
     @OneToMany(mappedBy = "customer")
     private List<Booking> bookings = new ArrayList<>();
 
-    @OneToMany(mappedBy = "customer")
-    private List<RefreshToken> refreshTokens = new ArrayList<>();
-
 }

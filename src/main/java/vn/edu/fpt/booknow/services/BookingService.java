@@ -309,44 +309,49 @@ public class BookingService {
 
     @Transactional
     public String completeOfflineCheckin(Booking bookingData, MultipartFile frontImg, MultipartFile backImg, RedirectAttributes redirectAttributes) {
-        Booking existingBooking = bookingRepository.findById(bookingData.getBookingId())
-                .orElseThrow(() -> new RuntimeException("Booking không tồn tại"));
-        if (BookingStatus.CANCELED.equals(bookingData.getBookingStatus())) {
+        try {
+            Booking existingBooking = bookingRepository.findById(bookingData.getBookingId())
+                    .orElseThrow(() -> new RuntimeException("Booking không tồn tại"));
+            if (isRateLimited(bookingData.getBookingCode())) {
+                redirectAttributes.addFlashAttribute("toastMessage", "Thao tác quá nhanh vui lòng tải lại trang!!!");
+                redirectAttributes.addFlashAttribute("toastType", "error");
+                return "redirect:/staff/offline-checkin?searchTerm=" + bookingData.getBookingCode();
+            }
+            if (frontImg != null && !frontImg.isEmpty()) {
+                try {
+                    Map<String, String> imageData = uploadToCloudinary(frontImg);
+                    existingBooking.setIdCardFrontUrl(imageData.get("url"));
+                    existingBooking.setIdCardFontPublicId(imageData.get("public_id"));
+                } catch (IOException e) {
+                    return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt trước!", bookingData.getBookingId());
+                }
+            }
+            if (backImg != null && !backImg.isEmpty()) {
+                try {
+                    Map<String, String> imageData = uploadToCloudinary(backImg);
+                    existingBooking.setIdCardBackUrl(imageData.get("url"));
+                    existingBooking.setIdCardBackPublicId(imageData.get("public_id"));
+                } catch (IOException e) {
+                    return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt sau!", bookingData.getBookingId());
+                }
+            }
+            if (BookingStatus.REJECTED_CHECKIN.equals(existingBooking.getBookingStatus()) || BookingStatus.APPROVED.equals(existingBooking.getBookingStatus())) {
+                existingBooking.setNote(bookingData.getNote());
+                existingBooking.setBookingStatus(BookingStatus.CHECKED_IN);
+                existingBooking.setUpdatedAt(LocalDateTime.now());
+                bookingRepository.save(existingBooking);
+                redirectAttributes.addFlashAttribute("toastMessage", "Check-in thành công!");
+                redirectAttributes.addFlashAttribute("toastType", "success");
+                return "redirect:/staff/offline-checkin?searchTerm=" + bookingData.getBookingCode();
+            }
             redirectAttributes.addFlashAttribute("toastMessage", "Lỗi đơn đã hủy!");
             redirectAttributes.addFlashAttribute("toastType", "error");
-            return "redirect:/offline-checkin";
-
+            return "redirect:/staff/offline-checkin?searchTerm=" + bookingData.getBookingCode();
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return "redirect:/staff/offline-checkin?searchTerm=" + bookingData.getBookingCode();
         }
-        existingBooking.setNote(bookingData.getNote());
-        existingBooking.setBookingStatus(BookingStatus.CHECKED_IN);
-        existingBooking.setUpdatedAt(LocalDateTime.now());
-
-        if (frontImg != null && !frontImg.isEmpty()) {
-            try {
-                Map<String, String> imageData = uploadToCloudinary(frontImg);
-                existingBooking.setIdCardFrontUrl(imageData.get("url"));
-                existingBooking.setIdCardFontPublicId(imageData.get("public_id"));
-            } catch (IOException e) {
-                return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt trước!", bookingData.getBookingId());
-            }
-        }
-
-        if (backImg != null && !backImg.isEmpty()) {
-            try {
-                Map<String, String> imageData = uploadToCloudinary(backImg);
-                existingBooking.setIdCardBackUrl(imageData.get("url"));
-                existingBooking.setIdCardBackPublicId(imageData.get("public_id"));
-            } catch (IOException e) {
-                return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt sau!", bookingData.getBookingId());
-            }
-        }
-
-        bookingRepository.save(existingBooking);
-
-        redirectAttributes.addFlashAttribute("toastMessage", "Check-in thành công!");
-        redirectAttributes.addFlashAttribute("toastType", "success");
-
-        return "redirect:/offline-checkin";
     }
 
     @Transactional
@@ -428,6 +433,7 @@ public class BookingService {
            System.out.println(" - CHECK-OUT: " + checkOutDate);
            System.out.println(" - Tổng tiền: " + calculateTotalAmount(allShifts, bookingDTO.getRoom().getRoomId()));
            System.out.println("====================================");
+
            Booking savedBooking = bookingRepository.save(newBooking);
 
            for (WorkShift shift : allShifts) {

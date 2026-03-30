@@ -100,6 +100,6 @@ public class JWTService {
 
     public boolean validateToken(String token, UserDetails userDetails) throws Exception{
         String username = extractUserName(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (username.equalsIgnoreCase(userDetails.getUsername()) && !isTokenExpired(token));
     }
 }

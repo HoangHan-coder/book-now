@@ -60,15 +60,17 @@ public class SecurityConfig {
                                 "/auth/logout", "/public/**",
                                 "/home", "/search",
                                 "/detail/**", "/pay/**", "/assets/**",
+                                "/admin/dashboard",
                                 "/forgot-password", "/verify-otp",
                                 "/resend-otp", "/reset-password",
                                 "/staff/offline-checkin",
+                                "/staff/bookings/update-status",
                                 "/404", "/error", "/approve","reject", "/payments/**")
                         .permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/staff/**").hasAnyRole("ADMIN", "STAFF")
                         .requestMatchers("/housekeeping/**", "/payments/**").hasRole("HOUSEKEEPING")
-                        .anyRequest().authenticated())
+                        .anyRequest().hasRole("ADMIN"))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
