@@ -1,9 +1,11 @@
 package vn.edu.fpt.booknow.controllers.admin;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,92 +30,22 @@ import java.util.HashSet;
 import java.util.List;
 
 @Controller
-@RequestMapping(value = "/admin")
+@RequestMapping(value = "/staff/")
 public class ManageRoomController {
     final static int ITEM_PER_PAGE = 10;
     private ManageRoomServices manageRoomServices;
     private RoomTypeService roomTypeService;
     private AmenityService amenityService;
 
-    public ManageRoomController(ManageRoomServices manageRoomServices, RoomTypeService roomTypeService, AmenityService amenityService) {
+    @Autowired
+    public ManageRoomController(ManageRoomServices manageRoomServices, RoomTypeService roomTypeService,
+            AmenityService amenityService) {
         this.manageRoomServices = manageRoomServices;
         this.roomTypeService = roomTypeService;
         this.amenityService = amenityService;
     }
 
-    @GetMapping("/dashboard")
-    public String adminDashboard(
-            Model model,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate) {
-
-        try {
-
-            String lastUpdate = LocalDateTime.now()
-                    .format(DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy"));
-
-            DashboardDTO data =
-                    manageRoomServices.getDashboard(startDate, endDate);
-
-            DateTimeFormatter displayFormat =
-                    DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-            LocalDate start;
-            LocalDate end;
-
-            if (startDate == null || endDate == null || startDate.isBlank() || endDate.isBlank()) {
-                start = LocalDate.now().withDayOfMonth(1);
-                end = LocalDate.now();
-            } else {
-                try {
-                    // Accept full ISO date-time strings or plain dates
-                    start = LocalDate.parse(startDate.length() >= 10 ? startDate.substring(0, 10) : startDate);
-                    end = LocalDate.parse(endDate.length() >= 10 ? endDate.substring(0, 10) : endDate);
-                } catch (Exception ex) {
-                    // Fallback to defaults if parsing fails (e.g., invalid format)
-                    start = LocalDate.now().withDayOfMonth(1);
-                    end = LocalDate.now();
-                }
-            }
-
-            String dateLabel =
-                    start.format(displayFormat) + " – " + end.format(displayFormat);
-
-            model.addAttribute("startDate", start);
-            model.addAttribute("endDate", end);
-            model.addAttribute("dashboard", data);
-            model.addAttribute("lastUpdate", lastUpdate);
-            model.addAttribute("dateLabel", dateLabel);
-
-            return "private/Admin_dashboard";
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
-    }
-
-    @GetMapping("/dashboard/export/{type}")
-    public void exportDashboard(
-            @PathVariable String type,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate,
-            HttpServletResponse response) throws Exception {
-        System.out.println("EXPORT CSV TRIGGERED" + type);
-        switch (type.toLowerCase()) {
-            case "csv":
-                manageRoomServices.exportCSV(startDate, endDate, response);
-                break;
-
-            case "excel":
-                manageRoomServices.exportExcel(startDate, endDate, response);
-                break;
-            default:
-                throw new ResourceNotFoundException("Invalid export type: " + type);
-        }
-    }
-
-    @GetMapping(value = "/list")
+    @GetMapping(value = "rooms/list")
     public String listRoom(
             Model model,
             @RequestParam(defaultValue = "1") int page,
@@ -129,21 +61,21 @@ public class ManageRoomController {
                     status,
                     type,
                     roomNumber,
-                    PageRequest.of(page - 1, ITEM_PER_PAGE)
-            );
+                    PageRequest.of(page - 1, ITEM_PER_PAGE));
 
-        if (page > roomlist.getTotalPages() && roomlist.getTotalPages() > 0) {
-            return "redirect:/admin/list?page=1"
-                    + "&status=" + (status == null ? "" : status)
-                    + "&type=" + (type == null ? "" : type)
-                    + "&roomNumber=" + (roomNumber == null ? "" : roomNumber);
-        }
+            if (page > roomlist.getTotalPages() && roomlist.getTotalPages() > 0) {
+                return "redirect:/staff/rooms/list?page=1"
+                        + "&status=" + (status == null ? "" : status)
+                        + "&type=" + (type == null ? "" : type)
+                        + "&roomNumber=" + (roomNumber == null ? "" : roomNumber);
+            }
 
-        model.addAttribute("rooms", roomlist);
-        model.addAttribute("totalRoom", roomlist.getTotalElements());
-        model.addAttribute("totalPages", roomlist.getTotalPages());
-        model.addAttribute("roomType", roomTypeService.findAll());
-        model.addAttribute("hasDeletedRooms", roomlist.getContent().stream().allMatch(r -> r.getStatus() == RoomStatus.INACTIVE));
+            model.addAttribute("rooms", roomlist);
+            model.addAttribute("totalRoom", roomlist.getTotalElements());
+            model.addAttribute("totalPages", roomlist.getTotalPages());
+            model.addAttribute("roomType", roomTypeService.findAll());
+            model.addAttribute("hasDeletedRooms",
+                    roomlist.getContent().stream().allMatch(r -> r.getStatus() == RoomStatus.INACTIVE));
         } catch (Exception e) {
             throw new InternalServerException("Cannot load room list");
         }
@@ -154,7 +86,8 @@ public class ManageRoomController {
         return "private/Room_list";
     }
 
-    @PostMapping("/delete-rooms")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/rooms/delete-rooms")
     @ResponseBody
     public ResponseEntity<?> deleteRooms(@RequestParam List<Long> roomIds) {
 
@@ -167,7 +100,7 @@ public class ManageRoomController {
 
     @PostMapping("/room/delete/{id}")
     public String softDeleteRoom(@PathVariable Long id,
-                                 RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) {
 
         try {
             manageRoomServices.softDeleteRoom(id);
@@ -175,22 +108,24 @@ public class ManageRoomController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/admin/list";
+        return "redirect:/staff/rooms/list";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/room/restore/{id}")
     public String restoreRoom(@PathVariable Long id,
-                              RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) {
         try {
             manageRoomServices.restoreRoom(id);
-            redirectAttributes.addFlashAttribute("success","Khôi phục phòng thành công");
+            redirectAttributes.addFlashAttribute("success", "Khôi phục phòng thành công");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/admin/list";
+        return "redirect:/staff/rooms/list";
     }
 
-    @GetMapping("/create")
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/rooms/create")
     public String createRoom(Model model) {
 
         model.addAttribute("roomNumber", manageRoomServices.getRoomNumbers());
@@ -199,6 +134,7 @@ public class ManageRoomController {
         return "private/Room_create";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/rooms/create")
     public String createRoom(
             @RequestParam String roomNumber,
@@ -213,8 +149,7 @@ public class ManageRoomController {
 
             @RequestParam(required = false) MultipartFile[] images,
 
-            RedirectAttributes redirectAttributes
-    ) {
+            RedirectAttributes redirectAttributes) {
         try {
 
             manageRoomServices.createRoom(
@@ -226,18 +161,17 @@ public class ManageRoomController {
                     amenityIds,
                     newAmenityNames,
                     newAmenityIcons,
-                    images
-            );
+                    images);
             redirectAttributes.addFlashAttribute("successMessage", "Tạo phòng thành công!");
 
         } catch (Exception e) {
             throw new InternalServerException("Create room failed: " + e.getMessage());
         }
 
-        return "redirect:/admin/list";
+        return "redirect:/staff/rooms/list";
     }
 
-    @GetMapping("/detail/{id}")
+    @GetMapping("/rooms/detail/{id}")
     public String viewDetailRoom(Model model, @PathVariable("id") Long id) {
 
         Room room = manageRoomServices.findRoomById(id);
@@ -251,8 +185,8 @@ public class ManageRoomController {
         return "private/Room_Detail";
     }
 
-
-    @GetMapping("/edit/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/rooms/edit/{id}")
     public String editRoom(Model model, @PathVariable("id") Long id) {
         Room room = manageRoomServices.findRoomById(id);
 
@@ -261,7 +195,7 @@ public class ManageRoomController {
         }
 
         if (room.getStatus() == RoomStatus.INACTIVE) {
-            return "redirect:/admin/detail/" + id + "?error=deleted";
+            return "redirect:/staff/detail/" + id + "?error=deleted";
         }
 
         if (room.getRoomType() == null) {
@@ -292,7 +226,7 @@ public class ManageRoomController {
 
         model.addAttribute("room", room);
         model.addAttribute("allowedStatuses", allowedStatuses);
-        model.addAttribute("roomType",roomTypeService.findAll());
+        model.addAttribute("roomType", roomTypeService.findAll());
         model.addAttribute("allAmenities", amenityService.findAll());
         model.addAttribute("roomAmenityIds", roomAmenityIds);
         model.addAttribute("basePrice", room.getRoomType().getBasePrice().longValue());
@@ -301,7 +235,8 @@ public class ManageRoomController {
     }
 
     // submit form edit
-    @PostMapping("/edit")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/rooms/edit")
     public String editRoomSubmit(
 
             // ===== ROOM =====
@@ -324,8 +259,7 @@ public class ManageRoomController {
 
             // ===== IMAGE DELETE =====
             @RequestParam(value = "deletedImageIds", required = false) String deletedImageIds,
-            RedirectAttributes redirectAttributes
-    ) {
+            RedirectAttributes redirectAttributes) {
         try {
 
             manageRoomServices.editRoom(
@@ -339,16 +273,14 @@ public class ManageRoomController {
                     newAmenityNames,
                     newAmenityIcons,
                     images,
-                    deletedImageIds
-            );
+                    deletedImageIds);
             redirectAttributes.addFlashAttribute("successMessage", "Cập nhật thành công!");
         } catch (IllegalArgumentException e) {
             throw e; // lỗi validate
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new InternalServerException("Lỗi hệ thống khi cập nhật phòng");
         }
-        return "redirect:/admin/detail/" + roomId;
+        return "redirect:/staff/rooms/detail/" + roomId;
     }
 
 }

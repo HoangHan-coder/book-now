@@ -2,9 +2,12 @@ package vn.edu.fpt.booknow.controllers;
 
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +44,8 @@ public class PaymentController {
         this.momoPaymentService = momoPaymentService;
     }
 
+
+
     @PostMapping("/create-payment")
     public String createPayment(
             @RequestParam("bookingId") String bookingIdRaw,
@@ -71,8 +76,6 @@ public class PaymentController {
             } else {
                 response = payForNewBooking(bookingId);
             }
-
-
 
 
             if (response.isSuccess() && response.getPayUrl() != null) {
@@ -109,7 +112,7 @@ public class PaymentController {
         }
 
         RoomType roomType = booking.getRoom().getRoomType();
-        if (roomType == null ) {
+        if (roomType == null) {
             throw new Exception("RoomType invalid");
         }
         if (timetableId == 4) {
@@ -285,16 +288,20 @@ public class PaymentController {
                             "MOMO Payment",
                             "SUCCESS"
                     ));
-                    HousekeepingTask task = housekeepingTaskService.newTask(new HousekeepingTask(booking.getRoom(),
-                            TaskStatus.PENDING,
-                            PriorityStatus.NORMAL,
-                            booking,
-                            LocalDateTime.now(),
-                            "ClEANING",
-                            "Create by the system"));
-                    if (task == null) {
-                        log.error("Lỗi xử lý tạo task tự động");
+                    HousekeepingTask housekeepingTask = housekeepingTaskService.getByBooKingCode(orderInfo);
+                    if (housekeepingTask == null) {
+                        HousekeepingTask task = housekeepingTaskService.newTask(new HousekeepingTask(booking.getRoom(),
+                                TaskStatus.PENDING,
+                                PriorityStatus.NORMAL,
+                                booking,
+                                LocalDateTime.now(),
+                                "ClEANING",
+                                "Create by the system"));
+                        if (task == null) {
+                            log.error("Lỗi xử lý tạo task tự động");
+                        }
                     }
+
                 }
             } else {
                 log.warn("Thanh toán thất bại: orderId={}, resultCode={}", orderId, resultCode);

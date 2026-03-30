@@ -1,5 +1,4 @@
-package vn.edu.fpt.booknow.services.admin;
-
+package vn.edu.fpt.booknow.services;
 
 import org.springframework.stereotype.Service;
 import vn.edu.fpt.booknow.model.dto.UserDetailDTO;
@@ -15,7 +14,7 @@ public class ViewUserDetailService {
     private final CustomerRepository customerRepo;
 
     public ViewUserDetailService(StaffAccountRepository staffRepo,
-                                 CustomerRepository customerRepo) {
+            CustomerRepository customerRepo) {
         this.staffRepo = staffRepo;
         this.customerRepo = customerRepo;
     }
@@ -27,8 +26,7 @@ public class ViewUserDetailService {
         if (!"CUSTOMER".equalsIgnoreCase(role)) {
 
             StaffAccount staff = staffRepo.findById(Long.parseLong(userId))
-                    .orElseThrow(() ->
-                            new RuntimeException("User not found"));
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
             return new UserDetailDTO(
                     String.valueOf(staff.getStaffAccountId()),
@@ -38,14 +36,12 @@ public class ViewUserDetailService {
                     staff.getRole(),
                     staff.getAvatarUrl(),
                     staff.getStatus(),
-                    staff.getCreatedAt()
-            );
+                    staff.getCreatedAt());
 
         } else {
 
             Customer customer = customerRepo.findById(Long.parseLong(userId))
-                    .orElseThrow(() ->
-                            new RuntimeException("User not found"));
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
             return new UserDetailDTO(
                     String.valueOf(customer.getCustomerId()),
@@ -55,8 +51,7 @@ public class ViewUserDetailService {
                     "CUSTOMER",
                     customer.getAvatarUrl(),
                     customer.getStatus(),
-                    customer.getCreatedAt()
-            );
+                    customer.getCreatedAt());
         }
     }
 }

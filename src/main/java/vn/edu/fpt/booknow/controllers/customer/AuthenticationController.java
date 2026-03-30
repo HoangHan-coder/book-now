@@ -89,6 +89,7 @@ public class AuthenticationController {
     @PostMapping(value = "/registerForm")
     public String register(@RequestParam(name = "fullName") String name, @RequestParam(name = "phone") String phone, @RequestParam(name = "password") String password, @RequestParam(name = "confirmPassword") String confirmPass, @RequestParam(name = "email") String email, Model model) {
         System.out.println("form running....");
+        System.out.println(email);
         String path = "authentication/login";
 
         if (name.isEmpty() || phone.isEmpty() || password.isEmpty()) {

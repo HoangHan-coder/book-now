@@ -8,7 +8,7 @@ import vn.edu.fpt.booknow.model.entities.Feedback;
 import vn.edu.fpt.booknow.services.FeedbackDetailService;
 
 @Controller
-@RequestMapping("/admin/feedback")
+@RequestMapping("/staff/feedback")
 @RequiredArgsConstructor
 public class FeedbackDetailController {
 

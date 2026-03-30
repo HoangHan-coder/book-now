@@ -72,20 +72,33 @@ public class AuthController {
     }
 
     @PostMapping("/admin/login")
-    public String loginAdminHandle(@RequestParam(name = "g-recaptcha-response", required = false) String recaptchaResponse,
-                                   @ModelAttribute StaffAccount staffAccount,
+    public String loginAdminHandle(@ModelAttribute StaffAccount staffAccount,
                                    HttpServletResponse response) {
-//        if (recaptchaResponse == null || recaptchaResponse.isEmpty() || !recaptchaService.verify(recaptchaResponse)) {
-//            model.addAttribute("errorRecaptcha", "Captcha không hợp lệ!");
-//            model.addAttribute("staffAccount", staffAccount);
-//            return "public/authentication/login-admin";
-//        }
         boolean loginStatus = staffAccountService.verify(staffAccount, response);
         if (!loginStatus) {
             return  "redirect:/admin/login?error";
         }
-        return "redirect:/admin/bookings";
 
+        StaffAccount account = staffAccountService.getAccount(staffAccount.getEmail());
+
+        if (account == null) {
+            return  "redirect:/admin/login?error";
+        }
+
+        switch (account.getRole()) {
+            case "ADMIN" -> {
+                return "redirect:/admin/dashboard";
+            }
+            case "STAFF" -> {
+                return "redirect:/staff/dashboard";
+            }
+            case "HOUSEKEEPING" -> {
+                return "redirect:/housekeeping/task";
+            }
+            default -> {
+                return  "redirect:/admin/login?error";
+            }
+        }
     }
 
     @GetMapping("/auth/login")

@@ -2,40 +2,40 @@
 <html lang="vi">
 <head th:replace="~{fragments/head :: head(title='Staff Dashboard - BookNow')}"></head>
 <style>
-/* Specific Logo Positioning Rule */
-.logo-fixed {
-    position: fixed;
-    top: 0;
-    left: 0;
-    margin-top: 25px;
-    margin-left: 25px;
-    z-index: 60; /* Higher than sidebar */
-}
+    /* Specific Logo Positioning Rule */
+    .logo-fixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        margin-top: 25px;
+        margin-left: 25px;
+        z-index: 60; /* Higher than sidebar */
+    }
 
-.gradient-text {
-    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
+    .gradient-text {
+        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
 
-.gradient-icon {
-    color: #3b82f6;
-}
+    .gradient-icon {
+        color: #3b82f6;
+    }
 
-/* Sidebar transitions */
-.sidebar {
-    transition: transform 0.3s ease-in-out;
-}
+    /* Sidebar transitions */
+    .sidebar {
+        transition: transform 0.3s ease-in-out;
+    }
 
-/* Hide scrollbar for sidebar */
-.no-scrollbar::-webkit-scrollbar {
-    display: none;
-}
+    /* Hide scrollbar for sidebar */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
 
-.no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
 </style>
 <body class="bg-gray-50 font-sans text-gray-800">
 
@@ -45,23 +45,8 @@
 <!-- MAIN CONTENT -->
 <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
 
-    <!-- TOP HEADER AREA -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-        <h1 class="text-2xl font-bold text-gray-800 lg:hidden">Dashboard</h1>
-        <!-- User Info -->
-        <div class="flex items-center gap-4 bg-white p-3 rounded-xl shadow-sm border border-gray-100 md:ml-auto">
-            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold border-2 border-white shadow-sm">
-                NV
-            </div>
-            <div class="pr-2">
-                <h4 class="text-sm font-bold text-gray-800 leading-none">Trần Thị B</h4>
-                <span class="text-xs text-green-600 font-semibold bg-green-50 px-2 py-0.5 rounded-full mt-1 inline-block">Nhân viên</span>
-            </div>
-            <button class="text-gray-400 hover:text-gray-600 ml-2">
-                <i class="fa-solid fa-chevron-down text-xs"></i>
-            </button>
-        </div>
-    </div>
+    <div th:replace="~{fragments/infor_admin}"></div>
+
 
     <!-- DATE INFO -->
     <div class="mb-6">
@@ -85,11 +70,11 @@
                         <i class="fa-solid fa-calendar-plus text-xl"></i>
                     </div>
                 </div>
-                <div class="mt-4 flex items-center text-xs">
-                        <a href="#" class="text-blue-600 font-medium flex items-center gap-1">
-                            Xem chi tiết <i class="fa-solid fa-arrow-right ml-1"></i>
-                        </a>
-                </div>
+                <!--                <div class="mt-4 flex items-center text-xs">-->
+                <!--                    <a href="#" class="text-blue-600 font-medium flex items-center gap-1">-->
+                <!--                        Xem chi tiết <i class="fa-solid fa-arrow-right ml-1"></i>-->
+                <!--                    </a>-->
+                <!--                </div>-->
             </div>
         </div>
 
@@ -125,9 +110,9 @@
                         <i class="fa-solid fa-user-clock text-xl"></i>
                     </div>
                 </div>
-                <div class="mt-4 flex items-center text-xs">
-                    <a href="#" class="text-orange-500 font-bold animate-pulse">Cần xử lý ngay</a>
-                </div>
+                <!--                <div class="mt-4 flex items-center text-xs">-->
+                <!--                    <a href="#" class="text-orange-500 font-bold animate-pulse">Cần xử lý ngay</a>-->
+                <!--                </div>-->
             </div>
         </div>
 
@@ -158,7 +143,7 @@
         <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col">
             <div class="p-5 border-b border-gray-100 flex justify-between items-center">
                 <h3 class="font-bold text-gray-800">Danh sách Check-in hôm nay</h3>
-                <a href="#" class="text-blue-600 text-sm hover:underline">Xem tất cả</a>
+                <!--                <a href="#" class="text-blue-600 text-sm hover:underline">Xem tất cả</a>-->
             </div>
             <div class="overflow-x-auto p-2">
                 <table class="w-full text-left border-collapse">
@@ -192,12 +177,14 @@
     </span>
                         </td>
                         <td class="p-3">
-                            <a href="#" th:if="${booking.bookingStatus == T(vn.edu.fpt.booknow.model.entities.BookingStatus).PAID}"
-                                    class="text-blue-600 hover:text-blue-800 font-medium">
+                            <a href="#"
+                               th:if="${booking.bookingStatus == T(vn.edu.fpt.booknow.model.entities.BookingStatus).PAID}"
+                               class="text-blue-600 hover:text-blue-800 font-medium">
                                 Xử lý
                             </a>
-                            <a href="#" th:if="${booking.bookingStatus == T(vn.edu.fpt.booknow.model.entities.BookingStatus).CHECKED_IN}"
-                                    class="text-gray-600 hover:text-gray-800 font-medium">
+                            <a href="#"
+                               th:if="${booking.bookingStatus == T(vn.edu.fpt.booknow.model.entities.BookingStatus).CHECKED_IN}"
+                               class="text-gray-600 hover:text-gray-800 font-medium">
                                 Chi tiết
                             </a>
                         </td>
@@ -235,7 +222,8 @@
                     </div>
                 </div>
                 <div class="p-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
-                    <a th:href="@{/admin/bookings}" class="block w-full text-center text-sm text-blue-600 font-medium hover:text-blue-700">
+                    <a th:href="@{/staff/bookings}"
+                       class="block w-full text-center text-sm text-blue-600 font-medium hover:text-blue-700">
                         xem Dash sách phòng
                     </a>
                 </div>

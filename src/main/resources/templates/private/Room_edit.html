@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/head :: head(title='Chỉnh sửa phòng - BookNow')}"></head>
 <style>
 /* Specific Logo Positioning Rule */
@@ -44,8 +44,15 @@
 </style>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<div th:replace="fragments/sidebar :: admin-sidebar('rooms','staff')"></div>
-<script th:replace="fragments/sidebar :: sidebar-scripts('staff')"></script>
+<div sec:authorize="hasRole('ADMIN')">
+    <div th:replace="fragments/sidebar :: admin-sidebar('rooms','admin')"></div>
+    <script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
+</div>
+<div sec:authorize="hasRole('STAFF')">
+    <div th:replace="fragments/sidebar :: staff-sidebar('rooms','staff')"></div>
+    <script th:replace="fragments/sidebar :: sidebar-scripts('staff')"></script>
+</div>
+
 
 <!-- MAIN CONTENT -->
 <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
@@ -53,7 +60,7 @@
     <!-- HEADER -->
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div class="flex items-center gap-3">
-            <a th:href="@{/admin/detail/{id}(id=${room.roomId})}"
+            <a th:href="@{/staff/rooms/detail/{id}(id=${room.roomId})}"
                class="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-colors">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
@@ -68,7 +75,7 @@
     <!-- FORM CARD -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <form id="editRoomForm"
-              th:action="@{/admin/edit}"
+              th:action="@{/staff/rooms/edit}"
               method="post"
               enctype="multipart/form-data"
               th:object="${room}"
@@ -432,7 +439,7 @@
 
             <!-- Footer Actions -->
             <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-end gap-3 sticky bottom-0 bg-white py-4 z-10">
-                <a th:href="@{/admin/detail/{id}(id=${room.roomId})}"
+                <a th:href="@{/staff/rooms/detail/{id}(id=${room.roomId})}"
                    class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors">
                     Hủy bỏ
                 </a>

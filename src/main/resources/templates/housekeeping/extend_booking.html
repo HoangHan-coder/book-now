@@ -133,6 +133,7 @@
                 <form th:action="@{/housekeeping/extend/booking/handle}" method="post">
                     <input id="extendTypeInput" type="hidden" name="extendBookingId" th:value="${booking.getBookingId()}">
                     <input id="extendAmountInput" type="hidden" name="timeId" th:value="${lastTimeId != null ? lastTimeId : 1}">
+                    <input type="hidden" name="price" th:value="${booking.room.getRoomType().getBasePrice()}">
                     <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-blue-600 text-white font-semibold px-5 py-2.5 hover:bg-blue-700 transition-colors">
                         Confirm Extension
                     </button>

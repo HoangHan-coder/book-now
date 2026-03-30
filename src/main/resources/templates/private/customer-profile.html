@@ -11,10 +11,10 @@
           rel="stylesheet">
 </head>
 
-<body class="bg-gray-50 font-sans text-gray-800 min-h-screen relative pt-24 pb-12">
-
+<body class="bg-gray-50 font-sans text-gray-800 min-h-screen relative pt-24">
+<div th:insert="~{fragments/navbar}"></div>
 <!-- MAIN -->
-<div class="max-w-5xl mx-auto px-4 md:px-8">
+<div class="max-w-5xl mx-auto px-4 md:px-8 mb-5">
 
     <div class="flex flex-col lg:flex-row gap-8">
 
@@ -28,8 +28,6 @@
         'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80'}"
                             class="w-32 h-32 rounded-full object-cover border-4 border-white shadow"
                             alt="Avatar"/>
-<!--                    <img src="/img/z7481825281286_fa899e399f343b7101288822f6c9a62d.jpg" class="w-32 h-32 rounded-full object-cover border-4 border-white shadow" alt="Avatar"/>-->
-
                 </div>
 
                 <!-- Name -->
@@ -110,6 +108,8 @@
 
     </div>
 </div>
+<div th:replace="~{fragments/navbar :: dropdown-script}"></div>
 
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 </html>

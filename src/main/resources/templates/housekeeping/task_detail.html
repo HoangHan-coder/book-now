@@ -13,7 +13,7 @@
         <h1 class="text-xl font-bold">Housekeeping Dashboard</h1>
         <div class="flex items-center gap-4">
             <span class="text-sm">Welcome, Nguyen Van A</span>
-            <a href="#" class="text-sm bg-blue-700 px-3 py-1 rounded hover:bg-blue-800">Logout</a>
+            <a th:href="@{/auth/logout}" class="text-sm bg-blue-700 px-3 py-1 rounded hover:bg-blue-800">Logout</a>
         </div>
     </div>
 </header>
@@ -165,8 +165,6 @@
                     </div>
 
                     <!-- Nội dung message -->
-
-
                     <p class="text-sm text-gray-700 font-medium" th:text="${#strings.defaultString(message,'cannot update status completed for your task')}"></p>
 
                     <button onclick="this.closest('.fixed').remove()"

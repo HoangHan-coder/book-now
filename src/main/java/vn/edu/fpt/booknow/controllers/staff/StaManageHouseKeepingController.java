@@ -15,7 +15,7 @@ import vn.edu.fpt.booknow.services.ManageHouseKeepingService;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/staff")
 public class StaManageHouseKeepingController {
     private final ManageHouseKeepingService manageHouseKeepingService;
     private final StaffAccountRepository staffAccountRepository;
@@ -98,10 +98,10 @@ public class StaManageHouseKeepingController {
         try {
             HousekeepingTask housekeepingTask = manageHouseKeepingService.updateHousekeepingTaskDetail(id, assignedStaffId, priority, notes);
             redirectAttributes.addFlashAttribute("successMessage", "Đã giao nhiệm vụ thành công");
-            return "redirect:/admin/manage-housekeeping";
+            return "redirect:/staff/manage-housekeeping";
         } catch (IllegalStateException e) {
             redirectAttributes.addFlashAttribute("errorMessage",  e.getMessage());
-            return "redirect:/admin/manage-housekeeping";
+            return "redirect:/staff/manage-housekeeping";
         }
     }
 

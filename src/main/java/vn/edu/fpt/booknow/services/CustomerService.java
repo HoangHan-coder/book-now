@@ -25,6 +25,17 @@ public class CustomerService {
 
     public boolean verify(Customer users, HttpServletResponse response) {
         System.out.println("Verify customer is running..");
+
+        Customer customer = customerRepository.getCustomerByEmail(users.getEmail());
+
+        if (customer == null) {
+            return false;
+        }
+
+        if (!customer.getStatus().equals("ACTIVE")) {
+            return false;
+        }
+
         try {
             Authentication authentication = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(users.getEmail(), users.getPasswordHash()));

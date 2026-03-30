@@ -40,7 +40,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             jwtCookie.setHttpOnly(true);     // JS không đọc được
             jwtCookie.setSecure(false);      // true nếu dùng HTTPS
             jwtCookie.setPath("/");
-            jwtCookie.setMaxAge(24 * 60 * 60);
+            jwtCookie.setMaxAge(60 * 60);
 
             response.addCookie(jwtCookie);
 

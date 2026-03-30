@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -77,8 +77,15 @@
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
 
-<div th:replace="fragments/sidebar :: admin-sidebar('feedback','admin')"></div>
-<script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
+<div sec:authorize="hasRole('ADMIN')">
+    <div th:replace="fragments/sidebar :: admin-sidebar('feedback','admin')"></div>
+    <script th:replace="fragments/sidebar :: sidebar-scripts('admin')"></script>
+</div>
+<div sec:authorize="hasRole('STAFF')">
+    <div th:replace="fragments/sidebar :: staff-sidebar('feedback','staff')"></div>
+    <script th:replace="fragments/sidebar :: sidebar-scripts('staff')"></script>
+</div>
+
 
 <!-- OVERLAY (for mobile) -->
 <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden glass-effect"></div>
@@ -98,7 +105,7 @@
   </div>
 
   <!-- FILTERS CARD -->
-  <form method="get" th:action="@{/admin/feedback}" id="filterForm">
+  <form method="get" th:action="@{/staff/feedback}" id="filterForm">
 
     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -234,7 +241,7 @@
           </td>
 
           <td class="py-4 px-6 text-right">
-            <a th:href="@{/admin/feedback/detail/{id}(id=${fb.feedbackId})}"
+            <a th:href="@{/staff/feedback/detail/{id}(id=${fb.feedbackId})}"
                class="inline-flex items-center gap-1
           bg-blue-600 hover:bg-blue-700
           text-white text-sm font-medium
@@ -265,7 +272,7 @@
 
         <!-- Previous -->
         <a th:if="${currentPage > 0}"
-           th:href="@{/admin/feedback(page=${currentPage - 1}, rating=${rating}, hidden=${hidden}, keyword=${keyword})}"
+           th:href="@{/staff/feedback(page=${currentPage - 1}, rating=${rating}, hidden=${hidden}, keyword=${keyword})}"
            class="px-3 py-1 border rounded">
           <i class="fa-solid fa-chevron-left"></i>
         </a>
@@ -280,7 +287,7 @@
 
         <!-- Next -->
         <a th:if="${currentPage < totalPages - 1}"
-           th:href="@{/admin/feedback(page=${currentPage+1}, rating=${rating}, hidden=${hidden}, keyword=${keyword})}"
+           th:href="@{/staff/feedback(page=${currentPage+1}, rating=${rating}, hidden=${hidden}, keyword=${keyword})}"
            class="px-3 py-1 border rounded">
           <i class="fa-solid fa-chevron-right"></i>
         </a>

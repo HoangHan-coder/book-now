@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@RequestMapping("/admin")
 public class CreateStaffAccountController {
 
     private final CreateStaffAccountService service;
@@ -17,9 +18,8 @@ public class CreateStaffAccountController {
         this.service = service;
     }
 
-
     // UC-17.X: Open Create Staff Account Page
-    @GetMapping("/admin/create_staff_account")
+    @GetMapping("/create_staff_account")
     public String showCreateForm(Model model) {
 
         model.addAttribute("staffDTO", new StaffAccountCreateDTO());
@@ -28,7 +28,7 @@ public class CreateStaffAccountController {
     }
 
     // UC-17.X: Submit Create Staff Account
-    @PostMapping("/admin/create_staff_account")
+    @PostMapping("/create_staff_account")
     public String createStaffAccount(
             @ModelAttribute("staffDTO") StaffAccountCreateDTO dto,
             RedirectAttributes redirectAttributes,
@@ -40,8 +40,7 @@ public class CreateStaffAccountController {
 
             redirectAttributes.addFlashAttribute(
                     "success",
-                    "Tạo tài khoản thành công!"
-            );
+                    "Tạo tài khoản thành công!");
 
             return "redirect:/admin/account_list";
 

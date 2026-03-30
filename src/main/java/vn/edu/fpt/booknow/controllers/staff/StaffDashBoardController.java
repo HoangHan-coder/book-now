@@ -29,9 +29,8 @@ public class StaffDashBoardController {
         String lastUpdate = LocalDateTime.now()
                 .format(DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy"));
 
-//        LocalDate date = LocalDate.now();
-        // Ngày muốn hiển thị dashboard (có thể là LocalDate.now())
-        LocalDate date = LocalDate.of(2026, 2, 3);
+        LocalDate date = LocalDate.now();
+//        LocalDate date = LocalDate.of(2026, 3, 30);
 
         // Gọi service duy nhất để lấy toàn bộ dữ liệu dashboard
         DashBoardStaffDTO dashboard = dashBoardStaffService.getDashboard(date);

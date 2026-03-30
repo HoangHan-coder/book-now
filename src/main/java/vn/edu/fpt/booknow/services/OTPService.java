@@ -42,10 +42,6 @@ public class OTPService {
         return saved ? otp : null;
     }
 
-    public String saveOtp(String email , String otp) {
-        boolean saved =  redisService.saveOtp(email, otp, OTP_TTL_MINUTES);;
-        return saved ? otp : null;
-    }
 
     public String getOtp(String email) {
         return redisService.getOtp(email);
@@ -138,10 +134,9 @@ public class OTPService {
     }
 
     public void sendOtp(String email) {
-        // Check if email exists (but don't reveal this to user for security)
+
         Optional<Customer> customerOpt = customerRepository.findCustomerByEmail(email);
-//        System.out.println(customerOpt);
-        // Always show success message even if email doesn't exist (security best practice)
+
         if (customerOpt.isPresent()) {
             // Generate and save OTP
             System.out.println("Email has exist " + this.hasOtp(email));

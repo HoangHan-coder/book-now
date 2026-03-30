@@ -46,14 +46,26 @@ public class BookingController {
         try {
             String email = token != null ? jwtService.extractUserName(token) : null;
             if (email == null) {
+                System.out.println("Email bị null ..............");
                 return "redirect:/auth/login";
             }
-
+            System.out.println("Email là : " + email);
             Customer customer = customerService.findCusByEmail(email);
+            if (customer == null) {
+                System.out.println("KHông tìm thấy customer");
+            }
 
+            assert customer != null;
+            System.out.println("customer là : " + customer.getFullName());
 
             PaginatedResponse<BookingDTO> paginatedBookings = bookingListService.bookingListWithPagination(page, email);
 
+            if (paginatedBookings == null) {
+                model.addAttribute("bookings", null);
+                return  "booking-history";
+            }
+
+            System.out.println("KHông ai có lỗi ................");
             model.addAttribute("fullName", customer.getFullName());
             model.addAttribute("bookings", paginatedBookings.getData());
             model.addAttribute("currentPage", paginatedBookings.getCurrentPage());

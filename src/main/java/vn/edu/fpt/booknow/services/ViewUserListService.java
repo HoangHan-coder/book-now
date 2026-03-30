@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.services.admin;
+package vn.edu.fpt.booknow.services;
 
 import vn.edu.fpt.booknow.model.dto.UserDTO;
 import vn.edu.fpt.booknow.model.entities.Customer;
@@ -35,15 +35,25 @@ public class ViewUserListService {
             keywordNormalized = TextUtils.removeAccent(keyword.trim());
         }
 
-        // STAFF
         List<StaffAccount> staffList =
-                staffAccountRepository.searchStaff(roleFilter, statusFilter, null); // ❌ bỏ keyword DB
+                staffAccountRepository.searchStaff(roleFilter, statusFilter, null);
+        List<Customer> customerList = new ArrayList<>();
 
+        if (roleFilter == null || roleFilter.equals("CUSTOMER")) {
+            customerList = customerRepository.searchCustomer(statusFilter, null);
+        }
+
+        // STAFF
         for (StaffAccount s : staffList) {
 
-            String nameNormalized = TextUtils.removeAccent(s.getFullName());
+            boolean matchKeyword = true;
 
-            if (keywordNormalized == null || nameNormalized.contains(keywordNormalized)) {
+            if (keywordNormalized != null) {
+                String nameNormalized = TextUtils.removeAccent(s.getFullName());
+                matchKeyword = nameNormalized.contains(keywordNormalized);
+            }
+
+            if (matchKeyword) {
                 result.add(new UserDTO(
                         s.getStaffAccountId(),
                         s.getFullName(),
@@ -55,14 +65,16 @@ public class ViewUserListService {
         }
 
         // CUSTOMER
-        List<Customer> customerList =
-                customerRepository.searchCustomer(statusFilter, null);
-
         for (Customer c : customerList) {
 
-            String nameNormalized = TextUtils.removeAccent(c.getFullName());
+            boolean matchKeyword = true;
 
-            if (keywordNormalized == null || nameNormalized.contains(keywordNormalized)) {
+            if (keywordNormalized != null) {
+                String nameNormalized = TextUtils.removeAccent(c.getFullName());
+                matchKeyword = nameNormalized.contains(keywordNormalized);
+            }
+
+            if (matchKeyword) {
                 result.add(new UserDTO(
                         c.getCustomerId(),
                         c.getFullName(),

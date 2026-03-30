@@ -1,4 +1,4 @@
-package vn.edu.fpt.booknow.services.admin;
+package vn.edu.fpt.booknow.services;
 
 import vn.edu.fpt.booknow.model.dto.FeedbackListDTO;
 import vn.edu.fpt.booknow.model.entities.Feedback;
@@ -19,27 +19,26 @@ public class ViewFeedbackListService {
         this.feedbackRepository = feedbackRepository;
     }
 
-
     public Page<FeedbackListDTO> getFeedbackList(Integer rating,
-                                                 Boolean hidden,
-                                                 String keyword,
-                                                 int page,
-                                                 int size) {
+            Boolean hidden,
+            String keyword,
+            int page,
+            int size) {
 
-        //Normalize keyword
+        // Normalize keyword
         final String keywordNormalized = (keyword == null || keyword.isBlank()) ? null : normalize(keyword.trim());
 
         Pageable pageable = PageRequest.of(page, size);
 
-        //BỎ keyword khỏi quer
-        Page<Feedback> feedbackPage =
-                feedbackRepository.filterFeedback(rating, hidden, pageable);
+        // BỎ keyword khỏi quer
+        Page<Feedback> feedbackPage = feedbackRepository.filterFeedback(rating, hidden, pageable);
 
-        //Filter lại bằng Java
+        // Filter lại bằng Java
         List<FeedbackListDTO> filteredList = feedbackPage.getContent().stream()
                 .filter(f -> {
 
-                    if (keywordNormalized == null) return true;
+                    if (keywordNormalized == null)
+                        return true;
 
                     String customerName = f.getBooking().getCustomer().getFullName();
                     String bookingCode = f.getBooking().getBookingCode();
@@ -60,20 +59,19 @@ public class ViewFeedbackListService {
                         f.getBooking().getCustomer().getFullName(),
                         f.getBooking().getRoom().getRoomNumber(),
                         f.getIsHidden(),
-                        f.getCreatedAt()
-                ))
+                        f.getCreatedAt()))
                 .toList();
 
-        //Convert lại Page
+        // Convert lại Page
         return new org.springframework.data.domain.PageImpl<>(
                 filteredList,
                 pageable,
-                filteredList.size()
-        );
+                filteredList.size());
     }
 
     private String normalize(String input) {
-        if (input == null) return null;
+        if (input == null)
+            return null;
 
         String noAccent = vn.edu.fpt.booknow.utils.TextUtils.removeAccent(input);
 

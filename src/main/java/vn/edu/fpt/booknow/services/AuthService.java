@@ -50,6 +50,6 @@ public class AuthService {
     }
 
     public String hashPassword(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt());
+        return BCrypt.hashpw(password, BCrypt.gensalt(12));
     }
 }

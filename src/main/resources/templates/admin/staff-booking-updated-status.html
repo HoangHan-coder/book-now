@@ -52,7 +52,8 @@
 <body class="bg-gray-50 font-sans text-gray-800">
 <input type="hidden" id="booking-status" class="hs" th:value="${booking.bookingStatus}">
 
-<div th:replace="~{fragments/sidebar :: staff-sidebar(activePage='bookings')}"></div>
+<div th:replace="~{fragments/sidebar :: admin-sidebar('bookings','staff')}"></div>
+<div th:replace="~{fragments/sidebar :: sidebar-scripts('staff')}"></div>
 <main class="lg:ml-64 min-h-screen pt-24 lg:pt-8 px-6 pb-10 transition-all duration-300">
 
     <div th:if="${successMessage}"
@@ -265,7 +266,7 @@
 
 
                     <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
-                        <form th:action="@{/admin/bookings/update-status}" method="post" class="w-full space-y-3">
+                        <form th:action="@{/staff/bookings/update-status}" method="post" class="w-full space-y-3">
 
                             <input type="hidden" name="bookingCode" th:value="${booking.bookingCode}">
                             <input type="hidden" name="status" value="REJECTED">
@@ -312,7 +313,7 @@
 
                         </form>
 
-                        <form th:action="@{/admin/bookings/update-status}" method="post">
+                        <form th:action="@{/staff/bookings/update-status}" method="post">
 
                             <input type="hidden" name="bookingCode" th:value="${booking.bookingCode}">
                             <input type="hidden" name="status" value="APPROVED">
@@ -453,9 +454,7 @@
                 </div>
             </div>
 
-            <!-- PANEL SUCCESS -->
-            <div id="panel_success"
-                 class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hidden">
+            <div id="panel_success" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hidden">
                 <div class="p-8 text-center">
 
                     <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-4xl mx-auto mb-4">
@@ -491,13 +490,13 @@
 
                     <!-- STAFF HOÀN TẤT BOOKING -->
                     <div class="mt-6 border-t pt-6 flex flex-col items-center gap-3"
-                         th:if="${booking.bookingStatus == 'CHECKED_OUT'}">
+                         th:if="${booking.bookingStatus.name() == 'CHECKED_OUT'}">
 
                         <p class="text-sm text-gray-500">
                             Khách chưa để lại feedback. Staff có thể hoàn tất booking thủ công.
                         </p>
 
-                        <form th:action="@{/admin/bookings/update-status}" method="post">
+                        <form th:action="@{/staff/bookings/update-status}" method="post">
                             <input type="hidden" name="bookingCode" th:value="${booking.bookingCode}">
                             <input type="hidden" name="status" value="COMPLETED">
 
@@ -562,7 +561,7 @@
         }, 1000);
     }
 </script>
-<script>
+<script th:inline="javascript">
     const panelIdentity = document.getElementById('panel_identity');
     const panelPayment = document.getElementById('panel_payment');
     const panelCheckin = document.getElementById('panel_checkin');
@@ -747,7 +746,7 @@
     mobileMenuBtn?.addEventListener('click', toggleSidebar);
     sidebarOverlay?.addEventListener('click', toggleSidebar);
 
-    const socket = new SockJS('http://localhost:8080/book-now/ws');
+    const socket = new SockJS(/*[[@{/ws}]]*/ 'http://localhost:8080/book-now/ws');
     const stompClient = Stomp.over(socket);
 
 
@@ -801,7 +800,8 @@
     }
 
     function approve() {
-        fetch("/book-now/checkin/approve", {
+        console.log("running....");
+        fetch(/*[[@{/checkin/approve}]]*/ "http://localhost:8080/book-now/checkin/approve", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -830,7 +830,7 @@
     }
 
     function reject(bookingId) {
-        fetch("/book-now/checkin/reject", {
+        fetch(/*[[@{/checkin/reject}]]*/ "http://localhost:8080/book-now/checkin/reject", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -861,7 +861,5 @@
 
     // Mobile Sidebar Toggle script moved to fragment
 </script>
-
-<div th:replace="~{fragments/sidebar :: sidebar-scripts}"></div>
 </body>
 </html>

@@ -2,6 +2,8 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/head :: head(title='Trang chủ - BookNow')}"></head>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=more_horiz"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <style>
 /* Định nghĩa độ rộng cố định cho mỗi cột phòng */
 .room-column {
@@ -125,11 +127,6 @@ table {
                             <li>
                                 <a th:href="@{/bookings/history}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
                                     <i class="fa-solid fa-clock-rotate-left mr-2 w-4"></i> Lịch sử đặt phòng
-                                </a>
-                            </li>
-                            <li>
-                                <a th:href="@{/user/customer-change-password}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
-                                    <i class="fa-solid fa-key mr-2 w-4"></i> Đổi mật khẩu
                                 </a>
                             </li>
                         </ul>
@@ -656,8 +653,8 @@ table {
         document.getElementById('formDate').value = selectedSlot.date;
         document.getElementById('formTimetableId').value = selectedSlot.slotId;
 
-        // 3. Cập nhật action URL: /book-now/detail/{roomId}
-        form.action = '/book-now/detail/' + selectedSlot.roomId;
+        // 3. Cập nhật action URL: /detail/{roomId}
+        form.action ="/book-now/detail/" + selectedSlot.roomId;
 
         // 4. Gửi form
         form.submit();

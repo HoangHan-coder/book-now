@@ -27,19 +27,22 @@ public class JWTFilter extends OncePerRequestFilter {
     @Autowired
     private ApplicationContext context;
 
-
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String requestPath = request.getRequestURI();
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        String requestPath = request.getServletPath();
 
         // Skip JWT validation for public endpoints
-        if (requestPath.contains("/auth/login") || requestPath.contains("/admin/login") ||
-                requestPath.contains("/register") || requestPath.contains("/public") ||
-                requestPath.contains("/auth/logout") ||
-                requestPath.contains("/pay") || requestPath.contains("/forgot-password")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+//        if (requestPath.startsWith("/auth/login") || requestPath.startsWith("/admin/login") ||
+//                requestPath.startsWith("/register") || requestPath.startsWith("/public") ||
+//                requestPath.startsWith("/auth/logout") ||
+//                requestPath.startsWith("/pay") || requestPath.startsWith("/forgot-password") ||
+//                requestPath.startsWith("/assets") || requestPath.startsWith("/home") ||
+//                requestPath.startsWith("/search") || requestPath.startsWith("/detail") ||
+//                requestPath.startsWith("/checkin") || requestPath.startsWith("/ws")) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
 
         Cookie[] cookies = request.getCookies();
         String authHeader = null;
@@ -54,7 +57,7 @@ public class JWTFilter extends OncePerRequestFilter {
         String username = null;
 
         // get token and username from header
-        if (authHeader != null){
+        if (authHeader != null) {
             token = authHeader;
             System.out.println("JWT TOKEN: " + token);
             try {
@@ -68,7 +71,7 @@ public class JWTFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
                 // get user from database through UserDetailsService
-                UserDetails userDetails =  context.getBean(CustomUserDetailsService.class).loadUserByUsername(username);
+                UserDetails userDetails = context.getBean(CustomUserDetailsService.class).loadUserByUsername(username);
                 // validate token
                 if (userDetails != null && jwtService.validateToken(token, userDetails)) {
                     setAuthentication(userDetails, request);
@@ -81,7 +84,7 @@ public class JWTFilter extends OncePerRequestFilter {
                 System.err.println("JWT Filter error: " + e.getMessage());
             }
         }
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 
     public void setAuthentication(UserDetails userDetails, HttpServletRequest request) {

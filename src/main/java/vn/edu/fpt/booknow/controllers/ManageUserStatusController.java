@@ -3,7 +3,7 @@ package vn.edu.fpt.booknow.controllers;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import vn.edu.fpt.booknow.services.admin.ManageUserStatusService;
+import vn.edu.fpt.booknow.services.ManageUserStatusService;
 
 @Controller
 @RequestMapping("/admin/users")

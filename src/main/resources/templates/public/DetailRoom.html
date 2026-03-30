@@ -23,8 +23,7 @@
 <div th:each="room : ${roomDetail}" class="max-w-7xl mx-auto px-4 md:px-8 pt-32 pb-12">
 
     <nav class="flex mb-6 text-sm text-gray-500 pl-2">
-        <a href="/" class="hover:text-blue-600">Trang chủ</a>
-        <span class="mx-2">/</span>
+
         <span class="text-gray-800 font-medium">Chi tiết phòng</span>
     </nav>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -699,7 +698,6 @@
         if (typeof selectedSlots !== 'undefined') selectedSlots.clear();
         if (typeof selectedSlotsMap !== 'undefined') selectedSlotsMap.clear();
     }
-
     // Lắng nghe sự kiện: Nếu người dùng động vào Dropdown thì xóa bảng
     document.addEventListener('DOMContentLoaded', function () {
         const dropdownIds = ['select-date-in', 'select-slot-in', 'select-date-out', 'select-slot-out'];
@@ -779,27 +777,22 @@
 
 
     function previewImage(input, previewId) {
-        const previewContainer = document.getElementById(previewId);
-
         if (input.files && input.files[0]) {
             const reader = new FileReader();
+            reader.onload = function(e) {
+                const container = document.getElementById(previewId);
+                const imageData = e.target.result;
 
-            reader.onload = function (e) {
-                // Thay thế toàn bộ nội dung bên trong div bằng thẻ img
-                previewContainer.innerHTML = `
-                <img src="${e.target.result}"
-                     class="absolute inset-0 w-full h-full object-cover p-1 rounded-lg"
-                     alt="CCCD Preview">
-                <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span class="text-white text-xs font-bold bg-blue-600/80 px-2 py-1 rounded">Thay đổi</span>
-                </div>
-            `;
+                // 1. Hiển thị ảnh ngay lập tức
+                container.innerHTML = `<img src="${imageData}" class="w-full h-full object-cover rounded-lg">`;
+
+                // 2. Lưu vào sessionStorage để "sống sót" khi nhấn Back
+                // previewId thường là 'preview_front_content' hoặc 'preview_back_content'
+                sessionStorage.setItem(previewId, imageData);
             };
-
             reader.readAsDataURL(input.files[0]);
         }
     }
-
     window.onload = function () {
         /* Thymeleaf thay thế giá trị vào đây */
         const message = /*[[${toastMessage}]]*/ null;
@@ -876,10 +869,39 @@
             showToast("Vui lòng tải lên cả hai mặt CCCD!", "error");
             return false;
         }
-
+        sessionStorage.removeItem('preview_front_content');
+        sessionStorage.removeItem('preview_back_content');
         return true;
     }
+    window.addEventListener('pageshow', function(event) {
+        // 1. Xóa toàn bộ dữ liệu ảnh đã lưu trong session (nếu trước đó bạn có lưu)
+        sessionStorage.removeItem('preview_front_content');
+        sessionStorage.removeItem('preview_back_content');
 
+        // 2. Reset nội dung hiển thị của các khung preview về trạng thái ban đầu (icon + chữ)
+        const previewFront = document.getElementById('preview_front_content');
+        const previewBack = document.getElementById('preview_back_content');
+
+        if (previewFront) {
+            previewFront.innerHTML = `
+            <i class="fa-solid fa-id-card text-2xl text-gray-400 group-hover:text-blue-500"></i>
+            <p class="text-[10px] text-gray-500 mt-1">Mặt trước CCCD</p>
+        `;
+        }
+
+        if (previewBack) {
+            previewBack.innerHTML = `
+            <i class="fa-solid fa-id-card text-2xl text-gray-400 group-hover:text-blue-500"></i>
+            <p class="text-[10px] text-gray-500 mt-1">Mặt sau CCCD</p>
+        `;
+        }
+
+        // 3. Reset luôn giá trị trong các thẻ input file (để đảm bảo đồng bộ)
+        const inputFront = document.getElementById('cccd_front');
+        const inputBack = document.getElementById('cccd_back');
+        if (inputFront) inputFront.value = "";
+        if (inputBack) inputBack.value = "";
+    });
     document.addEventListener('DOMContentLoaded', () => {
         // 1. Lấy tham số từ URL
         const urlParams = new URLSearchParams(window.location.search);

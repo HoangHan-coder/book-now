@@ -14,7 +14,7 @@ import vn.edu.fpt.booknow.services.BookingListService;
 import java.time.LocalDate;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/staff")
 public class StaBookingListController {
 
     private final BookingListService bookingListService;

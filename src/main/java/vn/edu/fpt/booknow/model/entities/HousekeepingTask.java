@@ -102,12 +102,12 @@ public class HousekeepingTask {
         return createdAt.toLocalTime();
     }
 
-    public LocalDate dateStart(){
-        return startedAt.toLocalDate();
+    public String dateStart() {
+        return startedAt != null ? startedAt.toLocalDate().toString() : "";
     }
 
-    public LocalTime timeStart(){
-        return startedAt.toLocalTime();
+    public String timeStart() {
+        return startedAt != null ? startedAt.toLocalTime().toString() : "";
     }
 
     public LocalTime completedTime(){

@@ -6,6 +6,7 @@ import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +18,7 @@ import vn.edu.fpt.booknow.repositories.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -52,6 +54,7 @@ public class BookingService {
     
     private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
 
+    @Autowired
     public BookingService(BookingRepository bookingRepository,
                           TimeTableRepository timeTableRepository,
                           RoomRepository roomRepository,
@@ -306,44 +309,49 @@ public class BookingService {
 
     @Transactional
     public String completeOfflineCheckin(Booking bookingData, MultipartFile frontImg, MultipartFile backImg, RedirectAttributes redirectAttributes) {
-        Booking existingBooking = bookingRepository.findById(bookingData.getBookingId())
-                .orElseThrow(() -> new RuntimeException("Booking không tồn tại"));
-        if (BookingStatus.CANCELED.equals(bookingData.getBookingStatus())) {
+        try {
+            Booking existingBooking = bookingRepository.findById(bookingData.getBookingId())
+                    .orElseThrow(() -> new RuntimeException("Booking không tồn tại"));
+            if (isRateLimited(bookingData.getBookingCode())) {
+                redirectAttributes.addFlashAttribute("toastMessage", "Thao tác quá nhanh vui lòng tải lại trang!!!");
+                redirectAttributes.addFlashAttribute("toastType", "error");
+                return "redirect:/staff/offline-checkin?searchTerm=" + bookingData.getBookingCode();
+            }
+            if (frontImg != null && !frontImg.isEmpty()) {
+                try {
+                    Map<String, String> imageData = uploadToCloudinary(frontImg);
+                    existingBooking.setIdCardFrontUrl(imageData.get("url"));
+                    existingBooking.setIdCardFontPublicId(imageData.get("public_id"));
+                } catch (IOException e) {
+                    return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt trước!", bookingData.getBookingId());
+                }
+            }
+            if (backImg != null && !backImg.isEmpty()) {
+                try {
+                    Map<String, String> imageData = uploadToCloudinary(backImg);
+                    existingBooking.setIdCardBackUrl(imageData.get("url"));
+                    existingBooking.setIdCardBackPublicId(imageData.get("public_id"));
+                } catch (IOException e) {
+                    return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt sau!", bookingData.getBookingId());
+                }
+            }
+            if (BookingStatus.REJECTED_CHECKIN.equals(existingBooking.getBookingStatus()) || BookingStatus.APPROVED.equals(existingBooking.getBookingStatus())) {
+                existingBooking.setNote(bookingData.getNote());
+                existingBooking.setBookingStatus(BookingStatus.CHECKED_IN);
+                existingBooking.setUpdatedAt(LocalDateTime.now());
+                bookingRepository.save(existingBooking);
+                redirectAttributes.addFlashAttribute("toastMessage", "Check-in thành công!");
+                redirectAttributes.addFlashAttribute("toastType", "success");
+                return "redirect:/staff/offline-checkin?searchTerm=" + bookingData.getBookingCode();
+            }
             redirectAttributes.addFlashAttribute("toastMessage", "Lỗi đơn đã hủy!");
             redirectAttributes.addFlashAttribute("toastType", "error");
-            return "redirect:/offline-checkin";
-
+            return "redirect:/staff/offline-checkin?searchTerm=" + bookingData.getBookingCode();
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return "redirect:/staff/offline-checkin?searchTerm=" + bookingData.getBookingCode();
         }
-        existingBooking.setNote(bookingData.getNote());
-        existingBooking.setBookingStatus(BookingStatus.CHECKED_IN);
-        existingBooking.setUpdatedAt(LocalDateTime.now());
-
-        if (frontImg != null && !frontImg.isEmpty()) {
-            try {
-                Map<String, String> imageData = uploadToCloudinary(frontImg);
-                existingBooking.setIdCardFrontUrl(imageData.get("url"));
-                existingBooking.setIdCardFontPublicId(imageData.get("public_id"));
-            } catch (IOException e) {
-                return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt trước!", bookingData.getBookingId());
-            }
-        }
-
-        if (backImg != null && !backImg.isEmpty()) {
-            try {
-                Map<String, String> imageData = uploadToCloudinary(backImg);
-                existingBooking.setIdCardBackUrl(imageData.get("url"));
-                existingBooking.setIdCardBackPublicId(imageData.get("public_id"));
-            } catch (IOException e) {
-                return setErrorMessage(redirectAttributes, "Lỗi upload ảnh mặt sau!", bookingData.getBookingId());
-            }
-        }
-
-        bookingRepository.save(existingBooking);
-
-        redirectAttributes.addFlashAttribute("toastMessage", "Check-in thành công!");
-        redirectAttributes.addFlashAttribute("toastType", "success");
-
-        return "redirect:/offline-checkin";
     }
 
     @Transactional
@@ -425,6 +433,7 @@ public class BookingService {
            System.out.println(" - CHECK-OUT: " + checkOutDate);
            System.out.println(" - Tổng tiền: " + calculateTotalAmount(allShifts, bookingDTO.getRoom().getRoomId()));
            System.out.println("====================================");
+
            Booking savedBooking = bookingRepository.save(newBooking);
 
            for (WorkShift shift : allShifts) {
@@ -468,15 +477,18 @@ public class BookingService {
         return total;
     }
     public String generateUniqueBookingCode() {
+        SecureRandom random = new SecureRandom();
         String newCode;
-        Booking isExisted = new Booking();
 
         do {
-            newCode = "BK" + System.currentTimeMillis();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 13; i++) {
+                sb.append(random.nextInt(10));
+            }
 
-            isExisted = bookingRepository.getByBookingCode(newCode);
+            newCode = "BK" + sb.toString();
 
-        } while (isExisted != null);
+        } while (bookingRepository.getByBookingCode(newCode) != null);
 
         return newCode;
     }
@@ -582,12 +594,12 @@ public class BookingService {
     @Transactional
     @Scheduled(fixedRate = 60000)
     public void cancelExpiredPendingPayments() {
-        LocalDateTime timeLimit = LocalDateTime.now().minusMinutes(15);
+        LocalDateTime timeLimit = LocalDateTime.now().minusMinutes(1);
         List<Booking> bookings = bookingRepository.findExpiredPendingBookings(timeLimit);
         for (Booking b : bookings) {
             try {
                 b.setBookingStatus(BookingStatus.FAILED);
-                b.setNote("Hệ thống tự động hủy do quá hạn thanh toán 15 phút.");
+                b.setNote("Hệ thống tự động hủy do quá hạn thanh toán 1 phút.");
                 b.setUpdatedAt(LocalDateTime.now());
 
                 bookingRepository.save(b);
