@@ -433,6 +433,7 @@ public class BookingService {
            System.out.println(" - CHECK-OUT: " + checkOutDate);
            System.out.println(" - Tổng tiền: " + calculateTotalAmount(allShifts, bookingDTO.getRoom().getRoomId()));
            System.out.println("====================================");
+
            Booking savedBooking = bookingRepository.save(newBooking);
 
            for (WorkShift shift : allShifts) {

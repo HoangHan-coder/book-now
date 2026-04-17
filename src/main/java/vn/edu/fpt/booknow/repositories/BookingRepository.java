@@ -1,6 +1,8 @@
 package vn.edu.fpt.booknow.repositories;
 
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import vn.edu.fpt.booknow.model.entities.Booking;
@@ -138,4 +140,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
         @Query("SELECT b FROM Booking b WHERE b.bookingStatus = 'PENDING_PAYMENT' AND b.createdAt < :timeLimit")
         List<Booking> findExpiredPendingBookings(@Param("timeLimit") LocalDateTime timeLimit);
+
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT b FROM Booking b WHERE b.room.roomId = :roomId")
+    List<Booking> lockByRoomId(@Param("roomId") Long roomId);
 }
