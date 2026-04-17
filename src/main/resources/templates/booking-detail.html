@@ -225,6 +225,17 @@
 
                     </div>
 
+                    <!-- Textarea Ghi chú đã được chỉnh sửa (thêm class w-full và CSS trang trí) -->
+                    <div class="mt-5">
+                        <label for="note" class="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+                            <i class="fa-regular fa-clipboard mr-2"></i>Ghi chú:
+                        </label>
+                        <textarea class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y min-h-[100px]"
+                                  id="note"
+                                  readonly
+                                  th:text="${booking.note}"></textarea>
+                    </div>
+
                 </div>
             </div>
 

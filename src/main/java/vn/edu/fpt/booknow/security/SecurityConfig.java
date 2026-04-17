@@ -70,7 +70,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/staff/**").hasAnyRole("ADMIN", "STAFF")
                         .requestMatchers("/housekeeping/**", "/payments/**").hasRole("HOUSEKEEPING")
-                        .anyRequest().authenticated())
+                        .anyRequest().hasRole("ADMIN"))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
